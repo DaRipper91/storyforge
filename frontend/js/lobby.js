@@ -87,7 +87,7 @@ export class Lobby {
     if (this.state.phase === "lobby" || this.state.phase === "creation") {
       // A = claim slot (if no slot held) or confirm in creation
       if (button === 0) {  // A
-        this._handleAButton(controllerId);
+        this._handleConfirm(controllerId);
       } else if (button === 1) {  // B
         this._handleBButton(controllerId);
       } else if (button === 4 || button === 5) {  // LB/RB
@@ -97,47 +97,75 @@ export class Lobby {
       }
     }
   }
-  
+
   handleControllerDpad({ controllerId, dx, dy }) {
     if (this.state.phase !== "creation") return;
     if (controllerId !== this._activeControllerId) return;
     this._moveFocus(dx, dy);
   }
-  
+
   handleKeyboard(e) {
     if (this.state.phase === "lobby") {
       if (e.key === "Enter") this.handleStartGame();
+      // Allow keyboard player to join with 'A' (mapped to Space or A)
+      if (e.key.toLowerCase() === "a" || e.key === " ") {
+        this._handleAButton("keyboard");
+      }
       return;
     }
     if (this.state.phase !== "creation") return;
-    
+
     if (e.key === "ArrowLeft")  this._moveFocus(-1, 0);
     if (e.key === "ArrowRight") this._moveFocus(+1, 0);
     if (e.key === "ArrowUp")    this._moveFocus(0, -1);
     if (e.key === "ArrowDown")  this._moveFocus(0, +1);
-    if (e.key === "Enter")      this.handleNext();
+    if (e.key === "Enter")      this._handleConfirm(this._activeControllerId || "keyboard");
     if (e.key === "Escape")     this.handleBack();
     if (e.key === "Tab") {
       e.preventDefault();
       this._cycleActiveDraft(e.shiftKey ? -1 : +1);
     }
   }
-  
+
   // ─────────────────────── Slot claim / release ───────────────────────
-  
-  async _handleAButton(controllerId) {
-    // Already in creation? Treat A as "confirm/next".
-    if (this._drafts.has(controllerId) && this.state.phase === "creation") {
-      if (controllerId === this._activeControllerId) {
-        await this.handleNext();
-      } else {
-        // Take focus.
-        this._activeControllerId = controllerId;
-        this._renderCreation();
-        this.audio?.playCursor();
-      }
-      return;
+
+  async _handleConfirm(controllerId) {
+    // If not in creation, just try to claim.
+    if (this.state.phase !== "creation") {
+      return this._handleAButton(controllerId);
     }
+
+    const draft = this._drafts.get(controllerId);
+    if (!draft) return this._handleAButton(controllerId);
+
+    // If this is the active draft, use Enter/A to select or advance.
+    if (controllerId === this._activeControllerId) {
+      if (draft.step === "race") {
+        const keys = Object.keys(this.catalog.races);
+        draft.race = keys[this._focusIndex];
+      } else if (draft.step === "state") {
+        const keys = Object.keys(this.catalog.states);
+        draft.evolutionState = keys[this._focusIndex];
+      } else if (draft.step === "role") {
+        const keys = Object.keys(this.catalog.roles);
+        draft.predatorRole = keys[this._focusIndex];
+      }
+      // "abilities" and "name" use their own internal focus/enter logic,
+      // but we still want Enter to advance once they are valid.
+
+      await this.handleNext();
+    } else {
+      // Take focus.
+      this._activeControllerId = controllerId;
+      this._renderCreation();
+      this.audio?.playCursor();
+    }
+  }
+
+  async _handleAButton(controllerId) {
+    // If already has a draft, we don't need to do anything here anymore
+    // as _handleConfirm handles the creation-phase logic.
+    if (this._drafts.has(controllerId)) return;
     
     // Brand-new claim.
     try {
@@ -208,7 +236,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
     
-    const order = ["race", "class", "abilities", "name"];
+    const order = ["race", "state", "role", "abilities", "name"];
     const idx = order.indexOf(draft.step);
     
     // Validate current step before advancing.
@@ -233,7 +261,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
     
-    const order = ["race", "class", "abilities", "name"];
+    const order = ["race", "state", "role", "abilities", "name"];
     const idx = order.indexOf(draft.step);
     if (idx === 0) return;  // Can't go back from first step
     
@@ -249,7 +277,8 @@ export class Lobby {
         slotIndex: draft.slotIndex,
         name: draft.name.trim(),
         race: draft.race,
-        charClass: draft.charClass,
+        evolution_state: draft.evolutionState,
+        predator_role: draft.predatorRole,
         abilities: draft.abilities,
       });
       this.audio?.playConfirm();
