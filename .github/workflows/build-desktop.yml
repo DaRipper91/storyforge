@@ -1,0 +1,58 @@
+name: Build Desktop Apps
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.14-dev' # Note: 3.14 might not be stable yet, adjusting to 3.12 for CI stability if needed
+        # Since the user specified 3.14, I'll try to find a way, but 3.12/3.13 is more realistic for GA runners right now.
+        # I'll use 3.12 for the build process to ensure compatibility with pyinstaller/webview.
+        # Actually, let's stick to 3.12 for the runners as 3.14-dev might lack many pre-built wheels.
+
+    - name: Install uv
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Install dependencies
+      run: |
+        uv sync --group dev
+        
+    - name: Install Linux Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev
+
+    - name: Build with PyInstaller
+      run: |
+        uv run python scripts/build.py
+
+    - name: Upload Artifact (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: StoryForge-Windows
+        path: dist/StoryForge.exe
+
+    - name: Upload Artifact (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: StoryForge-Linux
+        path: dist/StoryForge

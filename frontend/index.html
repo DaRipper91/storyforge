@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-paper="vellum" data-ink="midnight">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryForge</title>
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
+  <script src="https://unpkg.com/konva@9.3.16/konva.min.js"></script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="stylesheet" href="/static/css/parchment.css" />
+  <link rel="stylesheet" href="/static/css/ink-effects.css" />
+  <link rel="stylesheet" href="/static/css/lobby.css" />
+  <link rel="stylesheet" href="/static/css/flames.css" />
+  <link rel="stylesheet" href="/static/css/cinematic.css" />
+  <style>
+    /* New App Menu styles */
+    .app-menu {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .menu-btn {
+      background: var(--ink-midnight);
+      color: #f4ead4;
+      border: 2px solid var(--ink-gilded);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .menu-btn:hover {
+      background: var(--ink-burgundy);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body data-phase="lobby">
+  <div class="scanlines"></div>
+  <div class="film-grain"></div>
+
+  <!-- New App Menu -->
+  <nav class="app-menu">
+    <button class="menu-btn" onclick="location.reload()">Reload</button>
+    <button class="menu-btn" onclick="document.body.requestFullscreen()">Fullscreen</button>
+  </nav>
+
+  <!-- ─────── LOBBY VIEW ─────── -->
+  <section id="lobby-view" class="phase-view parchment-surface">
+    <h1 class="lobby-title ink-gilded">StoryForge</h1>
+    <p class="lobby-subtitle">Click a slot or press <kbd>A</kbd> / <kbd>1-4</kbd> to join the table</p>
+    
+    <div id="lobby-slots" class="lobby-slot-grid">
+      <!-- Populated by lobby.js -->
+    </div>
+    
+    <div class="lobby-actions">
+      <button id="start-game-btn" class="btn btn-primary" disabled>
+        Begin Adventure
+      </button>
+      <p class="lobby-hint">
+        At least one character must be ready. Click "Begin" or press <kbd>Start</kbd> / <kbd>Enter</kbd>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────── CREATION VIEW ─────── -->
+  <section id="creation-view" class="phase-view parchment-surface">
+    <h1 class="creation-title ink-gilded">Forge Your Hero</h1>
+    
+    <div class="creation-steps">
+      <div class="step-pill" data-step="race">1. Race</div>
+      <div class="step-pill" data-step="state">2. State</div>
+      <div class="step-pill" data-step="role">3. Role</div>
+      <div class="step-pill" data-step="abilities">4. Abilities</div>
+      <div class="step-pill" data-step="name">5. Name</div>
+    </div>
+    
+    <div id="creation-stage" class="creation-stage">
+      <!-- Active step's content rendered here by lobby.js -->
+    </div>
+    
+    <div class="creation-controls">
+      <button id="creation-back" class="btn">Back <kbd>Esc</kbd></button>
+      <span id="creation-slot-label" class="creation-slot-label">Slot —</span>
+      <button id="creation-next" class="btn btn-primary">Next <kbd>Enter</kbd></button>
+    </div>
+  </section>
+
+  <!-- ─────── GAME VIEW (existing) ─────── -->
+  <div id="game-view">
+    <header id="party-bar" class="party-bar parchment-strip">
+      <div class="portrait-row" id="portrait-row"></div>
+      <div class="status-cluster">
+        <span id="kbd-indicator" class="indicator">⌨ <span>KBD</span></span>
+        <span id="gamepad-indicator" class="indicator">
+          🎮 <span id="gp-slot-0">·</span><span id="gp-slot-1">·</span><span id="gp-slot-2">·</span><span id="gp-slot-3">·</span>
+        </span>
+      </div>
+    </header>
+
+    <main id="stage">
+      <section id="canvas-pane" class="parchment-surface">
+        <div id="initiative-tracker" class="hidden">
+          <div class="init-label">TURN ORDER</div>
+          <div class="init-slots"></div>
+        </div>
+        <div id="konva-mount"></div>
+      </section>
+      <aside id="log-pane" class="parchment-surface ink-midnight">
+        <h2 class="log-title">Chronicle</h2>
+        <ol id="narrative-log" class="narrative-log"></ol>
+      </aside>
+      <aside id="inventory-pane" class="parchment-surface hidden">
+        <h2 class="log-title ink-crimson">Stolen Goods</h2>
+        <ul id="inventory-list" class="inventory-list"></ul>
+      </aside>
+    </main>
+
+    <footer id="action-bar" class="action-bar parchment-strip">
+      <div id="active-summary" class="active-summary">
+        <span class="label">Active:</span>
+        <span id="active-name" class="active-name ink-gilded">—</span>
+        <span id="active-state" class="active-class">—</span>
+        <span id="active-role" class="active-class">—</span>
+        <span class="stat">HP <span id="active-hp">—</span></span>
+        <span class="stat">AC <span id="active-ac">—</span></span>
+        <span class="stat">MOVE <span id="active-move">—</span></span>
+        <span class="stat">POS <span id="active-pos">—</span></span>
+        <span id="active-silver" class="stat">—</span>
+        </div>
+        <div class="hints">
+        <span class="hint"><kbd>K</kbd> Keymap</span>
+        <span class="hint"><kbd>A</kbd>/<kbd>F</kbd> Move</span>
+        <span class="hint"><kbd>X</kbd>/<kbd>I</kbd> Inspect</span>
+        <span class="hint"><kbd>Y</kbd>/<kbd>T</kbd> Speak</span>
+        <span class="hint"><kbd>B</kbd>/<kbd>Tab</kbd> Cycle</span>
+        <span class="hint"><kbd>LT</kbd>/<kbd>V</kbd> Inventory</span>
+        </div>
+        </footer>
+  </div>
+
+  <!-- ─────── FREEFORM MODAL (unchanged) ─────── -->
+  <div id="freeform-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface">
+      <h2 class="ink-crimson">Speak Your Action</h2>
+      <p class="hint-small">Press <kbd>Esc</kbd> or <kbd>B</kbd> to cancel · <kbd>Enter</kbd> to commit</p>
+      <textarea id="freeform-input" rows="4" maxlength="500"
+                placeholder="I creep along the shadowed wall toward the bard..."></textarea>
+      <div class="modal-actions">
+        <button id="freeform-cancel" class="btn">Cancel</button>
+        <button id="freeform-commit" class="btn btn-primary">Commit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── KEYMAP MODAL ─────── -->
+  <div id="keymap-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface flame-glow">
+      <h2 class="ink-crimson">Controls Map</h2>
+      <div class="keymap-content">
+        <div class="keymap-section">
+          <h3>Movement & Interaction</h3>
+          <ul>
+            <li><kbd>WASD</kbd> or <kbd>Arrows</kbd> — Move Cursor / Navigate</li>
+            <li><kbd>Enter</kbd> or <kbd>F</kbd> — Confirm / Interact</li>
+            <li><kbd>X</kbd> or <kbd>I</kbd> — Inspect Cell / Item</li>
+            <li><kbd>T</kbd> or <kbd>/</kbd> — Speak (Freeform Action)</li>
+            <li><kbd>V</kbd> — Toggle Inventory</li>
+            <li><kbd>Tab</kbd> — Cycle Active Character</li>
+            <li><kbd>1-4</kbd> — Select Character directly</li>
+          </ul>
+        </div>
+        <div class="keymap-section">
+          <h3>System</h3>
+          <ul>
+            <li><kbd>K</kbd> or <kbd>?</kbd> — Toggle this Map</li>
+            <li><kbd>Esc</kbd> — Close Modals / Menus</li>
+            <li><kbd>R</kbd> — Reload Page</li>
+          </ul>
+        </div>
+      </div>
+      <button class="menu-btn" onclick="document.getElementById('keymap-modal').classList.add('hidden')" style="margin-top: 1rem; width: 100%;">Close</button>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>

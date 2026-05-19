@@ -1,0 +1,71 @@
+/* 
+   Flame Glow Effects
+   Used for highlighting selected/focused UI elements with a flickering fire effect.
+*/
+
+@keyframes flame-flicker {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(255, 69, 0, 0.6),
+      0 -2px 20px rgba(255, 140, 0, 0.5),
+      0 -4px 25px rgba(255, 215, 0, 0.4);
+    transform: scale(1.0);
+  }
+  33% {
+    box-shadow: 
+      0 0 18px rgba(255, 69, 0, 0.7),
+      0 -4px 25px rgba(255, 140, 0, 0.6),
+      0 -6px 30px rgba(255, 215, 0, 0.5);
+    transform: scale(1.01) translateY(-2px);
+  }
+  66% {
+    box-shadow: 
+      0 0 12px rgba(255, 69, 0, 0.5),
+      0 -1px 18px rgba(255, 140, 0, 0.4),
+      0 -3px 22px rgba(255, 215, 0, 0.3);
+    transform: scale(0.99) translateY(1px);
+  }
+}
+
+/* Base class for flame glow */
+.flame-glow {
+  animation: flame-flicker 0.6s infinite ease-in-out;
+  border-color: #ff4500 !important;
+  z-index: 10;
+}
+
+/* Apply to focused and selected elements across the UI */
+.option-card.focused,
+.option-card.selected,
+.lobby-slot[data-status="claimed"],
+.lobby-slot[data-status="creating"],
+.ability-row.focused,
+.ability-chip.selected-flame,
+.portrait.active,
+.btn:focus,
+.btn-primary:not(:disabled) {
+  animation: flame-flicker 0.5s infinite ease-in-out;
+  border-color: #ff4500 !important;
+  background: linear-gradient(to top, rgba(255, 69, 0, 0.3), rgba(255, 140, 0, 0.1), rgba(255, 215, 0, 0.05)) !important;
+  box-shadow: 
+    0 0 20px rgba(255, 69, 0, 0.4),
+    inset 0 0 15px rgba(255, 140, 0, 0.2) !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+/* Specific override for lobby slots to make them feel "hot" */
+.lobby-slot[data-status="claimed"] {
+  background: rgba(255, 100, 0, 0.1) !important;
+}
+
+.lobby-slot[data-status="creating"] {
+  background: rgba(255, 50, 0, 0.15) !important;
+}
+
+/* Ability chips that are selected */
+.ability-chip.selected-flame {
+  animation: flame-flicker 0.4s infinite ease-in-out;
+  background: #ff8c00 !important;
+  color: white !important;
+}

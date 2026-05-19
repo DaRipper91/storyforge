@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+build/
+dist/
+*.spec
+
+# Env
+.env
+.env.*
+
+# Data (Personal / Campaign state)
+data/campaigns/*
+!data/campaigns/.keep
+
+# OS
+.DS_Store
+Thumbs.db

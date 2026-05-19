@@ -1,0 +1,66 @@
+name: Package Linux Apps
+
+on:
+  workflow_run:
+    workflows: ["Build Desktop Apps"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Linux Binary
+      uses: actions/download-artifact@v4
+      with:
+        name: StoryForge-Linux
+        path: dist/
+
+    - name: Set Version
+      run: echo "VERSION=0.1.0" >> $GITHUB_ENV
+
+    - name: Install nFPM
+      run: |
+        echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
+        sudo apt-get update
+        sudo apt-get install nfpm
+
+    - name: Build .deb
+      run: nfpm package --config nfpm.yaml --target . --packager deb
+
+    - name: Build .rpm
+      run: nfpm package --config nfpm.yaml --target . --packager rpm
+
+    - name: Build Arch Linux (.pkg.tar.zst)
+      run: nfpm package --config nfpm.yaml --target . --packager archlinux
+
+    - name: Build AppImage
+      run: |
+        # Very simplified AppImage build
+        curl -LO https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
+        mkdir -p StoryForge.AppDir/usr/bin
+        cp dist/StoryForge StoryForge.AppDir/usr/bin/storyforge
+        cp frontend/icon.svg StoryForge.AppDir/storyforge.svg
+        cat > StoryForge.AppDir/storyforge.desktop <<EOF
+        [Desktop Entry]
+        Type=Application
+        Name=StoryForge
+        Exec=storyforge
+        Icon=storyforge
+        Categories=Game;
+        EOF
+        ARCH=x86_64 ./appimagetool-x86_64.AppImage StoryForge.AppDir StoryForge-x86_64.AppImage
+
+    - name: Upload Linux Packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: StoryForge-Linux-Packages
+        path: |
+          *.deb
+          *.rpm
+          *.pkg.tar.zst
+          *.AppImage
