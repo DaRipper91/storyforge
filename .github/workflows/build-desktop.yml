@@ -24,16 +24,14 @@ jobs:
         python-version: '3.12'
 
     - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-    - name: Add uv to PATH (Windows)
-      if: matrix.os == 'windows-latest'
-      run: echo "$HOME\.local\bin" >> $GITHUB_PATH
-      shell: bash
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        version: "latest"
 
     - name: Install dependencies
       run: |
-        uv sync --group dev
+        uv sync --group dev --python 3.12
         
     - name: Install Linux Dependencies
       if: matrix.os == 'ubuntu-latest'
@@ -43,7 +41,7 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        uv run python scripts/build.py
+        uv run --python 3.12 python scripts/build.py
 
     - name: Upload Artifact (Windows)
       if: matrix.os == 'windows-latest'
