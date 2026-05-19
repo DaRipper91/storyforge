@@ -1,0 +1,98 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Ink Effects
+   Used for character names, magical items, ability flourishes.
+   All effects use background-clip:text so they remain text (a11y +
+   selectable in modal). The "gilded" and "glitter" effects animate.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Solid inks ─── */
+.ink-midnight { color: var(--ink-midnight); }
+.ink-burgundy { color: var(--ink-burgundy); }
+.ink-emerald  { color: var(--ink-emerald); }
+.ink-crimson  { color: var(--ink-crimson); }
+.ink-violet   { color: var(--ink-violet); }
+
+/* ─── Gilded: gold gradient, gentle shimmer ─── */
+.ink-gilded {
+  background: linear-gradient(
+    100deg,
+    #8a6918 0%,
+    #c9a14a 25%,
+    #f5d97a 50%,
+    #c9a14a 75%,
+    #8a6918 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  animation: gilded-shimmer 6s ease-in-out infinite;
+  text-shadow: 0 0 1px rgba(201, 161, 74, 0.25);
+}
+
+@keyframes gilded-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ─── Arcane: violet → cyan, slow drift, for spells/wizards ─── */
+.ink-arcane {
+  background: linear-gradient(
+    100deg,
+    #4a1a6b 0%,
+    #7a3cb8 30%,
+    #3cc9d4 60%,
+    #7a3cb8 80%,
+    #4a1a6b 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  animation: arcane-drift 9s linear infinite;
+}
+
+@keyframes arcane-drift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ─── Glitter: rapid hue shimmer, for magical items / crits ─── */
+.ink-glitter {
+  background: linear-gradient(
+    90deg,
+    #f5d97a, #ffffff, #b78cff, #ffffff, #f5d97a
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  animation: glitter-pulse 2.5s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 220, 130, 0.45));
+}
+
+@keyframes glitter-pulse {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ─── Bloodied: throbbing red for low HP / wounded states ─── */
+.ink-bloodied {
+  color: var(--ink-crimson);
+  animation: bloodied-throb 1.4s ease-in-out infinite;
+}
+
+@keyframes bloodied-throb {
+  0%, 100% { opacity: 1.0; }
+  50%      { opacity: 0.65; }
+}
+
+/* Respect users who don't want motion */
+@media (prefers-reduced-motion: reduce) {
+  .ink-gilded, .ink-arcane, .ink-glitter, .ink-bloodied {
+    animation: none;
+  }
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-paper="vellum" data-ink="midnight">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryForge</title>
+  <script src="https://unpkg.com/konva@9.3.16/konva.min.js"></script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="stylesheet" href="/static/css/parchment.css" />
+  <link rel="stylesheet" href="/static/css/ink-effects.css" />
+  <link rel="stylesheet" href="/static/css/lobby.css" />
+  <link rel="stylesheet" href="/static/css/flames.css" />
+  <link rel="stylesheet" href="/static/css/cinematic.css" />
+</head>
+<body data-phase="lobby">
+  <div class="scanlines"></div>
+  <div class="film-grain"></div>
+
+  <!-- ─────── LOBBY VIEW ─────── -->
+  <section id="lobby-view" class="phase-view parchment-surface">
+    <h1 class="lobby-title ink-gilded">StoryForge</h1>
+    <p class="lobby-subtitle">Click a slot or press <kbd>A</kbd> / <kbd>1-4</kbd> to join the table</p>
+    
+    <div id="lobby-slots" class="lobby-slot-grid">
+      <!-- Populated by lobby.js -->
+    </div>
+    
+    <div class="lobby-actions">
+      <button id="start-game-btn" class="btn btn-primary" disabled>
+        Begin Adventure
+      </button>
+      <p class="lobby-hint">
+        At least one character must be ready. Click "Begin" or press <kbd>Start</kbd> / <kbd>Enter</kbd>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────── CREATION VIEW ─────── -->
+  <section id="creation-view" class="phase-view parchment-surface">
+    <h1 class="creation-title ink-gilded">Forge Your Hero</h1>
+    
+    <div class="creation-steps">
+      <div class="step-pill" data-step="race">1. Race</div>
+      <div class="step-pill" data-step="class">2. Class</div>
+      <div class="step-pill" data-step="abilities">3. Abilities</div>
+      <div class="step-pill" data-step="name">4. Name</div>
+    </div>
+    
+    <div id="creation-stage" class="creation-stage">
+      <!-- Active step's content rendered here by lobby.js -->
+    </div>
+    
+    <div class="creation-controls">
+      <button id="creation-back" class="btn">Back <kbd>Esc</kbd></button>
+      <span id="creation-slot-label" class="creation-slot-label">Slot —</span>
+      <button id="creation-next" class="btn btn-primary">Next <kbd>Enter</kbd></button>
+    </div>
+  </section>
+
+  <!-- ─────── GAME VIEW (existing) ─────── -->
+  <div id="game-view">
+    <header id="party-bar" class="party-bar parchment-strip">
+      <div class="portrait-row" id="portrait-row"></div>
+      <div class="status-cluster">
+        <span id="kbd-indicator" class="indicator">⌨ <span>KBD</span></span>
+        <span id="gamepad-indicator" class="indicator">
+          🎮 <span id="gp-slot-0">·</span><span id="gp-slot-1">·</span><span id="gp-slot-2">·</span><span id="gp-slot-3">·</span>
+        </span>
+      </div>
+    </header>
+
+    <main id="stage">
+      <section id="canvas-pane" class="parchment-surface">
+        <div id="initiative-tracker" class="hidden">
+          <div class="init-label">TURN ORDER</div>
+          <div class="init-slots"></div>
+        </div>
+        <div id="konva-mount"></div>
+      </section>
+      <aside id="log-pane" class="parchment-surface ink-midnight">
+        <h2 class="log-title">Chronicle</h2>
+        <ol id="narrative-log" class="narrative-log"></ol>
+      </aside>
+      <aside id="inventory-pane" class="parchment-surface hidden">
+        <h2 class="log-title ink-crimson">Stolen Goods</h2>
+        <ul id="inventory-list" class="inventory-list"></ul>
+      </aside>
+    </main>
+
+    <footer id="action-bar" class="action-bar parchment-strip">
+      <div id="active-summary" class="active-summary">
+        <span class="label">Active:</span>
+        <span id="active-name" class="active-name ink-gilded">—</span>
+        <span id="active-class" class="active-class">—</span>
+        <span class="stat">HP <span id="active-hp">—</span></span>
+        <span class="stat">AC <span id="active-ac">—</span></span>
+        <span class="stat">MOVE <span id="active-move">—</span></span>
+        <span class="stat">POS <span id="active-pos">—</span></span>
+        <span class="stat">SILVER <span id="active-silver">—</span></span>
+      </div>
+      <div class="hints">
+        <span class="hint"><kbd>A</kbd>/<kbd>F</kbd> Move</span>
+        <span class="hint"><kbd>X</kbd>/<kbd>I</kbd> Inspect</span>
+        <span class="hint"><kbd>Y</kbd>/<kbd>T</kbd> Speak</span>
+        <span class="hint"><kbd>B</kbd>/<kbd>Tab</kbd> Cycle</span>
+        <span class="hint"><kbd>LB</kbd>/<kbd>Tab</kbd> Cycle</span>
+        <span class="hint"><kbd>LT</kbd>/<kbd>V</kbd> Inventory</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ─────── FREEFORM MODAL (unchanged) ─────── -->
+  <div id="freeform-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface">
+      <h2 class="ink-crimson">Speak Your Action</h2>
+      <p class="hint-small">Press <kbd>Esc</kbd> or <kbd>B</kbd> to cancel · <kbd>Enter</kbd> to commit</p>
+      <textarea id="freeform-input" rows="4" maxlength="500"
+                placeholder="I creep along the shadowed wall toward the bard..."></textarea>
+      <div class="modal-actions">
+        <button id="freeform-cancel" class="btn">Cancel</button>
+        <button id="freeform-commit" class="btn btn-primary">Commit</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
