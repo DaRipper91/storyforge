@@ -11,6 +11,12 @@ orientation = landscape
 fullscreen = 1
 android.archs = arm64-v8a
 android.permissions = INTERNET
+android.api = 33
+android.minapi = 21
+android.sdk = 33
+android.ndk = 25b
+android.accept_sdk_license = True
+
 # Note: FastAPI on Android requires uvicorn and some networking setup.
 # This spec assumes the main.py or a wrapper can run under python-for-android.
 python-for-android.branch = master
