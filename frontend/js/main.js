@@ -352,7 +352,8 @@ function wireGamepad() {
         break;
       case XBOX.X:  canvas?.inspectCursor(); break;
       case XBOX.Y:  openFreeformModal(); break;
-      case XBOX.LT: inventory?.toggle(); break;
+      case XBOX.LT: canvas?.adjustZoom(-0.25); break;
+      case XBOX.RT: canvas?.adjustZoom(0.25); break;
       case XBOX.LB:
         characters?.cycleActive(-1);
         recenterCursorOnActive();
@@ -429,6 +430,11 @@ function wireKeyboard() {
       case "i":
       case "x":
         canvas?.inspectCursor(); break;
+      case "-":
+        canvas?.adjustZoom(-0.25); break;
+      case "=":
+      case "+":
+        canvas?.adjustZoom(0.25); break;
       case "v":
         inventory?.toggle(); break;
       case "r":

@@ -428,6 +428,15 @@ export class Lobby {
       case "abilities": this._renderAbilitiesStep(draft); break;
       case "name":      this._renderNameStep(draft); break;
     }
+
+    this._scrollFocusedIntoView();
+  }
+
+  _scrollFocusedIntoView() {
+    const focused = this._dom.stage.querySelector(".focused");
+    if (focused) {
+      focused.scrollIntoView({ block: "nearest" });
+    }
   }
   
   _renderRaceStep(draft) {

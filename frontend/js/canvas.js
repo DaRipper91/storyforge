@@ -26,6 +26,7 @@ export class GridCanvas {
     this.state = null;
     this.cursor = { x: 0, y: 0 };
     this.cellSize = 64;
+    this.zoomLevel = 1.0; // 1.0 = fit to screen, >1.0 = zoomed in
 
     this._initStage();
     this._observeResize();
@@ -82,6 +83,13 @@ export class GridCanvas {
 
     this.stage.container().addEventListener("contextmenu", (e) => e.preventDefault());
 
+    // Wheel Zoom
+    this.stage.container().addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      this.adjustZoom(delta);
+    });
+
     this.stage.on("mousemove", (e) => {
       const pos = this.stage.getPointerPosition();
       if (!pos) return;
@@ -93,6 +101,14 @@ export class GridCanvas {
 
     this._startAmbientParticles();
     this._startLightingAnimation();
+  }
+
+  adjustZoom(delta) {
+    const oldZoom = this.zoomLevel;
+    this.zoomLevel = Math.max(1.0, Math.min(2.5, this.zoomLevel + delta));
+    if (this.zoomLevel !== oldZoom) {
+      this._fitAndRedraw();
+    }
   }
 
   _startLightingAnimation() {
@@ -226,13 +242,14 @@ export class GridCanvas {
 
     const room = this._currentRoom();
     const padding = 32;
-    const cellW = (w - padding * 2) / room.width;
-    const cellH = (h - padding * 2) / room.height;
+    const baseCellW = (w - padding * 2) / room.width;
+    const baseCellH = (h - padding * 2) / room.height;
     
-    // Use a minimum cell size to ensure the grid is large enough to "feel" like a game board
-    const minCellSize = 100;
-    this.cellSize = Math.max(minCellSize, Math.floor(Math.min(cellW, cellH)));
+    // cellSize is the "fit to screen" size multiplied by current zoomLevel
+    const baseCellSize = Math.floor(Math.min(baseCellW, baseCellH));
+    this.cellSize = Math.floor(baseCellSize * this.zoomLevel);
 
+    // Initial offsets (unpanned)
     this.offsetX = Math.floor((w - this.cellSize * room.width) / 2);
     this.offsetY = Math.floor((h - this.cellSize * room.height) / 2);
 
