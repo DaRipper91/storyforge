@@ -60,7 +60,8 @@ uv run python src/storyforge/gui.py
 
 ## 🛡️ Special Thanks & Credits
 
-*   **Jason:** For the indispensable fire-safety protocol. Without him, we wouldn't know to "kill it with fire!" whenever a Wizard (or a Cinder-Kin) gets too enthusiastic, and a special thanks to RedVelvet.
+*   **Jason:** For the indispensable fire-safety protocol. Without him, we wouldn't know to "kill it with fire!" whenever a Wizard (or a Cinder-Kin) gets too enthusiastic.
+*   **RedVelvet:** A special thanks for the inspiration.
 *   **Gemini 3.5 Flash:** For being the snarkiest DM in the multiverse.
 
 ---
