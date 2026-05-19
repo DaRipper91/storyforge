@@ -33,7 +33,7 @@ a = Analysis(
         'storyforge.api.routes_action',
         'storyforge.api.routes_lobby',
         'storyforge.api.ws_session',
-        'google.generativeai',
+        'google.genai',
         'pydantic_settings',
         'webview.platforms.winforms',
     ],
@@ -68,5 +68,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='frontend/icon.svg', # PyInstaller might need .ico for Windows
+    icon='frontend/icon.ico', # Fixed for Windows
 )
