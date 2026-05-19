@@ -376,6 +376,7 @@ function toggleKeymap() {
     audio.playCursor();
   }
 }
+window.toggleKeymap = toggleKeymap;
 
 // ─────────────────────── Keyboard fallback ───────────────────────
 
