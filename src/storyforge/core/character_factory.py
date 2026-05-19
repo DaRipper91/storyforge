@@ -162,6 +162,7 @@ ROLES: dict[PredatorRole, RoleDef] = {
 # ─────────────────────── Factory logic ───────────────────────
 
 def is_valid_standard_array(abilities: AbilityScores) -> bool:
+    """True if the AbilityScores are a permutation of [15,14,13,12,10,8]."""
     values = sorted([
         abilities.STR, abilities.DEX, abilities.CON,
         abilities.INT, abilities.WIS, abilities.CHA,
@@ -169,6 +170,7 @@ def is_valid_standard_array(abilities: AbilityScores) -> bool:
     return tuple(values) == STANDARD_ARRAY
 
 def _ability_modifier(score: int) -> int:
+    """D&D 5e ability modifier: floor((score - 10) / 2)."""
     return (score - 10) // 2
 
 def build_character(
@@ -194,8 +196,8 @@ def build_character(
     hp_max = s_def.hit_die + _ability_modifier(final_scores.CON)
     ac = s_def.base_armor_class + _ability_modifier(final_scores.DEX)
 
-    # Spawn near entrance
-    spawn_pos = grid.find_empty_near(game_state.current_room, Coord(x=5, y=7))
+    # Find a starting position on the grid.
+    spawn_pos = find_starting_position(game_state)
 
     return CharacterSheet(
         id=char_id,
@@ -216,3 +218,41 @@ def build_character(
         position=spawn_pos,
         movement_remaining=r_def.speed,
     )
+
+
+# ─────────────────────── Starting position picker ───────────────────────
+
+def find_starting_position(state: GameState) -> Coord:
+    """
+    Find an empty floor cell near the southern entrance for a new character.
+    
+    Scans row 6 (the row we used in the original seed) left-to-right for
+    the first unoccupied floor cell. Falls back to a broader scan if row 6
+    is full.
+    """
+    room = state.rooms[state.current_room_id]
+    
+    # Preferred row: same row the original hardcoded characters used
+    preferred_y = 6 if room.height > 6 else room.height - 2
+    
+    for y in [preferred_y, preferred_y - 1, preferred_y + 1] + list(range(room.height)):
+        if y < 0 or y >= room.height:
+            continue
+        for x in range(room.width):
+            coord = Coord(x=x, y=y)
+            cell = grid.get_cell(room, coord)
+            if grid.is_traversable(cell):
+                return coord
+    
+    raise RuntimeError("no traversable cells available for new character")
+
+
+# ─────────────────────── Char ID generator ───────────────────────
+
+def generate_char_id(name: str, existing: set[str]) -> str:
+    """Slugify name and append a short token if collision."""
+    slug = "".join(c.lower() for c in name if c.isalnum()) or "char"
+    if slug not in existing:
+        return slug
+    suffix = secrets.token_hex(2)
+    return f"{slug}_{suffix}"

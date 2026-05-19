@@ -16,8 +16,8 @@ args = [
     '--collect-all=uvicorn',
 ]
 
-# Add platform-specific icons or options if needed
+# Add platform-specific options if needed
 if platform.system() == 'Windows':
-    args.append('--icon=frontend/icon.svg') # Note: might need .ico for Windows
+    pass # Icon conversion with SVG is failing on CI
 
 PyInstaller.__main__.run(args)

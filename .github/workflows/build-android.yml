@@ -17,10 +17,9 @@ jobs:
         python-version: '3.12'
 
     - name: Build with Buildozer
-      uses: ArtemSBulgakov/buildozer-action@v1
+      uses: digreatbrian/buildozer-action@v1
       with:
         workdir: .
-        buildozer_version: master
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4

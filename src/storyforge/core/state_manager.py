@@ -24,7 +24,7 @@ from storyforge.core.character_factory import (
 from storyforge.core.models import (
     CharacterSheet, Coord, GameState, GridAction,
     NarrativeEntry, StateDiff, TurnPhase,
-    CharacterCreationRequest, CharClass, LobbySlot, Race,
+    CharacterCreationRequest, LobbySlot, Race,
     SlotStatus,
 )
 from storyforge.events.bus import event_bus
