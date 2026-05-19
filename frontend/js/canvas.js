@@ -123,9 +123,14 @@ export class GridCanvas {
     this._particleAnim = new Konva.Animation((frame) => {
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
+        const sx = this.stage.x();
+        const sy = this.stage.y();
+        const sw = this.stage.width();
+        const sh = this.stage.height();
+
         const p = new Konva.Circle({
-          x: Math.random() * this.stage.width(),
-          y: this.stage.height() + 10,
+          x: (Math.random() * sw) - sx,
+          y: (sh + 10) - sy,
           radius: Math.random() * 2 + 1,
           fill: '#ffaa00',
           opacity: 0.6,
@@ -194,8 +199,13 @@ export class GridCanvas {
   _pixelToGrid(px, py) {
     if (!this.state) return null;
     const room = this._currentRoom();
-    const x = Math.floor((px - this.offsetX) / this.cellSize);
-    const y = Math.floor((py - this.offsetY) / this.cellSize);
+    
+    // Account for stage panning
+    const internalX = px - this.stage.x();
+    const internalY = py - this.stage.y();
+
+    const x = Math.floor((internalX - this.offsetX) / this.cellSize);
+    const y = Math.floor((internalY - this.offsetY) / this.cellSize);
     
     if (x >= 0 && x < room.width && y >= 0 && y < room.height) {
       return { x, y };
@@ -218,17 +228,25 @@ export class GridCanvas {
     const padding = 32;
     const cellW = (w - padding * 2) / room.width;
     const cellH = (h - padding * 2) / room.height;
-    this.cellSize = Math.floor(Math.min(cellW, cellH));
+    
+    // Use a minimum cell size to ensure the grid is large enough to "feel" like a game board
+    const minCellSize = 100;
+    this.cellSize = Math.max(minCellSize, Math.floor(Math.min(cellW, cellH)));
 
     this.offsetX = Math.floor((w - this.cellSize * room.width) / 2);
     this.offsetY = Math.floor((h - this.cellSize * room.height) / 2);
 
     this.renderAll();
+    this._followCursor(true);
   }
 
   setState(state) {
+    const firstTime = !this.state;
     this.state = state;
     this._fitAndRedraw();
+    if (firstTime) {
+      this._followCursor(true);
+    }
   }
 
   _currentRoom() {
@@ -250,10 +268,11 @@ export class GridCanvas {
       this.lightLayer.destroyChildren();
       lightGroup = new Konva.Group({ name: 'light-group' });
       
+      // Make the darkness rect large enough to cover the room plus plenty of padding for panning
       const darkness = new Konva.Rect({
-        x: -500, y: -500,
-        width: this.stage.width() + 1000,
-        height: this.stage.height() + 1000,
+        x: -2000, y: -2000,
+        width: 10000,
+        height: 10000,
         fill: 'rgba(10, 5, 10, 0.85)',
         listening: false
       });
@@ -497,26 +516,65 @@ export class GridCanvas {
   setCursor({ x, y }) {
     if (!this.state) return;
     const room = this._currentRoom();
+    const oldX = this.cursor.x;
+    const oldY = this.cursor.y;
+    
     this.cursor.x = Math.max(0, Math.min(room.width  - 1, x));
     this.cursor.y = Math.max(0, Math.min(room.height - 1, y));
-    this._renderCursor();
+    
+    if (this.cursor.x !== oldX || this.cursor.y !== oldY) {
+      this._renderCursor();
+      this._followCursor();
+    }
+  }
+
+  _followCursor(instant = false) {
+    if (!this.state) return;
+    const cs = this.cellSize;
+    const { x, y } = this.cursor;
+
+    // Target position for the stage to center the cursor
+    // Center of cursor in stage coordinates (relative to stage origin):
+    const cursorCx = this.offsetX + x * cs + cs / 2;
+    const cursorCy = this.offsetY + y * cs + cs / 2;
+
+    const targetX = this.stage.width() / 2 - cursorCx;
+    const targetY = this.stage.height() / 2 - cursorCy;
+
+    if (instant) {
+      this.stage.position({ x: targetX, y: targetY });
+    } else {
+      // Smooth follow
+      if (this._cameraTween) this._cameraTween.stop();
+      this._cameraTween = new Konva.Tween({
+        node: this.stage,
+        duration: 0.3,
+        x: targetX,
+        y: targetY,
+        easing: Konva.Easings.EaseOut
+      });
+      this._cameraTween.play();
+    }
   }
 
   shake(intensity = 10, duration = 500) {
     const start = Date.now();
+    const startX = this.stage.x();
+    const startY = this.stage.y();
+    
     const anim = new Konva.Animation((frame) => {
       const elapsed = Date.now() - start;
       if (elapsed > duration) {
         anim.stop();
-        this.stage.x(0);
-        this.stage.y(0);
+        this.stage.x(startX);
+        this.stage.y(startY);
         return;
       }
       const decay = 1 - (elapsed / duration);
       const curIntensity = intensity * decay;
-      this.stage.x((Math.random() - 0.5) * curIntensity);
-      this.stage.y((Math.random() - 0.5) * curIntensity);
-    }, [this.gridLayer, this.tokenLayer, this.cursorLayer]);
+      this.stage.x(startX + (Math.random() - 0.5) * curIntensity);
+      this.stage.y(startY + (Math.random() - 0.5) * curIntensity);
+    }, [this.gridLayer, this.tokenLayer, this.cursorLayer, this.fxLayer, this.lightLayer]);
     anim.start();
   }
 

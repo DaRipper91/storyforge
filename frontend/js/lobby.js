@@ -30,6 +30,7 @@ export class Lobby {
     this._focusIndex = 0;            // for keyboard navigation within a step
     
     this._dom = {
+      titleView:     document.getElementById("title-view"),
       lobbyView:     document.getElementById("lobby-view"),
       lobbySlots:    document.getElementById("lobby-slots"),
       startBtn:      document.getElementById("start-game-btn"),
@@ -44,6 +45,7 @@ export class Lobby {
     this._dom.startBtn.addEventListener("click", () => this.handleStartGame());
     this._dom.backBtn.addEventListener("click", () => this.handleBack());
     this._dom.nextBtn.addEventListener("click", () => this.handleNext());
+    this._dom.titleView.addEventListener("click", () => this._exitTitlePhase());
   }
   
   async init(currentState) {
@@ -52,6 +54,13 @@ export class Lobby {
   }
   
   setState(state) {
+    // If we are currently in "title" phase client-side, don't let server phase override it
+    // unless the server says we are already in exploration.
+    if (document.body.dataset.phase === "title" && state.phase !== "exploration") {
+      this.state = state;
+      return;
+    }
+
     this.state = state;
     document.body.dataset.phase = state.phase;
     
@@ -84,6 +93,13 @@ export class Lobby {
   // ─────────────────────── Gamepad / Keyboard input ───────────────────────
   
   handleControllerButton({ controllerId, button }) {
+    if (document.body.dataset.phase === "title") {
+      if (button === 0 || button === 9) { // A or Start
+        this._exitTitlePhase();
+      }
+      return;
+    }
+
     if (this.state.phase === "lobby" || this.state.phase === "creation") {
       // A = claim slot (if no slot held) or confirm in creation
       if (button === 0) {  // A
@@ -105,6 +121,13 @@ export class Lobby {
   }
 
   handleKeyboard(e) {
+    if (document.body.dataset.phase === "title") {
+      if (e.key === "Enter") {
+        this._exitTitlePhase();
+      }
+      return;
+    }
+
     if (this.state.phase === "lobby") {
       if (e.key === "Enter") this.handleStartGame();
       // Allow keyboard player to join with 'A' (mapped to Space or A)
@@ -679,6 +702,13 @@ export class Lobby {
     };
   }
   
+  _exitTitlePhase() {
+    if (document.body.dataset.phase !== "title") return;
+    this.audio?.playConfirm();
+    document.body.dataset.phase = this.state.phase; // Revert to server-authoritative phase (usually lobby)
+    this.setState(this.state);
+  }
+
   _escape(s) {
     return String(s).replace(/[&<>"']/g, c =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])

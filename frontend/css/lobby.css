@@ -18,17 +18,57 @@
 .hidden { display: none !important; }
 
 /* Body-driven view switching */
+body[data-phase="title"]       #title-view    { display: flex; }
+body[data-phase="title"]       #lobby-view,
+body[data-phase="title"]       #creation-view,
+body[data-phase="title"]       #game-view     { display: none; }
+
 body[data-phase="lobby"]       #lobby-view    { display: flex; }
+body[data-phase="lobby"]       #title-view,
 body[data-phase="lobby"]       #creation-view,
 body[data-phase="lobby"]       #game-view     { display: none; }
 
 body[data-phase="creation"]    #creation-view { display: flex; }
+body[data-phase="creation"]    #title-view,
 body[data-phase="creation"]    #lobby-view,
 body[data-phase="creation"]    #game-view     { display: none; }
 
 body[data-phase="exploration"] #game-view     { display: grid; grid-template-rows: var(--top-h) 1fr var(--bottom-h); position: fixed; inset: 0; }
+body[data-phase="exploration"] #title-view,
 body[data-phase="exploration"] #lobby-view,
 body[data-phase="exploration"] #creation-view { display: none; }
+
+/* ─── Title ─── */
+.title-view {
+  justify-content: center;
+  gap: var(--space-5);
+  background: radial-gradient(circle at center, rgba(30, 20, 10, 0.4) 0%, transparent 70%);
+}
+
+.title-logo {
+  font-size: 8rem;
+  margin: 0;
+  text-shadow: 0 0 2rem rgba(198, 161, 109, 0.5);
+  animation: logo-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes logo-glow {
+  from { filter: drop-shadow(0 0 1rem rgba(198, 161, 109, 0.3)); }
+  to { filter: drop-shadow(0 0 3rem rgba(198, 161, 109, 0.6)); }
+}
+
+.title-press-start {
+  font-size: var(--fs-xl);
+  opacity: 0.8;
+  animation: blink 2s infinite;
+  margin-top: var(--space-5);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
 
 /* ─── Lobby ─── */
 .lobby-title {

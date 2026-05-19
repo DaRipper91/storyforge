@@ -40,7 +40,7 @@
     }
   </style>
 </head>
-<body data-phase="lobby">
+<body data-phase="title">
   <div class="scanlines"></div>
   <div class="film-grain"></div>
 
@@ -50,6 +50,17 @@
     <button class="menu-btn" onclick="location.reload()">Reload</button>
     <button class="menu-btn" onclick="document.body.requestFullscreen()">Fullscreen</button>
   </nav>
+
+  <!-- ─────── TITLE VIEW ─────── -->
+  <section id="title-view" class="phase-view parchment-surface title-view">
+    <div class="flame-container">
+      <div class="flame"></div>
+      <div class="flame"></div>
+      <div class="flame"></div>
+    </div>
+    <h1 class="title-logo ink-gilded">StoryForge</h1>
+    <p class="title-press-start">Press <kbd>Enter</kbd> or <kbd>Start</kbd> to Begin</p>
+  </section>
 
   <!-- ─────── LOBBY VIEW ─────── -->
   <section id="lobby-view" class="phase-view parchment-surface">
