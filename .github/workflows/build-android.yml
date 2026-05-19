@@ -17,7 +17,7 @@ jobs:
         python-version: '3.12'
 
     - name: Build with Buildozer
-      uses: ArtemSerebriakov/buildozer-action@v1
+      uses: ArtemSBulgakov/buildozer-action@v1
       with:
         workdir: .
         buildozer_version: master
