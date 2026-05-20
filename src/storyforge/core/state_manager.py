@@ -91,7 +91,7 @@ class StateManager:
                 case "move":
                     diff_summary = self._do_move(char, action.target)
                 case "interact":
-                    diff_summary = {"type": "interact", "target": action.target.model_dump()}
+                    diff_summary = self._do_interact(char, action.target)
                 case _:
                     raise IllegalActionError(f"unhandled action: {action.type}")
             
@@ -328,6 +328,13 @@ class StateManager:
             return summary
 
 
+    async def transition_room(self, target_room_id: str) -> dict:
+        """Move the whole party to a different room (callable from routes)."""
+        async with self._lock:
+            summary = self._do_transition_room(target_room_id)
+            await self._commit(summary)
+            return summary
+
     async def start_exploration(self) -> dict:
         """
         Transition from CREATION to EXPLORATION.
@@ -376,6 +383,66 @@ class StateManager:
     
     # ─────────────────── Internal Helpers ───────────────────
     
+    def _do_interact(self, char: CharacterSheet, target: Coord) -> dict:
+        """
+        Resolve an interact action. In priority order:
+          1. Target cell is occupied by an NPC → return encounter info.
+          2. Target cell is a door with a room exit → transition the party.
+          3. Generic interact (usable by freeform narration).
+        """
+        room = self._state.rooms[self._state.current_room_id]
+        cell = grid.get_cell(room, target)
+
+        # 1. NPC encounter
+        if cell.occupant_id and cell.occupant_id in self._state.npcs:
+            npc = self._state.npcs[cell.occupant_id]
+            return {
+                "type": "npc_encounter",
+                "npc_id": npc.id,
+                "npc_name": npc.name,
+                "encounter_id": npc.encounter_id,
+                "position": target.model_dump(),
+            }
+
+        # 2. Door exit
+        exit_key = f"{target.x},{target.y}"
+        if cell.terrain.value == "door" and exit_key in room.exits:
+            return self._do_transition_room(room.exits[exit_key])
+
+        # 3. Generic
+        return {"type": "interact", "target": target.model_dump()}
+
+    def _do_transition_room(self, target_room_id: str) -> dict:
+        """Transition the entire party to another room (called inside the lock)."""
+        if target_room_id not in self._state.rooms:
+            raise StateError(f"unknown room: {target_room_id}")
+
+        old_room = self._state.rooms[self._state.current_room_id]
+        new_room = self._state.rooms[target_room_id]
+
+        # Vacate all character cells in the old room
+        for char in self._state.characters.values():
+            try:
+                old_cell = grid.get_cell(old_room, char.position)
+                if old_cell.occupant_id == char.id:
+                    old_cell.occupant_id = None
+            except (IndexError, KeyError):
+                pass
+
+        self._state.current_room_id = target_room_id
+        for char in self._state.characters.values():
+            spawn = find_starting_position(self._state)
+            char.position = spawn
+            char.movement_remaining = char.speed
+            grid.get_cell(new_room, spawn).occupant_id = char.id
+
+        return {
+            "type": "room_transition",
+            "from_room": old_room.id,
+            "to_room": target_room_id,
+            "room_name": new_room.name,
+        }
+
     def _do_move(self, char: CharacterSheet, target: Coord) -> dict:
         """Pure mutation: vacate old cell, occupy new, decrement movement."""
         room = self._state.rooms[self._state.current_room_id]

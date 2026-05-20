@@ -196,6 +196,71 @@
         </footer>
   </div>
 
+  <!-- ─────── JOHN'S SHOP OVERLAY ─────── -->
+  <div id="john-shop-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface john-shop-card">
+
+      <div class="john-shop-header">
+        <div class="john-npc-portrait">J</div>
+        <div class="john-header-text">
+          <h2 class="ink-gilded">The Store</h2>
+          <p id="john-shop-tagline" class="john-tagline">"What can I get for you? No rush. I'm here all day."</p>
+        </div>
+        <div class="john-companions">
+          <span class="companion-pip" title="Bink Bink">🐱</span>
+          <span class="companion-pip" title="Teddy">🐕</span>
+          <span class="companion-pip" title="Cyrus">🐕</span>
+        </div>
+      </div>
+
+      <div id="john-shop-message" class="john-message hidden"></div>
+
+      <div class="john-shop-body">
+        <div class="john-inventory-panel">
+          <h3>In Stock</h3>
+          <ul id="john-inventory-list" class="john-inventory-list"></ul>
+        </div>
+
+        <div class="john-action-panel">
+          <h3>Leave The Store</h3>
+          <p class="hint-small">Buying is the easy part.</p>
+          <div class="escape-methods" id="escape-methods">
+            <button class="escape-btn" data-method="smooth_talk">
+              <span class="escape-method-name">Smooth Talk</span>
+              <span class="escape-method-stat">CHA</span>
+            </button>
+            <button class="escape-btn" data-method="stealth">
+              <span class="escape-method-name">Stealth Exit</span>
+              <span class="escape-method-stat">DEX</span>
+            </button>
+            <button class="escape-btn" data-method="fabricate">
+              <span class="escape-method-name">Fake Emergency</span>
+              <span class="escape-method-stat">INT</span>
+            </button>
+            <button class="escape-btn" data-method="willpower">
+              <span class="escape-method-name">Sheer Willpower</span>
+              <span class="escape-method-stat">WIS</span>
+            </button>
+            <button class="escape-btn" data-method="bulldoze">
+              <span class="escape-method-name">Just Push Through</span>
+              <span class="escape-method-stat">STR</span>
+            </button>
+          </div>
+          <div id="escape-result" class="escape-result hidden"></div>
+
+          <hr class="john-divider" />
+          <h3>The Cactus</h3>
+          <p class="hint-small">Sitting on the counter. Very distinctive.</p>
+          <div class="cactus-actions">
+            <button id="cactus-admire-btn" class="btn btn-small">Admire it sincerely</button>
+            <button id="cactus-snicker-btn" class="btn btn-small btn-danger">Snicker</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ─────── FREEFORM MODAL (unchanged) ─────── -->
   <div id="freeform-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card parchment-surface">

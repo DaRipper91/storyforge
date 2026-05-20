@@ -123,6 +123,50 @@ export async function loadCampaign(campaignId) {
   return jsonOrThrow(res);
 }
 
+// ── John / NPC encounter API ──────────────────────────────────────
+
+export async function johnGetInventory(genre = "fantasy") {
+  const res = await fetch(`${API_BASE}/api/npc/john/inventory?genre=${genre}`);
+  return jsonOrThrow(res);
+}
+
+export async function johnBuy({ actorId, itemId, genre = "fantasy" }) {
+  const res = await fetch(`${API_BASE}/api/npc/john/buy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ actor_id: actorId, item_id: itemId, genre }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function johnCactus(isLewdOrMocking = false) {
+  const res = await fetch(`${API_BASE}/api/npc/john/cactus`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ is_lewd_or_mocking: isLewdOrMocking }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function johnEscape({ actorId, method = "smooth_talk", advantage = false, disadvantage = false }) {
+  const res = await fetch(`${API_BASE}/api/npc/john/escape`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ actor_id: actorId, method, advantage, disadvantage }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function johnGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/john/state`);
+  return jsonOrThrow(res);
+}
+
+export async function johnTick() {
+  const res = await fetch(`${API_BASE}/api/npc/john/tick`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
 /**
  * Open a WebSocket and call onMessage for every state_diff event.
  */

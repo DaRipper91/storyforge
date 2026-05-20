@@ -3,7 +3,7 @@ from storyforge.core.models import (
     GridAction, FreeformAction, AINarrationResponse, TurnPhase,
 )
 from storyforge.core.state_manager import StateManager
-from storyforge.core import rules, validators
+from storyforge.core import grid, rules, validators
 from storyforge.ai import narrator, interpreter
 from storyforge.events.bus import event_bus
 from storyforge.api.deps import get_state_manager
@@ -33,14 +33,24 @@ async def handle_grid(
     
     # 2. Apply the deterministic mutation
     diff = await state.apply_grid_action(char, action)
-    
-    # 3. Ask Gemini for flavor text (text-only, no state diff allowed)
+
+    # 3. Handle each diff type differently
+    diff_type = diff.get("type", "")
+
+    if diff_type == "npc_encounter":
+        # No narration — let the frontend open the encounter overlay
+        return {"encounter": diff, "revision": state.current.revision}
+
+    if diff_type == "room_transition":
+        narrative = f"{char.name} steps into {diff['room_name']}."
+        await state.append_narration(actor_id=char.id, kind="narration", text=narrative)
+        return {"narrative": narrative, "room_transition": diff, "revision": state.current.revision}
+
+    # Normal move — ask Gemini for flavor text
     narrative = await narrator.narrate_movement(state.current, char, diff["from"], diff["to"])
-    
+
     # 4. Log and broadcast
     await state.append_narration(actor_id=char.id, kind="action", text=narrative)
-    # Broadcast is handled by state.commit() called inside apply_grid_action
-    
     return {"narrative": narrative, "revision": state.current.revision}
 
 

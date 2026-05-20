@@ -274,6 +274,7 @@ export class GridCanvas {
     if (!this.state) return;
     this._renderGrid();
     this._renderTokens();
+    this._renderNpcs();
     this._renderLighting();
     this._renderCursor();
   }
@@ -468,6 +469,92 @@ export class GridCanvas {
             initial.fontSize(Math.floor(cs * 0.5));
           }
         }
+      }
+    }
+    this.tokenLayer.batchDraw();
+  }
+
+  _renderNpcs() {
+    // NPC tokens: distinct look from player tokens (diamond shape, muted gold).
+    // Non-player NPCs (Bink Bink, Teddy, Cyrus) show at their position even
+    // though they don't occupy a grid cell for pathfinding.
+    if (!this.state.npcs) return;
+
+    const cs = this.cellSize;
+    const ox = this.offsetX, oy = this.offsetY;
+
+    // Remove stale NPC nodes (room change etc.)
+    const currentRoom = this._currentRoom();
+    for (const [id, node] of this._tokenNodes.entries()) {
+      if (id.startsWith("npc_") && !this.state.npcs[id.slice(4)]) {
+        node.destroy();
+        this._tokenNodes.delete(id);
+      }
+    }
+
+    const NPC_COLORS = {
+      npc_john:    "#8B4513",  // saddle brown — shopkeeper warmth
+      npc_cat:     "#696969",  // dimgray — mysterious feline
+      npc_dog:     "#D2691E",  // chocolate — loyal hound
+      npc_default: "#556B2F",  // dark olive green
+    };
+
+    for (const npc of Object.values(this.state.npcs)) {
+      // Only render NPCs whose room matches current room (store NPCs only in store)
+      const nodeKey = `npc_${npc.id}`;
+      const cx = ox + npc.position.x * cs + cs / 2;
+      const cy = oy + npc.position.y * cs + cs / 2;
+      const color = NPC_COLORS[npc.sprite_key] ?? NPC_COLORS.npc_default;
+      const r = cs * 0.35;
+
+      let group = this._tokenNodes.get(nodeKey);
+      if (!group) {
+        group = new Konva.Group({ id: nodeKey, x: cx, y: cy });
+
+        // Diamond shape for NPCs
+        const diamond = new Konva.RegularPolygon({
+          x: 0, y: 0,
+          sides: 4,
+          radius: r,
+          fill: color,
+          stroke: "#f4ead4",
+          strokeWidth: 3,
+          rotation: 45,
+          shadowColor: "black",
+          shadowBlur: 6,
+          shadowOpacity: 0.4,
+        });
+
+        const label = new Konva.Text({
+          x: -cs / 2, y: -cs / 2,
+          width: cs, height: cs,
+          text: npc.name[0],
+          fontFamily: "Cardo, Georgia, serif",
+          fontSize: Math.floor(cs * 0.4),
+          fontStyle: "bold",
+          fill: "#f4ead4",
+          align: "center",
+          verticalAlign: "middle",
+          listening: false,
+        });
+
+        group.add(diamond);
+        group.add(label);
+        this.tokenLayer.add(group);
+        this._tokenNodes.set(nodeKey, group);
+
+        // Idle pulse animation for interactable NPCs
+        if (npc.interactable) {
+          const pulse = new Konva.Animation((frame) => {
+            const scale = 1 + 0.06 * Math.sin(frame.time / 600);
+            diamond.scaleX(scale);
+            diamond.scaleY(scale);
+          }, this.tokenLayer);
+          pulse.start();
+        }
+      } else {
+        group.x(cx);
+        group.y(cy);
       }
     }
     this.tokenLayer.batchDraw();

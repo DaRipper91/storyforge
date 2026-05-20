@@ -87,6 +87,18 @@ class Cell(BaseModel):
     occupant_id: str | None = None   # character_id or entity_id
 
 
+class NpcSheet(BaseModel):
+    """A non-player character placed on the grid."""
+    id: str
+    name: str
+    position: Coord
+    sprite_key: str = "npc_default"     # frontend canvas uses this to style the token
+    interactable: bool = True
+    encounter_id: str | None = None     # e.g. "john_shop" — links to encounter handler
+    blocks_movement: bool = True        # if True the grid cell has occupant_id set
+    description: str = ""
+
+
 class Room(BaseModel):
     id: str
     name: str
@@ -95,6 +107,9 @@ class Room(BaseModel):
     # cells stored row-major: cells[y * width + x]
     cells: list[Cell]
     description: str                 # static room flavor for AI context
+    # "x,y" -> room_id: when a player interacts with that door cell, everyone
+    # transitions to the target room. Omitted from old saves (defaults to {}).
+    exits: dict[str, str] = Field(default_factory=dict)
 
 
 # ─────────────────────── Session State ───────────────────────
@@ -199,6 +214,7 @@ class GameState(BaseModel):
     phase: TurnPhase = TurnPhase.LOBBY
     
     characters: dict[str, CharacterSheet] = Field(default_factory=dict)
+    npcs: dict[str, NpcSheet] = Field(default_factory=dict)
     rooms: dict[str, Room]
     combat: CombatState | None = None
     

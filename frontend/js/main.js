@@ -7,7 +7,9 @@
  *   - Lazy-init of game-phase modules
  */
 
-import { fetchState, openSession, postGridAction, postFreeformAction } from "./api.js";
+import { fetchState, openSession, postGridAction, postFreeformAction,
+         johnGetInventory, johnBuy, johnEscape, johnCactus, johnTick, johnGetState,
+} from "./api.js";
 import { GridCanvas } from "./canvas.js";
 import { GamepadManager, XBOX } from "./gamepad.js";
 import { CharacterPanel } from "./characters.js";
@@ -294,13 +296,34 @@ async function handleGridConfirm(target) {
   if (appState.phase !== "exploration") return;
   const active = characters.activeCharacter;
   if (!active) return;
+
+  // Decide action type: interact if the target is an NPC cell or a door
+  const room = appState.rooms?.[appState.current_room_id];
+  const cell = room?.cells?.[target.y * room.width + target.x];
+  const isNpcCell  = cell?.occupant_id && appState.npcs?.[cell.occupant_id];
+  const isDoorCell = cell?.terrain === "door";
+  const actionType = (isNpcCell || isDoorCell) ? "interact" : "move";
+
   try {
-    await postGridAction({
-      actorId: active.id,
-      type: "move",
-      target,
-    });
+    const result = await postGridAction({ actorId: active.id, type: actionType, target });
     audio.playConfirm();
+
+    if (result.encounter?.type === "npc_encounter") {
+      openShopOverlay(result.encounter);
+      return;
+    }
+    if (result.room_transition) {
+      // State refreshes via WS; force immediate canvas update
+      appState = await fetchState();
+      canvas.setState(appState);
+      log.append({
+        revision: appState.revision,
+        actor_id: active.id,
+        kind: "narration",
+        text: result.narrative ?? `Entered ${result.room_transition.room_name}.`,
+        timestamp: new Date().toISOString(),
+      });
+    }
   } catch (err) {
     console.warn("[grid] rejected:", err.message);
     audio.playDeny();
@@ -491,4 +514,172 @@ function openFreeformModal() {
 
 function closeFreeformModal() {
   els.freeformModal.classList.add("hidden");
+}
+
+// ─────────────────────── John's Shop Encounter ───────────────────────
+
+const shopEls = {
+  overlay:       document.getElementById("john-shop-overlay"),
+  tagline:       document.getElementById("john-shop-tagline"),
+  message:       document.getElementById("john-shop-message"),
+  inventoryList: document.getElementById("john-inventory-list"),
+  escapeResult:  document.getElementById("escape-result"),
+  cactusAdmire:  document.getElementById("cactus-admire-btn"),
+  cactusSnicker: document.getElementById("cactus-snicker-btn"),
+};
+
+let _shopGenre = "fantasy";
+let _shopActorId = null;
+
+async function openShopOverlay(encounterData) {
+  _shopActorId = characters?.activeCharacter?.id ?? null;
+  shopEls.overlay.classList.remove("hidden");
+  shopEls.message.classList.add("hidden");
+  shopEls.escapeResult.classList.add("hidden");
+
+  // Derive genre from current_room_id (extend later if GameState gets a genre field)
+  _shopGenre = "fantasy";
+
+  await refreshShopInventory();
+  wireShopButtons();
+  audio.playPageTurn();
+}
+
+function closeShopOverlay() {
+  shopEls.overlay.classList.add("hidden");
+  shopEls.message.classList.add("hidden");
+  shopEls.escapeResult.classList.add("hidden");
+  johnTick().catch(() => {});  // advance John's turn clock on departure
+}
+
+async function refreshShopInventory() {
+  shopEls.inventoryList.innerHTML = "<li style='opacity:.5;font-style:italic'>Loading stock…</li>";
+  try {
+    const data = await johnGetInventory(_shopGenre);
+    renderShopInventory(data.items);
+  } catch (e) {
+    shopEls.inventoryList.innerHTML = "<li style='opacity:.5'>Couldn't reach the back room.</li>";
+  }
+}
+
+function renderShopInventory(items) {
+  shopEls.inventoryList.innerHTML = "";
+  for (const item of items) {
+    const li = document.createElement("li");
+    li.className = "john-item";
+    li.innerHTML = `
+      <span class="john-item-name">${item.name}</span>
+      <span class="john-item-notes">${item.notes ?? ""}</span>
+      <span class="john-item-price">${item.value}s</span>
+      <button class="john-item-buy" data-item-id="${item.id}">Buy</button>
+    `;
+    li.querySelector(".john-item-buy").addEventListener("click", () => buyItem(item.id, item.name));
+    shopEls.inventoryList.appendChild(li);
+  }
+}
+
+async function buyItem(itemId, itemName) {
+  if (!_shopActorId) return;
+  try {
+    const res = await johnBuy({ actorId: _shopActorId, itemId, genre: _shopGenre });
+    showShopMessage(res.message, res.success ? "" : "is-offended");
+    if (res.success) {
+      appState = await fetchState();
+      canvas?.setState(appState);
+      characters?.setState(appState);
+      audio.playConfirm();
+    } else {
+      audio.playDeny();
+    }
+  } catch (e) {
+    showShopMessage("Something went wrong.", "is-offended");
+  }
+}
+
+function wireShopButtons() {
+  // Escape method buttons
+  document.querySelectorAll(".escape-btn").forEach(btn => {
+    btn.onclick = () => attemptEscape(btn.dataset.method);
+  });
+
+  shopEls.cactusAdmire.onclick  = () => handleCactus(false);
+  shopEls.cactusSnicker.onclick = () => handleCactus(true);
+
+  // Close on backdrop click
+  shopEls.overlay.addEventListener("click", (e) => {
+    if (e.target === shopEls.overlay) closeShopOverlay();
+  });
+
+  // Esc to close (only if escape check succeeded)
+  document.addEventListener("keydown", function shopEsc(e) {
+    if (e.key === "Escape" && !shopEls.overlay.classList.contains("hidden")) {
+      closeShopOverlay();
+      document.removeEventListener("keydown", shopEsc);
+    }
+  });
+}
+
+async function attemptEscape(method) {
+  if (!_shopActorId) return;
+
+  const johnState = await johnGetState().catch(() => null);
+  if (johnState && !johnState.party_can_leave) {
+    showEscapeResult(
+      "John is mid-sentence. He hasn't noticed you trying to leave. " +
+      "You literally cannot get a word in. Wait for him to finish.",
+      false,
+    );
+    return;
+  }
+
+  try {
+    const res = await johnEscape({ actorId: _shopActorId, method });
+
+    const rollLine = `d20(${res.roll}) + ${res.modifier} = **${res.total}** vs DC ${res.dc}`;
+    const result = `${res.flavor}\n\n*${rollLine}*`;
+    showEscapeResult(result, res.success);
+
+    if (res.psychic_damage > 0) {
+      appState = await fetchState();
+      canvas?.setState(appState);
+      characters?.setState(appState);
+      canvas?.shake(12, 300);
+      const char = appState.characters[_shopActorId];
+      if (char) canvas?.spawnFloatingText(char.position, `-${res.psychic_damage} ψ`, "#9966cc");
+      showShopMessage(`The rambling carves a small psychic notch in your soul. −${res.psychic_damage} HP.`, "is-offended");
+    }
+
+    if (res.success) {
+      setTimeout(closeShopOverlay, 2200);
+    }
+  } catch (e) {
+    showEscapeResult("Something went wrong with the escape check.", false);
+  }
+}
+
+async function handleCactus(isLewd) {
+  try {
+    const res = await johnCactus(isLewd);
+    showShopMessage(res.john_response, isLewd ? "is-offended" : "");
+    if (!res.john_will_sell) {
+      audio.playDeny();
+      document.querySelectorAll(".john-item-buy").forEach(b => b.disabled = true);
+    }
+  } catch (e) {
+    showShopMessage("John looks at you. You look at John.", "");
+  }
+}
+
+function showShopMessage(text, extraClass = "") {
+  shopEls.message.className = `john-message${extraClass ? " " + extraClass : ""}`;
+  shopEls.message.textContent = text;
+  shopEls.message.classList.remove("hidden");
+  shopEls.tagline.textContent = text.slice(0, 80) + (text.length > 80 ? "…" : "");
+}
+
+function showEscapeResult(text, success) {
+  shopEls.escapeResult.className = `escape-result${success ? " is-success" : " is-fail"}`;
+  // Render simple markdown bold
+  shopEls.escapeResult.innerHTML = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
+  shopEls.escapeResult.classList.remove("hidden");
 }
