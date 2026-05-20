@@ -46,8 +46,11 @@ async def handle_grid(
         await state.append_narration(actor_id=char.id, kind="narration", text=narrative)
         return {"narrative": narrative, "room_transition": diff, "revision": state.current.revision}
 
-    # Normal move — ask Gemini for flavor text
-    narrative = await narrator.narrate_movement(state.current, char, diff["from"], diff["to"])
+    # Normal move — ask Gemini for flavor text (non-fatal if Gemini is unavailable)
+    try:
+        narrative = await narrator.narrate_movement(state.current, char, diff["from"], diff["to"])
+    except Exception:
+        narrative = f"{char.name} moves to ({diff['to']['x']}, {diff['to']['y']})."
 
     # 4. Log and broadcast
     await state.append_narration(actor_id=char.id, kind="action", text=narrative)

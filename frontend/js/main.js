@@ -307,6 +307,9 @@ async function handleGridConfirm(target) {
   const active = characters.activeCharacter;
   if (!active) return;
 
+  // Confirming your own cell is a no-op — don't send to the server
+  if (target.x === active.position.x && target.y === active.position.y) return;
+
   // Decide action type: interact if the target is an NPC cell or a door
   const room = appState.rooms?.[appState.current_room_id];
   const cell = room?.cells?.[target.y * room.width + target.x];
