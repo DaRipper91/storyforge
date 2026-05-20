@@ -127,7 +127,9 @@ Cross-platform builds are automated via GitHub Actions:
 
 ## Credits
 
-- **Jason** — fire-safety protocol consultant
+- **Haley** — the most awesome cuz ever, and for all the laughs
+- **John** — for everything he's taught me, and for never giving up, even when I made it ever so difficult
+- **Jason** — for being the brother I never had, and a friend when I needed one the most
 - **RedVelvet** — inspiration
 - **Gemini 2.0 Flash** — the DM
 
