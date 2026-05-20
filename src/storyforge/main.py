@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from storyforge.config import settings
-from storyforge.api import routes_state, routes_action, routes_lobby, ws_session
+from storyforge.api import routes_state, routes_action, routes_lobby, routes_npc, ws_session
 from storyforge.core.state_manager import StateManager
 from storyforge.persistence import snapshot
 
@@ -54,6 +54,7 @@ app.add_middleware(
 app.include_router(routes_state.router)
 app.include_router(routes_action.router)
 app.include_router(routes_lobby.router)
+app.include_router(routes_npc.router)
 app.include_router(ws_session.router)
 
 # Frontend static
