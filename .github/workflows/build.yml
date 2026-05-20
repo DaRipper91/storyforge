@@ -1,0 +1,214 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # ── Desktop: Windows ───────────────────────────────────────────────
+  build-windows:
+    name: Build (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --group dev --python 3.12
+
+      - name: Build with PyInstaller
+        run: uv run --python 3.12 python scripts/build.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoryForge-Windows
+          path: dist/StoryForge.exe
+
+  # ── Desktop: Linux binary ─────────────────────────────────────────
+  build-linux:
+    name: Build (Linux)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            libgtk-3-dev libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev libcairo2-dev pkg-config
+
+      - name: Install dependencies
+        run: uv sync --group dev --python 3.12
+
+      - name: Build with PyInstaller
+        run: uv run --python 3.12 python scripts/build.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoryForge-Linux
+          path: dist/StoryForge
+
+  # ── Android APK ───────────────────────────────────────────────────
+  build-android:
+    name: Build (Android APK)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential git zip unzip autoconf libtool \
+            libffi-dev libssl-dev libbz2-dev libreadline-dev \
+            libsqlite3-dev zlib1g-dev libltdl-dev
+
+      - name: Install buildozer and Cython
+        run: pip install --upgrade buildozer cython==0.29.37
+
+      - name: Cache buildozer global directory
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}-${{ runner.os }}
+          restore-keys: buildozer-
+
+      - name: Build APK
+        run: buildozer android debug 2>&1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoryForge-Android
+          path: bin/*.apk
+
+  # ── Linux packages (.deb / .rpm / .AppImage / Arch) ───────────────
+  package-linux:
+    name: Package (Linux)
+    runs-on: ubuntu-latest
+    needs: build-linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux binary
+        uses: actions/download-artifact@v4
+        with:
+          name: StoryForge-Linux
+          path: dist/
+
+      - name: Install nFPM
+        run: |
+          echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
+          sudo apt-get update -qq
+          sudo apt-get install -y nfpm
+
+      - name: Build packages
+        run: |
+          nfpm package --config nfpm.yaml --target . --packager deb
+          nfpm package --config nfpm.yaml --target . --packager rpm
+          nfpm package --config nfpm.yaml --target . --packager archlinux
+
+      - name: Build AppImage
+        run: |
+          curl -LO https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          mkdir -p StoryForge.AppDir/usr/bin
+          cp dist/StoryForge StoryForge.AppDir/usr/bin/storyforge
+          cp frontend/icon.svg StoryForge.AppDir/storyforge.svg
+          cat > StoryForge.AppDir/storyforge.desktop <<'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=StoryForge
+          Exec=storyforge
+          Icon=storyforge
+          Categories=Game;
+          EOF
+          ARCH=x86_64 ./appimagetool-x86_64.AppImage StoryForge.AppDir StoryForge-x86_64.AppImage
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: StoryForge-Linux-Packages
+          path: |
+            *.deb
+            *.rpm
+            *.pkg.tar.zst
+            *.AppImage
+
+  # ── GitHub Release (main branch pushes only) ──────────────────────
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [build-windows, package-linux, build-android]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release/
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0
+          name: Release v0.1.0
+          body: |
+            Initial release of the **Feral Successors** update.
+
+            Features:
+            - 15 Original Races
+            - Hybrid Evolutionary State + Predator Role system
+            - AI-driven snarky narration via Gemini 2.0 Flash
+            - Standalone Desktop (Windows/Linux) and Android support
+            - John's Multiversal Bodega — genre-adaptive NPC encounter
+            - Special thanks to Jason and RedVelvet
+          files: |
+            release/*.exe
+            release/*.apk
+            release/*.deb
+            release/*.rpm
+            release/*.pkg.tar.zst
+            release/*.AppImage
