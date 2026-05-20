@@ -786,17 +786,42 @@ export class Lobby {
   }
 
   _renderRaceStep(draft) {
-    const grid = document.createElement("div");
-    grid.className = "option-grid";
-    Object.entries(this.catalog.races).forEach(([key, def], idx) => {
-      const card = this._optionCard(def.name, def.flavor,
-        `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
-        draft.race === key, idx === this._focusIndex);
-      card.addEventListener("click",      () => { draft.race = key; this._renderCreation(); this.audio?.playCursor(); });
-      card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
-      grid.appendChild(card);
+    const entries = Object.entries(this.catalog.races);
+    const groups = ["Cosmic", "Primal", "Eldritch"];
+    let globalIdx = 0;
+    const container = document.createElement("div");
+    container.className = "race-groups";
+
+    groups.forEach(group => {
+      const groupEntries = entries.filter(([, def]) => def.group === group);
+      if (!groupEntries.length) return;
+
+      const section = document.createElement("div");
+      section.className = "race-group";
+
+      const heading = document.createElement("h3");
+      heading.className = "race-group-heading";
+      heading.textContent = group;
+      section.appendChild(heading);
+
+      const grid = document.createElement("div");
+      grid.className = "option-grid";
+
+      groupEntries.forEach(([key, def]) => {
+        const idx = globalIdx++;
+        const card = this._optionCard(def.name, def.flavor,
+          `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
+          draft.race === key, idx === this._focusIndex);
+        card.addEventListener("click",      () => { draft.race = key; this._renderCreation(); this.audio?.playCursor(); });
+        card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
+      container.appendChild(section);
     });
-    this._dom.stage.appendChild(grid);
+
+    this._dom.stage.appendChild(container);
   }
 
   _renderStateStep(draft) {

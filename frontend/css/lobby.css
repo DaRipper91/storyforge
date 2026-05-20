@@ -355,6 +355,24 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 /* Race + Class grid */
+.race-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.race-group-heading {
+  font-family: "Cinzel Decorative", serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-gilded);
+  opacity: 0.8;
+  margin: 0 0 var(--space-1) 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(196, 160, 64, 0.3);
+}
+
 .option-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

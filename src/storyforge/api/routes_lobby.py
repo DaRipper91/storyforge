@@ -53,6 +53,7 @@ async def get_catalog() -> dict:
                 "speed": rdef.speed,
                 "ability_bonuses": rdef.ability_bonuses,
                 "flavor": rdef.flavor,
+                "group": rdef.group,
             }
             for race, rdef in RACES.items()
         },
