@@ -762,28 +762,41 @@ export class GridCanvas {
 
   _followCursor(instant = false) {
     if (!this.state) return;
+
+    // At zoom 1.0 the whole grid fits the canvas — offsetX/Y already center it,
+    // so stage stays at (0,0) and no panning is needed.
+    if (this.zoomLevel <= 1.0) {
+      if (instant) {
+        this.stage.position({ x: 0, y: 0 });
+      } else {
+        if (this._cameraTween) this._cameraTween.stop();
+        this._cameraTween = new Konva.Tween({
+          node: this.stage, duration: 0.3, x: 0, y: 0,
+          easing: Konva.Easings.EaseOut,
+        });
+        this._cameraTween.play();
+      }
+      return;
+    }
+
+    // Zoomed in — pan so the cursor cell stays centred on screen.
     const cs = this.cellSize;
     const { x, y } = this.cursor;
-
-    // Target position for the stage to center the cursor
-    // Center of cursor in stage coordinates (relative to stage origin):
     const cursorCx = this.offsetX + x * cs + cs / 2;
     const cursorCy = this.offsetY + y * cs + cs / 2;
-
-    const targetX = this.stage.width() / 2 - cursorCx;
+    const targetX = this.stage.width()  / 2 - cursorCx;
     const targetY = this.stage.height() / 2 - cursorCy;
 
     if (instant) {
       this.stage.position({ x: targetX, y: targetY });
     } else {
-      // Smooth follow
       if (this._cameraTween) this._cameraTween.stop();
       this._cameraTween = new Konva.Tween({
         node: this.stage,
         duration: 0.3,
         x: targetX,
         y: targetY,
-        easing: Konva.Easings.EaseOut
+        easing: Konva.Easings.EaseOut,
       });
       this._cameraTween.play();
     }
