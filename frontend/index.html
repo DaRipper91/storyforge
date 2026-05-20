@@ -52,6 +52,7 @@
 
   <!-- App Menu -->
   <nav class="app-menu">
+    <button class="menu-btn" onclick="window.openSettings()">Settings</button>
     <button class="menu-btn" onclick="toggleKeymap()">Controls</button>
     <button class="menu-btn" onclick="
       if (window.pywebview) window.pywebview.api.toggle_fullscreen();
@@ -442,6 +443,38 @@
       <div class="modal-actions">
         <button id="freeform-cancel" class="btn">Cancel</button>
         <button id="freeform-commit" class="btn btn-primary">Commit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── SETTINGS MODAL ─────── -->
+  <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface settings-card">
+      <h2 class="ink-crimson">Settings</h2>
+
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>UI Scale</span>
+          <span id="ui-scale-value" class="settings-value ink-gilded">100%</span>
+        </div>
+        <input type="range" id="ui-scale-slider" class="settings-slider"
+               min="60" max="140" step="5" value="100">
+        <p class="hint-small">Scales all menus, text, and panels.</p>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">
+          <span>Game Zoom</span>
+          <span id="game-zoom-value" class="settings-value ink-gilded">70%</span>
+        </div>
+        <input type="range" id="game-zoom-slider" class="settings-slider"
+               min="40" max="150" step="5" value="70">
+        <p class="hint-small">Scales the grid and tokens on the map.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="window.resetSettings()">Reset Defaults</button>
+        <button class="btn btn-primary" onclick="window.closeSettings()">Done <kbd>Esc</kbd></button>
       </div>
     </div>
   </div>

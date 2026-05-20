@@ -416,6 +416,100 @@ function toggleKeymap() {
 }
 window.toggleKeymap = toggleKeymap;
 
+// ─────────────────────── Settings ────────────────────────────────
+
+const _settingsModal   = document.getElementById("settings-modal");
+const _uiScaleSlider   = document.getElementById("ui-scale-slider");
+const _gameZoomSlider  = document.getElementById("game-zoom-slider");
+const _uiScaleValue    = document.getElementById("ui-scale-value");
+const _gameZoomValue   = document.getElementById("game-zoom-value");
+
+const _DEFAULT_SETTINGS = { uiScale: 1.0, gameZoom: 0.7 };
+
+function _loadSettings() {
+  try {
+    return { ..._DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem("sf_settings") || "{}") };
+  } catch { return { ..._DEFAULT_SETTINGS }; }
+}
+
+function _saveSettings(s) {
+  localStorage.setItem("sf_settings", JSON.stringify(s));
+}
+
+function _applySettings({ uiScale, gameZoom }) {
+  // UI scale — zoom the entire document
+  document.documentElement.style.zoom = uiScale;
+  // Game zoom — update canvas cell size
+  if (canvas) {
+    canvas.zoomLevel = gameZoom;
+    canvas._fitAndRedraw();
+  }
+}
+
+function _syncSliderUI({ uiScale, gameZoom }) {
+  const uiPct   = Math.round(uiScale  * 100);
+  const gamePct = Math.round(gameZoom * 100);
+  _uiScaleSlider.value   = uiPct;
+  _gameZoomSlider.value  = gamePct;
+  _uiScaleValue.textContent  = `${uiPct}%`;
+  _gameZoomValue.textContent = `${gamePct}%`;
+}
+
+function openSettings() {
+  const s = _loadSettings();
+  _syncSliderUI(s);
+  _settingsModal.classList.remove("hidden");
+  audio.playCursor();
+}
+window.openSettings = openSettings;
+
+function closeSettings() {
+  _settingsModal.classList.add("hidden");
+}
+window.closeSettings = closeSettings;
+
+function resetSettings() {
+  _saveSettings(_DEFAULT_SETTINGS);
+  _syncSliderUI(_DEFAULT_SETTINGS);
+  _applySettings(_DEFAULT_SETTINGS);
+}
+window.resetSettings = resetSettings;
+
+// Live preview as sliders move
+_uiScaleSlider.addEventListener("input", () => {
+  const uiScale  = _uiScaleSlider.value / 100;
+  const gameZoom = _gameZoomSlider.value / 100;
+  _uiScaleValue.textContent = `${_uiScaleSlider.value}%`;
+  const s = { uiScale, gameZoom };
+  _applySettings(s);
+  _saveSettings(s);
+});
+
+_gameZoomSlider.addEventListener("input", () => {
+  const uiScale  = _uiScaleSlider.value / 100;
+  const gameZoom = _gameZoomSlider.value / 100;
+  _gameZoomValue.textContent = `${_gameZoomSlider.value}%`;
+  const s = { uiScale, gameZoom };
+  _applySettings(s);
+  _saveSettings(s);
+});
+
+// Close on backdrop click or Esc
+_settingsModal.addEventListener("click", (e) => {
+  if (e.target === _settingsModal) closeSettings();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !_settingsModal.classList.contains("hidden")) {
+    closeSettings();
+  }
+});
+
+// Apply saved settings on load
+(function initSettings() {
+  const s = _loadSettings();
+  _applySettings(s);
+})();
+
 // ─────────────────────── Keyboard fallback ───────────────────────
 
 function wireKeyboard() {
