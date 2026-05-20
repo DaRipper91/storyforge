@@ -4,7 +4,7 @@ package.name = storyforge
 package.domain = org.storyforge
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
-source.include_patterns = assets/*
+source.include_patterns = assets/*,res/xml/*
 version = 0.1.0
 icon.filename = %(source.dir)s/icon.png
 
@@ -15,6 +15,8 @@ orientation = landscape
 fullscreen = 1
 android.archs = arm64-v8a
 android.permissions = INTERNET
+android.manifest.application.usesCleartextTraffic = True
+android.res_dir = res/
 android.api = 33
 android.minapi = 21
 android.sdk = 33
