@@ -26,10 +26,11 @@ const CHARACTER_COLORS = {
 };
 
 export class GridCanvas {
-  constructor({ mountEl, onCellConfirmed, onCellInspected }) {
+  constructor({ mountEl, onCellConfirmed, onCellInspected, onZoomChanged }) {
     this.mountEl = mountEl;
     this.onCellConfirmed = onCellConfirmed;
     this.onCellInspected = onCellInspected;
+    this.onZoomChanged = onZoomChanged;
 
     this.state = null;
     this.cursor = { x: 0, y: 0 };
@@ -117,6 +118,7 @@ export class GridCanvas {
     this.zoomLevel = Math.max(0.4, Math.min(2.5, this.zoomLevel + delta));
     if (this.zoomLevel !== oldZoom) {
       this._fitAndRedraw();
+      this.onZoomChanged?.(this.zoomLevel);
     }
   }
 

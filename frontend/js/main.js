@@ -163,7 +163,15 @@ function initExplorationView() {
   canvas = new GridCanvas({
     mountEl: els.konvaMount,
     onCellConfirmed: handleGridConfirm,
+    onZoomChanged: (z) => {
+      const s = _loadSettings();
+      s.gameZoom = z;
+      _saveSettings(s);
+      _syncSliderUI(s);
+    },
   });
+  // Apply saved game zoom before the first setState (which triggers _fitAndRedraw)
+  canvas.zoomLevel = _loadSettings().gameZoom;
   characters = new CharacterPanel({
     portraitRowEl: els.portraitRow,
     summaryEls:    els.summary,
@@ -437,12 +445,11 @@ function _saveSettings(s) {
 }
 
 function _applySettings({ uiScale, gameZoom }) {
-  // UI scale — zoom the entire document
   document.documentElement.style.zoom = uiScale;
-  // Game zoom — update canvas cell size
   if (canvas) {
     canvas.zoomLevel = gameZoom;
-    canvas._fitAndRedraw();
+    // Wait one frame so the zoom reflow settles before measuring clientWidth/Height
+    requestAnimationFrame(() => canvas._fitAndRedraw());
   }
 }
 
