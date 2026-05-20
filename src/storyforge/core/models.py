@@ -152,11 +152,18 @@ class Race(StrEnum):
     DEEPTYRANT  = "deeptyrant"
     GRIMCROW    = "grimcrow"
     # Eldritch
-    BLOODWEAVER = "bloodweaver"
-    DREAMHUSK   = "dreamhusk"
-    BONEDRIFTER = "bonedrifter"
-    MINDSPIDER  = "mindspider"
-    CHAOSLING   = "chaosling"
+    BLOODWEAVER  = "bloodweaver"
+    DREAMHUSK    = "dreamhusk"
+    BONEDRIFTER  = "bonedrifter"
+    MINDSPIDER   = "mindspider"
+    CHAOSLING    = "chaosling"
+    # Cosmic (extended)
+    SIGNALSHADE  = "signalshade"
+    GALVANCHID   = "galvanchid"
+    # Primal (extended)
+    SUNSOVEREIGN = "sunsovereign"
+    VEXGHOST     = "vexghost"
+    ASHCRAWLER   = "ashcrawler"
 
 
 class EvolutionaryState(StrEnum):

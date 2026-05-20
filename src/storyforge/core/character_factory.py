@@ -94,6 +94,28 @@ RACES: dict[Race, RaceDef] = {
         name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1}, group="Eldritch",
         flavor="Twitching fragments of unraveled reality stitched into borrowed flesh."
     ),
+    # Cosmic (extended)
+    Race.SIGNALSHADE: RaceDef(
+        name="Signal-Shade", speed=45, ability_bonuses={"DEX": 2, "INT": 1}, group="Cosmic",
+        flavor="Digital phantoms born from collapsed broadcast networks, encoded into electromagnetic static."
+    ),
+    Race.GALVANCHID: RaceDef(
+        name="Galvanchid", speed=30, ability_bonuses={"CON": 2, "STR": 1}, group="Cosmic",
+        flavor="Bio-electric hive-nodes whose carapace stores enough charge to stop a heart or start one."
+    ),
+    # Primal (extended)
+    Race.SUNSOVEREIGN: RaceDef(
+        name="Sun-Sovereign", speed=35, ability_bonuses={"CHA": 2, "STR": 1}, group="Primal",
+        flavor="Radiant monarchs of dying stars whose breath turns stone to glass and glass to light."
+    ),
+    Race.VEXGHOST: RaceDef(
+        name="Vexghost", speed=40, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch",
+        flavor="Spite-born shades that outlasted their grievances and now haunt anyone who forgets their name."
+    ),
+    Race.ASHCRAWLER: RaceDef(
+        name="Ashcrawler", speed=25, ability_bonuses={"CON": 2, "WIS": 1}, group="Eldritch",
+        flavor="Armored scavengers that outlived three extinction events by consuming the dead of each one."
+    ),
 }
 
 # ─────────────────────── Evolutionary State definitions ───────────────────────

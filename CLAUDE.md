@@ -98,7 +98,7 @@ AI diffs (`StateDiff`) are rejected during `LOBBY` and `CREATION` phases. Phase 
 
 This is **not** standard D&D races/classes. Characters are built from three orthogonal choices:
 
-- **Race** (15 options across Sci-Fi, Mythic, Eldritch themes) — grants ability score bonuses and speed.
+- **Race** (20 options across Sci-Fi, Mythic, Eldritch themes) — grants ability score bonuses and speed.
 - **Evolutionary State** (Behemoth / Phantom / Swarm-Host / Mimic) — determines hit die and base AC.
 - **Predator Role** (Stalker / Vanguard / Catalyst / Siphoner) — determines starting inventory.
 
