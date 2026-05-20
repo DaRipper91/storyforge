@@ -1,56 +1,31 @@
-name: Release Apps
+name: Release APK
 
 on:
   workflow_run:
-    workflows: ["Build Desktop Apps", "Build Android APK", "Package Linux Apps"]
+    workflows: ["Build Android APK"]
     types: [completed]
-  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v4
 
-    - name: Download Windows Binary
-      uses: actions/download-artifact@v4
-      with:
-        name: StoryForge-Windows
-        path: release/
-
-    - name: Download Android APK
+    - name: Download APK
       uses: actions/download-artifact@v4
       with:
         name: StoryForge-Android
         path: release/
-
-    - name: Download Linux Packages
-      uses: actions/download-artifact@v4
-      with:
-        name: StoryForge-Linux-Packages
-        path: release/
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v0.1.0
-        name: Release v0.1.0
-        body: |
-          Initial release of the **Feral Successors** update.
-          
-          Features:
-          - 15 Original Races
-          - Hybrid Evolutionary State + Predator Role system
-          - AI-driven snarky narration via Gemini 3.5 Flash
-          - Standalone Desktop (Windows/Linux) and Android support
-          - Special thanks to Jason and RedVelvet
-        files: |
-          release/*.exe
-          release/*.apk
-          release/*.deb
-          release/*.rpm
-          release/*.pkg.tar.zst
-          release/*.AppImage
+        tag_name: apk-latest
+        name: StoryForge APK (latest)
+        body: "Android APK — connect to a StoryForge server on your LAN."
+        files: release/*.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
