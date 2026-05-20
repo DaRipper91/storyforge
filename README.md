@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/System-D%26D_5e-red?style=for-the-badge&logo=dungeons-and-dragons" alt="D&D 5e">
   <img src="https://img.shields.io/badge/Engine-Python_3.14-blue?style=for-the-badge&logo=python" alt="Python">
-  <img src="https://img.shields.io/badge/AI-Gemini_3.5-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
+  <img src="https://img.shields.io/badge/AI-Gemini_3.5_Flash-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
   <img src="https://img.shields.io/badge/Platform-Linux_%2F_Windows_%2F_Android-lightgrey?style=for-the-badge" alt="Platform">
 </p>
 
@@ -131,7 +131,7 @@ Cross-platform builds are automated via GitHub Actions:
 - **John** — for everything he's taught me, and for never giving up, even when I made it ever so difficult
 - **Jason** — for being the brother I never had, and a friend when I needed one the most
 - **RedVelvet** — inspiration
-- **Gemini 3.5** — the DM
+- **Gemini 3.5 Flash** — the DM
 
 ---
 
