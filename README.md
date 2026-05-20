@@ -23,7 +23,7 @@ Characters are built from three orthogonal choices — not classes:
 
 | Choice | Options |
 |--------|---------|
-| **Race** (20 total) | Signal-Shade, Sun-Sovereign, Vexghost, Galvanchid, Ashcrawler, and 15 more |
+| **Race** (20 total) | Ironveil, Forgespawn, Wirewraith, Hexgear, Cinderplate, and 15 more |
 | **Evolutionary State** | Behemoth · Phantom · Swarm-Host · Mimic |
 | **Predator Role** | Stalker · Vanguard · Catalyst · Siphoner |
 

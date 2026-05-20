@@ -28,11 +28,11 @@ export const RACE_ACCENT_COLORS = {
   dreamhusk:   '#d8b4ff',  // spore-mist lavender
   bonedrifter: '#ddddd0',  // bleached bone white
   mindspider:  '#aaffdd',  // translucent emerald shimmer
-  signalshade: '#00ff88',  // broadcast-green signal pulse
-  galvanchid:  '#ffee00',  // bio-electric yellow charge
-  sunsovereign:'#ffd700',  // molten gold crown
-  vexghost:    '#ff88ff',  // spite-pink spectral trace
-  ashcrawler:  '#bbbbaa',  // extinction-grey carapace
+  ironveil:    '#c8e8ff',  // razor-thin steel shimmer
+  forgespawn:  '#ff8800',  // liquid-metal forge glow
+  cinderplate: '#ff4400',  // molten core bleed
+  hexgear:     '#88ffcc',  // modular circuit trace
+  wirewraith:  '#ffff44',  // exposed-nerve charge
 };
 
 // ─────────────────────────── sprite data ────────────────────────────────────

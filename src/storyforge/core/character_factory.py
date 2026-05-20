@@ -94,27 +94,26 @@ RACES: dict[Race, RaceDef] = {
         name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1}, group="Eldritch",
         flavor="Twitching fragments of unraveled reality stitched into borrowed flesh."
     ),
-    # Cosmic (extended)
-    Race.SIGNALSHADE: RaceDef(
-        name="Signal-Shade", speed=45, ability_bonuses={"DEX": 2, "INT": 1}, group="Cosmic",
-        flavor="Digital phantoms born from collapsed broadcast networks, encoded into electromagnetic static."
+    # Mechanical — constructed, forged, refused to stop
+    Race.IRONVEIL: RaceDef(
+        name="Ironveil", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Mechanical",
+        flavor="Gossamer-thin war constructs that fold themselves flat to slip through walls and armor plating. Deceptively fragile looking, catastrophically sharp."
     ),
-    Race.GALVANCHID: RaceDef(
-        name="Galvanchid", speed=30, ability_bonuses={"CON": 2, "STR": 1}, group="Cosmic",
-        flavor="Bio-electric hive-nodes whose carapace stores enough charge to stop a heart or start one."
+    Race.FORGESPAWN: RaceDef(
+        name="Forgespawn", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Mechanical",
+        flavor="Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire."
     ),
-    # Primal (extended)
-    Race.SUNSOVEREIGN: RaceDef(
-        name="Sun-Sovereign", speed=35, ability_bonuses={"CHA": 2, "STR": 1}, group="Primal",
-        flavor="Radiant monarchs of dying stars whose breath turns stone to glass and glass to light."
+    Race.CINDERPLATE: RaceDef(
+        name="Cinderplate", speed=20, ability_bonuses={"STR": 2, "WIS": 1}, group="Mechanical",
+        flavor="Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch."
     ),
-    Race.VEXGHOST: RaceDef(
-        name="Vexghost", speed=40, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch",
-        flavor="Spite-born shades that outlasted their grievances and now haunt anyone who forgets their name."
+    Race.HEXGEAR: RaceDef(
+        name="Hexgear", speed=35, ability_bonuses={"INT": 2, "DEX": 1}, group="Mechanical",
+        flavor="Six-sided modular beings that reconfigure their body layout mid-combat. No consistent face, no consistent silhouette."
     ),
-    Race.ASHCRAWLER: RaceDef(
-        name="Ashcrawler", speed=25, ability_bonuses={"CON": 2, "WIS": 1}, group="Eldritch",
-        flavor="Armored scavengers that outlived three extinction events by consuming the dead of each one."
+    Race.WIREWRAITH: RaceDef(
+        name="Wirewraith", speed=45, ability_bonuses={"DEX": 2, "WIS": 1}, group="Mechanical",
+        flavor="Exposed-nerve constructs that transmit pain and data at the same speed. They feel everything, process it, and don't stop moving."
     ),
 }
 

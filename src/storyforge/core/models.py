@@ -157,13 +157,12 @@ class Race(StrEnum):
     BONEDRIFTER  = "bonedrifter"
     MINDSPIDER   = "mindspider"
     CHAOSLING    = "chaosling"
-    # Cosmic (extended)
-    SIGNALSHADE  = "signalshade"
-    GALVANCHID   = "galvanchid"
-    # Primal (extended)
-    SUNSOVEREIGN = "sunsovereign"
-    VEXGHOST     = "vexghost"
-    ASHCRAWLER   = "ashcrawler"
+    # Mechanical
+    IRONVEIL     = "ironveil"
+    FORGESPAWN   = "forgespawn"
+    CINDERPLATE  = "cinderplate"
+    HEXGEAR      = "hexgear"
+    WIREWRAITH   = "wirewraith"
 
 
 class EvolutionaryState(StrEnum):
