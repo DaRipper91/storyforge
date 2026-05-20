@@ -3,6 +3,7 @@ import time
 import socket
 import uvicorn
 import webview
+from webview.menu import Menu, MenuAction, MenuSeparator
 from storyforge.main import app
 
 
@@ -65,17 +66,17 @@ def main():
     api.set_window(window)
 
     menu = [
-        webview.Menu("File", [
-            webview.MenuAction("Reload / New Game", api.reload),
-            webview.MenuSeparator(),
-            webview.MenuAction("Quit", api.quit),
+        Menu("File", [
+            MenuAction("Reload / New Game", api.reload),
+            MenuSeparator(),
+            MenuAction("Quit", api.quit),
         ]),
-        webview.Menu("View", [
-            webview.MenuAction("Toggle Fullscreen", api.toggle_fullscreen),
-            webview.MenuAction("Minimize", api.minimize),
+        Menu("View", [
+            MenuAction("Toggle Fullscreen", api.toggle_fullscreen),
+            MenuAction("Minimize", api.minimize),
         ]),
-        webview.Menu("Help", [
-            webview.MenuAction("Show Controls", api.open_controls),
+        Menu("Help", [
+            MenuAction("Show Controls", api.open_controls),
         ]),
     ]
 
