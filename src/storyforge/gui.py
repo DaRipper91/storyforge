@@ -40,6 +40,10 @@ class StoryForgeAPI:
         if self._window:
             self._window.evaluate_js("window.toggleKeymap && window.toggleKeymap()")
 
+    def open_settings(self):
+        if self._window:
+            self._window.evaluate_js("window.openSettings && window.openSettings()")
+
     def reload(self):
         if self._window:
             self._window.evaluate_js("window.location.reload()")
@@ -83,6 +87,8 @@ def main():
         Menu("View", [
             MenuAction("Toggle Fullscreen", api.toggle_fullscreen),
             MenuAction("Minimize", api.minimize),
+            MenuSeparator(),
+            MenuAction("Settings", api.open_settings),
         ]),
         Menu("Help", [
             MenuAction("Show Controls", api.open_controls),
