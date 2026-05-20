@@ -199,6 +199,66 @@ export async function hailieGetState() {
   return jsonOrThrow(res);
 }
 
+// ── Queen D.Anna ──────────────────────────────────────────────────
+
+export async function dannaAddress(form = "proper") {
+  const res = await fetch(`${API_BASE}/api/npc/danna/address`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ form }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function dannaPetition(petitionType = "blessing") {
+  const res = await fetch(`${API_BASE}/api/npc/danna/petition`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ petition_type: petitionType }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function dannaGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/danna/state`);
+  return jsonOrThrow(res);
+}
+
+// ── Firey RedVelvet ───────────────────────────────────────────────
+
+export async function rvPerform() {
+  const res = await fetch(`${API_BASE}/api/npc/redvelvet/perform`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
+export async function rvTip(silver = 5) {
+  const res = await fetch(`${API_BASE}/api/npc/redvelvet/tip`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ silver }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function rvHeckle() {
+  const res = await fetch(`${API_BASE}/api/npc/redvelvet/heckle`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
+export async function rvRequestSong(songType = "mystery") {
+  const res = await fetch(`${API_BASE}/api/npc/redvelvet/request-song`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ song_type: songType }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function rvGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/redvelvet/state`);
+  return jsonOrThrow(res);
+}
+
 /**
  * Open a WebSocket and call onMessage for every state_diff event.
  */

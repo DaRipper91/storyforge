@@ -822,3 +822,108 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 .btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
 
+/* ─────────────────────── Queen D.Anna Overlay ─────────────────────── */
+
+.danna-card {
+  width: min(96vw, 1000px);
+  max-height: 88vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.danna-portrait {
+  background: #4a1060 !important;
+  border-color: #c8a0e8 !important;
+}
+
+.danna-standing-badge {
+  font-size: var(--fs-xs);
+  text-align: right;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.danna-favor-display {
+  font-family: "JetBrains Mono", monospace;
+  opacity: 0.8;
+}
+
+.danna-address-btns,
+.danna-petition-btns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-1) 0;
+}
+
+.danna-wrong .escape-method-stat {
+  color: var(--ink-crimson);
+}
+
+.danna-cost {
+  color: #c8a0e8;
+}
+
+/* ─────────────────────── Firey RedVelvet Overlay ─────────────────── */
+
+.redvelvet-card {
+  width: min(96vw, 1000px);
+  max-height: 88vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.redvelvet-portrait {
+  background: #8B1a1a !important;
+  border-color: #ff6820 !important;
+}
+
+.rv-mood-badge {
+  font-size: var(--fs-xs);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rv-mood-pips {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  justify-content: flex-end;
+}
+
+.rv-pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rv-pip.active {
+  border-color: transparent;
+}
+
+.rv-perform-btn {
+  width: 100%;
+  margin-bottom: var(--space-1);
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.rv-song-btns,
+.rv-tip-btns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-1) 0;
+}
+
+.rv-tip-btns {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+

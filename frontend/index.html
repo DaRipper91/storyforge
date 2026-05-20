@@ -272,6 +272,165 @@
     </div>
   </div>
 
+  <!-- ─────── QUEEN D.ANNA OVERLAY ─────── -->
+  <div id="danna-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface danna-card">
+
+      <div class="jon-shop-header">
+        <div class="jon-npc-portrait danna-portrait" data-initial="D"></div>
+        <div class="jon-header-text">
+          <h2 class="ink-gilded">Queen D.Anna</h2>
+          <p id="danna-tagline" class="jon-tagline">"State your business. Correctly."</p>
+        </div>
+        <div class="danna-standing-badge">
+          Standing: <span id="danna-standing-label" class="ink-gilded">Neutral</span>
+          <br><span class="danna-favor-display">Favor <span id="danna-favor">0</span></span>
+        </div>
+      </div>
+
+      <div id="danna-message" class="jon-message hidden"></div>
+
+      <div class="jon-shop-body">
+        <div class="jon-inventory-panel">
+          <h3>Address Her Majesty</h3>
+          <p class="hint-small">How you greet her determines everything that follows.</p>
+          <div class="danna-address-btns">
+            <button class="escape-btn danna-address-btn" data-form="proper">
+              <span class="escape-method-name">Your Majesty</span>
+              <span class="escape-method-stat">Correct</span>
+            </button>
+            <button class="escape-btn danna-address-btn" data-form="friendly">
+              <span class="escape-method-name">Your Grace</span>
+              <span class="escape-method-stat">Acceptable</span>
+            </button>
+            <button class="escape-btn danna-address-btn" data-form="casual">
+              <span class="escape-method-name">By Name</span>
+              <span class="escape-method-stat">Unwise</span>
+            </button>
+            <button class="escape-btn danna-address-btn danna-wrong" data-form="wrong">
+              <span class="escape-method-name">Hey You</span>
+              <span class="escape-method-stat">💀</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="jon-action-panel">
+          <h3>Petition the Queen</h3>
+          <p class="hint-small">Spend Favor. Earn things worth having.</p>
+          <div class="danna-petition-btns escape-methods">
+            <button class="escape-btn danna-petition-btn" data-petition="blessing">
+              <span class="escape-method-name">Royal Blessing</span>
+              <span class="escape-method-stat danna-cost">1 favor</span>
+            </button>
+            <button class="escape-btn danna-petition-btn" data-petition="intelligence">
+              <span class="escape-method-name">Road Intelligence</span>
+              <span class="escape-method-stat danna-cost">1 favor</span>
+            </button>
+            <button class="escape-btn danna-petition-btn" data-petition="endorsement">
+              <span class="escape-method-name">Royal Endorsement</span>
+              <span class="escape-method-stat danna-cost">2 favor</span>
+            </button>
+            <button class="escape-btn danna-petition-btn" data-petition="mercy">
+              <span class="escape-method-name">Royal Mercy</span>
+              <span class="escape-method-stat danna-cost">3 favor</span>
+            </button>
+          </div>
+
+          <hr class="jon-divider" />
+          <h3>Take Your Leave</h3>
+          <p class="hint-small">She will note whether you depart correctly.</p>
+          <div class="cactus-actions">
+            <button id="danna-leave-btn" class="btn btn-small">Bow and Withdraw</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────── FIREY REDVELVET OVERLAY ─────── -->
+  <div id="redvelvet-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface redvelvet-card">
+
+      <div class="jon-shop-header">
+        <div class="jon-npc-portrait redvelvet-portrait" data-initial="R"></div>
+        <div class="jon-header-text">
+          <h2 class="ink-gilded">Firey RedVelvet</h2>
+          <p id="rv-tagline" class="jon-tagline">"You're watching, or you're in the way."</p>
+        </div>
+        <div class="rv-mood-badge">
+          Mood: <span id="rv-mood-label" class="ink-gilded rv-mood-text">Warm</span>
+          <div class="rv-mood-pips" id="rv-mood-pips">
+            <span class="rv-pip active"></span>
+            <span class="rv-pip active"></span>
+            <span class="rv-pip"></span>
+            <span class="rv-pip"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="rv-message" class="jon-message hidden"></div>
+
+      <div class="jon-shop-body">
+        <div class="jon-inventory-panel">
+          <h3>The Performance</h3>
+          <button id="rv-perform-btn" class="btn btn-primary rv-perform-btn">Watch Her Perform</button>
+
+          <hr class="jon-divider" />
+          <h3>Request a Song</h3>
+          <p class="hint-small">She picks the right one for the moment.</p>
+          <div class="rv-song-btns escape-methods">
+            <button class="escape-btn rv-song-btn" data-song="battle_hymn">
+              <span class="escape-method-name">Battle Hymn</span>
+              <span class="escape-method-stat">STR</span>
+            </button>
+            <button class="escape-btn rv-song-btn" data-song="lullaby">
+              <span class="escape-method-name">Lullaby</span>
+              <span class="escape-method-stat">CON</span>
+            </button>
+            <button class="escape-btn rv-song-btn" data-song="drinking_song">
+              <span class="escape-method-name">Drinking Song</span>
+              <span class="escape-method-stat">CHA</span>
+            </button>
+            <button class="escape-btn rv-song-btn" data-song="dirge">
+              <span class="escape-method-name">Dirge</span>
+              <span class="escape-method-stat">WIS</span>
+            </button>
+            <button class="escape-btn rv-song-btn" data-song="mystery">
+              <span class="escape-method-name">Her Choice</span>
+              <span class="escape-method-stat">✦</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="jon-action-panel">
+          <h3>Your Contribution</h3>
+          <p class="hint-small">Tips raise the mood. Every 5 silver, one step.</p>
+          <div class="rv-tip-btns cactus-actions">
+            <button class="btn btn-small rv-tip-btn" data-tip="5">Tip 5s</button>
+            <button class="btn btn-small rv-tip-btn" data-tip="10">Tip 10s</button>
+            <button class="btn btn-small rv-tip-btn" data-tip="20">Tip 20s</button>
+          </div>
+
+          <hr class="jon-divider" />
+          <h3>Make It Worse</h3>
+          <p class="hint-small">She handles it. Mood drops one step.</p>
+          <div class="cactus-actions">
+            <button id="rv-heckle-btn" class="btn btn-small btn-danger">Heckle Her</button>
+          </div>
+
+          <hr class="jon-divider" />
+          <h3>Step Away</h3>
+          <p class="hint-small">The fire continues whether you watch or not.</p>
+          <div class="cactus-actions">
+            <button id="rv-leave-btn" class="btn btn-small">Walk Away</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ─────── FREEFORM MODAL (unchanged) ─────── -->
   <div id="freeform-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card parchment-surface">

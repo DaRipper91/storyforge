@@ -9,6 +9,8 @@
 
 import { fetchState, openSession, postGridAction, postFreeformAction,
          jonGetInventory, jonBuy, jonEscape, jonCactus, jonTick, jonGetState,
+         dannaAddress, dannaPetition, dannaGetState,
+         rvPerform, rvTip, rvHeckle, rvRequestSong,
 } from "./api.js";
 import { GridCanvas } from "./canvas.js";
 import { GamepadManager, XBOX } from "./gamepad.js";
@@ -309,7 +311,7 @@ async function handleGridConfirm(target) {
     audio.playConfirm();
 
     if (result.encounter?.type === "npc_encounter") {
-      openShopOverlay(result.encounter);
+      openNpcOverlay(result.encounter);
       return;
     }
     if (result.room_transition) {
@@ -516,6 +518,16 @@ function closeFreeformModal() {
   els.freeformModal.classList.add("hidden");
 }
 
+// ─────────────────────── NPC overlay dispatcher ───────────────────
+
+function openNpcOverlay(encounterData) {
+  const id = encounterData.encounter_id;
+  if      (id === "jon_shop")              openShopOverlay(encounterData);
+  else if (id === "danna_audience")        openDannaOverlay();
+  else if (id === "redvelvet_performance") openRedVelvetOverlay();
+  // samael_lore / haylie_inn: no overlay yet — fall through silently
+}
+
 // ─────────────────────── Jon Shop Encounter ───────────────────────
 
 const shopEls = {
@@ -682,4 +694,229 @@ function showEscapeResult(text, success) {
   // Render simple markdown bold
   shopEls.escapeResult.innerHTML = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
   shopEls.escapeResult.classList.remove("hidden");
+}
+
+// ─────────────────────── Queen D.Anna Encounter ───────────────────
+
+const dannaEls = {
+  overlay:       document.getElementById("danna-overlay"),
+  tagline:       document.getElementById("danna-tagline"),
+  message:       document.getElementById("danna-message"),
+  standingLabel: document.getElementById("danna-standing-label"),
+  favorDisplay:  document.getElementById("danna-favor"),
+  leaveBtn:      document.getElementById("danna-leave-btn"),
+};
+
+function openDannaOverlay() {
+  dannaEls.overlay.classList.remove("hidden");
+  dannaEls.message.classList.add("hidden");
+  _refreshDannaState();
+  wireDannaButtons();
+  audio.playPageTurn();
+}
+
+function closeDannaOverlay() {
+  dannaEls.overlay.classList.add("hidden");
+  dannaEls.message.classList.add("hidden");
+}
+
+async function _refreshDannaState() {
+  try {
+    const s = await dannaGetState();
+    dannaEls.standingLabel.textContent = s.standing;
+    dannaEls.favorDisplay.textContent  = s.favor;
+    dannaEls.tagline.textContent = _dannaTagline(s.favor, s.is_offended);
+  } catch (_) {}
+}
+
+function _dannaTagline(favor, offended) {
+  if (offended)  return '"We will try this again. From the beginning."';
+  if (favor >= 3) return '"You have conducted yourself well. Remarkably well."';
+  if (favor >= 1) return '"You may approach."';
+  if (favor < 0)  return '"I am choosing, deliberately, not to elaborate."';
+  return '"State your business. Correctly."';
+}
+
+function _showDannaMessage(text, cls = "") {
+  dannaEls.message.className = `jon-message${cls ? " " + cls : ""}`;
+  dannaEls.message.textContent = text;
+  dannaEls.message.classList.remove("hidden");
+  dannaEls.tagline.textContent = text.slice(0, 80) + (text.length > 80 ? "…" : "");
+}
+
+function wireDannaButtons() {
+  document.querySelectorAll(".danna-address-btn").forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        const res = await dannaAddress(btn.dataset.form);
+        _showDannaMessage(res.response, res.correct ? "" : "is-offended");
+        dannaEls.standingLabel.textContent = res.standing;
+        dannaEls.favorDisplay.textContent  = res.new_favor;
+        dannaEls.tagline.textContent = _dannaTagline(res.new_favor, res.is_offended);
+      } catch (e) {
+        _showDannaMessage("She looks at you. The situation is unclear.", "");
+      }
+    };
+  });
+
+  document.querySelectorAll(".danna-petition-btn").forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        const res = await dannaPetition(btn.dataset.petition);
+        _showDannaMessage(res.response, res.granted ? "" : "is-offended");
+        dannaEls.standingLabel.textContent = res.standing;
+        dannaEls.favorDisplay.textContent  = res.new_favor;
+      } catch (e) {
+        _showDannaMessage("The petition went unheard.", "is-offended");
+      }
+    };
+  });
+
+  dannaEls.leaveBtn.onclick = closeDannaOverlay;
+
+  dannaEls.overlay.addEventListener("click", (e) => {
+    if (e.target === dannaEls.overlay) closeDannaOverlay();
+  });
+
+  document.addEventListener("keydown", function dannaEsc(e) {
+    if (e.key === "Escape" && !dannaEls.overlay.classList.contains("hidden")) {
+      closeDannaOverlay();
+      document.removeEventListener("keydown", dannaEsc);
+    }
+  });
+}
+
+// ─────────────────────── Firey RedVelvet Encounter ────────────────
+
+const rvEls = {
+  overlay:    document.getElementById("redvelvet-overlay"),
+  tagline:    document.getElementById("rv-tagline"),
+  message:    document.getElementById("rv-message"),
+  moodLabel:  document.getElementById("rv-mood-label"),
+  moodPips:   document.getElementById("rv-mood-pips"),
+  performBtn: document.getElementById("rv-perform-btn"),
+  heckleBtn:  document.getElementById("rv-heckle-btn"),
+  leaveBtn:   document.getElementById("rv-leave-btn"),
+};
+
+const _MOOD_NAMES  = ["Cold", "Warm", "Hot", "Blazing"];
+const _MOOD_COLORS = ["#aaa", "#e8a040", "#ff6820", "#ff2200"];
+
+function openRedVelvetOverlay() {
+  rvEls.overlay.classList.remove("hidden");
+  rvEls.message.classList.add("hidden");
+  _refreshRvState();
+  wireRvButtons();
+  audio.playPageTurn();
+}
+
+function closeRedVelvetOverlay() {
+  rvEls.overlay.classList.add("hidden");
+  rvEls.message.classList.add("hidden");
+}
+
+async function _refreshRvState() {
+  try {
+    const s = await (await fetch("/api/npc/redvelvet/state")).json();
+    _updateRvMood(s.current_mood);
+  } catch (_) {}
+}
+
+function _updateRvMood(moodValue) {
+  const label = _MOOD_NAMES[moodValue] ?? "Warm";
+  const color  = _MOOD_COLORS[moodValue] ?? _MOOD_COLORS[1];
+  rvEls.moodLabel.textContent = label;
+  rvEls.moodLabel.style.color = color;
+  rvEls.moodPips?.querySelectorAll(".rv-pip").forEach((pip, i) => {
+    pip.classList.toggle("active", i <= moodValue);
+    pip.style.background = i <= moodValue ? color : "";
+  });
+
+  const taglines = [
+    '"The fire performs whether you deserve it or not."',
+    '"You\'re watching, or you\'re in the way."',
+    '"Now we\'re getting somewhere."',
+    '"This one\'s the real one. Pay attention."',
+  ];
+  rvEls.tagline.textContent = taglines[moodValue] ?? taglines[1];
+
+  const btn = rvEls.performBtn;
+  btn.textContent = moodValue >= 3 ? "★ Watch Her Perform ★" : "Watch Her Perform";
+  btn.style.borderColor = moodValue >= 2 ? color : "";
+}
+
+function _showRvMessage(text, cls = "") {
+  rvEls.message.className = `jon-message${cls ? " " + cls : ""}`;
+  rvEls.message.textContent = text;
+  rvEls.message.classList.remove("hidden");
+}
+
+function wireRvButtons() {
+  rvEls.performBtn.onclick = async () => {
+    try {
+      const res = await rvPerform();
+      _showRvMessage(res.performance_text, res.grants_boon ? "" : "");
+      _updateRvMood(res.mood_value);
+      if (res.grants_boon) {
+        audio.playConfirm();
+        canvas?.spawnFloatingText(
+          characters?.activeCharacter?.position ?? { x: 0, y: 0 },
+          "✦ Inspired", "#ff6820"
+        );
+      } else {
+        audio.playPageTurn();
+      }
+    } catch (e) {
+      _showRvMessage("The performance continues regardless.", "");
+    }
+  };
+
+  document.querySelectorAll(".rv-tip-btn").forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        const res = await rvTip(Number(btn.dataset.tip));
+        _showRvMessage(res.response, "");
+        if (res.mood_changed) _updateRvMood(_MOOD_NAMES.indexOf(res.mood_after));
+        audio.playConfirm();
+      } catch (e) {
+        _showRvMessage("The silver landed somewhere. Probably fine.", "");
+      }
+    };
+  });
+
+  document.querySelectorAll(".rv-song-btn").forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        const res = await rvRequestSong(btn.dataset.song);
+        _showRvMessage(res.performance_text, "");
+        audio.playPageTurn();
+      } catch (e) {
+        _showRvMessage("She starts playing something. The request may not have registered.", "");
+      }
+    };
+  });
+
+  rvEls.heckleBtn.onclick = async () => {
+    try {
+      const res = await rvHeckle();
+      _showRvMessage(res.response, "is-offended");
+      _updateRvMood(_MOOD_NAMES.indexOf(res.mood_after));
+      audio.playDeny();
+    } catch (e) {
+      _showRvMessage("She heard you. Everyone heard you.", "is-offended");
+    }
+  };
+
+  rvEls.leaveBtn.onclick = closeRedVelvetOverlay;
+
+  rvEls.overlay.addEventListener("click", (e) => {
+    if (e.target === rvEls.overlay) closeRedVelvetOverlay();
+  });
+
+  document.addEventListener("keydown", function rvEsc(e) {
+    if (e.key === "Escape" && !rvEls.overlay.classList.contains("hidden")) {
+      closeRedVelvetOverlay();
+      document.removeEventListener("keydown", rvEsc);
+    }
+  });
 }
