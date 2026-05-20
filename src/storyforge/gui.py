@@ -27,6 +27,14 @@ class StoryForgeAPI:
         if self._window:
             self._window.minimize()
 
+    def open_controls(self):
+        if self._window:
+            self._window.evaluate_js("window.toggleKeymap && window.toggleKeymap()")
+
+    def reload(self):
+        if self._window:
+            self._window.evaluate_js("window.location.reload()")
+
 
 def find_free_port():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -55,7 +63,23 @@ def main():
         js_api=api,
     )
     api.set_window(window)
-    webview.start()
+
+    menu = [
+        webview.Menu("File", [
+            webview.MenuAction("Reload / New Game", api.reload),
+            webview.MenuSeparator(),
+            webview.MenuAction("Quit", api.quit),
+        ]),
+        webview.Menu("View", [
+            webview.MenuAction("Toggle Fullscreen", api.toggle_fullscreen),
+            webview.MenuAction("Minimize", api.minimize),
+        ]),
+        webview.Menu("Help", [
+            webview.MenuAction("Show Controls", api.open_controls),
+        ]),
+    ]
+
+    webview.start(menu=menu)
 
 
 if __name__ == "__main__":
