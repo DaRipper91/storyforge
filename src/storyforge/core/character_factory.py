@@ -30,68 +30,68 @@ class RaceDef:
     flavor: str
 
 RACES: dict[Race, RaceDef] = {
-    # Sci-Fi
-    Race.ARCHON_VULTURE: RaceDef(
-        name="Archon-Vulture", speed=30, ability_bonuses={"INT": 2, "STR": 1},
-        flavor="Bio-magnetic scavengers that reanimate dead systems."
+    # Cosmic — born between stars, beneath suns, inside the void
+    Race.VOIDWRAITH: RaceDef(
+        name="Voidwraith", speed=30, ability_bonuses={"INT": 2, "STR": 1},
+        flavor="Stellar scavengers that feast on dying magic and the bones of dead worlds."
     ),
-    Race.SIGNAL_SHADE: RaceDef(
-        name="Signal-Shade", speed=40, ability_bonuses={"DEX": 2, "INT": 1},
-        flavor="Formless data-entities striking from digital networks."
+    Race.NULLSHADE: RaceDef(
+        name="Nullshade", speed=40, ability_bonuses={"DEX": 2, "INT": 1},
+        flavor="Formless hunters that stalk prey from the dark spaces between worlds."
     ),
-    Race.GEAR_LOCUST: RaceDef(
-        name="Gear-Locust", speed=35, ability_bonuses={"DEX": 2, "CON": 1},
-        flavor="Chitinous drones that disassemble gear in combat."
+    Race.IRONLOCUST: RaceDef(
+        name="Iron-Locust", speed=35, ability_bonuses={"DEX": 2, "CON": 1},
+        flavor="Chitinous swarms that strip metal, stone, and bone with equal hunger."
     ),
-    Race.CORE_DRINKER: RaceDef(
-        name="Core-Drinker", speed=20, ability_bonuses={"STR": 2, "CON": 1},
-        flavor="Geothermal leviathans with fusion-grafted spines."
+    Race.EMBERVEIN: RaceDef(
+        name="Embervein", speed=20, ability_bonuses={"STR": 2, "CON": 1},
+        flavor="Molten-blooded leviathans born in the cores of burning worlds."
     ),
-    Race.VOID_STRIDER: RaceDef(
-        name="Void-Strider", speed=30, ability_bonuses={"DEX": 1, "WIS": 2},
-        flavor="Radar-absorbing hunters blinking through Glitch-Space."
+    Race.RIFTWALKER: RaceDef(
+        name="Riftwalker", speed=30, ability_bonuses={"DEX": 1, "WIS": 2},
+        flavor="Phase-hunters that slip between realms leaving no shadow and no sound."
     ),
-    # Mythic
-    Race.SUN_SOVEREIGN: RaceDef(
-        name="Sun-Sovereign", speed=40, ability_bonuses={"CHA": 2, "WIS": 1},
-        flavor="Avian humanoids manipulating celestial light-leys."
+    # Primal — ancient, elemental, rooted in myth and living world
+    Race.SOLARLORD: RaceDef(
+        name="Solar-Lord", speed=40, ability_bonuses={"CHA": 2, "WIS": 1},
+        flavor="Celestial avians who ride light-paths between suns and speak in stellar fire."
     ),
-    Race.ECHO_VINE: RaceDef(
-        name="Echo-Vine", speed=30, ability_bonuses={"DEX": 1, "CHA": 2},
-        flavor="Bark-skinned mimics replacing prey in sentient jungles."
+    Race.THORNMIMIC: RaceDef(
+        name="Thornmimic", speed=30, ability_bonuses={"DEX": 1, "CHA": 2},
+        flavor="Bark-skinned shapeshifters who replace their prey in the oldest forests."
     ),
-    Race.CINDER_KIN: RaceDef(
-        name="Cinder-Kin", speed=35, ability_bonuses={"INT": 1, "DEX": 2},
-        flavor="Crystalline imps strategically melting tectonic plates."
+    Race.CINDERKIN: RaceDef(
+        name="Cinderkin", speed=35, ability_bonuses={"INT": 1, "DEX": 2},
+        flavor="Crystalline fire-sprites forged in the hearts of volcanoes."
     ),
-    Race.TIDE_TYRANT: RaceDef(
-        name="Tide-Tyrant", speed=30, ability_bonuses={"STR": 1, "INT": 2},
-        flavor="Cephalopodic strategists manipulating trade via whirlpools."
+    Race.DEEPTYRANT: RaceDef(
+        name="Deep-Tyrant", speed=30, ability_bonuses={"STR": 1, "INT": 2},
+        flavor="Ancient cephalopodic minds who rule kingdoms from the lightless abyss."
     ),
-    Race.RUNE_RAVEN: RaceDef(
-        name="Rune-Raven", speed=30, ability_bonuses={"WIS": 2, "INT": 1},
-        flavor="Obsidian scavengers grafting stolen runes into wings."
+    Race.GRIMCROW: RaceDef(
+        name="Grimcrow", speed=30, ability_bonuses={"WIS": 2, "INT": 1},
+        flavor="Obsidian-feathered oracles who steal living magic and bind it to bone."
     ),
-    # Eldritch
-    Race.HEMATIC_WEAVER: RaceDef(
-        name="Hematic-Weaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1},
-        flavor="Regal horrors conquering bloodlines and sleeper agents."
+    # Eldritch — things that should not be, things that persist anyway
+    Race.BLOODWEAVER: RaceDef(
+        name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1},
+        flavor="Regal horrors who conquer entire bloodlines from the inside out."
     ),
-    Race.WHISPERING_HUSK: RaceDef(
-        name="Whispering-Husk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1},
-        flavor="Fungal gases projecting illusions of lost loved ones."
+    Race.DREAMHUSK: RaceDef(
+        name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1},
+        flavor="Spore-borne entities that project the faces of the beloved dead."
     ),
-    Race.MARROW_DRIFTER: RaceDef(
-        name="Marrow-Drifter", speed=20, ability_bonuses={"CON": 2, "STR": 1},
-        flavor="Microscopic parasites rewriting host skeletons into cages."
+    Race.BONEDRIFTER: RaceDef(
+        name="Bonedrifter", speed=20, ability_bonuses={"CON": 2, "STR": 1},
+        flavor="Parasitic beings that rewrite their hosts skeleton-first into living prisons."
     ),
-    Race.SYNAPSE_SPIDER: RaceDef(
-        name="Synapse-Spider", speed=40, ability_bonuses={"INT": 2, "DEX": 1},
-        flavor="Translucent arachnids snipping plans from dreaming minds."
+    Race.MINDSPIDER: RaceDef(
+        name="Mindspider", speed=40, ability_bonuses={"INT": 2, "DEX": 1},
+        flavor="Translucent arachnids that harvest plans and secrets from sleeping prey."
     ),
-    Race.VOID_FLEA: RaceDef(
-        name="Void-Flea", speed=35, ability_bonuses={"DEX": 2, "WIS": 1},
-        flavor="Twitching entities sewing glitched reality into carapaces."
+    Race.CHAOSLING: RaceDef(
+        name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1},
+        flavor="Twitching fragments of unraveled reality stitched into borrowed flesh."
     ),
 }
 

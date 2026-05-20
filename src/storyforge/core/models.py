@@ -139,24 +139,24 @@ class NarrativeEntry(BaseModel):
 
 
 class Race(StrEnum):
-    # Sci-Fi
-    ARCHON_VULTURE = "archon_vulture"
-    SIGNAL_SHADE = "signal_shade"
-    GEAR_LOCUST = "gear_locust"
-    CORE_DRINKER = "core_drinker"
-    VOID_STRIDER = "void_strider"
-    # Mythic
-    SUN_SOVEREIGN = "sun_sovereign"
-    ECHO_VINE = "echo_vine"
-    CINDER_KIN = "cinder_kin"
-    TIDE_TYRANT = "tide_tyrant"
-    RUNE_RAVEN = "rune_raven"
+    # Cosmic
+    VOIDWRAITH  = "voidwraith"
+    NULLSHADE   = "nullshade"
+    IRONLOCUST  = "ironlocust"
+    EMBERVEIN   = "embervein"
+    RIFTWALKER  = "riftwalker"
+    # Primal
+    SOLARLORD   = "solarlord"
+    THORNMIMIC  = "thornmimic"
+    CINDERKIN   = "cinderkin"
+    DEEPTYRANT  = "deeptyrant"
+    GRIMCROW    = "grimcrow"
     # Eldritch
-    HEMATIC_WEAVER = "hematic_weaver"
-    WHISPERING_HUSK = "whispering_husk"
-    MARROW_DRIFTER = "marrow_drifter"
-    SYNAPSE_SPIDER = "synapse_spider"
-    VOID_FLEA = "void_flea"
+    BLOODWEAVER = "bloodweaver"
+    DREAMHUSK   = "dreamhusk"
+    BONEDRIFTER = "bonedrifter"
+    MINDSPIDER  = "mindspider"
+    CHAOSLING   = "chaosling"
 
 
 class EvolutionaryState(StrEnum):
