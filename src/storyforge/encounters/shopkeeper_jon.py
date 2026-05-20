@@ -1,17 +1,18 @@
 """
-ShopkeeperJohn — encounter logic for John (The Boss / Store Owner).
+ShopkeeperJon — encounter logic for Jon (The Boss / Store Owner).
 
 Architecture:
-  - ShopkeeperJohn is a pure service class. It never touches GameState directly.
+  - ShopkeeperJon is a pure service class. It never touches GameState directly.
   - Every mutation is returned as a StateDiff for state_manager.apply_diff().
-  - JohnEncounterState is the persisted encounter record (session-level, stored
-    on app.state.john_encounter — it resets when a campaign is loaded/created,
+  - JonEncounterState is the persisted encounter record (session-level, stored
+    on app.state.jon_encounter — it resets when a campaign is loaded/created,
     not on every turn).
 
 Mechanics implemented here:
-  1. Multiversal Bodega      — genre-adaptive inventory, John never notices
+  1. Multiversal Bodega      — genre-adaptive inventory, Jon never notices
   2. Cactus Defense Protocol — offense tracking + sales embargo on repeated jokes
   3. Escape Check            — d20 ability check to leave; penalty scales with margin
+  4. Haylie Bailout Flag     — set on critical fail so MadameHaylie can intervene
 """
 from __future__ import annotations
 
@@ -28,23 +29,23 @@ from storyforge.core.models import (
 # ─────────────────────── Genre enum ───────────────────────
 
 class SceneGenre(StrEnum):
-    FANTASY         = "fantasy"
-    SCI_FI          = "sci_fi"
-    CYBERPUNK       = "cyberpunk"
-    HORROR          = "horror"
-    WESTERN         = "western"
+    FANTASY          = "fantasy"
+    SCI_FI           = "sci_fi"
+    CYBERPUNK        = "cyberpunk"
+    HORROR           = "horror"
+    WESTERN          = "western"
     POST_APOCALYPTIC = "post_apocalyptic"
 
 
 # ─────────────────────── Escape methods ───────────────────────
 
 class EscapeMethod(StrEnum):
-    """How the party attempts to leave John's store."""
-    SMOOTH_TALK          = "smooth_talk"   # CHA — compliment your way to the door
-    STEALTH              = "stealth"       # DEX — slip out during a Bink Bink incident
-    FABRICATE_EMERGENCY  = "fabricate"     # INT — invent an excuse he can't argue with
-    SHEER_WILLPOWER      = "willpower"     # WIS — nod and smile until you feel the exit
-    BULLDOZE             = "bulldoze"      # STR — physically push through; he takes no offense
+    """How the party attempts to leave Jon's store."""
+    SMOOTH_TALK         = "smooth_talk"
+    STEALTH             = "stealth"
+    FABRICATE_EMERGENCY = "fabricate"
+    SHEER_WILLPOWER     = "willpower"
+    BULLDOZE            = "bulldoze"
 
 
 _ESCAPE_ABILITY: dict[EscapeMethod, Ability] = {
@@ -61,13 +62,13 @@ _ESCAPE_ABILITY: dict[EscapeMethod, Ability] = {
 @dataclass(frozen=True)
 class EscapeResult:
     success: bool
-    roll: int           # raw d20
+    roll: int
     modifier: int
-    total: int          # roll + modifier
+    total: int
     dc: int
-    margin: int         # total - dc (negative = fail)
-    psychic_damage: int # 0 unless margin <= -5
-    turns_lost: int     # 0 on success, 1 on mild fail, 2 on bad fail
+    margin: int
+    psychic_damage: int
+    turns_lost: int
     method: EscapeMethod
     ability_used: Ability
     flavor: str
@@ -75,19 +76,20 @@ class EscapeResult:
 
 # ─────────────────────── Encounter state ───────────────────────
 
-class JohnEncounterState(BaseModel):
+class JonEncounterState(BaseModel):
     """
-    Session-level state for an active John encounter.
-    Stored on app.state.john_encounter; reset on new/load campaign.
+    Session-level state for an active Jon encounter.
+    Stored on app.state.jon_encounter; reset on new/load campaign.
     """
     active: bool = False
     cactus_offense_count: int = 0
-    john_currently_offended: bool = False
-    refused_sale_turns_remaining: int = 0  # sales embargo after repeated cactus jokes
+    jon_currently_offended: bool = False
+    refused_sale_turns_remaining: int = 0
     story_trap_active: bool = False
     story_trap_turns_remaining: int = 0
     escape_attempts: int = 0
     total_psychic_damage_dealt: int = 0
+    bailout_available: bool = False  # set True on critical fail; Haylie can clear it
 
 
 # ─────────────────────── Inventory tables ───────────────────────
@@ -99,7 +101,7 @@ def _item(item_id: str, name: str, value: int, notes: str) -> InventoryItem:
 
 _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     SceneGenre.FANTASY: [
-        _item("longsword_john",   "Longsword",                 150, "Slightly notched. 'Character,' John says."),
+        _item("longsword_jon",    "Longsword",                 150, "Slightly notched. 'Character,' Jon says."),
         _item("healing_potion",   "Healing Potion (2d4+2)",     50, "Store brand. Tastes like cherry cough syrup."),
         _item("rope_50ft",        "Hempen Rope, 50ft",          10, "'You'd be surprised how often people need this.'"),
         _item("torches_x5",       "Torch Bundle (×5)",           5, "Come back when you need more. He'll be here."),
@@ -160,14 +162,13 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     ],
 }
 
-# The Cactus. Always present. Never for sale.
 THE_CACTUS = _item(
-    "cactus_johns",
+    "cactus_jons",
     "Remarkably Distinctive Desert Succulent",
     value=0,
     notes=(
-        "NOT FOR SALE. A rare botanical specimen, purchased for John's sister. "
-        "John is extremely proud of it and is entirely unaware why people keep "
+        "NOT FOR SALE. A rare botanical specimen, purchased for Jon's sister. "
+        "Jon is extremely proud of it and is entirely unaware why people keep "
         "smirking at it. Shape noted as 'very architectural' by the specialist grower."
     ),
 )
@@ -177,97 +178,94 @@ THE_CACTUS = _item(
 
 _SUCCESS_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "You compliment the cactus, praise Teddy's coat, and back toward the door with practiced grace. John beams. You're gone before he can remember what he was about to say about his brother-in-law.",
-        "A firm handshake, a 'we'll do this again soon,' and a smile that doesn't reach your eyes. John watches you go, genuinely touched. He's already planning what he'll tell you next time.",
+        "You compliment the cactus, praise Teddy's coat, and back toward the door with practiced grace. Jon beams. You're gone before he can remember what he was about to say about his brother-in-law.",
+        "A firm handshake, a 'we'll do this again soon,' and a smile that doesn't reach your eyes. Jon watches you go, genuinely touched. He's already planning what he'll tell you next time.",
     ],
     EscapeMethod.STEALTH: [
-        "Bink Bink leaps onto the display case. John spins around. By the time the cat has knocked three items to the floor and John has apologized to all of them individually, you are gone. Bink Bink winks. You think.",
+        "Bink Bink leaps onto the display case. Jon spins around. By the time the cat has knocked three items to the floor and Jon has apologized to all of them individually, you are gone. Bink Bink winks. You think.",
         "You time your exit to the exact moment Teddy demands ear scratches. The bell above the door barely makes a sound.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
-        "You inform John that something is on fire approximately two blocks away. He says, 'Oh, is it the Hendersons again?' and turns to look out the window. You are a distant memory.",
-        "A mumbled 'I think I left the stove on' and a rising sense of urgency does the trick. John calls after you to 'be safe out there.' You will not be coming back anytime soon.",
+        "You inform Jon that something is on fire approximately two blocks away. He says, 'Oh, is it the Hendersons again?' and turns to look out the window. You are a distant memory.",
+        "A mumbled 'I think I left the stove on' and a rising sense of urgency does the trick. Jon calls after you to 'be safe out there.' You will not be coming back anytime soon.",
     ],
     EscapeMethod.SHEER_WILLPOWER: [
-        "You nod through four unrelated anecdotes, maintain eye contact, smile at all the right moments, and slowly, imperceptibly drift toward the exit like a leaf on a river. John never noticed you leave.",
+        "You nod through four unrelated anecdotes, maintain eye contact, smile at all the right moments, and slowly, imperceptibly drift toward the exit like a leaf on a river. Jon never noticed you leave.",
         "Twenty years of politely surviving holidays with extended family have prepared you for this exact moment. You are free.",
     ],
     EscapeMethod.BULLDOZE: [
-        "You pat John firmly on the shoulder, say 'Good talk, buddy,' and walk out. He's a little surprised but genuinely not offended. 'Come back any time!' You will absolutely not.",
-        "A bear hug you didn't consent to initiates. You endure it. You leave. John wipes his eye. Everyone's fine.",
+        "You pat Jon firmly on the shoulder, say 'Good talk, buddy,' and walk out. He's a little surprised but genuinely not offended. 'Come back any time!' You will absolutely not.",
+        "A bear hug you didn't consent to initiates. You endure it. You leave. Jon wipes his eye. Everyone's fine.",
     ],
 }
 
 _FAIL_MILD_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "You make your move, but John's face lights up. 'Oh! That reminds me—' You sink back. Seventeen minutes about his cousin's second wedding. The details are extraordinary in their mundanity.",
-        "You're almost out the door when John asks if you've met Bink Bink. You have. He introduces you anyway. At length.",
+        "You make your move, but Jon's face lights up. 'Oh! That reminds me—' You sink back. Seventeen minutes about his cousin's second wedding. The details are extraordinary in their mundanity.",
+        "You're almost out the door when Jon asks if you've met Bink Bink. You have. He introduces you anyway. At length.",
     ],
     EscapeMethod.STEALTH: [
-        "You miscalculate Bink Bink's trajectory. The cat knocks something toward you instead of away. John turns. Sees you near the door. 'Oh, were you heading out? Actually—'",
-        "The bell above the door is louder than you remembered. John spins around with the enthusiasm of a man who has been alone with a cat and two dogs all day.",
+        "You miscalculate Bink Bink's trajectory. The cat knocks something toward you instead of away. Jon turns. Sees you near the door. 'Oh, were you heading out? Actually—'",
+        "The bell above the door is louder than you remembered. Jon spins around with the enthusiasm of a man who has been alone with a cat and two dogs all day.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
-        "John immediately offers to come help with your fictional emergency. He knows a guy. He's going to call the guy. He's telling you about the guy first.",
-        "Your excuse is plausible, but John has a relevant story. It starts in 1987. By the time he finishes, your fake emergency has had time to resolve itself.",
+        "Jon immediately offers to come help with your fictional emergency. He knows a guy. He's going to call the guy. He's telling you about the guy first.",
+        "Your excuse is plausible, but Jon has a relevant story. It starts in 1987. By the time he finishes, your fake emergency has had time to resolve itself.",
     ],
     EscapeMethod.SHEER_WILLPOWER: [
         "Your resolve falters on anecdote three. You make a polite noise of interest. This is interpreted as an invitation to continue. It was not an invitation.",
-        "You blink at the wrong moment. John takes it as a question. It was not a question.",
+        "You blink at the wrong moment. Jon takes it as a question. It was not a question.",
     ],
     EscapeMethod.BULLDOZE: [
-        "John reciprocates the hug with significantly more force than expected. By the time you've extracted yourself, the moment has passed and he's already mid-sentence.",
-        "You push for the door. Teddy has sat down in front of it and will not move until acknowledged. John laughs and launches into Teddy's origin story.",
+        "Jon reciprocates the hug with significantly more force than expected. By the time you've extracted yourself, the moment has passed and he's already mid-sentence.",
+        "You push for the door. Teddy has sat down in front of it and will not move until acknowledged. Jon laughs and launches into Teddy's origin story.",
     ],
 }
 
 _FAIL_SEVERE_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "Your charm backfires. John thinks you're his new best friend. He shows you photos — physical, printed photos. There are many. Your mind retreats to a soft, gray place.",
+        "Your charm backfires. Jon thinks you're his new best friend. He shows you photos — physical, printed photos. There are many. Your mind retreats to a soft, gray place.",
         "You complimented his hat. There is a story about the hat. The hat story leads to a boat story. The boat story leads to a fishing story. You briefly cease to be a person and become instead a pair of eyes, floating.",
     ],
     EscapeMethod.STEALTH: [
-        "Bink Bink lands on your shoulder and yowls directly into your ear. John is delighted. Bink Bink has *chosen* you. There is extensive commentary on this. Your sanity absorbs the impact.",
-        "You slip on something Bink Bink knocked over. John helps you up. At length. With a story about a similar fall in 2003. The cognitive erosion begins immediately.",
+        "Bink Bink lands on your shoulder and yowls directly into your ear. Jon is delighted. Bink Bink has *chosen* you. There is extensive commentary on this. Your sanity absorbs the impact.",
+        "You slip on something Bink Bink knocked over. Jon helps you up. At length. With a story about a similar fall in 2003. The cognitive erosion begins immediately.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
-        "John has a cousin who went through EXACTLY that. He is going to call them. You listen to both sides of the conversation. By the end, you are no longer certain of your own name.",
-        "Your emergency was too interesting. John is invested. He asks clarifying questions. You must maintain the lie in real time while he builds on it. Your mind files the experience under 'formative trauma.'",
+        "Jon has a cousin who went through EXACTLY that. He is going to call them. You listen to both sides of the conversation. By the end, you are no longer certain of your own name.",
+        "Your emergency was too interesting. Jon is invested. He asks clarifying questions. You must maintain the lie in real time while he builds on it. Your mind files the experience under 'formative trauma.'",
     ],
     EscapeMethod.SHEER_WILLPOWER: [
-        "Your wall breaks at minute thirty-two. John says something tangentially related to something you once cared about. You engage. You don't know why you engage. The damage is done.",
-        "The anecdote has no ending. John has circled back to the beginning with new details. You stare into the middle distance. Cyrus makes eye contact with you. He has seen this before. He is very sorry.",
+        "Your wall breaks at minute thirty-two. Jon says something tangentially related to something you once cared about. You engage. You don't know why you engage. The damage is done.",
+        "The anecdote has no ending. Jon has circled back to the beginning with new details. You stare into the middle distance. Cyrus makes eye contact with you. He has seen this before. He is very sorry.",
     ],
     EscapeMethod.BULLDOZE: [
-        "John, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Cyrus sits on your foot. You cannot leave without disturbing the dog. John takes this as a sign you want to stay.",
-        "You push through but John follows, continuing the story onto the front stoop. He doesn't notice he is now outside. You are standing in the sun together. This is somehow worse. His rambling erodes something essential in you.",
+        "Jon, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Cyrus sits on your foot. You cannot leave without disturbing the dog. Jon takes this as a sign you want to stay.",
+        "You push through but Jon follows, continuing the story onto the front stoop. He doesn't notice he is now outside. You are standing in the sun together. This is somehow worse. His rambling erodes something essential in you.",
     ],
 }
 
 
 # ─────────────────────── Service class ───────────────────────
 
-class ShopkeeperJohn:
+class ShopkeeperJon:
     """
-    Pure service layer for the John encounter.
-
-    Instantiate with the current JohnEncounterState, call methods,
+    Pure service layer for the Jon encounter.
+    Instantiate with the current JonEncounterState, call methods,
     pass returned StateDiff objects to state_manager.apply_diff().
-    The caller is responsible for persisting the mutated encounter state.
     """
 
-    ESCAPE_DC = 15                  # DC to leave the store
-    PSYCHIC_DAMAGE_DIE = 4          # d4 psychic on a bad fail (margin ≤ -5)
-    CACTUS_OFFENSE_THRESHOLD = 3    # jokes before sales embargo
-    CACTUS_SALES_BLOCK_TURNS = 2    # turns John refuses to sell after threshold
+    ESCAPE_DC = 15
+    PSYCHIC_DAMAGE_DIE = 4
+    CACTUS_OFFENSE_THRESHOLD = 3
+    CACTUS_SALES_BLOCK_TURNS = 2
 
-    def __init__(self, state: JohnEncounterState | None = None) -> None:
-        self.encounter = state or JohnEncounterState()
+    def __init__(self, state: JonEncounterState | None = None) -> None:
+        self.encounter = state or JonEncounterState()
 
     # ── Inventory ────────────────────────────────────────────────
 
     def get_inventory(self, genre: SceneGenre) -> list[InventoryItem]:
-        """Return current shop stock. John never acknowledges the genre shift."""
         return list(_INVENTORY_TABLES[genre])
 
     def get_item(self, genre: SceneGenre, item_id: str) -> InventoryItem | None:
@@ -282,27 +280,23 @@ class ShopkeeperJohn:
         genre: SceneGenre,
         item_id: str,
     ) -> tuple[StateDiff | None, str]:
-        """
-        Attempt a purchase. Returns (StateDiff | None, message).
-        StateDiff is None when the purchase fails.
-        """
         if self.encounter.refused_sale_turns_remaining > 0:
             return (
                 None,
-                "John has turned away from the counter. 'I need a moment,' he says, "
+                "Jon has turned away from the counter. 'I need a moment,' he says, "
                 "staring pointedly at the cactus. 'Some people have no respect for "
                 "horticulture.' He will not be selling anything for a while."
             )
 
         item = self.get_item(genre, item_id)
         if item is None:
-            return None, "John squints. 'Don't carry that. Try me next week.'"
+            return None, "Jon squints. 'Don't carry that. Try me next week.'"
 
         if character.silver < item.value:
             shortage = item.value - character.silver
             return (
                 None,
-                f"John does the math. You're {shortage} silver short. "
+                f"Jon does the math. You're {shortage} silver short. "
                 f"'Come back when you're less broke. No offense.' He means all of it.",
             )
 
@@ -312,7 +306,7 @@ class ShopkeeperJohn:
         )
         return (
             diff,
-            f"John wraps the {item.name} with practiced efficiency. "
+            f"Jon wraps the {item.name} with practiced efficiency. "
             f"'Anything else? No rush. I'm here all day. And tomorrow. "
             f"The day after, actually. Did I mention the—'",
         )
@@ -320,24 +314,20 @@ class ShopkeeperJohn:
     # ── Cactus Defense Protocol ───────────────────────────────────
 
     def handle_cactus_comment(self, is_lewd_or_mocking: bool) -> str:
-        """
-        Call when a player comments on the cactus.
-        Mutates encounter state if offensive. Returns John's response.
-        """
         if not is_lewd_or_mocking:
             return (
-                "John brightens. 'Gorgeous, isn't she? Sister's going to love it. "
+                "Jon brightens. 'Gorgeous, isn't she? Sister's going to love it. "
                 "Found a specialist grower three towns over. Very rare specimen. "
                 "The shape is quite distinctive — very *architectural*, they said.'"
             )
 
         self.encounter.cactus_offense_count += 1
-        self.encounter.john_currently_offended = True
+        self.encounter.jon_currently_offended = True
 
         if self.encounter.cactus_offense_count >= self.CACTUS_OFFENSE_THRESHOLD:
             self.encounter.refused_sale_turns_remaining = self.CACTUS_SALES_BLOCK_TURNS
             return (
-                "John's face cycles through several colors. He sets down what he was "
+                "Jon's face cycles through several colors. He sets down what he was "
                 "holding. 'I don't know what you think you're implying, but that is a "
                 "*plant*. A rare, carefully cultivated *succulent*. For my *sister*. "
                 "She has a collection. It is a *hobby*. Now I'm going to need you to "
@@ -347,13 +337,13 @@ class ShopkeeperJohn:
 
         early_responses = [
             (
-                "John stares at you for a long moment. 'I beg your pardon? That is a "
+                "Jon stares at you for a long moment. 'I beg your pardon? That is a "
                 "*botanical specimen*. Imported. For my sister. Who collects them. "
                 "There is nothing funny about succulent horticulture.' He turns the "
                 "cactus slightly away from you, as if protecting it."
             ),
             (
-                "'What is *wrong* with you people?' John positions himself between you "
+                "'What is *wrong* with you people?' Jon positions himself between you "
                 "and the cactus. 'That is a gift. For family. The shape is *distinctive* "
                 "because it is a rare *species*. The specialist was very clear. Very. "
                 "Clear.' His eye twitches."
@@ -376,15 +366,10 @@ class ShopkeeperJohn:
         disadvantage: bool = False,
     ) -> tuple[EscapeResult, StateDiff | None]:
         """
-        Attempt to leave the store. Returns (EscapeResult, StateDiff | None).
-
-        Penalty ladder (by margin = total − DC):
-          margin ≥  0  : success — clean exit
-          margin −1 to −4 : mild fail — 1 turn lost, no damage (time tax only)
-          margin ≤ −5  : bad fail  — 2 turns lost + 1d4 psychic damage
-
-        The StateDiff on a bad fail carries the hp_current reduction.
-        On success or mild fail, StateDiff is None.
+        Penalty ladder (margin = total − DC):
+          ≥  0      : success — clean exit
+          −1 to −4  : mild fail — 1 turn lost
+          ≤ −5      : bad fail  — 2 turns lost + 1d4 psychic, bailout_available=True
         """
         ability = _ESCAPE_ABILITY[method]
         score = getattr(character.abilities, ability.value)
@@ -404,43 +389,36 @@ class ShopkeeperJohn:
 
         if margin >= 0:
             flavor = random.choice(_SUCCESS_FLAVOR[method])
-            turns_lost = 0
-            psychic = 0
+            turns_lost, psychic = 0, 0
+            self.encounter.bailout_available = False
             diff = None
 
         elif margin >= -4:
             flavor = random.choice(_FAIL_MILD_FLAVOR[method])
-            turns_lost = 1
-            psychic = 0
+            turns_lost, psychic = 1, 0
             self.encounter.story_trap_active = True
             self.encounter.story_trap_turns_remaining = turns_lost
+            self.encounter.bailout_available = False
             diff = None
 
-        else:  # margin <= -5: bad fail
+        else:
             flavor = random.choice(_FAIL_SEVERE_FLAVOR[method])
             turns_lost = 2
             psychic = random.randint(1, self.PSYCHIC_DAMAGE_DIE)
             self.encounter.story_trap_active = True
             self.encounter.story_trap_turns_remaining = turns_lost
             self.encounter.total_psychic_damage_dealt += psychic
+            self.encounter.bailout_available = True
             new_hp = max(0, character.hp_current - psychic)
-            diff = StateDiff(
-                character_updates={character.id: {"hp_current": new_hp}}
-            )
+            diff = StateDiff(character_updates={character.id: {"hp_current": new_hp}})
 
         return (
             EscapeResult(
                 success=(margin >= 0),
-                roll=raw,
-                modifier=modifier,
-                total=total,
-                dc=self.ESCAPE_DC,
-                margin=margin,
-                psychic_damage=psychic,
-                turns_lost=turns_lost,
-                method=method,
-                ability_used=ability,
-                flavor=flavor,
+                roll=raw, modifier=modifier, total=total,
+                dc=self.ESCAPE_DC, margin=margin,
+                psychic_damage=psychic, turns_lost=turns_lost,
+                method=method, ability_used=ability, flavor=flavor,
             ),
             diff,
         )
@@ -448,7 +426,6 @@ class ShopkeeperJohn:
     # ── Turn clock ────────────────────────────────────────────────
 
     def tick_turn(self) -> None:
-        """Decrement all time-based counters. Call once per in-game turn."""
         if self.encounter.story_trap_turns_remaining > 0:
             self.encounter.story_trap_turns_remaining -= 1
             if self.encounter.story_trap_turns_remaining == 0:
@@ -457,14 +434,12 @@ class ShopkeeperJohn:
         if self.encounter.refused_sale_turns_remaining > 0:
             self.encounter.refused_sale_turns_remaining -= 1
             if self.encounter.refused_sale_turns_remaining == 0:
-                self.encounter.john_currently_offended = False
+                self.encounter.jon_currently_offended = False
 
     @property
     def party_can_leave(self) -> bool:
-        """True when no active story trap is holding the party."""
         return not self.encounter.story_trap_active
 
     @property
-    def john_will_sell(self) -> bool:
-        """False during a cactus-triggered sales embargo."""
+    def jon_will_sell(self) -> bool:
         return self.encounter.refused_sale_turns_remaining == 0

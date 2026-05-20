@@ -123,15 +123,15 @@ export async function loadCampaign(campaignId) {
   return jsonOrThrow(res);
 }
 
-// ── John / NPC encounter API ──────────────────────────────────────
+// ── Jon / NPC encounter API ──────────────────────────────────────
 
-export async function johnGetInventory(genre = "fantasy") {
-  const res = await fetch(`${API_BASE}/api/npc/john/inventory?genre=${genre}`);
+export async function jonGetInventory(genre = "fantasy") {
+  const res = await fetch(`${API_BASE}/api/npc/jon/inventory?genre=${genre}`);
   return jsonOrThrow(res);
 }
 
-export async function johnBuy({ actorId, itemId, genre = "fantasy" }) {
-  const res = await fetch(`${API_BASE}/api/npc/john/buy`, {
+export async function jonBuy({ actorId, itemId, genre = "fantasy" }) {
+  const res = await fetch(`${API_BASE}/api/npc/jon/buy`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ actor_id: actorId, item_id: itemId, genre }),
@@ -139,8 +139,8 @@ export async function johnBuy({ actorId, itemId, genre = "fantasy" }) {
   return jsonOrThrow(res);
 }
 
-export async function johnCactus(isLewdOrMocking = false) {
-  const res = await fetch(`${API_BASE}/api/npc/john/cactus`, {
+export async function jonCactus(isLewdOrMocking = false) {
+  const res = await fetch(`${API_BASE}/api/npc/jon/cactus`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ is_lewd_or_mocking: isLewdOrMocking }),
@@ -148,8 +148,8 @@ export async function johnCactus(isLewdOrMocking = false) {
   return jsonOrThrow(res);
 }
 
-export async function johnEscape({ actorId, method = "smooth_talk", advantage = false, disadvantage = false }) {
-  const res = await fetch(`${API_BASE}/api/npc/john/escape`, {
+export async function jonEscape({ actorId, method = "smooth_talk", advantage = false, disadvantage = false }) {
+  const res = await fetch(`${API_BASE}/api/npc/jon/escape`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ actor_id: actorId, method, advantage, disadvantage }),
@@ -157,13 +157,45 @@ export async function johnEscape({ actorId, method = "smooth_talk", advantage = 
   return jsonOrThrow(res);
 }
 
-export async function johnGetState() {
-  const res = await fetch(`${API_BASE}/api/npc/john/state`);
+export async function jonGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/jon/state`);
   return jsonOrThrow(res);
 }
 
-export async function johnTick() {
-  const res = await fetch(`${API_BASE}/api/npc/john/tick`, { method: "POST" });
+export async function jonTick() {
+  const res = await fetch(`${API_BASE}/api/npc/jon/tick`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
+// ── Samael the Ascended ───────────────────────────────────────────
+
+export async function samaelConsult(category = "general_lore") {
+  const res = await fetch(`${API_BASE}/api/npc/samael/consult`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ category }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function samaelGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/samael/state`);
+  return jsonOrThrow(res);
+}
+
+// ── Madame Haylie ─────────────────────────────────────────────────
+
+export async function hailieBailout(genre = "fantasy") {
+  const res = await fetch(`${API_BASE}/api/npc/haylie/bailout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ genre }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function hailieGetState() {
+  const res = await fetch(`${API_BASE}/api/npc/haylie/state`);
   return jsonOrThrow(res);
 }
 

@@ -385,7 +385,7 @@
       "name": "The Store",
       "width": 10,
       "height": 8,
-      "description": "It's a shop. It has always been a shop. The shelves are stocked with whatever you need, and John is behind the counter, ready to help. A remarkably distinctive cactus sits on the counter near him. Two large dogs guard the door with the quiet confidence of creatures who have seen many people try to leave quickly and fail.",
+      "description": "It's a shop. It has always been a shop. The shelves are stocked with whatever you need, and Jon is behind the counter, ready to help. A remarkably distinctive cactus sits on the counter near him. Two large dogs guard the door with the quiet confidence of creatures who have seen many people try to leave quickly and fail.",
       "exits": {
         "5,7": "tavern_01"
       },
@@ -436,7 +436,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": "john"
+          "occupant_id": "jon"
         },
         {
           "terrain": "difficult",
@@ -715,19 +715,6 @@
   },
   "combat": null,
   "npcs": {
-    "john": {
-      "id": "john",
-      "name": "John",
-      "position": {
-        "x": 1,
-        "y": 1
-      },
-      "sprite_key": "npc_john",
-      "interactable": true,
-      "encounter_id": "john_shop",
-      "blocks_movement": true,
-      "description": "The proprietor of The Store. Very friendly. Very chatty."
-    },
     "bink_bink": {
       "id": "bink_bink",
       "name": "Bink Bink",
@@ -739,7 +726,7 @@
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "John's cat. Currently eyeing a shelf item with intent."
+      "description": "Jon's cat. Currently eyeing a shelf item with intent."
     },
     "teddy": {
       "id": "teddy",
@@ -766,6 +753,45 @@
       "encounter_id": null,
       "blocks_movement": false,
       "description": "Dignified. Has seen things. Makes prolonged eye contact with people who are trying to leave."
+    },
+    "jon": {
+      "id": "jon",
+      "name": "Jon",
+      "position": {
+        "x": 1,
+        "y": 1
+      },
+      "sprite_key": "npc_jon",
+      "interactable": true,
+      "encounter_id": "jon_shop",
+      "blocks_movement": true,
+      "description": "The proprietor of The Store. Very friendly. Very chatty."
+    },
+    "samael": {
+      "id": "samael",
+      "name": "Samael the Ascended",
+      "position": {
+        "x": 8,
+        "y": 4
+      },
+      "sprite_key": "npc_samael",
+      "interactable": true,
+      "encounter_id": "samael_lore",
+      "blocks_movement": false,
+      "description": "Leaning against the back wall. Has been here longer than the wall."
+    },
+    "haylie": {
+      "id": "haylie",
+      "name": "Madame Haylie",
+      "position": {
+        "x": 4,
+        "y": 1
+      },
+      "sprite_key": "npc_haylie",
+      "interactable": true,
+      "encounter_id": "haylie_inn",
+      "blocks_movement": false,
+      "description": "Jon's wife. Runs the inn. Runs the books. Runs the situation."
     }
   }
 }
