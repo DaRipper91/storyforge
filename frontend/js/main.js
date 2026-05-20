@@ -435,7 +435,7 @@ const _gameZoomSlider  = document.getElementById("game-zoom-slider");
 const _uiScaleValue    = document.getElementById("ui-scale-value");
 const _gameZoomValue   = document.getElementById("game-zoom-value");
 
-const _DEFAULT_SETTINGS = { uiScale: 1.0, gameZoom: 0.7 };
+const _DEFAULT_SETTINGS = { uiScale: 0.65, gameZoom: 0.7 };
 
 function _loadSettings() {
   try {
