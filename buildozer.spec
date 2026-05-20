@@ -6,6 +6,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 source.include_patterns = assets/*
 version = 0.1.0
+icon.filename = %(source.dir)s/icon.png
 
 # Thin WebView client — server runs on desktop/LAN, not bundled in the APK.
 requirements = python3,kivy,android
