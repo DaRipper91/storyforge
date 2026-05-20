@@ -250,6 +250,10 @@ body[data-phase="saves"] #game-view { display: none; }
   font-size: var(--fs-lg);
   padding: var(--space-3);
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .menu-options button.focused,
@@ -259,6 +263,18 @@ body[data-phase="saves"] #game-view { display: none; }
   transform: translateY(-3px);
   box-shadow: var(--glow-gold);
   outline: none;
+}
+
+.mode-btn-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.mode-btn-desc {
+  font-size: var(--fs-xs);
+  opacity: 0.75;
+  font-weight: 400;
+  font-style: italic;
 }
 
 /* ─── Saves list ─── */
@@ -611,32 +627,32 @@ body[data-phase="saves"] #game-view { display: none; }
 /* ─────────────────────── Jon's Shop Overlay ─────────────────────── */
 
 .jon-shop-card {
-  width: min(96vw, 860px);
+  width: min(96vw, 1000px);
   max-height: 88vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-2);
 }
 
 .jon-shop-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-2);
   border-bottom: 2px solid var(--ink-gilded);
-  padding-bottom: 0.75rem;
+  padding-bottom: var(--space-2);
 }
 
 .jon-npc-portrait {
-  width: 56px;
-  height: 56px;
+  width: 3.5rem;
+  height: 3.5rem;
   background: #8B4513;
   border: 3px solid var(--ink-gilded);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
+  font-size: var(--fs-lg);
   font-weight: bold;
   color: #f4ead4;
   flex-shrink: 0;
@@ -644,32 +660,34 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: "Cardo", Georgia, serif;
 }
 .jon-npc-portrait::after {
-  transform: rotate(-45deg);
   content: attr(data-initial);
+  transform: rotate(-45deg);
+  display: block;
+  line-height: 1;
 }
 
 .jon-header-text { flex: 1; }
-.jon-header-text h2 { margin: 0; font-size: 1.4rem; }
+.jon-header-text h2 { margin: 0; font-size: var(--fs-lg); }
 .jon-tagline {
   margin: 0.2rem 0 0;
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-style: italic;
   opacity: 0.8;
 }
 
 .jon-companions {
   display: flex;
-  gap: 0.4rem;
-  font-size: 1.4rem;
+  gap: var(--space-1);
+  font-size: var(--fs-lg);
 }
 
 .jon-message {
   background: rgba(139, 69, 19, 0.12);
   border-left: 4px solid #8B4513;
   border-radius: 4px;
-  padding: 0.75rem 1rem;
+  padding: var(--space-2) var(--space-3);
   font-style: italic;
-  font-size: 0.92rem;
+  font-size: var(--fs-sm);
   line-height: 1.5;
 }
 .jon-message.is-offended { border-left-color: var(--ink-crimson); }
@@ -678,16 +696,16 @@ body[data-phase="saves"] #game-view { display: none; }
 .jon-shop-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: var(--space-3);
 }
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .jon-shop-body { grid-template-columns: 1fr; }
 }
 
 .jon-inventory-panel h3,
 .jon-action-panel h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-base);
   color: var(--ink-gilded);
   border-bottom: 1px solid rgba(196,160,64,0.3);
   padding-bottom: 0.3rem;
@@ -699,8 +717,8 @@ body[data-phase="saves"] #game-view { display: none; }
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  max-height: 320px;
+  gap: var(--space-1);
+  max-height: 40vh;
   overflow-y: auto;
 }
 
@@ -708,19 +726,19 @@ body[data-phase="saves"] #game-view { display: none; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0.6rem;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 6px;
   background: rgba(244,234,212,0.05);
   border: 1px solid rgba(196,160,64,0.2);
-  gap: 0.5rem;
+  gap: var(--space-2);
   cursor: pointer;
   transition: background 0.15s;
 }
 .jon-item:hover { background: rgba(196,160,64,0.12); }
-.jon-item-name { font-size: 0.88rem; flex: 1; }
-.jon-item-notes { font-size: 0.75rem; opacity: 0.65; font-style: italic; flex: 1.2; }
+.jon-item-name  { font-size: var(--fs-sm); flex: 1; }
+.jon-item-notes { font-size: var(--fs-xs); opacity: 0.65; font-style: italic; flex: 1.2; }
 .jon-item-price {
-  font-size: 0.88rem;
+  font-size: var(--fs-sm);
   font-family: "JetBrains Mono", monospace;
   color: var(--ink-gilded);
   white-space: nowrap;
@@ -729,42 +747,45 @@ body[data-phase="saves"] #game-view { display: none; }
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   border: none;
-  border-radius: 3px;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.78rem;
+  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-xs);
   cursor: pointer;
   font-weight: bold;
+  font-family: inherit;
+  white-space: nowrap;
 }
 .jon-item-buy:hover { filter: brightness(1.1); }
 
 .escape-methods {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin: 0.5rem 0;
+  gap: var(--space-1);
+  margin: var(--space-1) 0;
 }
 
 .escape-btn {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.45rem 0.75rem;
+  padding: var(--space-1) var(--space-2);
   background: rgba(244,234,212,0.06);
   border: 1px solid rgba(196,160,64,0.25);
-  border-radius: 4px;
+  border-radius: 6px;
   color: #f4ead4;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
   font-family: inherit;
+  font-size: var(--fs-sm);
 }
 .escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
-.escape-method-name { font-size: 0.88rem; }
+.escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   color: var(--ink-gilded);
   opacity: 0.9;
 }
@@ -772,12 +793,12 @@ body[data-phase="saves"] #game-view { display: none; }
 .escape-result {
   background: rgba(10,5,10,0.35);
   border: 1px solid rgba(196,160,64,0.3);
-  border-radius: 4px;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-sm);
   font-style: italic;
   line-height: 1.5;
-  margin-top: 0.5rem;
+  margin-top: var(--space-1);
 }
 .escape-result.is-success { border-color: #2d7a2d; }
 .escape-result.is-fail    { border-color: var(--ink-crimson); }
@@ -785,15 +806,15 @@ body[data-phase="saves"] #game-view { display: none; }
 .jon-divider {
   border: none;
   border-top: 1px solid rgba(196,160,64,0.25);
-  margin: 0.75rem 0;
+  margin: var(--space-2) 0;
 }
 
-.cactus-actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; flex-wrap: wrap; }
+.cactus-actions { display: flex; gap: var(--space-1); margin-top: var(--space-1); flex-wrap: wrap; }
 
 .btn-small {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.82rem;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-xs);
+  border-radius: 6px;
 }
 .btn-danger {
   border-color: var(--ink-crimson) !important;

@@ -1,6 +1,14 @@
 /**
  * Konva-based 10x8 grid renderer with HiDPI awareness.
  */
+import { getRaceFrames, RACE_ACCENT_COLORS, renderSprite, flipH } from './sprites.js';
+
+// Moves longer than this many cells trigger the 8-bit walk sprite.
+const LONG_WALK_CELLS = 3;
+// Walk speed in cells per second during sprite animation.
+const WALK_SPEED_CELLS = 2.5;
+// Sprite animation frames per second.
+const SPRITE_FPS = 8;
 
 const TERRAIN_COLORS = {
   floor:     "rgba(244, 234, 212, 0.0)",
@@ -54,8 +62,9 @@ export class GridCanvas {
     this.stage.add(this.cursorLayer);
 
     // Keep track of token nodes for tweening
-    this._tokenNodes = new Map();
+    this._tokenNodes  = new Map();
     this._lightCircles = new Map(); // id -> Circle
+    this._walkingChars = new Set(); // ids currently doing sprite walk
 
     // Mouse/Touch Interaction
     this.stage.on("mousedown touchstart", (e) => {
@@ -429,37 +438,42 @@ export class GridCanvas {
       } else {
         // Tween to new position if it moved
         if (group.x() !== targetCx || group.y() !== targetCy) {
-          // Calculate distance for bounce effect
-          const dx = targetCx - group.x();
-          const dy = targetCy - group.y();
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          
+          const dx   = targetCx - group.x();
+          const dy   = targetCy - group.y();
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
           if (dist > 5) {
-            // Animate
-            new Konva.Tween({
-              node: group,
-              duration: 0.3,
-              x: targetCx,
-              y: targetCy,
-              easing: Konva.Easings.EaseInOut,
-            }).play();
-            
-            // Add a small squash/stretch on movement
-            const ring = group.getChildren()[0];
-            new Konva.Tween({
-              node: ring,
-              duration: 0.15,
-              scaleX: 1.1,
-              scaleY: 0.9,
-              yoyo: true,
-              easing: Konva.Easings.EaseInOut,
-            }).play();
+            const distCells = dist / cs;
+
+            if (distCells >= LONG_WALK_CELLS && !this._walkingChars.has(char.id)) {
+              // ── Long-distance: play 8-bit sprite walk ──────────────
+              this._startSpriteWalk(char, group, group.x(), group.y(), targetCx, targetCy);
+            } else if (!this._walkingChars.has(char.id)) {
+              // ── Short hop: normal smooth tween ─────────────────────
+              new Konva.Tween({
+                node: group,
+                duration: 0.3,
+                x: targetCx,
+                y: targetCy,
+                easing: Konva.Easings.EaseInOut,
+              }).play();
+
+              const ring = group.getChildren()[0];
+              new Konva.Tween({
+                node: ring,
+                duration: 0.15,
+                scaleX: 1.1,
+                scaleY: 0.9,
+                yoyo: true,
+                easing: Konva.Easings.EaseInOut,
+              }).play();
+            }
+            // else: sprite walk in progress — do nothing until it finishes
           } else {
             // Resize edge case or tiny shift, jump directly
             group.x(targetCx);
             group.y(targetCy);
-            // Also need to resize the children if cellSize changed
-            const ring = group.getChildren()[0];
+            const ring    = group.getChildren()[0];
             const initial = group.getChildren()[1];
             ring.radius(cs * 0.4);
             initial.width(cs);
@@ -472,6 +486,116 @@ export class GridCanvas {
       }
     }
     this.tokenLayer.batchDraw();
+  }
+
+  /**
+   * Play an 8-bit walking sprite from (fromCx,fromCy) to (toCx,toCy).
+   * The normal circular token is hidden while the sprite is in motion
+   * and restored (at the new position) when the animation completes.
+   */
+  _startSpriteWalk(char, group, fromCx, fromCy, toCx, toCy) {
+    this._walkingChars.add(char.id);
+
+    const cs         = this.cellSize;
+    const charColor  = CHARACTER_COLORS[char.id] ?? '#8B4513';
+    const scale      = Math.max(3, Math.round(cs / 10));
+    const spriteSize = 8 * scale;
+
+    const dx   = toCx - fromCx;
+    const dy   = toCy - fromCy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const facingLeft = dx < 0;
+
+    // Pre-render all 4 frames (flipped if walking left)
+    const raceFrames = getRaceFrames(char.race);
+    const accent = RACE_ACCENT_COLORS[char.race] ?? '#f4ead4';
+    const frames = raceFrames.map(f =>
+      renderSprite(facingLeft ? flipH(f) : f, charColor, scale, accent)
+    );
+
+    // Sprite image node — positioned so feet land at the cell centre
+    let currentFrameIdx = 0;
+    const img = new Konva.Image({
+      image:  frames[0],
+      x:      fromCx - spriteSize / 2,
+      y:      fromCy - spriteSize,
+      width:  spriteSize,
+      height: spriteSize,
+      listening: false,
+      shadowColor:   'black',
+      shadowBlur:    8,
+      shadowOpacity: 0.4,
+    });
+    this.tokenLayer.add(img);
+    group.hide();
+
+    // Duration based on travel distance and walk speed
+    const totalDuration = dist / (cs * WALK_SPEED_CELLS);  // seconds
+    const startMs       = Date.now();
+
+    // Spawn a dust puff at the sprite's feet
+    const _spawnDust = (x, y) => {
+      for (let i = 0; i < 3; i++) {
+        const puff = new Konva.Circle({
+          x: x + (Math.random() - 0.5) * spriteSize * 0.6,
+          y: y + 2,
+          radius: Math.random() * 3 + 2,
+          fill: '#c9a14a',
+          opacity: 0.55,
+          listening: false,
+        });
+        this.fxLayer.add(puff);
+        new Konva.Tween({
+          node: puff,
+          duration: 0.4 + Math.random() * 0.3,
+          y:        y - 10 - Math.random() * 8,
+          opacity:  0,
+          scaleX:   2,
+          scaleY:   2,
+          easing:   Konva.Easings.EaseOut,
+          onFinish: () => puff.destroy(),
+        }).play();
+      }
+    };
+
+    let lastDustProgress = 0;
+
+    const walkAnim = new Konva.Animation((frame) => {
+      const elapsed  = (Date.now() - startMs) / 1000;
+      const progress = Math.min(1, elapsed / totalDuration);
+
+      // Advance sprite position
+      const cx = fromCx + dx * progress;
+      const cy = fromCy + dy * progress;
+      img.x(cx - spriteSize / 2);
+      img.y(cy - spriteSize);
+
+      // Cycle animation frames
+      const fi = Math.floor(elapsed * SPRITE_FPS) % frames.length;
+      if (fi !== currentFrameIdx) {
+        currentFrameIdx = fi;
+        img.image(frames[fi]);
+      }
+
+      // Spawn dust every ~0.5 cells of travel
+      if (progress - lastDustProgress > (cs * 0.5) / dist) {
+        _spawnDust(cx, cy);
+        lastDustProgress = progress;
+      }
+
+      if (progress >= 1) {
+        walkAnim.stop();
+        img.destroy();
+        // Teleport the group to the destination before unhiding
+        group.x(toCx);
+        group.y(toCy);
+        group.show();
+        this._walkingChars.delete(char.id);
+        this.tokenLayer.batchDraw();
+      }
+    }, this.tokenLayer);
+
+    walkAnim.start();
   }
 
   _renderNpcs() {

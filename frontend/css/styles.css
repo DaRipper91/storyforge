@@ -8,6 +8,7 @@
   /* ─── Type scale ─── */
   --fs-base: 1.5rem;       /* 24px */
   --fs-sm:   1.25rem;      /* 20px */
+  --fs-xs:   1.05rem;      /* 17px — supplementary text, still legible at 10ft */
   --fs-lg:   2rem;         /* 32px */
   --fs-xl:   2.75rem;      /* 44px */
   --fs-display: 4rem;      /* 64px */
@@ -435,6 +436,7 @@ body {
   :root {
     --fs-base: 2rem;        /* 32px at 4K */
     --fs-sm: 1.6rem;
+    --fs-xs: 1.35rem;
     --fs-lg: 2.75rem;
     --fs-xl: 3.5rem;
     --token-border-w: 6px;

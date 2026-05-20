@@ -41,13 +41,11 @@
 .lobby-slot[data-status="creating"],
 .ability-row.focused,
 .ability-chip.selected-flame,
-.portrait.active,
-.btn:focus,
-.btn-primary:not(:disabled) {
+.portrait.active {
   animation: flame-flicker 0.5s infinite ease-in-out;
   border-color: #ff4500 !important;
   background: linear-gradient(to top, rgba(255, 69, 0, 0.3), rgba(255, 140, 0, 0.1), rgba(255, 215, 0, 0.05)) !important;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(255, 69, 0, 0.4),
     inset 0 0 15px rgba(255, 140, 0, 0.2) !important;
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);

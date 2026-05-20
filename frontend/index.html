@@ -18,7 +18,7 @@
       position: fixed;
       top: 1rem;
       right: 1rem;
-      z-index: 1000;
+      z-index: 1010;
       display: flex;
       gap: 0.5rem;
     }
@@ -74,18 +74,29 @@
   <!-- ─────── MENU VIEW (New Game / Saved Games) ─────── -->
   <section id="menu-view" class="phase-view parchment-surface">
     <h1 class="lobby-title ink-gilded">StoryForge</h1>
+    <p class="lobby-subtitle"><kbd>↑↓</kbd> navigate · <kbd>Enter</kbd> confirm</p>
     <div class="menu-options">
-      <button id="new-game-btn" class="btn btn-primary">New Adventure</button>
+      <button id="new-game-btn" class="btn">New Adventure</button>
       <button id="load-game-btn" class="btn">Continue Journey</button>
     </div>
   </section>
 
   <!-- ─────── MODE VIEW (Solo / Multi) ─────── -->
   <section id="mode-view" class="phase-view parchment-surface">
-    <h1 class="lobby-title ink-gilded">StoryForge</h1>
+    <h1 class="lobby-title ink-gilded">Choose Your Table</h1>
+    <p class="lobby-subtitle"><kbd>↑↓</kbd> navigate · <kbd>Enter</kbd> confirm · <kbd>Esc</kbd> back</p>
     <div class="menu-options">
-      <button id="solo-btn" class="btn btn-primary">Solo Quest</button>
-      <button id="multi-btn" class="btn">Multiplayer Table</button>
+      <button id="solo-btn" class="btn">
+        <span class="mode-btn-title">Solo Quest</span>
+        <span class="mode-btn-desc">One hero, one keyboard</span>
+      </button>
+      <button id="multi-btn" class="btn">
+        <span class="mode-btn-title">Multiplayer Table</span>
+        <span class="mode-btn-desc">Up to 4 players with gamepads</span>
+      </button>
+    </div>
+    <div class="lobby-actions">
+      <button id="mode-back-btn" class="btn">← Back <kbd>Esc</kbd></button>
     </div>
   </section>
 
@@ -201,7 +212,7 @@
     <div class="modal-card parchment-surface jon-shop-card">
 
       <div class="jon-shop-header">
-        <div class="jon-npc-portrait">J</div>
+        <div class="jon-npc-portrait" data-initial="J"></div>
         <div class="jon-header-text">
           <h2 class="ink-gilded">Jon's Store</h2>
           <p id="jon-shop-tagline" class="jon-tagline">"What can I get for you? No rush. I'm here all day."</p>

@@ -50,6 +50,7 @@ export class Lobby {
       savesView:    document.getElementById("saves-view"),
       savesList:    document.getElementById("saves-list"),
       savesBackBtn: document.getElementById("saves-back-btn"),
+      modeBackBtn:  document.getElementById("mode-back-btn"),
       newGameBtn:   document.getElementById("new-game-btn"),
       loadGameBtn:  document.getElementById("load-game-btn"),
       soloBtn:      document.getElementById("solo-btn"),
@@ -81,7 +82,8 @@ export class Lobby {
     this._dom.soloBtn?.addEventListener("click",  () => this._startNewCampaign(true));
     this._dom.multiBtn?.addEventListener("click", () => this._startNewCampaign(false));
 
-    // Saves back
+    // Back buttons
+    this._dom.modeBackBtn?.addEventListener("click",  () => this._goToMenu());
     this._dom.savesBackBtn?.addEventListener("click", () => this._goToMenu());
 
     // Creation controls
@@ -1003,7 +1005,9 @@ export class Lobby {
     };
     const max     = stepSizes[draft.step] ?? 0;
     if (!max) return;
-    const columns = ["race", "state", "role"].includes(draft.step) ? 3 : 1;
+    const columns = ["race", "state", "role"].includes(draft.step)
+      ? Math.max(1, Math.floor((this._dom.stage.clientWidth || 900) / 300))
+      : 1;
     let next = this._focusIndex + dx + dy * columns;
     next = Math.max(0, Math.min(max - 1, next));
     this._focusIndex = next;
