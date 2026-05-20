@@ -34,7 +34,7 @@ export class GridCanvas {
     this.state = null;
     this.cursor = { x: 0, y: 0 };
     this.cellSize = 64;
-    this.zoomLevel = 1.0; // 1.0 = fit to screen, >1.0 = zoomed in
+    this.zoomLevel = 0.7; // <1.0 = zoomed out from fit, 1.0 = fit to screen, >1.0 = zoomed in
 
     this._initStage();
     this._observeResize();
@@ -114,7 +114,7 @@ export class GridCanvas {
 
   adjustZoom(delta) {
     const oldZoom = this.zoomLevel;
-    this.zoomLevel = Math.max(1.0, Math.min(2.5, this.zoomLevel + delta));
+    this.zoomLevel = Math.max(0.4, Math.min(2.5, this.zoomLevel + delta));
     if (this.zoomLevel !== oldZoom) {
       this._fitAndRedraw();
     }
