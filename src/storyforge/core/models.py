@@ -100,8 +100,11 @@ class Room(BaseModel):
 # ─────────────────────── Session State ───────────────────────
 
 class TurnPhase(StrEnum):
-    LOBBY = "lobby"              # NEW: waiting for slot claims
-    CREATION = "creation"        # NEW: claimed players picking race/class/name
+    TITLE = "title"
+    MENU = "menu"                # New Game / Saved Games
+    MODE_SELECT = "mode_select"  # Solo / Multi
+    LOBBY = "lobby"              # waiting for slot claims
+    CREATION = "creation"        # claimed players picking race/class/name
     EXPLORATION = "exploration"
     COMBAT = "combat"
 

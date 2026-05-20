@@ -1,4 +1,5 @@
 """Environment + path resolution. No secrets in code."""
+import sys
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,10 +22,16 @@ class Settings(BaseSettings):
     
     @property
     def campaign_path(self) -> Path:
-        return PROJECT_ROOT / "data" / "campaigns" / self.campaign_id
+        # Save campaigns in the current working directory to avoid losing them
+        # when running from a temporary PyInstaller directory
+        base_dir = Path.cwd() / "data" / "campaigns"
+        base_dir.mkdir(parents=True, exist_ok=True)
+        return base_dir / self.campaign_id
     
     @property
     def prompts_path(self) -> Path:
+        if hasattr(sys, '_MEIPASS'):
+            return Path(sys._MEIPASS) / "storyforge" / "ai" / "prompts"
         return PROJECT_ROOT / "src" / "storyforge" / "ai" / "prompts"
 
 

@@ -77,3 +77,29 @@ def load_seed() -> GameState:
     with SEED_PATH.open("r", encoding="utf-8") as f:
         raw = json.load(f)
     return GameState.model_validate(raw)
+
+
+def list_campaigns(base_dir: Path) -> list[dict]:
+    """Scan base_dir for campaign directories and return summary metadata."""
+    campaigns = []
+    if not base_dir.exists():
+        return campaigns
+    for path in base_dir.iterdir():
+        if not path.is_dir():
+            continue
+        state_file = path / STATE_FILENAME
+        if not state_file.exists():
+            continue
+        try:
+            with state_file.open("r", encoding="utf-8") as f:
+                raw = json.load(f)
+            campaigns.append({
+                "campaign_id": raw.get("campaign_id", path.name),
+                "phase": raw.get("phase", "unknown"),
+                "characters": [c.get("name", "?") for c in raw.get("characters", {}).values()],
+                "revision": raw.get("revision", 0),
+                "last_modified": state_file.stat().st_mtime,
+            })
+        except Exception:
+            continue
+    return sorted(campaigns, key=lambda c: c["last_modified"], reverse=True)

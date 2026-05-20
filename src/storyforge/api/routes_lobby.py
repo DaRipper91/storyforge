@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from storyforge.api.deps import get_state_manager
 from storyforge.core.character_factory import RACES, STATES, ROLES
-from storyforge.core.models import CharacterCreationRequest
+from storyforge.core.models import CharacterCreationRequest, TurnPhase
 from storyforge.core.state_manager import StateError, StateManager
 
 
@@ -23,11 +23,21 @@ router = APIRouter(prefix="/api", tags=["lobby"])
 
 # ───────────────────────── Request models ─────────────────────────
 
+class SetPhaseRequest(BaseModel):
+    phase: TurnPhase
+
+
 class JoinRequest(BaseModel):
     controller_id: str = Field(min_length=1, max_length=200)
 
 
 class LeaveRequest(BaseModel):
+    controller_id: str = Field(min_length=1, max_length=200)
+
+
+class UpdateNameRequest(BaseModel):
+    slot_index: int = Field(ge=0, le=3)
+    name: str = Field(min_length=0, max_length=24)
     controller_id: str = Field(min_length=1, max_length=200)
 
 
@@ -89,6 +99,32 @@ async def leave_lobby(
         return await state.release_slot(controller_id=req.controller_id)
     except StateError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post("/lobby/update_name")
+async def update_name(
+    req: UpdateNameRequest,
+    state: StateManager = Depends(get_state_manager),
+) -> dict:
+    try:
+        return await state.update_slot_name(
+            slot_index=req.slot_index,
+            name=req.name,
+            controller_id=req.controller_id,
+        )
+    except StateError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.post("/lobby/set_phase")
+async def set_phase(
+    req: SetPhaseRequest,
+    state: StateManager = Depends(get_state_manager),
+) -> dict:
+    try:
+        return await state.set_phase(req.phase)
+    except StateError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.post("/character/create")

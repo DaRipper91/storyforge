@@ -1,21 +1,27 @@
 /**
  * Lobby + Creation state machine.
  *
- * Two phases this module owns:
- *   LOBBY    — show 4 slot cards; press A on any controller to claim a slot.
- *   CREATION — selected controller walks through race → class → abilities → name.
- *
- * Per-controller creation state is held in `_drafts` keyed by controller_id.
- * Only one draft is "active" (rendering in the creation stage) at a time;
- * we cycle between drafts with LB/RB so multiple players can take turns.
+ * Phases this module owns (client-side virtual phases in CAPS):
+ *   TITLE       — press-start splash
+ *   MENU        — New Adventure / Saved Games
+ *   MODE_SELECT — Solo / Multiplayer
+ *   SAVES       — list of saved campaigns
+ *   lobby       — 4 slot cards; press A on any controller to claim a slot
+ *   creation    — per-controller: race → state → role → abilities → name
  */
 
 import {
   fetchCatalog, joinLobby, leaveLobby, createCharacter, startGame,
+  updateLobbyName, setPhase,
+  fetchCampaigns, newCampaign, loadCampaign,
 } from "./api.js";
 
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
 const ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
+
+// Phases that exist only client-side — server state must not override them
+// (unless server reaches "exploration", which always wins).
+const CLIENT_ONLY_PHASES = ["title", "menu", "mode_select", "saves"];
 
 export class Lobby {
   constructor({ state, audio, onExplorationStarted, onStateRefetch }) {
@@ -23,47 +29,101 @@ export class Lobby {
     this.audio = audio;
     this.onExplorationStarted = onExplorationStarted;
     this.onStateRefetch = onStateRefetch;
-    
+
     this.catalog = null;
-    this._drafts = new Map();       // controllerId -> draft object
+    this._drafts = new Map();        // controllerId → draft object
     this._activeControllerId = null; // whose creation flow is on screen
-    this._focusIndex = 0;            // for keyboard navigation within a step
-    
+    this._focusIndex = 0;            // focused card in the current creation step
+    this._pool = null;               // remaining ability values to assign
+    this._pendingValue = null;       // ability chip picked, waiting for a slot
+
+    // Pre-menu / saves navigation
+    this._menuFocus = 0;   // 0 = New Adventure, 1 = Saved Games
+    this._modeFocus = 0;   // 0 = Solo, 1 = Multiplayer
+    this._saves = [];
+    this._saveFocus = 0;
+
     this._dom = {
-      titleView:     document.getElementById("title-view"),
-      lobbyView:     document.getElementById("lobby-view"),
-      lobbySlots:    document.getElementById("lobby-slots"),
-      startBtn:      document.getElementById("start-game-btn"),
-      creationView:  document.getElementById("creation-view"),
-      stage:         document.getElementById("creation-stage"),
-      stepPills:     document.querySelectorAll(".step-pill"),
-      slotLabel:     document.getElementById("creation-slot-label"),
-      backBtn:       document.getElementById("creation-back"),
-      nextBtn:       document.getElementById("creation-next"),
+      titleView:    document.getElementById("title-view"),
+      menuView:     document.getElementById("menu-view"),
+      modeView:     document.getElementById("mode-view"),
+      savesView:    document.getElementById("saves-view"),
+      savesList:    document.getElementById("saves-list"),
+      savesBackBtn: document.getElementById("saves-back-btn"),
+      newGameBtn:   document.getElementById("new-game-btn"),
+      loadGameBtn:  document.getElementById("load-game-btn"),
+      soloBtn:      document.getElementById("solo-btn"),
+      multiBtn:     document.getElementById("multi-btn"),
+      lobbyView:    document.getElementById("lobby-view"),
+      lobbySlots:   document.getElementById("lobby-slots"),
+      startBtn:     document.getElementById("start-game-btn"),
+      creationView: document.getElementById("creation-view"),
+      stage:        document.getElementById("creation-stage"),
+      stepPills:    document.querySelectorAll(".step-pill"),
+      slotLabel:    document.getElementById("creation-slot-label"),
+      backBtn:      document.getElementById("creation-back"),
+      nextBtn:      document.getElementById("creation-next"),
     };
-    
-    this._dom.startBtn.addEventListener("click", () => this.handleStartGame());
-    this._dom.backBtn.addEventListener("click", () => this.handleBack());
-    this._dom.nextBtn.addEventListener("click", () => this.handleNext());
-    this._dom.titleView.addEventListener("click", () => this._exitTitlePhase());
+
+    // Title
+    this._dom.titleView?.addEventListener("click", () => this._exitTitlePhase());
+
+    // Menu buttons
+    this._dom.newGameBtn?.addEventListener("click", () => {
+      document.body.dataset.phase = "mode_select";
+      this._modeFocus = 0;
+      this._renderMode();
+      this.audio?.playPageTurn();
+    });
+    this._dom.loadGameBtn?.addEventListener("click", () => this._showSaves());
+
+    // Mode buttons
+    this._dom.soloBtn?.addEventListener("click",  () => this._startNewCampaign(true));
+    this._dom.multiBtn?.addEventListener("click", () => this._startNewCampaign(false));
+
+    // Saves back
+    this._dom.savesBackBtn?.addEventListener("click", () => this._goToMenu());
+
+    // Creation controls
+    this._dom.startBtn?.addEventListener("click", () => this.handleStartGame());
+    this._dom.backBtn?.addEventListener("click",  () => this.handleBack());
+    this._dom.nextBtn?.addEventListener("click",  () => this.handleNext());
+
+    // Always start on title (boot sets body[data-phase="title"])
+    if (document.body.dataset.phase === "title") {
+      this._renderTitle();
+    }
   }
-  
+
+  _renderTitle() {
+    if (!this._dom.titleView) return;
+    this._dom.titleView.innerHTML = `
+      <div class="flame-container">
+        <div class="flame"></div><div class="flame"></div><div class="flame"></div>
+      </div>
+      <h1 class="title-logo ink-gilded">StoryForge</h1>
+      <p class="title-press-start">Press <kbd>Enter</kbd> or <kbd>A</kbd> to Begin</p>
+    `;
+  }
+
   async init(currentState) {
     this.catalog = await fetchCatalog();
     this.setState(currentState);
   }
-  
+
   setState(state) {
-    // If we are currently in "title" phase client-side, don't let server phase override it
-    // unless the server says we are already in exploration.
-    if (document.body.dataset.phase === "title" && state.phase !== "exploration") {
+    const clientPhase = document.body.dataset.phase;
+
+    // Client-only phases: don't let a server state_diff override navigation,
+    // unless the server has already progressed to exploration.
+    if (CLIENT_ONLY_PHASES.includes(clientPhase) && state.phase !== "exploration") {
       this.state = state;
       return;
     }
 
     this.state = state;
     document.body.dataset.phase = state.phase;
-    
+
     // Hydrate drafts from server-persisted lobby_slots.
     for (const slot of state.lobby_slots) {
       if (slot.status === "creating" || slot.status === "claimed") {
@@ -72,72 +132,139 @@ export class Lobby {
         }
       }
     }
-    
+
     if (state.phase === "lobby" || state.phase === "creation") {
       this._renderLobby();
     }
     if (state.phase === "creation") {
-      // Auto-focus the first claiming controller if none is active.
       if (!this._activeControllerId) {
-        const firstClaiming = state.lobby_slots.find(
+        const first = state.lobby_slots.find(
           s => s.status === "claimed" || s.status === "creating"
         );
-        if (firstClaiming) {
-          this._activeControllerId = firstClaiming.controller_id;
-        }
+        if (first) this._activeControllerId = first.controller_id;
       }
       this._renderCreation();
     }
   }
-  
+
   // ─────────────────────── Gamepad / Keyboard input ───────────────────────
-  
+
   handleControllerButton({ controllerId, button }) {
-    if (document.body.dataset.phase === "title") {
-      if (button === 0 || button === 9) { // A or Start
-        this._exitTitlePhase();
-      }
+    const clientPhase = document.body.dataset.phase;
+
+    if (clientPhase === "title") {
+      if (button === 0 || button === 9) this._exitTitlePhase(); // A or Start
       return;
     }
 
+    if (clientPhase === "menu") {
+      if (button === 0) this._handleMenuConfirm();              // A
+      return;
+    }
+
+    if (clientPhase === "mode_select") {
+      if (button === 0) this._handleModeConfirm();              // A
+      if (button === 1) this._goToMenu();                       // B
+      return;
+    }
+
+    if (clientPhase === "saves") {
+      if (button === 0 && this._saves.length)
+        this._loadSave(this._saves[this._saveFocus].campaign_id); // A
+      if (button === 1) this._goToMenu();                          // B
+      return;
+    }
+
+    // lobby / creation
     if (this.state.phase === "lobby" || this.state.phase === "creation") {
-      // A = claim slot (if no slot held) or confirm in creation
-      if (button === 0) {  // A
-        this._handleConfirm(controllerId);
-      } else if (button === 1) {  // B
-        this._handleBButton(controllerId);
-      } else if (button === 4 || button === 5) {  // LB/RB
-        this._cycleActiveDraft(button === 5 ? +1 : -1);
-      } else if (button === 9) {  // Start
-        this.handleStartGame();
-      }
+      if (button === 0) {
+        // In creation with no active draft → everyone is done → start the game
+        if (this.state.phase === "creation" && !this._activeControllerId) {
+          this.handleStartGame();
+        } else {
+          this._handleConfirm(controllerId);
+        }
+      } else if (button === 1)   this._handleBButton(controllerId);
+      else if (button === 4 || button === 5) this._cycleActiveDraft(button === 5 ? +1 : -1);
+      else if (button === 9)     this.handleStartGame();
     }
   }
 
   handleControllerDpad({ controllerId, dx, dy }) {
+    const clientPhase = document.body.dataset.phase;
+
+    if (clientPhase === "menu") {
+      this._menuFocus = Math.max(0, Math.min(1, this._menuFocus + (dy > 0 ? 1 : dy < 0 ? -1 : 0)));
+      this._renderMenu();
+      this.audio?.playCursor();
+      return;
+    }
+
+    if (clientPhase === "mode_select") {
+      this._modeFocus = Math.max(0, Math.min(1, this._modeFocus + (dy > 0 ? 1 : dy < 0 ? -1 : 0)));
+      this._renderMode();
+      this.audio?.playCursor();
+      return;
+    }
+
+    if (clientPhase === "saves") {
+      this._saveFocus = Math.max(0, Math.min(this._saves.length - 1,
+        this._saveFocus + (dy > 0 ? 1 : dy < 0 ? -1 : 0)));
+      this._renderSaves();
+      this.audio?.playCursor();
+      return;
+    }
+
     if (this.state.phase !== "creation") return;
     if (controllerId !== this._activeControllerId) return;
     this._moveFocus(dx, dy);
   }
 
   handleKeyboard(e) {
-    if (document.body.dataset.phase === "title") {
-      if (e.key === "Enter") {
-        this._exitTitlePhase();
-      }
+    const clientPhase = document.body.dataset.phase;
+
+    if (clientPhase === "title") {
+      if (e.key === "Enter") this._exitTitlePhase();
+      return;
+    }
+
+    if (clientPhase === "menu") {
+      if (e.key === "ArrowUp")   { this._menuFocus = 0; this._renderMenu(); this.audio?.playCursor(); }
+      if (e.key === "ArrowDown") { this._menuFocus = 1; this._renderMenu(); this.audio?.playCursor(); }
+      if (e.key === "Enter")     this._handleMenuConfirm();
+      return;
+    }
+
+    if (clientPhase === "mode_select") {
+      if (e.key === "ArrowUp")   { this._modeFocus = 0; this._renderMode(); this.audio?.playCursor(); }
+      if (e.key === "ArrowDown") { this._modeFocus = 1; this._renderMode(); this.audio?.playCursor(); }
+      if (e.key === "Enter")     this._handleModeConfirm();
+      if (e.key === "Escape")    this._goToMenu();
+      return;
+    }
+
+    if (clientPhase === "saves") {
+      if (e.key === "ArrowUp")   { this._saveFocus = Math.max(0, this._saveFocus - 1); this._renderSaves(); this.audio?.playCursor(); }
+      if (e.key === "ArrowDown") { this._saveFocus = Math.min(this._saves.length - 1, this._saveFocus + 1); this._renderSaves(); this.audio?.playCursor(); }
+      if (e.key === "Enter" && this._saves.length) this._loadSave(this._saves[this._saveFocus].campaign_id);
+      if (e.key === "Escape")    this._goToMenu();
       return;
     }
 
     if (this.state.phase === "lobby") {
       if (e.key === "Enter") this.handleStartGame();
-      // Allow keyboard player to join with 'A' (mapped to Space or A)
-      if (e.key.toLowerCase() === "a" || e.key === " ") {
-        this._handleAButton("keyboard");
-      }
+      if (e.key.toLowerCase() === "a" || e.key === " ") this._handleAButton("keyboard");
       return;
     }
     if (this.state.phase !== "creation") return;
 
+    // When all players have finished creation, Enter/Space starts the adventure
+    if (!this._activeControllerId) {
+      if (e.key === "Enter" || e.key === " ") this.handleStartGame();
+      return;
+    }
+
+    if (document.activeElement?.tagName === "INPUT") return;
     if (e.key === "ArrowLeft")  this._moveFocus(-1, 0);
     if (e.key === "ArrowRight") this._moveFocus(+1, 0);
     if (e.key === "ArrowUp")    this._moveFocus(0, -1);
@@ -150,10 +277,166 @@ export class Lobby {
     }
   }
 
+  // ─────────────────────── Pre-lobby navigation ───────────────────────
+
+  _exitTitlePhase() {
+    if (document.body.dataset.phase !== "title") return;
+    this.audio?.playConfirm();
+    document.body.dataset.phase = "menu";
+    this._menuFocus = 0;
+    this._renderMenu();
+  }
+
+  _goToMenu() {
+    document.body.dataset.phase = "menu";
+    this._menuFocus = 0;
+    this._renderMenu();
+    this.audio?.playCursor();
+  }
+
+  _handleMenuConfirm() {
+    if (this._menuFocus === 0) {
+      document.body.dataset.phase = "mode_select";
+      this._modeFocus = 0;
+      this._renderMode();
+      this.audio?.playPageTurn();
+    } else {
+      this._showSaves();
+    }
+  }
+
+  _handleModeConfirm() {
+    this._startNewCampaign(this._modeFocus === 0); // 0 = solo
+  }
+
+  async _startNewCampaign(isSolo = false) {
+    try {
+      await newCampaign();
+      this._drafts.clear();
+      this._activeControllerId = null;
+      this._focusIndex = 0;
+      this._pool = null;
+      this._pendingValue = null;
+
+      if (isSolo) {
+        // Skip the lobby entirely: claim one keyboard slot and go straight to creation.
+        await joinLobby("keyboard");
+        await setPhase("creation");
+        document.body.dataset.phase = "creation";
+      } else {
+        document.body.dataset.phase = "lobby";
+      }
+
+      this.audio?.playConfirm();
+      await this.onStateRefetch?.();
+    } catch (err) {
+      console.error("[lobby] new campaign failed:", err.message);
+      this.audio?.playDeny();
+    }
+  }
+
+  async _showSaves() {
+    try {
+      const data = await fetchCampaigns();
+      this._saves = data.campaigns || [];
+      this._saveFocus = 0;
+      document.body.dataset.phase = "saves";
+      this._renderSaves();
+    } catch (err) {
+      console.error("[lobby] fetch campaigns failed:", err.message);
+      this.audio?.playDeny();
+    }
+  }
+
+  async _loadSave(campaignId) {
+    try {
+      const state = await loadCampaign(campaignId);
+      this._drafts.clear();
+      this._activeControllerId = null;
+      this._focusIndex = 0;
+      this._pool = null;
+      this._pendingValue = null;
+      document.body.dataset.phase = state.phase;
+      this.audio?.playConfirm();
+      await this.onStateRefetch?.();
+    } catch (err) {
+      console.error("[lobby] load campaign failed:", err.message);
+      this.audio?.playDeny();
+    }
+  }
+
+  _renderAllReady() {
+    // Reset step pills to all-done
+    this._dom.stepPills.forEach(p => { p.classList.remove("active"); p.classList.add("done"); });
+    this._dom.slotLabel.textContent = "";
+
+    const readySlots = this.state.lobby_slots.filter(s => s.status === "ready");
+    const names = readySlots.map(s => {
+      const char = this.state.characters[s.character_id];
+      return char?.name ?? "Hero";
+    }).join(", ");
+
+    this._dom.stage.innerHTML = `
+      <div class="creation-all-ready">
+        <p class="all-ready-names ink-gilded">${this._escape(names)}</p>
+        <p class="all-ready-msg">${readySlots.length === 1 ? "Your hero is" : "All heroes are"} forged and ready.</p>
+        <button class="btn btn-primary all-ready-begin">Begin Adventure <kbd>Enter</kbd></button>
+      </div>
+    `;
+    this._dom.stage.querySelector(".all-ready-begin")
+      ?.addEventListener("click", () => this.handleStartGame());
+  }
+
+  _renderMenu() {
+    [this._dom.newGameBtn, this._dom.loadGameBtn].forEach((btn, i) => {
+      btn?.classList.toggle("focused", i === this._menuFocus);
+    });
+  }
+
+  _renderMode() {
+    [this._dom.soloBtn, this._dom.multiBtn].forEach((btn, i) => {
+      btn?.classList.toggle("focused", i === this._modeFocus);
+    });
+  }
+
+  _renderSaves() {
+    const container = this._dom.savesList;
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (this._saves.length === 0) {
+      container.innerHTML = '<p class="saves-empty">No saved adventures found.</p>';
+      return;
+    }
+
+    this._saves.forEach((save, idx) => {
+      const card = document.createElement("div");
+      card.className = "save-card";
+      if (idx === this._saveFocus) card.classList.add("focused");
+
+      const date = new Date(save.last_modified * 1000);
+      const dateStr = date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+        + " · " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const chars = save.characters.length ? save.characters.join(", ") : "No heroes yet";
+      const phaseLabel = { lobby: "At the Tavern", creation: "Forging Heroes", exploration: "On Adventure", combat: "In Combat" }[save.phase] ?? save.phase;
+
+      card.innerHTML = `
+        <div class="save-title ink-gilded">${this._escape(save.campaign_id)}</div>
+        <div class="save-meta">
+          <span class="save-phase">${this._escape(phaseLabel)}</span>
+          <span class="save-chars">${this._escape(chars)}</span>
+          <span class="save-date">${dateStr}</span>
+        </div>
+      `;
+      card.addEventListener("click",      () => this._loadSave(save.campaign_id));
+      card.addEventListener("mouseenter", () => { this._saveFocus = idx; this._renderSaves(); });
+      container.appendChild(card);
+    });
+  }
+
   // ─────────────────────── Slot claim / release ───────────────────────
 
   async _handleConfirm(controllerId) {
-    // If not in creation, just try to claim.
     if (this.state.phase !== "creation") {
       return this._handleAButton(controllerId);
     }
@@ -161,7 +444,6 @@ export class Lobby {
     const draft = this._drafts.get(controllerId);
     if (!draft) return this._handleAButton(controllerId);
 
-    // If this is the active draft, use Enter/A to select or advance.
     if (controllerId === this._activeControllerId) {
       if (draft.step === "race") {
         const keys = Object.keys(this.catalog.races);
@@ -172,13 +454,29 @@ export class Lobby {
       } else if (draft.step === "role") {
         const keys = Object.keys(this.catalog.roles);
         draft.predatorRole = keys[this._focusIndex];
+      } else if (draft.step === "abilities") {
+        const abil = ABILITIES[this._focusIndex];
+        if (!this._pool) {
+          const assigned = Object.values(draft.abilities).filter(v => v != null);
+          this._pool = STANDARD_ARRAY.filter(v => !assigned.includes(v));
+        }
+        if (draft.abilities[abil] != null) {
+          this._pool.push(draft.abilities[abil]);
+          draft.abilities[abil] = null;
+          this._renderCreation();
+          this.audio?.playCursor();
+          return;
+        } else if (this._pool.length > 0) {
+          this._pool.sort((a, b) => b - a);
+          draft.abilities[abil] = this._pool.shift();
+          this._renderCreation();
+          this.audio?.playConfirm();
+          if (this._pool.length > 0) return;
+        }
       }
-      // "abilities" and "name" use their own internal focus/enter logic,
-      // but we still want Enter to advance once they are valid.
-
+      // name step confirm is handled inside _renderNameStep via Enter key
       await this.handleNext();
     } else {
-      // Take focus.
       this._activeControllerId = controllerId;
       this._renderCreation();
       this.audio?.playCursor();
@@ -186,15 +484,10 @@ export class Lobby {
   }
 
   async _handleAButton(controllerId) {
-    // If already has a draft, we don't need to do anything here anymore
-    // as _handleConfirm handles the creation-phase logic.
     if (this._drafts.has(controllerId)) return;
-    
-    // Brand-new claim.
     try {
       const result = await joinLobby(controllerId);
       this.audio?.playConfirm();
-      // Initialize an empty draft.
       this._drafts.set(controllerId, {
         controllerId,
         slotIndex: result.slot_index,
@@ -205,29 +498,20 @@ export class Lobby {
         abilities: { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null },
         name: "",
       });
-      if (!this._activeControllerId) {
-        this._activeControllerId = controllerId;
-      }
+      if (!this._activeControllerId) this._activeControllerId = controllerId;
       await this.onStateRefetch?.();
     } catch (err) {
       console.warn("[lobby] join failed:", err.message);
       this.audio?.playDeny();
     }
   }
-  
+
   async _handleBButton(controllerId) {
     if (!this._drafts.has(controllerId)) return;
-    
     if (this.state.phase === "creation") {
-      // Back in creation flow first.
       const draft = this._drafts.get(controllerId);
-      if (draft.step !== "race") {
-        this.handleBack();
-        return;
-      }
+      if (draft.step !== "race") { this.handleBack(); return; }
     }
-    
-    // From race step or lobby: release the slot.
     try {
       await leaveLobby(controllerId);
       this._drafts.delete(controllerId);
@@ -240,86 +524,83 @@ export class Lobby {
       console.warn("[lobby] leave failed:", err.message);
     }
   }
-  
+
   _cycleActiveDraft(direction) {
     const ids = [...this._drafts.keys()];
-    if (ids.length === 0) return;
-    const currentIdx = ids.indexOf(this._activeControllerId);
-    const nextIdx = (currentIdx + direction + ids.length) % ids.length;
-    this._activeControllerId = ids[nextIdx];
+    if (!ids.length) return;
+    const cur = ids.indexOf(this._activeControllerId);
+    this._activeControllerId = ids[(cur + direction + ids.length) % ids.length];
     this._focusIndex = 0;
     this._renderCreation();
     this.audio?.playCursor();
   }
-  
+
   // ─────────────────────── Step navigation ───────────────────────
-  
+
   async handleNext() {
     if (!this._activeControllerId) return;
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
-    
+
     const order = ["race", "state", "role", "abilities", "name"];
-    const idx = order.indexOf(draft.step);
-    
-    // Validate current step before advancing.
+    const idx   = order.indexOf(draft.step);
+
     if (!this._isStepComplete(draft, draft.step)) {
       this.audio?.playDeny();
       return;
     }
-    
+
     if (idx === order.length - 1) {
-      // Final step — commit to server.
       await this._commitDraft(draft);
     } else {
       draft.step = order[idx + 1];
       this._focusIndex = 0;
+      this._pool = null;
+      this._pendingValue = null;
       this._renderCreation();
       this.audio?.playPageTurn();
     }
   }
-  
+
   handleBack() {
     if (!this._activeControllerId) return;
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
-    
+
     const order = ["race", "state", "role", "abilities", "name"];
-    const idx = order.indexOf(draft.step);
-    if (idx === 0) return;  // Can't go back from first step
-    
+    const idx   = order.indexOf(draft.step);
+    if (idx === 0) return;
+
     draft.step = order[idx - 1];
     this._focusIndex = 0;
+    this._pool = null;
+    this._pendingValue = null;
     this._renderCreation();
     this.audio?.playPageTurn();
   }
-  
+
   async _commitDraft(draft) {
     try {
       await createCharacter({
-        slotIndex: draft.slotIndex,
-        name: draft.name.trim(),
-        race: draft.race,
-        evolution_state: draft.evolutionState,
-        predator_role: draft.predatorRole,
-        abilities: draft.abilities,
+        slotIndex:     draft.slotIndex,
+        name:          draft.name.trim(),
+        race:          draft.race,
+        evolutionState: draft.evolutionState,
+        predatorRole:  draft.predatorRole,
+        abilities:     draft.abilities,
       });
       this.audio?.playConfirm();
       this._drafts.delete(draft.controllerId);
-      
-      // Move focus to next unfinished draft.
-      const ids = [...this._drafts.keys()];
-      this._activeControllerId = ids[0] ?? null;
-      
+      this._activeControllerId = [...this._drafts.keys()][0] ?? null;
       await this.onStateRefetch?.();
     } catch (err) {
       console.error("[creation] commit failed:", err.message);
       this.audio?.playDeny();
     }
   }
-  
+
   async handleStartGame() {
-    if (this._dom.startBtn.disabled) return;
+    if (this._dom.startBtn?.disabled) return;
     try {
       await startGame();
       this.audio?.playConfirm();
@@ -330,26 +611,56 @@ export class Lobby {
       this.audio?.playDeny();
     }
   }
-  
+
   // ─────────────────────── Rendering: lobby ───────────────────────
-  
+
   _renderLobby() {
     this._dom.lobbySlots.innerHTML = "";
     for (const slot of this.state.lobby_slots) {
       const card = document.createElement("div");
       card.className = "lobby-slot";
       card.dataset.status = slot.status;
-      
+
       const idx = document.createElement("div");
       idx.className = "slot-index";
       idx.textContent = `Slot ${slot.slot_index + 1}`;
       card.appendChild(idx);
-      
+
       const status = document.createElement("div");
       status.className = "slot-status-text";
       status.textContent = this._slotStatusText(slot);
       card.appendChild(status);
-      
+
+      const nameContainer = document.createElement("div");
+      nameContainer.className = "slot-name-container";
+
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.placeholder = "Enter name...";
+      nameInput.className = "slot-name-input";
+      nameInput.value = slot.name_draft || "";
+      nameInput.disabled = slot.status === "ready";
+
+      nameInput.addEventListener("change", async (e) => {
+        const val = e.target.value.trim();
+        if (val) {
+          try {
+            await updateLobbyName({
+              slotIndex:    slot.slot_index,
+              name:         val,
+              controllerId: slot.controller_id || `mouse_${slot.slot_index}`,
+            });
+            this.audio?.playConfirm();
+          } catch (err) {
+            console.error("[lobby] name update failed:", err);
+            this.audio?.playDeny();
+          }
+        }
+      });
+
+      nameContainer.appendChild(nameInput);
+      card.appendChild(nameContainer);
+
       if (slot.status === "ready" && slot.character_id) {
         const char = this.state.characters[slot.character_id];
         if (char) {
@@ -364,230 +675,212 @@ export class Lobby {
           card.appendChild(preview);
         }
       }
-      
-      this._dom.lobbySlots.appendChild(card);
 
-      card.addEventListener("click", () => {
-        if (slot.status === "empty") {
-          this._handleAButton("mouse");
-        } else if (slot.status === "claimed" || slot.status === "creating") {
-          // If already claimed, clicking it makes it the active draft.
-          this._activeControllerId = slot.controller_id;
-          this._renderCreation();
-          this.audio?.playCursor();
+      this._dom.lobbySlots.appendChild(card);
+    }
+
+    // Start button
+    const claimedSlots = this.state.lobby_slots.filter(s => s.status !== "empty");
+    const readyCount   = this.state.lobby_slots.filter(s => s.status === "ready").length;
+
+    if (this.state.phase === "lobby") {
+      this._dom.startBtn.disabled = claimedSlots.length === 0;
+      this._dom.startBtn.textContent = claimedSlots.length > 0
+        ? `Start Hero Creation (${claimedSlots.length} ${claimedSlots.length === 1 ? "player" : "players"})`
+        : "Join a slot to start";
+      this._dom.startBtn.onclick = async () => {
+        try {
+          await setPhase("creation");
+          this.audio?.playPageTurn();
+        } catch (err) {
+          console.error("[lobby] phase transition failed:", err);
+          this.audio?.playDeny();
         }
-      });
+      };
+    } else {
+      this._dom.startBtn.disabled = readyCount < 1;
+      this._dom.startBtn.textContent = readyCount > 0
+        ? `Begin Adventure (${readyCount} ${readyCount === 1 ? "hero" : "heroes"})`
+        : "Finish creating heroes";
+      this._dom.startBtn.onclick = () => this.handleStartGame();
     }
-    
-    // Update Start button.
-    const readyCount = this.state.lobby_slots.filter(s => s.status === "ready").length;
-    this._dom.startBtn.disabled = readyCount < 1;
-    this._dom.startBtn.textContent = readyCount > 0
-      ? `Begin Adventure (${readyCount} ${readyCount === 1 ? "hero" : "heroes"})`
-      : "Begin Adventure";
   }
-  
+
   _slotStatusText(slot) {
-    switch (slot.status) {
-      case "empty":    return "Press A to join";
-      case "claimed":  return "Choosing race...";
-      case "creating": return "Forging...";
-      case "ready":    return "Ready";
-      default:         return slot.status;
-    }
+    return { empty: "Available", claimed: "Joined", creating: "Forging…", ready: "Ready" }[slot.status] ?? slot.status;
   }
-  
+
   // ─────────────────────── Rendering: creation ───────────────────────
-  
+
   _renderCreation() {
     if (!this._activeControllerId) {
-      this._dom.stage.innerHTML = "<p>Waiting for players...</p>";
-      return;
+      const next = this.state.lobby_slots.find(s => s.status !== "ready" && s.controller_id);
+      if (next) {
+        this._activeControllerId = next.controller_id;
+        if (!this._drafts.has(this._activeControllerId))
+          this._drafts.set(this._activeControllerId, this._draftFromSlot(next));
+      } else {
+        // All players finished — show the launch screen
+        this._renderAllReady();
+        return;
+      }
     }
+
     const draft = this._drafts.get(this._activeControllerId);
-    if (!draft) return;
-    
-    // Update step pills.
-    const stepOrder = ["race", "state", "role", "abilities", "name"];
+    if (!draft) { this._renderAllReady(); return; }
+
+    const stepOrder  = ["race", "state", "role", "abilities", "name"];
     const currentIdx = stepOrder.indexOf(draft.step);
+
     this._dom.stepPills.forEach((pill, i) => {
       pill.classList.remove("active", "done");
       if (i === currentIdx) pill.classList.add("active");
       if (i < currentIdx)  pill.classList.add("done");
     });
-    
-    this._dom.slotLabel.textContent =
-      `Slot ${draft.slotIndex + 1} of ${this._drafts.size}`;
-    
-    // Render the current step.
+
+    // Multi-player progress strip
+    const activePlayers = this.state.lobby_slots.filter(s => s.status !== "empty");
+    if (activePlayers.length > 1) {
+      const existing = this._dom.creationView?.querySelector(".player-progress");
+      if (existing) existing.remove();
+      const strip = document.createElement("div");
+      strip.className = "player-progress";
+      activePlayers.forEach(slot => {
+        const pip = document.createElement("div");
+        pip.className = "player-pip";
+        const isActive = slot.controller_id === this._activeControllerId;
+        const isDone   = slot.status === "ready";
+        if (isDone)   pip.classList.add("done");
+        if (isActive) pip.classList.add("active");
+        const char = this.state.characters[slot.character_id];
+        pip.textContent = isDone
+          ? `${char?.name ?? slot.name_draft ?? `P${slot.slot_index + 1}`} ✓`
+          : (slot.name_draft?.trim() || `Player ${slot.slot_index + 1}`);
+        strip.appendChild(pip);
+      });
+      if (activePlayers.length > 1) {
+        const hint = document.createElement("span");
+        hint.className = "player-pip-hint";
+        hint.textContent = "Tab / LB·RB to switch";
+        strip.appendChild(hint);
+      }
+      this._dom.creationView?.insertBefore(strip, this._dom.creationView.querySelector(".creation-steps"));
+    }
+
+    this._dom.slotLabel.textContent = `Forging: ${draft.name.trim() || `Slot ${draft.slotIndex + 1}`}`;
+
     this._dom.stage.innerHTML = "";
     switch (draft.step) {
-      case "race":      this._renderRaceStep(draft); break;
-      case "state":     this._renderStateStep(draft); break;
-      case "role":      this._renderRoleStep(draft); break;
+      case "race":      this._renderRaceStep(draft);      break;
+      case "state":     this._renderStateStep(draft);     break;
+      case "role":      this._renderRoleStep(draft);      break;
       case "abilities": this._renderAbilitiesStep(draft); break;
-      case "name":      this._renderNameStep(draft); break;
+      case "name":      this._renderNameStep(draft);      break;
     }
 
     this._scrollFocusedIntoView();
   }
 
   _scrollFocusedIntoView() {
-    const focused = this._dom.stage.querySelector(".focused");
-    if (focused) {
-      focused.scrollIntoView({ block: "nearest" });
-    }
+    this._dom.stage.querySelector(".focused")?.scrollIntoView({ block: "nearest" });
   }
-  
+
   _renderRaceStep(draft) {
     const grid = document.createElement("div");
     grid.className = "option-grid";
-    
-    const entries = Object.entries(this.catalog.races);
-    entries.forEach(([raceKey, rdef], idx) => {
-      const card = document.createElement("div");
-      card.className = "option-card";
-      if (draft.race === raceKey) card.classList.add("selected");
-      if (idx === this._focusIndex) card.classList.add("focused");
-      
-      card.innerHTML = `
-        <h3>${this._escape(rdef.name)}</h3>
-        <p class="flavor">${this._escape(rdef.flavor)}</p>
-        <div class="stats">
-          Speed: ${rdef.speed}ft · 
-          ${Object.entries(rdef.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}
-        </div>
-      `;
-      
-      card.addEventListener("click", () => {
-        draft.race = raceKey;
-        this._renderCreation();
-        this.audio?.playCursor();
-      });
-      card.addEventListener("mouseenter", () => {
-        this._focusIndex = idx;
-        this._renderCreation();
-      });
+    Object.entries(this.catalog.races).forEach(([key, def], idx) => {
+      const card = this._optionCard(def.name, def.flavor,
+        `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
+        draft.race === key, idx === this._focusIndex);
+      card.addEventListener("click",      () => { draft.race = key; this._renderCreation(); this.audio?.playCursor(); });
+      card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
       grid.appendChild(card);
     });
-    
     this._dom.stage.appendChild(grid);
   }
 
   _renderStateStep(draft) {
     const grid = document.createElement("div");
     grid.className = "option-grid";
-    
-    const entries = Object.entries(this.catalog.states);
-    entries.forEach(([stateKey, sdef], idx) => {
-      const card = document.createElement("div");
-      card.className = "option-card";
-      if (draft.evolutionState === stateKey) card.classList.add("selected");
-      if (idx === this._focusIndex) card.classList.add("focused");
-      
-      card.innerHTML = `
-        <h3>${this._escape(sdef.name)}</h3>
-        <p class="flavor">${this._escape(sdef.flavor)}</p>
-        <div class="stats">
-          Hit Die: d${sdef.hit_die} · Base AC: ${sdef.base_armor_class}
-        </div>
-      `;
-      
-      card.addEventListener("click", () => {
-        draft.evolutionState = stateKey;
-        this._renderCreation();
-        this.audio?.playCursor();
-      });
-      card.addEventListener("mouseenter", () => {
-        this._focusIndex = idx;
-        this._renderCreation();
-      });
+    Object.entries(this.catalog.states).forEach(([key, def], idx) => {
+      const card = this._optionCard(def.name, def.flavor,
+        `Hit Die: d${def.hit_die} · Base AC: ${def.base_armor_class}`,
+        draft.evolutionState === key, idx === this._focusIndex);
+      card.addEventListener("click",      () => { draft.evolutionState = key; this._renderCreation(); this.audio?.playCursor(); });
+      card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
       grid.appendChild(card);
     });
-    
     this._dom.stage.appendChild(grid);
   }
-  
+
   _renderRoleStep(draft) {
     const grid = document.createElement("div");
     grid.className = "option-grid";
-    
-    const entries = Object.entries(this.catalog.roles);
-    entries.forEach(([roleKey, pdef], idx) => {
-      const card = document.createElement("div");
-      card.className = "option-card";
-      if (draft.predatorRole === roleKey) card.classList.add("selected");
-      if (idx === this._focusIndex) card.classList.add("focused");
-      
-      const inv = pdef.starting_inventory.map(i => i.name).join(", ");
-      card.innerHTML = `
-        <h3>${this._escape(pdef.name)}</h3>
-        <p class="flavor">${this._escape(pdef.flavor)}</p>
-        <div class="stats">
-          Gear: ${this._escape(inv)}
-        </div>
-      `;
-      
-      card.addEventListener("click", () => {
-        draft.predatorRole = roleKey;
-        this._renderCreation();
-        this.audio?.playCursor();
-      });
-      card.addEventListener("mouseenter", () => {
-        this._focusIndex = idx;
-        this._renderCreation();
-      });
+    Object.entries(this.catalog.roles).forEach(([key, def], idx) => {
+      const inv = def.starting_inventory.map(i => i.name).join(", ");
+      const card = this._optionCard(def.name, def.flavor,
+        `Gear: ${inv}`,
+        draft.predatorRole === key, idx === this._focusIndex);
+      card.addEventListener("click",      () => { draft.predatorRole = key; this._renderCreation(); this.audio?.playCursor(); });
+      card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
       grid.appendChild(card);
     });
-    
     this._dom.stage.appendChild(grid);
   }
-  
+
+  _optionCard(name, flavor, stats, selected, focused) {
+    const card = document.createElement("div");
+    card.className = "option-card";
+    if (selected) card.classList.add("selected");
+    if (focused)  card.classList.add("focused");
+    card.innerHTML = `
+      <h3>${this._escape(name)}</h3>
+      <p class="flavor">${this._escape(flavor)}</p>
+      <div class="stats">${this._escape(stats)}</div>
+    `;
+    return card;
+  }
+
   _renderAbilitiesStep(draft) {
     const stage = document.createElement("div");
-    
+
     const help = document.createElement("p");
-    help.style.textAlign = "center";
-    help.innerHTML = `Assign the standard array to each ability. Click an unused value, then click an ability to set it.`;
+    help.style.cssText = "text-align:center;margin-bottom:var(--space-2)";
+    help.textContent = "Assign the standard array to each ability.";
     stage.appendChild(help);
-    
+
+    if (!this._pool) {
+      const assigned = Object.values(draft.abilities).filter(v => v != null);
+      this._pool = STANDARD_ARRAY.filter(v => !assigned.includes(v));
+    }
+
     const grid = document.createElement("div");
     grid.className = "ability-grid";
-    
     ABILITIES.forEach((abil, i) => {
       const row = document.createElement("div");
       row.className = "ability-row";
       if (i === this._focusIndex) row.classList.add("focused");
-      
+
       const name = document.createElement("span");
       name.className = "ability-name";
       name.textContent = abil;
-      
+
       const val = document.createElement("span");
       val.className = "ability-value";
       val.textContent = draft.abilities[abil] ?? "—";
-      
-      row.appendChild(val);
-      
-      row.addEventListener("mouseenter", () => {
-        this._focusIndex = i;
-        this._renderCreation();
-      });
 
+      row.appendChild(name);
+      row.appendChild(val);
+      row.addEventListener("mouseenter", () => { this._focusIndex = i; this._renderCreation(); });
       row.addEventListener("click", () => {
         if (this._pendingValue != null) {
-          // Place the pending value.
-          if (draft.abilities[abil] != null) {
-            // Restore the displaced value to the pool.
-            this._pool.push(draft.abilities[abil]);
-          }
+          if (draft.abilities[abil] != null) this._pool.push(draft.abilities[abil]);
           draft.abilities[abil] = this._pendingValue;
           this._pool = this._pool.filter(v => v !== this._pendingValue);
           this._pendingValue = null;
           this._renderCreation();
           this.audio?.playConfirm();
         } else if (draft.abilities[abil] != null) {
-          // Take this value back.
           this._pendingValue = draft.abilities[abil];
           this._pool.push(this._pendingValue);
           draft.abilities[abil] = null;
@@ -597,15 +890,8 @@ export class Lobby {
       });
       grid.appendChild(row);
     });
-    
     stage.appendChild(grid);
-    
-    // Pool of available values.
-    if (!this._pool) {
-      const assigned = Object.values(draft.abilities).filter(v => v != null);
-      this._pool = STANDARD_ARRAY.filter(v => !assigned.includes(v));
-    }
-    
+
     const pool = document.createElement("div");
     pool.className = "ability-pool";
     STANDARD_ARRAY.forEach(v => {
@@ -626,101 +912,99 @@ export class Lobby {
     stage.appendChild(pool);
     this._dom.stage.appendChild(stage);
   }
-  
+
   _renderNameStep(draft) {
     const wrap = document.createElement("div");
     wrap.className = "name-stage";
-    
+
     const label = document.createElement("p");
-    label.style.fontSize = "var(--fs-lg)";
+    label.className = "name-prompt";
     label.textContent = "What is your hero called?";
     wrap.appendChild(label);
-    
+
     const input = document.createElement("input");
     input.type = "text";
     input.className = "name-input";
     input.maxLength = 24;
-    input.placeholder = "Kael, Lyra, Whisper...";
+    input.placeholder = "Kael, Lyra, Whisper…";
     input.value = draft.name;
+
     input.addEventListener("input", (e) => { draft.name = e.target.value; });
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && draft.name.trim()) this.handleNext();
+      if (e.key === "Enter") {
+        e.stopPropagation();
+        if (draft.name.trim()) this.handleNext();
+      }
     });
     wrap.appendChild(input);
-    
-    const preview = document.createElement("p");
-    preview.style.opacity = "0.7";
-    preview.style.fontStyle = "italic";
-    preview.textContent =
-      `${draft.race ? this.catalog.races[draft.race].name : "—"} ` +
-      `${draft.charClass ? this.catalog.classes[draft.charClass].name : "—"}`;
-    wrap.appendChild(preview);
-    
+
+    // Preview line showing race · state · role
+    if (draft.race && draft.evolutionState && draft.predatorRole) {
+      const preview = document.createElement("p");
+      preview.className = "name-preview";
+      preview.textContent =
+        `${this.catalog.races[draft.race]?.name ?? "—"} · ` +
+        `${this.catalog.states[draft.evolutionState]?.name ?? "—"} · ` +
+        `${this.catalog.roles[draft.predatorRole]?.name ?? "—"}`;
+      wrap.appendChild(preview);
+    }
+
     this._dom.stage.appendChild(wrap);
     setTimeout(() => input.focus(), 50);
   }
-  
+
   // ─────────────────────── Helpers ───────────────────────
-  
+
   _isStepComplete(draft, step) {
     switch (step) {
       case "race":      return draft.race != null;
       case "state":     return draft.evolutionState != null;
       case "role":      return draft.predatorRole != null;
       case "abilities": return ABILITIES.every(a => draft.abilities[a] != null);
-      case "name":      return draft.name.trim().length >= 1;
+      case "name":      return draft.name.trim().length > 0;
       default:          return false;
     }
   }
-  
+
   _moveFocus(dx, dy) {
-    // Step-specific focus model. For race/state/role grids, dx/dy moves through
-    // the cards in row-major order assuming ~3 columns.
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
-    
     const stepSizes = {
-      race: Object.keys(this.catalog.races).length,
-      state: Object.keys(this.catalog.states).length,
-      role: Object.keys(this.catalog.roles).length,
+      race:      Object.keys(this.catalog.races).length,
+      state:     Object.keys(this.catalog.states).length,
+      role:      Object.keys(this.catalog.roles).length,
       abilities: ABILITIES.length,
-      name: 1,
+      name:      1,
     };
-    const max = stepSizes[draft.step] ?? 0;
-    if (max === 0) return;
-    
-    const columns = (draft.step === "race" || draft.step === "state" || draft.step === "role") ? 3 : 1;
+    const max     = stepSizes[draft.step] ?? 0;
+    if (!max) return;
+    const columns = ["race", "state", "role"].includes(draft.step) ? 3 : 1;
     let next = this._focusIndex + dx + dy * columns;
     next = Math.max(0, Math.min(max - 1, next));
     this._focusIndex = next;
     this._renderCreation();
     this.audio?.playCursor();
   }
-  
+
   _draftFromSlot(slot) {
     return {
-      controllerId: slot.controller_id,
-      slotIndex: slot.slot_index,
-      step: slot.race ? (slot.evolution_state ? (slot.predator_role ? "abilities" : "role") : "state") : "race",
-      race: slot.race,
+      controllerId:   slot.controller_id,
+      slotIndex:      slot.slot_index,
+      step:           slot.race
+        ? (slot.evolution_state ? (slot.predator_role ? "abilities" : "role") : "state")
+        : "race",
+      race:           slot.race,
       evolutionState: slot.evolution_state,
-      predatorRole: slot.predator_role,
-      abilities: slot.assigned_abilities ??
-        { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null },
-      name: slot.name_draft ?? "",
+      predatorRole:   slot.predator_role,
+      abilities:      slot.assigned_abilities
+        ?? { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null },
+      name:           slot.name_draft ?? "",
     };
-  }
-  
-  _exitTitlePhase() {
-    if (document.body.dataset.phase !== "title") return;
-    this.audio?.playConfirm();
-    document.body.dataset.phase = this.state.phase; // Revert to server-authoritative phase (usually lobby)
-    this.setState(this.state);
   }
 
   _escape(s) {
     return String(s).replace(/[&<>"']/g, c =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c])
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
     );
   }
 }

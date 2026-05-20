@@ -3,6 +3,7 @@
 Run:
     uv run uvicorn storyforge.main:app --reload --host 127.0.0.1 --port 8765
 """
+import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -56,7 +57,11 @@ app.include_router(routes_lobby.router)
 app.include_router(ws_session.router)
 
 # Frontend static
-FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
+if hasattr(sys, '_MEIPASS'):
+    FRONTEND = Path(sys._MEIPASS) / "frontend"
+else:
+    FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
+    
 app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
 
 

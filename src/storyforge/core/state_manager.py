@@ -62,6 +62,18 @@ class StateManager:
     
     # ─────────────────── Public Mutators ───────────────────
     
+    async def set_phase(self, phase: TurnPhase) -> dict:
+        """Explicitly change the game phase."""
+        async with self._lock:
+            self._state.phase = phase
+            summary = {
+                "type": "phase_changed",
+                "phase": phase.value,
+            }
+            await self._commit(summary)
+            return summary
+
+
     async def apply_grid_action(
         self,
         char: CharacterSheet,
@@ -184,9 +196,6 @@ class StateManager:
                 if slot.status == SlotStatus.EMPTY:
                     slot.status = SlotStatus.CLAIMED
                     slot.controller_id = controller_id
-                    # Transition LOBBY -> CREATION when first slot claimed.
-                    if self._state.phase == TurnPhase.LOBBY:
-                        self._state.phase = TurnPhase.CREATION
                     
                     summary = {
                         "type": "slot_claimed",
@@ -198,6 +207,30 @@ class StateManager:
                     return summary
             
             raise StateError("all 4 slots are claimed")
+
+
+    async def update_slot_name(self, *, slot_index: int, name: str, controller_id: str) -> dict:
+        """Update a slot's draft name. Claims the slot if it's empty."""
+        async with self._lock:
+            slot = self._state.lobby_slots[slot_index]
+            
+            if slot.status == SlotStatus.READY:
+                raise StateError(f"slot {slot_index} is already ready")
+            
+            if slot.status == SlotStatus.EMPTY:
+                slot.status = SlotStatus.CLAIMED
+            
+            slot.name_draft = name
+            slot.controller_id = controller_id
+            
+            summary = {
+                "type": "slot_name_updated",
+                "slot_index": slot_index,
+                "name": name,
+                "controller_id": controller_id,
+            }
+            await self._commit(summary)
+            return summary
 
 
     async def release_slot(self, *, controller_id: str) -> dict:

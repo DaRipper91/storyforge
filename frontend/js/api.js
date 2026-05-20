@@ -63,6 +63,24 @@ export async function leaveLobby(controllerId) {
   return jsonOrThrow(res);
 }
 
+export async function updateLobbyName({ slotIndex, name, controllerId }) {
+  const res = await fetch(`${API_BASE}/api/lobby/update_name`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slot_index: slotIndex, name, controller_id: controllerId }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function setPhase(phase) {
+  const res = await fetch(`${API_BASE}/api/lobby/set_phase`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phase }),
+  });
+  return jsonOrThrow(res);
+}
+
 export async function createCharacter({ slotIndex, name, race, evolutionState, predatorRole, abilities }) {
   const res = await fetch(`${API_BASE}/api/character/create`, {
     method: "POST",
@@ -82,6 +100,25 @@ export async function createCharacter({ slotIndex, name, race, evolutionState, p
 export async function startGame() {
   const res = await fetch(`${API_BASE}/api/lobby/start`, {
     method: "POST",
+  });
+  return jsonOrThrow(res);
+}
+
+export async function fetchCampaigns() {
+  const res = await fetch(`${API_BASE}/api/campaigns`);
+  return jsonOrThrow(res);
+}
+
+export async function newCampaign() {
+  const res = await fetch(`${API_BASE}/api/campaigns/new`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
+export async function loadCampaign(campaignId) {
+  const res = await fetch(`${API_BASE}/api/campaigns/load`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ campaign_id: campaignId }),
   });
   return jsonOrThrow(res);
 }

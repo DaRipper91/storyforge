@@ -61,8 +61,13 @@ let session  = null;
 (async function boot() {
   try {
     appState = await fetchState();
-    document.body.dataset.phase = appState.phase;
-    
+    // Only skip the title screen if the server is already mid-game (exploration).
+    // For lobby/creation the user navigates there via the menu flow.
+    if (appState.phase === "exploration") {
+      document.body.dataset.phase = "exploration";
+    }
+    // else: keep body[data-phase="title"] that was set in HTML
+
     lobby = new Lobby({
       state: appState,
       audio,
@@ -186,13 +191,20 @@ function initExplorationView() {
 
 // ─────────────────────── Server events ───────────────────────
 
+const CLIENT_ONLY_PHASES = ["title", "menu", "mode_select", "saves"];
+
 async function handleServerEvent(msg) {
   if (msg.type !== "state_diff") return;
   const oldPhase = appState?.phase;
   const oldChars = appState?.characters ?? {};
   appState = await fetchState();
-  
-  document.body.dataset.phase = appState.phase;
+
+  // Don't let server events clobber client-only navigation phases (title/menu/etc.)
+  // unless the server has already moved to exploration.
+  const clientPhase = document.body.dataset.phase;
+  if (!CLIENT_ONLY_PHASES.includes(clientPhase) || appState.phase === "exploration") {
+    document.body.dataset.phase = appState.phase;
+  }
   
   // Detect damage for screen shake and floating text
   if (canvas) {
