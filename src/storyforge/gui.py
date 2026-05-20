@@ -1,3 +1,11 @@
+import os
+
+# Must be set before Qt/WebEngine initializes — disables HiDPI auto-scaling so
+# the CSS viewport equals the physical pixel count, not a halved logical size.
+os.environ.setdefault("QT_SCALE_FACTOR", "1")
+os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "0")
+os.environ.setdefault("QT_ENABLE_HIGHDPI_SCALING", "0")
+
 import threading
 import time
 import socket
