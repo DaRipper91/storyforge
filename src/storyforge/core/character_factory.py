@@ -29,6 +29,7 @@ class RaceDef:
     ability_bonuses: dict[str, int]
     flavor: str
     group: str = "Cosmic"
+    before: str | None = None  # Humanoid only: the "Before" race name
 
 RACES: dict[Race, RaceDef] = {
     # Cosmic — born between stars, beneath suns, inside the void
@@ -114,6 +115,67 @@ RACES: dict[Race, RaceDef] = {
     Race.WIREWRAITH: RaceDef(
         name="Wirewraith", speed=45, ability_bonuses={"DEX": 2, "WIS": 1}, group="Mechanical",
         flavor="Exposed-nerve constructs that transmit pain and data at the same speed. They feel everything, process it, and don't stop moving."
+    ),
+    # Humanoid — what the civilized races became after the Paradox
+    Race.ASHENBORN: RaceDef(
+        name="Ashenborn", speed=30, ability_bonuses={"CON": 2, "STR": 1}, group="Humanoid", before="Human",
+        flavor="Humans who burned through the Paradox and came out the other side charred, fireproof, and furious."
+    ),
+    Race.HOLLOWSONG: RaceDef(
+        name="Hollowsong", speed=35, ability_bonuses={"WIS": 2, "INT": 1}, group="Humanoid", before="Elf",
+        flavor="Elves whose magic inverted; they no longer cast, they absorb, and it's starting to show."
+    ),
+    Race.VEILBORN: RaceDef(
+        name="Veilborn", speed=40, ability_bonuses={"DEX": 2, "CHA": 1}, group="Humanoid", before="Dark Elf",
+        flavor="Dark elves who were already living in the dark when the Paradox hit; they adapted faster than anyone and trust no one."
+    ),
+    Race.THORNWEFT: RaceDef(
+        name="Thornweft", speed=30, ability_bonuses={"WIS": 2, "CON": 1}, group="Humanoid", before="Wood Elf",
+        flavor="Wood elves who merged with the forests during the silence; bark grows where skin used to be."
+    ),
+    Race.ASHCROWN: RaceDef(
+        name="Ashcrown", speed=35, ability_bonuses={"INT": 2, "CHA": 1}, group="Humanoid", before="High Elf",
+        flavor="High elves who refused to change and paid for it; regal, brittle, and slowly going translucent."
+    ),
+    Race.IRONFAST: RaceDef(
+        name="Ironfast", speed=25, ability_bonuses={"CON": 2, "STR": 1}, group="Humanoid", before="Dwarf",
+        flavor="Dwarves whose bones calcified past stone; they are slower, denser, and nearly impossible to put down."
+    ),
+    Race.COREBORN: RaceDef(
+        name="Coreborn", speed=25, ability_bonuses={"CON": 2, "INT": 1}, group="Humanoid", before="Deep Dwarf",
+        flavor="Deep dwarves who pulled something up from below during the Paradox; it came with them."
+    ),
+    Race.WARPBRED: RaceDef(
+        name="Warpbred", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Humanoid", before="Orc",
+        flavor="Orcs who leaned into the Paradox and asked it for more; nobody is sure what they traded."
+    ),
+    Race.SPLITBLOOD: RaceDef(
+        name="Splitblood", speed=30, ability_bonuses={"STR": 1, "CON": 2}, group="Humanoid", before="Half-Orc",
+        flavor="Half-orcs whose two halves stopped agreeing during the silence; they are in a constant negotiation with themselves."
+    ),
+    Race.DUSKWEFT: RaceDef(
+        name="Duskweft", speed=40, ability_bonuses={"DEX": 2, "WIS": 1}, group="Humanoid", before="Halfling",
+        flavor="Halflings who slipped sideways during the silence and haven't fully come back; they flicker."
+    ),
+    Race.GLITCHKIN: RaceDef(
+        name="Glitchkin", speed=30, ability_bonuses={"INT": 2, "DEX": 1}, group="Humanoid", before="Gnome",
+        flavor="Gnomes whose tinkering instinct turned inward; they've been modifying themselves ever since."
+    ),
+    Race.FRACTURELINE: RaceDef(
+        name="Fractureline", speed=35, ability_bonuses={"INT": 2, "CHA": 1}, group="Humanoid", before="Half-Elf",
+        flavor="Half-elves split cleanly down the middle during the Paradox; one half remembers the old world, the other doesn't."
+    ),
+    Race.EMBERPACT: RaceDef(
+        name="Emberpact", speed=30, ability_bonuses={"CHA": 2, "STR": 1}, group="Humanoid", before="Tiefling",
+        flavor="Tieflings whose infernal contracts dissolved in the Paradox; they kept the features and lost the leash."
+    ),
+    Race.FALLENLIGHT: RaceDef(
+        name="Fallenlight", speed=35, ability_bonuses={"CHA": 2, "WIS": 1}, group="Humanoid", before="Aasimar",
+        flavor="Aasimars whose divine connection severed; they still glow, but nothing answers when they call."
+    ),
+    Race.SCALEWORN: RaceDef(
+        name="Scaleworn", speed=30, ability_bonuses={"STR": 2, "DEX": 1}, group="Humanoid", before="Dragonborn",
+        flavor="Dragonborn whose draconic heritage collapsed inward; the fire is still there, the bloodline is not."
     ),
 }
 

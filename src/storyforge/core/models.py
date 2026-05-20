@@ -163,6 +163,22 @@ class Race(StrEnum):
     CINDERPLATE  = "cinderplate"
     HEXGEAR      = "hexgear"
     WIREWRAITH   = "wirewraith"
+    # Humanoid (After the Paradox)
+    ASHENBORN    = "ashenborn"
+    HOLLOWSONG   = "hollowsong"
+    VEILBORN     = "veilborn"
+    THORNWEFT    = "thornweft"
+    ASHCROWN     = "ashcrown"
+    IRONFAST     = "ironfast"
+    COREBORN     = "coreborn"
+    WARPBRED     = "warpbred"
+    SPLITBLOOD   = "splitblood"
+    DUSKWEFT     = "duskweft"
+    GLITCHKIN    = "glitchkin"
+    FRACTURELINE = "fractureline"
+    EMBERPACT    = "emberpact"
+    FALLENLIGHT  = "fallenlight"
+    SCALEWORN    = "scaleworn"
 
 
 class EvolutionaryState(StrEnum):

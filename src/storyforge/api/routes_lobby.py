@@ -54,6 +54,7 @@ async def get_catalog() -> dict:
                 "ability_bonuses": rdef.ability_bonuses,
                 "flavor": rdef.flavor,
                 "group": rdef.group,
+                "before": rdef.before,
             }
             for race, rdef in RACES.items()
         },

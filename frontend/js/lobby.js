@@ -21,7 +21,7 @@ const ABILITIES = ["STR", "DEX", "CON", "INT", "WIS", "CHA"];
 
 // Phases that exist only client-side — server state must not override them
 // (unless server reaches "exploration", which always wins).
-const CLIENT_ONLY_PHASES = ["title", "menu", "mode_select", "saves"];
+const CLIENT_ONLY_PHASES = ["title", "intro", "menu", "mode_select", "saves"];
 
 export class Lobby {
   constructor({ state, audio, onExplorationStarted, onStateRefetch }) {
@@ -153,6 +153,8 @@ export class Lobby {
 
   handleControllerButton({ controllerId, button }) {
     const clientPhase = document.body.dataset.phase;
+
+    if (clientPhase === "intro") return; // intro handles its own skip via document events
 
     if (clientPhase === "title") {
       if (button === 0 || button === 9) this._exitTitlePhase(); // A or Start
@@ -298,13 +300,109 @@ export class Lobby {
 
   _handleMenuConfirm() {
     if (this._menuFocus === 0) {
-      document.body.dataset.phase = "mode_select";
-      this._modeFocus = 0;
-      this._renderMode();
+      this._showIntroCrawl(() => {
+        this._modeFocus = 0;
+        this._renderMode();
+      });
       this.audio?.playPageTurn();
     } else {
       this._showSaves();
     }
+  }
+
+  _showIntroCrawl(onComplete) {
+    const LINES = [
+      "The world did not end.",
+      "",
+      "It refused to.",
+      "",
+      "The Weaver's Paradox did not arrive as war, or plague, or fire from the sky. It arrived as a silence — three seconds where every living thing forgot what it was.",
+      "",
+      "Most remembered wrong.",
+      "",
+      "The civilized races — their cities, their gods, their carefully arranged hierarchies of who mattered and who didn't — dissolved inside those three seconds. Not destroyed. Reorganized. The Paradox looked at what had been built and decided it was a first draft.",
+      "",
+      "What came after was not apocalypse.",
+      "",
+      "It was revision.",
+      "",
+      "The Cosmic wanderers had always known the world was temporary. The Primal things had roots deep enough to survive the silence. The Eldritch had never belonged to the old order at all.",
+      "",
+      "But the ones who called themselves civilized — the ones with names for everything, borders for everything, rules for everything —",
+      "",
+      "They held on.",
+      "",
+      "They changed.",
+      "",
+      "They are still here.",
+      "",
+      "And they are very difficult to kill.",
+      "",
+      "Welcome to what comes next.",
+    ];
+
+    document.body.dataset.phase = "intro";
+    const content = document.getElementById("intro-content");
+    content.innerHTML = "";
+
+    let delay = 0.4;
+    const WORD_GAP = 0.11;
+
+    LINES.forEach(line => {
+      const p = document.createElement("p");
+      p.className = "intro-para";
+      if (!line) {
+        p.innerHTML = "&nbsp;";
+        delay += 0.35;
+      } else {
+        line.split(" ").forEach((word, i, arr) => {
+          const span = document.createElement("span");
+          span.className = "burn-word";
+          span.textContent = word + (i < arr.length - 1 ? " " : "");
+          span.style.animationDelay = `${delay.toFixed(2)}s`;
+          delay += WORD_GAP;
+          p.appendChild(span);
+        });
+      }
+      content.appendChild(p);
+    });
+
+    const totalMs = (delay + 1.8) * 1000;
+    let autoTimer = setTimeout(finish, totalMs);
+    let skipTimer = null;
+
+    function startSkip() {
+      if (skipTimer) return;
+      const bar = document.getElementById("skip-bar");
+      if (bar) { bar.style.transition = "width 3s linear"; bar.style.width = "100%"; }
+      skipTimer = setTimeout(() => { clearTimeout(autoTimer); finish(); }, 3000);
+    }
+
+    function cancelSkip() {
+      clearTimeout(skipTimer);
+      skipTimer = null;
+      const bar = document.getElementById("skip-bar");
+      if (bar) { bar.style.transition = "none"; bar.style.width = "0%"; }
+    }
+
+    function finish() {
+      clearTimeout(autoTimer);
+      clearTimeout(skipTimer);
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keyup", onKeyUp);
+      document.body.dataset.phase = "mode_select";
+      onComplete();
+    }
+
+    const onKeyDown = (e) => {
+      if (e.key === "Enter" || e.key === "a" || e.key === "A") startSkip();
+    };
+    const onKeyUp = (e) => {
+      if (e.key === "Enter" || e.key === "a" || e.key === "A") cancelSkip();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
   }
 
   _handleModeConfirm() {
@@ -789,7 +887,7 @@ export class Lobby {
 
   _renderRaceStep(draft) {
     const entries = Object.entries(this.catalog.races);
-    const groups = ["Cosmic", "Primal", "Eldritch"];
+    const groups = ["Cosmic", "Primal", "Eldritch", "Mechanical", "Humanoid"];
     let globalIdx = 0;
     const container = document.createElement("div");
     container.className = "race-groups";
@@ -799,21 +897,43 @@ export class Lobby {
       if (!groupEntries.length) return;
 
       const section = document.createElement("div");
-      section.className = "race-group";
+      section.className = group === "Humanoid" ? "race-group humanoid-group" : "race-group";
 
       const heading = document.createElement("h3");
       heading.className = "race-group-heading";
       heading.textContent = group;
       section.appendChild(heading);
 
+      if (group === "Humanoid") {
+        const hint = document.createElement("p");
+        hint.className = "humanoid-hint";
+        hint.textContent = "What you were — and what the Paradox made you.";
+        section.appendChild(hint);
+      }
+
       const grid = document.createElement("div");
-      grid.className = "option-grid";
+      grid.className = group === "Humanoid" ? "option-grid humanoid-grid" : "option-grid";
 
       groupEntries.forEach(([key, def]) => {
         const idx = globalIdx++;
-        const card = this._optionCard(def.name, def.flavor,
-          `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
-          draft.race === key, idx === this._focusIndex);
+        let card;
+        if (group === "Humanoid" && def.before) {
+          card = document.createElement("div");
+          card.className = "option-card humanoid-card";
+          if (draft.race === key) card.classList.add("selected");
+          if (idx === this._focusIndex) card.classList.add("focused");
+          card.innerHTML = `
+            <div class="humanoid-before-label">Before: <span>${this._escape(def.before)}</span></div>
+            <div class="humanoid-arrow">↓</div>
+            <h3>${this._escape(def.name)}</h3>
+            <p class="flavor">${this._escape(def.flavor)}</p>
+            <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
+          `;
+        } else {
+          card = this._optionCard(def.name, def.flavor,
+            `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
+            draft.race === key, idx === this._focusIndex);
+        }
         card.addEventListener("click",      () => { draft.race = key; this._renderCreation(); this.audio?.playCursor(); });
         card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
         grid.appendChild(card);

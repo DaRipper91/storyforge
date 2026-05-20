@@ -28,6 +28,21 @@ export const RACE_ACCENT_COLORS = {
   dreamhusk:   '#d8b4ff',  // spore-mist lavender
   bonedrifter: '#ddddd0',  // bleached bone white
   mindspider:  '#aaffdd',  // translucent emerald shimmer
+  ashenborn:   '#ff6644',  // charred ember survivor
+  hollowsong:  '#cc88ff',  // inverted magic residue
+  veilborn:    '#6677aa',  // deep shadow adaptation
+  thornweft:   '#66aa44',  // bark-skin growth
+  ashcrown:    '#eeeebb',  // fading translucent regal
+  ironfast:    '#999999',  // calcified bone grey
+  coreborn:    '#ff4422',  // deep-core pull
+  warpbred:    '#aa2200',  // paradox-asked blood
+  splitblood:  '#884422',  // two-half conflict
+  duskweft:    '#aaaaff',  // sideways flicker
+  glitchkin:   '#00ffaa',  // self-modified circuitry
+  fractureline:'#ffaa00',  // split-memory gold
+  emberpact:   '#ff4444',  // freed infernal fire
+  fallenlight: '#ffff99',  // severed divine glow
+  scaleworn:   '#336633',  // collapsed draconic green
   ironveil:    '#c8e8ff',  // razor-thin steel shimmer
   forgespawn:  '#ff8800',  // liquid-metal forge glow
   cinderplate: '#ff4400',  // molten core bleed
