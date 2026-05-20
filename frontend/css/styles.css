@@ -431,6 +431,25 @@ body {
   border-radius: 7px;
 }
 
+/* ─── 2K / QHD (2560px) — desktop monitor, scale down from TV defaults ─── */
+@media (min-width: 2400px) and (max-width: 2999px) {
+  :root {
+    --fs-base: 1.15rem;
+    --fs-sm:   0.95rem;
+    --fs-xs:   0.82rem;
+    --fs-lg:   1.5rem;
+    --fs-xl:   2rem;
+    --fs-display: 3rem;
+    --space-1: 0.35rem;
+    --space-2: 0.7rem;
+    --space-3: 1.1rem;
+    --space-4: 1.5rem;
+    --space-5: 2rem;
+    --top-h:    6vh;
+    --bottom-h: 10vh;
+  }
+}
+
 /* ─────────────────────────── 4K scaling tweaks ─────────────────────────── */
 @media (min-width: 3000px) {
   :root {

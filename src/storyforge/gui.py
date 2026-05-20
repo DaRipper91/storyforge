@@ -64,6 +64,7 @@ def main():
         js_api=api,
     )
     api.set_window(window)
+    window.events.loaded += lambda: window.maximize()
 
     menu = [
         Menu("File", [
