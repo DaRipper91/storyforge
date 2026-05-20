@@ -139,7 +139,7 @@ body {
 /* ─────────────────────────── MAIN STAGE ─────────────────────────── */
 #stage {
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 3fr 2fr;
   gap: var(--pane-gap);
   padding: var(--pane-gap);
   overflow: hidden;
