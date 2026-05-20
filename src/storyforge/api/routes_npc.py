@@ -6,9 +6,11 @@ automatically when a new campaign is loaded — encounters aren't persisted
 to the campaign snapshot.
 
 NPCs:
-  /api/npc/jon/*     — Jon the shopkeeper (Multiversal Bodega, Cactus, Escape)
-  /api/npc/samael/*  — Samael the Ascended (cryptic lore hints)
-  /api/npc/haylie/*  — Madame Haylie (bailout from Jon's conversational trap)
+  /api/npc/jon/*       — Jon the shopkeeper (Multiversal Bodega, Cactus, Escape)
+  /api/npc/samael/*    — Samael the Ascended (cryptic lore hints)
+  /api/npc/haylie/*    — Madame Haylie (bailout from Jon's conversational trap)
+  /api/npc/danna/*     — Queen D.Anna (Royal Address, Petitions, Boons)
+  /api/npc/redvelvet/* — Firey RedVelvet (Performances, Tips, Song Requests)
 """
 from __future__ import annotations
 
@@ -31,6 +33,18 @@ from storyforge.encounters.samael import (
 from storyforge.encounters.haylie import (
     HaylieEncounterState,
     MadameHaylie,
+)
+from storyforge.encounters.queen_danna import (
+    AddressForm,
+    PetitionType,
+    QueenDAnna,
+    QueenDAnnaEncounterState,
+)
+from storyforge.encounters.redvelvet import (
+    FireyRedVelvet,
+    Mood,
+    RedVelvetEncounterState,
+    SongRequest,
 )
 
 router = APIRouter(prefix="/api/npc", tags=["npc"])
@@ -320,4 +334,162 @@ async def haylie_state(request: Request):
     return {
         **haylie.encounter.model_dump(),
         "bailout_available": jon.encounter.bailout_available,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# QUEEN D.ANNA helpers & endpoints
+# ═══════════════════════════════════════════════════════════════════
+
+def _get_danna(request: Request) -> QueenDAnna:
+    if not hasattr(request.app.state, "danna_encounter"):
+        request.app.state.danna_encounter = QueenDAnnaEncounterState(active=True)
+    return QueenDAnna(request.app.state.danna_encounter)
+
+
+def _save_danna(request: Request, danna: QueenDAnna) -> None:
+    request.app.state.danna_encounter = danna.encounter
+
+
+class AddressRequest(BaseModel):
+    form: AddressForm = AddressForm.PROPER
+
+
+@router.post("/danna/address")
+async def danna_address(body: AddressRequest, request: Request):
+    """Address Queen D.Anna. Correct address earns Favor; wrong address earns a lesson."""
+    danna = _get_danna(request)
+    result = danna.address(body.form)
+    _save_danna(request, danna)
+    return {
+        "form": result.form,
+        "correct": result.correct,
+        "response": result.response,
+        "favor_delta": result.favor_delta,
+        "new_favor": result.new_favor,
+        "standing": danna.standing_label,
+        "is_offended": result.is_offended,
+    }
+
+
+class PetitionRequest(BaseModel):
+    petition_type: PetitionType = PetitionType.BLESSING
+
+
+@router.post("/danna/petition")
+async def danna_petition(body: PetitionRequest, request: Request):
+    """Petition Queen D.Anna for a boon. Requires Favor; costs Favor on grant."""
+    danna = _get_danna(request)
+    result = danna.petition(body.petition_type)
+    _save_danna(request, danna)
+    return {
+        "granted": result.granted,
+        "petition_type": result.petition_type,
+        "response": result.response,
+        "favor_cost": result.favor_cost,
+        "new_favor": result.new_favor,
+        "standing": danna.standing_label,
+    }
+
+
+@router.get("/danna/state")
+async def danna_state(request: Request):
+    """Return Queen D.Anna's current encounter state."""
+    danna = _get_danna(request)
+    return {
+        **danna.encounter.model_dump(),
+        "standing": danna.standing_label,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# FIREY REDVELVET helpers & endpoints
+# ═══════════════════════════════════════════════════════════════════
+
+def _get_redvelvet(request: Request) -> FireyRedVelvet:
+    if not hasattr(request.app.state, "redvelvet_encounter"):
+        request.app.state.redvelvet_encounter = RedVelvetEncounterState(active=True)
+    return FireyRedVelvet(request.app.state.redvelvet_encounter)
+
+
+def _save_redvelvet(request: Request, rv: FireyRedVelvet) -> None:
+    request.app.state.redvelvet_encounter = rv.encounter
+
+
+@router.post("/redvelvet/perform")
+async def redvelvet_perform(request: Request):
+    """Watch Firey RedVelvet perform. At BLAZING mood, the party gains Inspiration."""
+    rv = _get_redvelvet(request)
+    result = rv.perform()
+    _save_redvelvet(request, rv)
+    return {
+        "performance_text": result.performance_text,
+        "mood": result.mood.name,
+        "mood_value": int(result.mood),
+        "grants_boon": result.grants_boon,
+        "boon_description": result.boon_description,
+        "performances_given": rv.encounter.performances_given,
+    }
+
+
+class TipRequest(BaseModel):
+    silver: int = 5
+
+
+@router.post("/redvelvet/tip")
+async def redvelvet_tip(body: TipRequest, request: Request):
+    """Tip Firey RedVelvet. Every 5 silver raises her mood by one step."""
+    if body.silver <= 0:
+        raise HTTPException(status_code=400, detail="silver must be positive")
+    rv = _get_redvelvet(request)
+    result = rv.tip(body.silver)
+    _save_redvelvet(request, rv)
+    return {
+        "response": result.response,
+        "silver_spent": result.silver_spent,
+        "mood_before": result.mood_before.name,
+        "mood_after": result.mood_after.name,
+        "mood_changed": result.mood_changed,
+        "total_tips": rv.encounter.total_tips_silver,
+    }
+
+
+@router.post("/redvelvet/heckle")
+async def redvelvet_heckle(request: Request):
+    """Heckle Firey RedVelvet. She handles it. Mood drops one step."""
+    rv = _get_redvelvet(request)
+    result = rv.heckle()
+    _save_redvelvet(request, rv)
+    return {
+        "response": result.response,
+        "mood_before": result.mood_before.name,
+        "mood_after": result.mood_after.name,
+        "heckles_received": rv.encounter.heckles_received,
+    }
+
+
+class SongRequestBody(BaseModel):
+    song_type: SongRequest = SongRequest.MYSTERY
+
+
+@router.post("/redvelvet/request-song")
+async def redvelvet_request_song(body: SongRequestBody, request: Request):
+    """Request a song from Firey RedVelvet. She picks the right one."""
+    rv = _get_redvelvet(request)
+    result = rv.request_song(body.song_type)
+    _save_redvelvet(request, rv)
+    return {
+        "song_type": result.song_type,
+        "performance_text": result.performance_text,
+        "mood": result.mood.name,
+    }
+
+
+@router.get("/redvelvet/state")
+async def redvelvet_state(request: Request):
+    """Return Firey RedVelvet's current encounter state."""
+    rv = _get_redvelvet(request)
+    return {
+        **rv.encounter.model_dump(),
+        "mood_label": rv.mood_label,
     }

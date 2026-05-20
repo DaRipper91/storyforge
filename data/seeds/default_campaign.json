@@ -145,7 +145,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "danna"
         },
         {
           "terrain": "floor",
@@ -169,7 +169,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "redvelvet"
         },
         {
           "terrain": "wall",
@@ -792,6 +792,32 @@
       "encounter_id": "haylie_inn",
       "blocks_movement": false,
       "description": "Jon's wife. Runs the inn. Runs the books. Runs the situation."
+    },
+    "danna": {
+      "id": "danna",
+      "name": "Queen D.Anna",
+      "position": {
+        "x": 2,
+        "y": 2
+      },
+      "sprite_key": "npc_danna",
+      "interactable": true,
+      "encounter_id": "danna_audience",
+      "blocks_movement": true,
+      "description": "Seated at the best table in the room, which is now the best table in the room because she is sitting at it. Traveling. Not explaining where."
+    },
+    "redvelvet": {
+      "id": "redvelvet",
+      "name": "Firey RedVelvet",
+      "position": {
+        "x": 8,
+        "y": 2
+      },
+      "sprite_key": "npc_redvelvet",
+      "interactable": true,
+      "encounter_id": "redvelvet_performance",
+      "blocks_movement": true,
+      "description": "The tavern's current performer. There is a scorch mark on the ceiling that was not there this morning. She does not appear concerned about this."
     }
   }
 }
