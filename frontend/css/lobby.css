@@ -365,7 +365,7 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .creation-stage {
   flex: 1;
-  width: min(95vw, 1200px);
+  width: min(98vw, 1800px);
   display: grid;
   gap: var(--space-2);
   align-content: start;
@@ -376,6 +376,7 @@ body[data-phase="saves"] #game-view { display: none; }
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  width: 100%;
 }
 
 .race-group-heading {
@@ -392,8 +393,15 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .option-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--space-2);
+  align-items: stretch;
+}
+
+/* Inside race groups, force exactly 5 columns so 5-race groups
+   always lay out as a clean single row */
+.race-group .option-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .option-card {
@@ -403,6 +411,9 @@ body[data-phase="saves"] #game-view { display: none; }
   background: rgba(255, 245, 220, 0.6);
   cursor: pointer;
   transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .option-card:hover,
@@ -416,21 +427,27 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 .option-card h3 {
-  margin: 0 0 2px 0;
+  margin: 0;
   font-size: var(--fs-base);
+  line-height: 1.2;
 }
 
 .option-card .flavor {
   font-size: var(--fs-sm);
-  margin: 0 0 var(--space-1) 0;
+  margin: 0;
   font-style: italic;
   opacity: 0.85;
+  flex: 1;
+  line-height: 1.4;
 }
 
 .option-card .stats {
   font-size: var(--fs-xs);
   font-family: "JetBrains Mono", monospace;
   opacity: 0.85;
+  margin-top: auto;
+  padding-top: 0.2rem;
+  border-top: 1px solid rgba(0,0,0,0.08);
 }
 
 /* Ability assignment */
@@ -1077,8 +1094,9 @@ body[data-phase="saves"] #game-view { display: none; }
   text-align: center;
 }
 
+/* Humanoid group: 15 races → 5 columns × 3 rows (inherits .race-group .option-grid rule) */
 .humanoid-grid {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .humanoid-card {
