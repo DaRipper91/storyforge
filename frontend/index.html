@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/css/lobby.css" />
   <link rel="stylesheet" href="/static/css/flames.css" />
   <link rel="stylesheet" href="/static/css/cinematic.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     /* New App Menu styles */
     .app-menu {
@@ -79,6 +80,16 @@
       <div class="flame"></div>
     </div>
     <h1 class="title-logo ink-gilded">StoryForge</h1>
+    <div id="auth-container" style="margin-top: 2rem;">
+      <div id="g_id_onload"
+           data-client_id=""
+           data-context="signin"
+           data-ux_mode="popup"
+           data-callback="onGoogleLogin"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard"></div>
+    </div>
     <p class="title-press-start">Press <kbd>Enter</kbd> or <kbd>Start</kbd> to Begin</p>
   </section>
 

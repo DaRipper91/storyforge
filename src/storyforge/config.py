@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     gemini_api_key: str = Field(..., description="Google AI Studio API key")
     gemini_model: str = "gemini-3.5-flash"
     
+    # Auth
+    google_client_id: str = ""
+    jwt_secret: str = "dev-secret-change-me-in-production"
+    jwt_algorithm: str = "HS256"
+    
     campaign_id: str = "family_campaign_01"
     
     @property

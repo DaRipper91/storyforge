@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from storyforge.core import grid
 from storyforge.core.models import (
-    CharacterSheet, Coord, GameState, GridAction, Room,
+    CharacterSheet, Coord, GameState, GridAction, Room, TurnPhase,
 )
 
 
@@ -41,7 +41,7 @@ def check_grid_action(
     
     match action.type:
         case "move":
-            return _check_move(room, char, action.target)
+            return _check_move(state, char, action.target)
         case "attack":
             return Legality.deny("attacks are v0.2; freeform-narrate it for now")
         case "interact":
@@ -50,7 +50,8 @@ def check_grid_action(
             return Legality.deny(f"unknown action type: {action.type}")
 
 
-def _check_move(room: Room, char: CharacterSheet, target: Coord) -> Legality:
+def _check_move(state: GameState, char: CharacterSheet, target: Coord) -> Legality:
+    room = state.rooms[state.current_room_id]
     target_cell = grid.get_cell(room, target)
     
     if not grid.is_traversable(target_cell):
@@ -61,10 +62,13 @@ def _check_move(room: Room, char: CharacterSheet, target: Coord) -> Legality:
         )
     
     feet_needed = grid.feet_between(char.position, target)
-    if feet_needed > char.movement_remaining:
-        return Legality.deny(
-            f"need {feet_needed}ft, only {char.movement_remaining}ft remaining"
-        )
+    
+    # Movement limit only applies in Combat (v0.2)
+    if state.phase == TurnPhase.COMBAT:
+        if feet_needed > char.movement_remaining:
+            return Legality.deny(
+                f"need {feet_needed}ft, only {char.movement_remaining}ft remaining"
+            )
     
     if not grid.path_is_clear(room, char.position, target):
         return Legality.deny("path is blocked between start and target")

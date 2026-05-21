@@ -459,7 +459,12 @@ class StateManager:
         # Update character
         previous = char.position
         char.position = target
-        char.movement_remaining -= feet_spent
+        
+        if self._state.phase == TurnPhase.EXPLORATION:
+            # In exploration, movement resets after every "stride"
+            char.movement_remaining = char.speed
+        else:
+            char.movement_remaining -= feet_spent
         
         return {
             "type": "move",

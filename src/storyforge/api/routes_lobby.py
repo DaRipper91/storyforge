@@ -9,9 +9,11 @@ Endpoints:
     GET  /api/lobby/catalog   — race + class definitions for the UI
 """
 from __future__ import annotations
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
+from jose import jwt
 
+from storyforge.config import settings
 from storyforge.api.deps import get_state_manager
 from storyforge.core.character_factory import RACES, STATES, ROLES
 from storyforge.core.models import CharacterCreationRequest, TurnPhase
@@ -28,17 +30,18 @@ class SetPhaseRequest(BaseModel):
 
 
 class JoinRequest(BaseModel):
-    controller_id: str = Field(min_length=1, max_length=200)
+    # If authenticated, this is ignored and the Google ID is used.
+    controller_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class LeaveRequest(BaseModel):
-    controller_id: str = Field(min_length=1, max_length=200)
+    controller_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class UpdateNameRequest(BaseModel):
     slot_index: int = Field(ge=0, le=3)
     name: str = Field(min_length=0, max_length=24)
-    controller_id: str = Field(min_length=1, max_length=200)
+    controller_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 # ───────────────────────── Endpoints ─────────────────────────
@@ -85,9 +88,24 @@ async def get_catalog() -> dict:
 async def join_lobby(
     req: JoinRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    # Use Google ID if available, else fallback to provided controller_id (e.g. guest/local)
+    token = request.cookies.get("storyforge_session")
+    controller_id = req.controller_id
+    
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            controller_id = f"google::{payload['sub']}"
+        except Exception:
+            pass
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
     try:
-        return await state.claim_slot(controller_id=req.controller_id)
+        return await state.claim_slot(controller_id=controller_id)
     except StateError as exc:
         raise HTTPException(status_code=409, detail=str(exc))
 
@@ -96,9 +114,23 @@ async def join_lobby(
 async def leave_lobby(
     req: LeaveRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    token = request.cookies.get("storyforge_session")
+    controller_id = req.controller_id
+
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            controller_id = f"google::{payload['sub']}"
+        except Exception:
+            pass
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
     try:
-        return await state.release_slot(controller_id=req.controller_id)
+        return await state.release_slot(controller_id=controller_id)
     except StateError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
@@ -107,12 +139,26 @@ async def leave_lobby(
 async def update_name(
     req: UpdateNameRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    token = request.cookies.get("storyforge_session")
+    controller_id = req.controller_id
+
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            controller_id = f"google::{payload['sub']}"
+        except Exception:
+            pass
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
     try:
         return await state.update_slot_name(
             slot_index=req.slot_index,
             name=req.name,
-            controller_id=req.controller_id,
+            controller_id=controller_id,
         )
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))

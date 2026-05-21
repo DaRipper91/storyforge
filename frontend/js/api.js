@@ -123,6 +123,27 @@ export async function loadCampaign(campaignId) {
   return jsonOrThrow(res);
 }
 
+// ── Authentication ───────────────────────────────────────────────
+
+export async function loginGoogle(idToken) {
+  const res = await fetch(`${API_BASE}/api/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: idToken }),
+  });
+  return jsonOrThrow(res);
+}
+
+export async function fetchMe() {
+  const res = await fetch(`${API_BASE}/api/auth/me`);
+  return jsonOrThrow(res);
+}
+
+export async function logout() {
+  const res = await fetch(`${API_BASE}/api/auth/logout`, { method: "POST" });
+  return jsonOrThrow(res);
+}
+
 // ── Jon / NPC encounter API ──────────────────────────────────────
 
 export async function jonGetInventory(genre = "fantasy") {

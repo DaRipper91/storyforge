@@ -13,6 +13,7 @@ import { fetchState, openSession, postGridAction, postFreeformAction,
          rvPerform, rvTip, rvHeckle, rvRequestSong,
          samaelConsult, samaelGetState,
          hailieBailout, hailieGetState,
+         loginGoogle, fetchMe, logout
 } from "./api.js";
 import { GridCanvas } from "./canvas.js";
 import { GamepadManager, XBOX } from "./gamepad.js";
@@ -61,11 +62,36 @@ let inventory = null;
 
 let appState = null;
 let session  = null;
+let currentUser = null;
+
+// Expose auth to window for Google SDK callback
+window.onGoogleLogin = async (response) => {
+  try {
+    const data = await loginGoogle(response.credential);
+    console.log("Logged in as:", data.user.name);
+    currentUser = data.user;
+    // Hide auth button if logged in
+    document.getElementById("auth-container").style.display = "none";
+    // Check session again
+    checkAuthStatus();
+  } catch (err) {
+    console.error("Login failed", err);
+  }
+};
+
+async function checkAuthStatus() {
+  const data = await fetchMe();
+  if (data.authenticated) {
+    currentUser = data.user;
+    document.getElementById("auth-container").style.display = "none";
+  }
+}
 
 // ─────────────────────── Boot ───────────────────────
 
 (async function boot() {
   try {
+    await checkAuthStatus();
     appState = await fetchState();
     // Only skip the title screen if the server is already mid-game (exploration).
     // For lobby/creation the user navigates there via the menu flow.
@@ -437,7 +463,7 @@ const _gameZoomSlider  = document.getElementById("game-zoom-slider");
 const _uiScaleValue    = document.getElementById("ui-scale-value");
 const _gameZoomValue   = document.getElementById("game-zoom-value");
 
-const _DEFAULT_SETTINGS = { uiScale: 0.65, gameZoom: 0.7 };
+const _DEFAULT_SETTINGS = { uiScale: 1.2, gameZoom: 0.7 };
 
 function _loadSettings() {
   try {
