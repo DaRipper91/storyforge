@@ -8,10 +8,7 @@
     "bink_bink": {
       "id": "bink_bink",
       "name": "Bink Bink",
-      "position": {
-        "x": 6,
-        "y": 3
-      },
+      "position": { "x": 6, "y": 3 },
       "room_id": "store_01",
       "sprite_key": "npc_cat",
       "interactable": false,
@@ -22,10 +19,7 @@
     "cole": {
       "id": "cole",
       "name": "Cole",
-      "position": {
-        "x": 7,
-        "y": 6
-      },
+      "position": { "x": 7, "y": 6 },
       "room_id": "store_01",
       "sprite_key": "npc_dog",
       "interactable": false,
@@ -36,10 +30,7 @@
     "jon": {
       "id": "jon",
       "name": "Jon",
-      "position": {
-        "x": 1,
-        "y": 1
-      },
+      "position": { "x": 1, "y": 1 },
       "room_id": "store_01",
       "sprite_key": "npc_jon",
       "interactable": true,
@@ -50,10 +41,7 @@
     "samael": {
       "id": "samael",
       "name": "Samael the Ascended",
-      "position": {
-        "x": 8,
-        "y": 4
-      },
+      "position": { "x": 8, "y": 4 },
       "room_id": "store_01",
       "sprite_key": "npc_samael",
       "interactable": true,
@@ -64,10 +52,7 @@
     "haylie": {
       "id": "haylie",
       "name": "Madame Haylie",
-      "position": {
-        "x": 4,
-        "y": 1
-      },
+      "position": { "x": 4, "y": 1 },
       "room_id": "store_01",
       "sprite_key": "npc_haylie",
       "interactable": true,
@@ -75,55 +60,65 @@
       "blocks_movement": false,
       "description": "Jon's wife. Runs the inn. Runs the books. Runs the situation."
     },
-    "teddy": {
-      "id": "teddy",
-      "name": "Teddy",
-      "position": {
-        "x": 1,
-        "y": 2
-      },
-      "room_id": "tavern_01",
-      "sprite_key": "npc_teddy",
+    "kodrik": {
+      "id": "kodrik",
+      "name": "Guildmaster Kodrik",
+      "position": { "x": 5, "y": 2 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_kodrik",
       "interactable": true,
+      "encounter_id": "kodrik_guild",
+      "blocks_movement": true,
+      "description": "Guildmaster of the Iron Ledge Company. Broad-shouldered and unhurried. His hands are stained with ink and machine oil. He is the arbitrator and quartermaster of the Keep."
+    },
+    "cyrus": {
+      "id": "cyrus",
+      "name": "Cyrus",
+      "position": { "x": 1, "y": 1 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_wolf",
+      "interactable": false,
       "encounter_id": null,
-      "blocks_movement": false,
-      "description": "A young, golden Great Pyrenees puppy. She is the granddaughter of Cyrus and Keeva, serving as a Heavenly Protector-in-training. Though small, she watches the room with the inherited, calm authority of her bloodline."
+      "blocks_movement": true,
+      "description": "A massive Winter Wolf with a smoke-white coat. He lies motionless by the hearth, a permanent fixture of Ironhold Keep. He issues no warnings, but his presence is a silent deterrent."
     },
     "danna": {
       "id": "danna",
       "name": "Queen D.Anna",
-      "position": {
-        "x": 2,
-        "y": 2
-      },
-      "room_id": "tavern_01",
+      "position": { "x": 7, "y": 2 },
+      "room_id": "ironhold_keep",
       "sprite_key": "npc_danna",
       "interactable": true,
       "encounter_id": "danna_audience",
       "blocks_movement": true,
-      "description": "The Traveling Sovereign. She sits at the best table in the room, flanked by her heavenly protectors. She is currently traveling through the Feral worlds on matters of divine state."
+      "description": "The Traveling Sovereign. She resides here in Ironhold Keep, the castle headquarters of the Iron Ledge Company. She sits with a regal poise that commands the room."
     },
     "keeva": {
       "id": "keeva",
       "name": "Keeva",
-      "position": {
-        "x": 3,
-        "y": 2
-      },
-      "room_id": "tavern_01",
+      "position": { "x": 8, "y": 2 },
+      "room_id": "ironhold_keep",
       "sprite_key": "npc_keeva",
       "interactable": true,
       "encounter_id": "keeva_divine",
       "blocks_movement": false,
-      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating hound who seems to have a halo of soft light. She sits with divine grace at the Queen's right hand."
+      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating hound who seems to have a halo of soft light. She sits with divine grace at the Queen's side."
+    },
+    "teddy": {
+      "id": "teddy",
+      "name": "Teddy",
+      "position": { "x": 6, "y": 2 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_teddy",
+      "interactable": true,
+      "encounter_id": null,
+      "blocks_movement": false,
+      "description": "A young, golden Great Pyrenees puppy. The granddaughter of Cyrus (the wolf) and Keeva, serving as a Heavenly Protector-in-training."
     },
     "redvelvet": {
       "id": "redvelvet",
       "name": "Firey RedVelvet",
-      "position": {
-        "x": 8,
-        "y": 2
-      },
+      "position": { "x": 8, "y": 2 },
       "room_id": "tavern_01",
       "sprite_key": "npc_redvelvet",
       "interactable": true,
@@ -157,7 +152,23 @@
       "grid": [
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_redvelvet"}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_redvelvet"}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}
+      ]
+    },
+    "ironhold_keep": {
+      "id": "ironhold_keep",
+      "name": "Ironhold Keep",
+      "width": 10,
+      "height": 8,
+      "grid": [
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cyrus"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},

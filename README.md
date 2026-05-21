@@ -98,12 +98,14 @@ The world is populated by reactive NPCs, each with unique mechanics:
 
 | NPC | Role | Encounter |
 |-----|------|-----------|
+| **Kodrik** | Guildmaster | Ironhold Keep — Central dispatch, repairs gear, Meta-Guide for lore drops. |
 | **Jon (The Boss)** | Shopkeeper | Multiversal Bodega — buy gear, avoid his "Cousin Dale" stories. |
 | **Madame Haylie** | Innkeeper | The Real Boss — managing the books, the inn, and Jon's monologues. |
 | **Samael the Ascended** | Demigod | Lore Oracle — provides cryptic hints and opens jars with cosmic power. |
-| **Queen D.Anna** | Sovereign | Formal Address Protocol — petition her for divine boons and mercy. |
+| **Queen D.Anna** | Sovereign | Ironhold Keep (Castle) — formal address protocol, petition for boons. |
 | **Firey RedVelvet** | Bard | Tavern Performer — tip, heckle, or request songs. |
-| **The Pets** | Companions | **Bink Bink** (Black Cat), **Cole** (Shadow Guardian), **Teddy** (Heavenly Protector of D.Anna), **Keeva** (Queen D.Anna's Angelic Hound). |
+| **The Pets** | Companions | **Cyrus** (Winter Wolf Deterrent), **Bink Bink** (Black Cat), **Cole** (Shadow Guardian), **Teddy** (Heavenly Protector-in-training), **Keeva** (Angelic Hound). |
+
 
 ---
 

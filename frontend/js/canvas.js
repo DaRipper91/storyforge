@@ -633,6 +633,8 @@ export class GridCanvas {
       npc_redvelvet:"#8B1a1a",  // deep crimson-red
       npc_keeva:    "#F8F8FF",  // ghost white — angelic hound
       npc_teddy:    "#B8860B",  // dark goldenrod — heavenly protector
+      npc_kodrik:   "#2F4F4F",  // dark slate gray — iron guildmaster
+      npc_wolf:     "#E0E0E0",  // smoke white — massive winter wolf
     };
 
     for (const npc of Object.values(this.state.npcs)) {
