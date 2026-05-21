@@ -813,6 +813,20 @@
       "blocks_movement": true,
       "description": "Seated at the best table in the room, which is now the best table in the room because she is sitting at it. Traveling. Not explaining where."
     },
+    "keeva": {
+      "id": "keeva",
+      "name": "Keeva",
+      "position": {
+        "x": 3,
+        "y": 2
+      },
+      "room_id": "tavern_01",
+      "sprite_key": "npc_keeva",
+      "interactable": true,
+      "encounter_id": "keeva_divine",
+      "blocks_movement": false,
+      "description": "D.Anna's dog. Lies at the foot of the queen's table with the authority of someone who outranks most of the people in this room. Her eyes are the color of old gold and she is looking directly at you."
+    },
     "redvelvet": {
       "id": "redvelvet",
       "name": "Firey RedVelvet",

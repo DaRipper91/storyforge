@@ -489,6 +489,59 @@
     </div>
   </div>
 
+  <!-- ─────── KEEVA OVERLAY ─────── -->
+  <div id="keeva-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface keeva-card">
+
+      <div class="jon-shop-header">
+        <div class="jon-npc-portrait keeva-portrait" data-initial="K"></div>
+        <div class="jon-header-text">
+          <h2 class="ink-gilded">Keeva</h2>
+          <p id="keeva-tagline" class="jon-tagline">She is looking at you. She has been looking at you since you walked in.</p>
+        </div>
+        <div class="keeva-standing-badge">
+          Her Judgement: <span id="keeva-verdict" class="ink-gilded keeva-verdict-text">Pending</span>
+        </div>
+      </div>
+
+      <div id="keeva-message" class="jon-message keeva-message hidden"></div>
+
+      <div class="jon-shop-body">
+        <div class="jon-inventory-panel">
+          <h3>Approach Her</h3>
+          <p class="hint-small">She is D.Anna's dog. Whatever she decides about you, D.Anna will know.</p>
+          <div class="keeva-action-btns escape-methods">
+            <button class="escape-btn keeva-btn" data-action="offer_hand">
+              <span class="escape-method-name">Offer Your Hand</span>
+              <span class="escape-method-stat">WIS</span>
+            </button>
+            <button class="escape-btn keeva-btn" data-action="speak">
+              <span class="escape-method-name">Speak to Her</span>
+              <span class="escape-method-stat">CHA</span>
+            </button>
+            <button class="escape-btn keeva-btn" data-action="bow">
+              <span class="escape-method-name">Bow Respectfully</span>
+              <span class="escape-method-stat">Correct</span>
+            </button>
+            <button class="escape-btn keeva-btn keeva-btn-risky" data-action="ignore">
+              <span class="escape-method-name">Ignore Her</span>
+              <span class="escape-method-stat">💀</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="jon-action-panel">
+          <h3>Step Back</h3>
+          <p class="hint-small">She will remember.</p>
+          <div class="cactus-actions">
+            <button id="keeva-leave-btn" class="btn btn-small">Withdraw</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ─────── SAMAEL THE ASCENDED OVERLAY ─────── -->
   <div id="samael-overlay" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card parchment-surface samael-card">

@@ -1238,3 +1238,51 @@ body[data-phase="saves"] #game-view { display: none; }
   cursor: not-allowed;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Keeva — D.Anna's Divine Hound
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.keeva-card {
+  border-color: #B8860B;
+  box-shadow: 0 0 40px rgba(184, 134, 11, 0.35), inset 0 0 20px rgba(184, 134, 11, 0.08);
+}
+
+.keeva-portrait {
+  background: radial-gradient(circle at 40% 35%, #c8960c 0%, #7a5500 55%, #2a1a00 100%);
+  border-color: #daa520;
+  box-shadow: 0 0 18px rgba(218, 165, 32, 0.55);
+}
+
+.keeva-standing-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: rgba(244, 234, 212, 0.7);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.keeva-verdict-text {
+  color: #B8860B;
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.9rem;
+}
+
+.keeva-message {
+  font-style: italic;
+  background: rgba(184, 134, 11, 0.08);
+  border-color: rgba(184, 134, 11, 0.35);
+  line-height: 1.6;
+}
+
+.keeva-action-btns .escape-btn:hover {
+  border-color: #daa520;
+  background: rgba(218, 165, 32, 0.15);
+}
+
+.keeva-btn-risky:hover {
+  border-color: #cc2222 !important;
+  background: rgba(204, 34, 34, 0.15) !important;
+  color: #ffaaaa;
+}
+

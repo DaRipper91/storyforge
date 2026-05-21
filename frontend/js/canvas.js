@@ -623,14 +623,15 @@ export class GridCanvas {
     }
 
     const NPC_COLORS = {
-      npc_jon:    "#8B4513",  // saddle brown — shopkeeper warmth
-      npc_cat:     "#696969",  // dimgray — mysterious feline
-      npc_dog:     "#D2691E",  // chocolate — loyal hound
-      npc_default:   "#556B2F",
-      npc_samael:    "#4B0082",
-      npc_haylie:    "#8B0000",
-      npc_danna:     "#4a1060",   // deep regal purple
-      npc_redvelvet: "#8B1a1a",   // deep crimson-red
+      npc_jon:      "#8B4513",  // saddle brown — shopkeeper warmth
+      npc_cat:      "#696969",  // dimgray — mysterious feline
+      npc_dog:      "#D2691E",  // chocolate — loyal hound
+      npc_default:  "#556B2F",
+      npc_samael:   "#4B0082",
+      npc_haylie:   "#8B0000",
+      npc_danna:    "#4a1060",  // deep regal purple
+      npc_redvelvet:"#8B1a1a",  // deep crimson-red
+      npc_keeva:    "#B8860B",  // dark goldenrod — divine hound
     };
 
     for (const npc of Object.values(this.state.npcs)) {

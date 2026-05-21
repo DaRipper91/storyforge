@@ -633,6 +633,7 @@ function openNpcOverlay(encounterData) {
   else if (id === "redvelvet_performance") openRedVelvetOverlay();
   else if (id === "samael_lore")           openSamaelOverlay();
   else if (id === "haylie_inn")            openHaylieOverlay();
+  else if (id === "keeva_divine")          openKeevaOverlay();
 }
 
 // ─────────────────────── Jon Shop Encounter ───────────────────────
@@ -1196,6 +1197,114 @@ function wireHaylieButtons() {
     if (e.key === "Escape" && !haylieEls.overlay.classList.contains("hidden")) {
       closeHaylieOverlay();
       document.removeEventListener("keydown", haylieEsc);
+    }
+  });
+}
+
+// ─────────────────────── Keeva — D.Anna's Divine Hound ────────────────
+
+const keevaEls = {
+  overlay:  document.getElementById("keeva-overlay"),
+  tagline:  document.getElementById("keeva-tagline"),
+  message:  document.getElementById("keeva-message"),
+  verdict:  document.getElementById("keeva-verdict"),
+  leaveBtn: document.getElementById("keeva-leave-btn"),
+};
+
+const _KEEVA_RESPONSES = {
+  offer_hand: [
+    "She sniffs your hand with the deliberate focus of a creature who can see your entire soul and has decided it smells acceptable. She does not move otherwise. This is high praise.",
+    "She leans forward, sniffs once, and sits back. She has rendered a verdict. You are not going to know what it is. D.Anna will know what it is.",
+    "The sniff is thorough. The pause afterward is longer. She then places one paw on your hand, briefly, and withdraws it. Something has been decided in your favor.",
+    "She sniffs your hand, looks at D.Anna, and looks back at you. A short sound — not quite a bark, not quite a breath. D.Anna glances over. Whatever was communicated, it was positive.",
+  ],
+  speak: [
+    "You say something. She listens in the way that divine things listen — not to the words, but to what is underneath the words. She appears satisfied. You are not certain you should be relieved.",
+    "She tilts her head. The gold of her eyes catches the light. You feel, briefly, that she understood every word perfectly and has filed it somewhere you cannot access.",
+    "She is quiet. The room feels slightly more still than it did before you spoke. Then she blinks once, slowly, and looks away. This means something. You don't know what.",
+    "She regards you steadily. Then she makes a sound that is not quite a whine and not quite words. D.Anna, without looking up, says: 'She agrees with you.' You had not realized you had asked a question.",
+  ],
+  bow: [
+    "She accepts this. She closes her eyes for a moment, which feels like being blessed, and opens them again. D.Anna, from across the table, says nothing, but her posture has shifted half a degree toward favorable.",
+    "The bow is received. She does not bow back — she does not need to — but her tail moves once, a single controlled sweep, and this is sufficient.",
+    "She watches you bow and then stands up, turns in a careful circle, and lies back down facing you directly. You are now in an audience. Conduct yourself accordingly.",
+    "She receives it with dignity. You feel, for a moment, that something ancient has noticed you and decided you are worth noticing. Then she yawns enormously and rests her head on her paws.",
+  ],
+  ignore: [
+    "She watches you ignore her. She continues watching. D.Anna sets down her cup very deliberately. The silence in this part of the room has taken on texture. You have made a decision and you will be living with it.",
+    "You look away from her. She does not look away from you. This is not a staring contest you are winning. This is not a staring contest.",
+    "She tilts her head. Somewhere in the cosmological fabric of the universe, a small notation is made. D.Anna says, quietly, to no one: 'Mm.' This is not good.",
+    "She stands up. She walks two steps toward you. She sits down again. She is now closer to you than she was before, and she is still looking directly at you, and D.Anna has put down everything she was holding.",
+  ],
+};
+
+const _KEEVA_VERDICTS = {
+  offer_hand: ["Acceptable",  "Favorable",    "Approved",      "Approved"],
+  speak:      ["Noted",       "Understood",   "Filed",         "Agreed"],
+  bow:        ["Received",    "Acknowledged", "In Audience",   "Honored"],
+  ignore:     ["Displeased",  "Watching",     "Recorded",      "Unimpressed"],
+};
+
+const _KEEVA_VERDICT_COLORS = {
+  offer_hand: "#B8860B",
+  speak:      "#B8860B",
+  bow:        "#c8a04a",
+  ignore:     "#cc2222",
+};
+
+let _keevaConsultations = 0;
+
+function openKeevaOverlay() {
+  keevaEls.overlay.classList.remove("hidden");
+  keevaEls.message.classList.add("hidden");
+  if (keevaEls.verdict) {
+    keevaEls.verdict.textContent = "Pending";
+    keevaEls.verdict.style.color = "";
+  }
+  wireKeevaButtons();
+  audio.playPageTurn();
+}
+
+function closeKeevaOverlay() {
+  keevaEls.overlay.classList.add("hidden");
+  keevaEls.message.classList.add("hidden");
+}
+
+function wireKeevaButtons() {
+  document.querySelectorAll(".keeva-btn").forEach(btn => {
+    btn.onclick = () => {
+      const action = btn.dataset.action;
+      const pool = _KEEVA_RESPONSES[action] ?? [];
+      const verdicts = _KEEVA_VERDICTS[action] ?? [];
+      const idx = _keevaConsultations % pool.length;
+      _keevaConsultations++;
+
+      keevaEls.message.textContent = pool[idx];
+      keevaEls.message.classList.remove("hidden");
+
+      if (keevaEls.verdict) {
+        keevaEls.verdict.textContent = verdicts[idx] ?? verdicts[0];
+        keevaEls.verdict.style.color = _KEEVA_VERDICT_COLORS[action] ?? "";
+      }
+      if (keevaEls.tagline) {
+        keevaEls.tagline.textContent = action === "ignore"
+          ? "She is still looking at you."
+          : "She has made a determination.";
+      }
+      audio.playPageTurn();
+    };
+  });
+
+  keevaEls.leaveBtn.onclick = closeKeevaOverlay;
+
+  keevaEls.overlay.addEventListener("click", (e) => {
+    if (e.target === keevaEls.overlay) closeKeevaOverlay();
+  });
+
+  document.addEventListener("keydown", function keevaEsc(e) {
+    if (e.key === "Escape" && !keevaEls.overlay.classList.contains("hidden")) {
+      closeKeevaOverlay();
+      document.removeEventListener("keydown", keevaEsc);
     }
   });
 }
