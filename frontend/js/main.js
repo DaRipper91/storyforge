@@ -11,6 +11,8 @@ import { fetchState, openSession, postGridAction, postFreeformAction,
          jonGetInventory, jonBuy, jonEscape, jonCactus, jonTick, jonGetState,
          dannaAddress, dannaPetition, dannaGetState,
          rvPerform, rvTip, rvHeckle, rvRequestSong,
+         samaelConsult, samaelGetState,
+         hailieBailout, hailieGetState,
 } from "./api.js";
 import { GridCanvas } from "./canvas.js";
 import { GamepadManager, XBOX } from "./gamepad.js";
@@ -203,7 +205,7 @@ function initExplorationView() {
 
 // ─────────────────────── Server events ───────────────────────
 
-const CLIENT_ONLY_PHASES = ["title", "menu", "mode_select", "saves"];
+const CLIENT_ONLY_PHASES = ["title", "menu", "mode_select", "saves", "intro"];
 
 async function handleServerEvent(msg) {
   if (msg.type !== "state_diff") return;
@@ -629,7 +631,8 @@ function openNpcOverlay(encounterData) {
   if      (id === "jon_shop")              openShopOverlay(encounterData);
   else if (id === "danna_audience")        openDannaOverlay();
   else if (id === "redvelvet_performance") openRedVelvetOverlay();
-  // samael_lore / haylie_inn: no overlay yet — fall through silently
+  else if (id === "samael_lore")           openSamaelOverlay();
+  else if (id === "haylie_inn")            openHaylieOverlay();
 }
 
 // ─────────────────────── Jon Shop Encounter ───────────────────────
@@ -1021,6 +1024,178 @@ function wireRvButtons() {
     if (e.key === "Escape" && !rvEls.overlay.classList.contains("hidden")) {
       closeRedVelvetOverlay();
       document.removeEventListener("keydown", rvEsc);
+    }
+  });
+}
+
+// ─────────────────────── Samael the Ascended Encounter ────────────────
+
+const samaelEls = {
+  overlay:       document.getElementById("samael-overlay"),
+  tagline:       document.getElementById("samael-tagline"),
+  message:       document.getElementById("samael-message"),
+  activityText:  document.getElementById("samael-activity"),
+  apathyLabel:   document.getElementById("samael-apathy"),
+  leaveBtn:      document.getElementById("samael-leave-btn"),
+};
+
+const _LORE_CATEGORIES = [
+  { key: "general_lore",    label: "General Lore",      stat: "Know" },
+  { key: "enemy_weakness",  label: "Enemy Weakness",    stat: "Hunt" },
+  { key: "location_secret", label: "Hidden Place",      stat: "Find" },
+  { key: "npc_backstory",   label: "NPC History",       stat: "Ask"  },
+  { key: "item_origin",     label: "Item Origin",       stat: "Lore" },
+  { key: "tactical_hint",   label: "Tactical Advice",   stat: "Plan" },
+];
+
+function openSamaelOverlay() {
+  samaelEls.overlay.classList.remove("hidden");
+  samaelEls.message.classList.add("hidden");
+  _refreshSamaelState();
+  wireSamaelButtons();
+  audio.playPageTurn();
+}
+
+function closeSamaelOverlay() {
+  samaelEls.overlay.classList.add("hidden");
+  samaelEls.message.classList.add("hidden");
+}
+
+async function _refreshSamaelState() {
+  try {
+    const s = await samaelGetState();
+    if (samaelEls.activityText) samaelEls.activityText.textContent = s.current_activity_description;
+    const apathy = Math.min(5, 1 + Math.floor(s.consultations / 2));
+    const apathyLabels = ["Mildly Present", "Tolerant", "Resigned", "Theatrical", "Transcendently Bored"];
+    if (samaelEls.apathyLabel) samaelEls.apathyLabel.textContent = apathyLabels[apathy - 1] ?? apathyLabels[0];
+  } catch (_) {}
+}
+
+function _showSamaelMessage(res) {
+  const text = `${res.apathy_intro}\n\n"${res.cryptic_hint}"\n\n${res.apathy_outro}`;
+  samaelEls.message.textContent = text;
+  samaelEls.message.classList.remove("hidden");
+  if (samaelEls.activityText) samaelEls.activityText.textContent = res.mundane_description;
+  if (samaelEls.tagline) {
+    const quotes = [
+      '"Oh. You need something."',
+      '"Another question. Of course."',
+      '"I already told you this. Across several timelines."',
+      '"The answer exists. Finding it is your part."',
+    ];
+    samaelEls.tagline.textContent = quotes[Math.min(res.apathy_level - 1, quotes.length - 1)];
+  }
+}
+
+function wireSamaelButtons() {
+  document.querySelectorAll(".samael-consult-btn").forEach(btn => {
+    btn.onclick = async () => {
+      btn.disabled = true;
+      try {
+        const res = await samaelConsult(btn.dataset.category);
+        _showSamaelMessage(res);
+        audio.playPageTurn();
+      } catch (e) {
+        samaelEls.message.textContent = "He looks at you. Nothing is forthcoming. This is, somehow, still more than you deserved.";
+        samaelEls.message.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  });
+
+  samaelEls.leaveBtn.onclick = closeSamaelOverlay;
+
+  samaelEls.overlay.addEventListener("click", (e) => {
+    if (e.target === samaelEls.overlay) closeSamaelOverlay();
+  });
+
+  document.addEventListener("keydown", function samaelEsc(e) {
+    if (e.key === "Escape" && !samaelEls.overlay.classList.contains("hidden")) {
+      closeSamaelOverlay();
+      document.removeEventListener("keydown", samaelEsc);
+    }
+  });
+}
+
+// ─────────────────────── Madame Haylie Encounter ────────────────
+
+const haylieEls = {
+  overlay:       document.getElementById("haylie-overlay"),
+  tagline:       document.getElementById("haylie-tagline"),
+  message:       document.getElementById("haylie-message"),
+  innDesc:       document.getElementById("haylie-inn-desc"),
+  bailoutBtn:    document.getElementById("haylie-bailout-btn"),
+  bailoutStatus: document.getElementById("haylie-bailout-status"),
+  leaveBtn:      document.getElementById("haylie-leave-btn"),
+};
+
+function openHaylieOverlay() {
+  haylieEls.overlay.classList.remove("hidden");
+  haylieEls.message.classList.add("hidden");
+  _refreshHaylieState();
+  wireHaylieButtons();
+  audio.playPageTurn();
+}
+
+function closeHaylieOverlay() {
+  haylieEls.overlay.classList.add("hidden");
+  haylieEls.message.classList.add("hidden");
+}
+
+async function _refreshHaylieState() {
+  try {
+    const s = await hailieGetState();
+    if (haylieEls.bailoutBtn) {
+      haylieEls.bailoutBtn.disabled = !s.bailout_available;
+      haylieEls.bailoutBtn.title = s.bailout_available
+        ? "Haylie can intervene — Jon has gone too far."
+        : "Jon hasn't trapped anyone yet. Come back after a failed escape attempt.";
+    }
+    if (haylieEls.bailoutStatus) {
+      haylieEls.bailoutStatus.textContent = s.bailout_available
+        ? "Jon is holding someone. She notices."
+        : `${s.bailouts_delivered} rescue${s.bailouts_delivered !== 1 ? "s" : ""} delivered this session.`;
+    }
+  } catch (_) {}
+}
+
+function wireHaylieButtons() {
+  if (haylieEls.bailoutBtn) {
+    haylieEls.bailoutBtn.onclick = async () => {
+      haylieEls.bailoutBtn.disabled = true;
+      try {
+        const res = await hailieBailout("fantasy");
+        if (res.triggered) {
+          const text = `${res.scolding}\n\n${res.jon_response}\n\n${res.haylie_sign_off}`;
+          haylieEls.message.textContent = text;
+          haylieEls.message.classList.remove("hidden");
+          if (haylieEls.tagline) haylieEls.tagline.textContent = '"Jon. These people need to leave."';
+          audio.playConfirm();
+          await _refreshHaylieState();
+        } else {
+          haylieEls.message.textContent = res.message ?? "Not yet. She's watching.";
+          haylieEls.message.classList.remove("hidden");
+          haylieEls.bailoutBtn.disabled = false;
+        }
+      } catch (e) {
+        haylieEls.message.textContent = "She is occupied. Try the exit yourself.";
+        haylieEls.message.classList.remove("hidden");
+        haylieEls.bailoutBtn.disabled = false;
+      }
+    };
+  }
+
+  haylieEls.leaveBtn.onclick = closeHaylieOverlay;
+
+  haylieEls.overlay.addEventListener("click", (e) => {
+    if (e.target === haylieEls.overlay) closeHaylieOverlay();
+  });
+
+  document.addEventListener("keydown", function haylieEsc(e) {
+    if (e.key === "Escape" && !haylieEls.overlay.classList.contains("hidden")) {
+      closeHaylieOverlay();
+      document.removeEventListener("keydown", haylieEsc);
     }
   });
 }

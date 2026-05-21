@@ -609,10 +609,14 @@ export class GridCanvas {
     const cs = this.cellSize;
     const ox = this.offsetX, oy = this.offsetY;
 
-    // Remove stale NPC nodes (room change etc.)
-    const currentRoom = this._currentRoom();
+    const currentRoomId = this.state.current_room_id;
+
+    // Remove stale NPC nodes: NPC deleted OR NPC belongs to a different room
     for (const [id, node] of this._tokenNodes.entries()) {
-      if (id.startsWith("npc_") && !this.state.npcs[id.slice(4)]) {
+      if (!id.startsWith("npc_")) continue;
+      const npcId = id.slice(4);
+      const npc = this.state.npcs[npcId];
+      if (!npc || (npc.room_id && npc.room_id !== currentRoomId)) {
         node.destroy();
         this._tokenNodes.delete(id);
       }
@@ -630,7 +634,8 @@ export class GridCanvas {
     };
 
     for (const npc of Object.values(this.state.npcs)) {
-      // Only render NPCs whose room matches current room (store NPCs only in store)
+      // Skip NPCs assigned to a different room
+      if (npc.room_id && npc.room_id !== currentRoomId) continue;
       const nodeKey = `npc_${npc.id}`;
       const cx = ox + npc.position.x * cs + cs / 2;
       const cy = oy + npc.position.y * cs + cs / 2;

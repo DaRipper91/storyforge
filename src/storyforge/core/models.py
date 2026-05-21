@@ -92,6 +92,7 @@ class NpcSheet(BaseModel):
     id: str
     name: str
     position: Coord
+    room_id: str | None = None          # which room this NPC belongs to (None = any)
     sprite_key: str = "npc_default"     # frontend canvas uses this to style the token
     interactable: bool = True
     encounter_id: str | None = None     # e.g. "john_shop" — links to encounter handler

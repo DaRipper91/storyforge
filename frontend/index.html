@@ -178,6 +178,53 @@
     </header>
 
     <main id="stage">
+      <!-- ── Active Character Sidebar ── -->
+      <aside id="char-card-pane" class="parchment-surface char-card-pane">
+        <div class="char-card-portrait" id="char-card-portrait">
+          <span id="char-card-initial" class="char-card-initial">?</span>
+        </div>
+        <div class="char-card-name" id="char-card-name">—</div>
+        <div class="char-card-race" id="char-card-race"></div>
+
+        <div class="char-card-hp-block">
+          <div class="char-card-hp-label">
+            <span>HP</span>
+            <span id="char-card-hp-text" class="char-card-hp-text">—</span>
+          </div>
+          <div class="char-card-hp-bar-bg">
+            <div class="char-card-hp-bar-fill" id="char-card-hp-fill"></div>
+          </div>
+        </div>
+
+        <div class="char-card-stats">
+          <div class="char-card-stat">
+            <span class="char-card-stat-label">AC</span>
+            <span class="char-card-stat-val" id="char-card-ac">—</span>
+          </div>
+          <div class="char-card-stat">
+            <span class="char-card-stat-label">MV</span>
+            <span class="char-card-stat-val" id="char-card-mv">—</span>
+          </div>
+          <div class="char-card-stat">
+            <span class="char-card-stat-label">POS</span>
+            <span class="char-card-stat-val" id="char-card-pos">—</span>
+          </div>
+          <div class="char-card-stat char-card-stat-silver">
+            <span class="char-card-stat-label">💰</span>
+            <span class="char-card-stat-val" id="char-card-silver">—</span>
+          </div>
+        </div>
+
+        <div class="char-card-badges">
+          <span class="char-card-badge char-card-state" id="char-card-state"></span>
+          <span class="char-card-badge char-card-role" id="char-card-role"></span>
+        </div>
+
+        <div class="char-card-conditions" id="char-card-conditions"></div>
+
+        <div class="char-card-room" id="char-card-room"></div>
+      </aside>
+
       <section id="canvas-pane" class="parchment-surface">
         <div id="initiative-tracker" class="hidden">
           <div class="init-label">TURN ORDER</div>
@@ -435,6 +482,117 @@
           <p class="hint-small">The fire continues whether you watch or not.</p>
           <div class="cactus-actions">
             <button id="rv-leave-btn" class="btn btn-small">Walk Away</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────── SAMAEL THE ASCENDED OVERLAY ─────── -->
+  <div id="samael-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface samael-card">
+
+      <div class="jon-shop-header">
+        <div class="jon-npc-portrait samael-portrait" data-initial="S"></div>
+        <div class="jon-header-text">
+          <h2 class="ink-gilded">Samael the Ascended</h2>
+          <p id="samael-tagline" class="jon-tagline">"Oh. You need something."</p>
+        </div>
+        <div class="samael-apathy-badge">
+          Engagement: <span id="samael-apathy" class="ink-gilded samael-apathy-text">Mildly Present</span>
+        </div>
+      </div>
+
+      <div id="samael-message" class="jon-message samael-message hidden"></div>
+
+      <div class="samael-activity-strip">
+        <span class="samael-activity-label">Currently:</span>
+        <span id="samael-activity" class="samael-activity-text">He is devoting the omniscient focus of a divine mind to ensuring Bink Bink is scratched at precisely the right pressure behind the left ear.</span>
+      </div>
+
+      <div class="jon-shop-body">
+        <div class="jon-inventory-panel">
+          <h3>Ask for Guidance</h3>
+          <p class="hint-small">He will answer. Whether you understand the answer is your problem.</p>
+          <div class="samael-consult-btns escape-methods">
+            <button class="escape-btn samael-consult-btn" data-category="general_lore">
+              <span class="escape-method-name">General Lore</span>
+              <span class="escape-method-stat">Know</span>
+            </button>
+            <button class="escape-btn samael-consult-btn" data-category="enemy_weakness">
+              <span class="escape-method-name">Enemy Weakness</span>
+              <span class="escape-method-stat">Hunt</span>
+            </button>
+            <button class="escape-btn samael-consult-btn" data-category="location_secret">
+              <span class="escape-method-name">Hidden Places</span>
+              <span class="escape-method-stat">Find</span>
+            </button>
+            <button class="escape-btn samael-consult-btn" data-category="npc_backstory">
+              <span class="escape-method-name">Someone's History</span>
+              <span class="escape-method-stat">Ask</span>
+            </button>
+            <button class="escape-btn samael-consult-btn" data-category="item_origin">
+              <span class="escape-method-name">Item Origins</span>
+              <span class="escape-method-stat">Lore</span>
+            </button>
+            <button class="escape-btn samael-consult-btn" data-category="tactical_hint">
+              <span class="escape-method-name">Tactical Hint</span>
+              <span class="escape-method-stat">Plan</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="jon-action-panel">
+          <h3>Walk Away</h3>
+          <p class="hint-small">He will not notice. He is very busy.</p>
+          <div class="cactus-actions">
+            <button id="samael-leave-btn" class="btn btn-small">Leave Him To It</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────── MADAME HAYLIE OVERLAY ─────── -->
+  <div id="haylie-overlay" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card parchment-surface haylie-card">
+
+      <div class="jon-shop-header">
+        <div class="jon-npc-portrait haylie-portrait" data-initial="H"></div>
+        <div class="jon-header-text">
+          <h2 class="ink-gilded">Madame Haylie</h2>
+          <p id="haylie-tagline" class="jon-tagline">"The exit is right there. You are free to use it."</p>
+        </div>
+        <div class="haylie-inn-badge">
+          The Crooked Tankard Inn
+        </div>
+      </div>
+
+      <div id="haylie-message" class="jon-message hidden"></div>
+
+      <div class="jon-shop-body">
+        <div class="jon-inventory-panel">
+          <h3>The Inn</h3>
+          <p id="haylie-inn-desc" class="haylie-inn-text">Warm rooms upstairs, a hearth that hasn't gone out in years, and a stew that Jon is not allowed to describe because every time he does, people leave.</p>
+
+          <hr class="jon-divider" />
+          <h3>Emergency Services</h3>
+          <p class="hint-small">For when Jon has gone too far. Requires a critical escape fail first.</p>
+          <div class="cactus-actions" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
+            <button id="haylie-bailout-btn" class="btn btn-primary haylie-bailout-btn" disabled>
+              Call In Haylie
+            </button>
+            <span id="haylie-bailout-status" class="hint-small" style="text-align:center; margin-top: 0.25rem;">Loading...</span>
+          </div>
+        </div>
+
+        <div class="jon-action-panel">
+          <h3>Step Out</h3>
+          <p class="hint-small">She runs this place. She doesn't need your lingering.</p>
+          <div class="cactus-actions">
+            <button id="haylie-leave-btn" class="btn btn-small">Take Your Leave</button>
           </div>
         </div>
       </div>

@@ -1105,3 +1105,118 @@ body[data-phase="saves"] #game-view { display: none; }
   line-height: 1;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Samael the Ascended overlay
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.samael-card {
+  border-color: #4B0082;
+  box-shadow: 0 0 40px rgba(75, 0, 130, 0.4), inset 0 0 20px rgba(75, 0, 130, 0.08);
+}
+
+.samael-portrait {
+  background: radial-gradient(circle at 40% 35%, #6a0dad 0%, #2a0050 60%, #0a0020 100%);
+  border-color: #9b4dca;
+  box-shadow: 0 0 16px rgba(155, 77, 202, 0.5);
+}
+
+.samael-apathy-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: rgba(244, 234, 212, 0.7);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.samael-apathy-text {
+  color: #9b4dca;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.samael-activity-strip {
+  background: rgba(75, 0, 130, 0.12);
+  border: 1px solid rgba(75, 0, 130, 0.3);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  margin: 0.5rem 0 0.75rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: rgba(244, 234, 212, 0.8);
+  line-height: 1.5;
+}
+
+.samael-activity-label {
+  font-style: normal;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9b4dca;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.samael-activity-text {
+  display: block;
+}
+
+.samael-message {
+  white-space: pre-line;
+  font-style: italic;
+  background: rgba(75, 0, 130, 0.1);
+  border-color: rgba(75, 0, 130, 0.4);
+}
+
+.samael-consult-btns .escape-btn:hover {
+  border-color: #9b4dca;
+  background: rgba(155, 77, 202, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Madame Haylie overlay
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.haylie-card {
+  border-color: #8B0000;
+  box-shadow: 0 0 40px rgba(139, 0, 0, 0.3), inset 0 0 20px rgba(139, 0, 0, 0.06);
+}
+
+.haylie-portrait {
+  background: radial-gradient(circle at 40% 35%, #cc2222 0%, #7a0000 60%, #2a0000 100%);
+  border-color: #e05050;
+  box-shadow: 0 0 16px rgba(204, 34, 34, 0.4);
+}
+
+.haylie-inn-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  color: rgba(244, 234, 212, 0.7);
+  text-align: right;
+  font-style: italic;
+}
+
+.haylie-inn-text {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  font-style: italic;
+  color: rgba(244, 234, 212, 0.85);
+  margin: 0.25rem 0 0.75rem;
+}
+
+.haylie-bailout-btn {
+  background: rgba(139, 0, 0, 0.2);
+  border-color: #cc2222;
+  color: #f4ead4;
+}
+
+.haylie-bailout-btn:not(:disabled):hover {
+  background: rgba(204, 34, 34, 0.3);
+  border-color: #e05050;
+}
+
+.haylie-bailout-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+

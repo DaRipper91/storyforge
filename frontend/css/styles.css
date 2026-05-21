@@ -139,7 +139,7 @@ body {
 /* ─────────────────────────── MAIN STAGE ─────────────────────────── */
 #stage {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 180px minmax(0, 3fr) minmax(0, 2fr);
   gap: var(--pane-gap);
   padding: var(--pane-gap);
   overflow: hidden;
@@ -421,6 +421,212 @@ body {
   opacity: 0.6;
   text-align: center;
   padding: var(--space-5);
+}
+
+/* ─────────────────────────── CHARACTER CARD SIDEBAR ─────────────────────────── */
+
+.char-card-pane {
+  border: 4px solid var(--ink-midnight);
+  border-radius: 12px;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.char-card-portrait {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 4px solid var(--ink-gilded);
+  background: radial-gradient(circle at 40% 35%, #4a3070 0%, #1a1428 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 18px rgba(200, 160, 74, 0.35), inset 0 2px 8px rgba(0,0,0,0.5);
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.5s;
+  position: relative;
+  overflow: hidden;
+}
+
+.char-card-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.char-card-initial {
+  font-size: 2.4rem;
+  font-weight: 900;
+  font-family: "IM Fell English", Georgia, serif;
+  color: #f4ead4;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.char-card-name {
+  font-family: "IM Fell English", Georgia, serif;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--ink-gilded);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.char-card-race {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(244, 234, 212, 0.55);
+  text-align: center;
+}
+
+.char-card-hp-block {
+  width: 100%;
+}
+
+.char-card-hp-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  color: rgba(244, 234, 212, 0.8);
+}
+
+.char-card-hp-text {
+  font-weight: 700;
+}
+
+.char-card-hp-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+.char-card-hp-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: #22bb55;
+  border-radius: 4px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.char-card-hp-bar-fill.bloodied { background: #e8a040; }
+.char-card-hp-bar-fill.critical { background: #cc2222; }
+
+.char-card-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+}
+
+.char-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 0.2rem 0.1rem;
+}
+
+.char-card-stat-silver { grid-column: 1 / -1; }
+
+.char-card-stat-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(244, 234, 212, 0.45);
+  line-height: 1;
+}
+
+.char-card-stat-val {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f4ead4;
+  line-height: 1.3;
+}
+
+.char-card-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.char-card-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.char-card-state {
+  background: rgba(75, 0, 130, 0.3);
+  border: 1px solid rgba(155, 77, 202, 0.4);
+  color: #c8a0ff;
+}
+
+.char-card-role {
+  background: rgba(139, 0, 0, 0.3);
+  border: 1px solid rgba(204, 34, 34, 0.4);
+  color: #ff9090;
+}
+
+.char-card-conditions {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  justify-content: center;
+}
+
+.char-card-condition-pip {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.55rem;
+  background: rgba(200, 50, 50, 0.3);
+  border: 1px solid rgba(200, 50, 50, 0.5);
+  color: #ffaaaa;
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+  text-transform: uppercase;
+}
+
+.char-card-room {
+  width: 100%;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.58rem;
+  color: rgba(244, 234, 212, 0.35);
+  text-align: center;
+  margin-top: auto;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* TV-friendly scrollbar */

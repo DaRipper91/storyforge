@@ -722,6 +722,7 @@
         "x": 6,
         "y": 3
       },
+      "room_id": "store_01",
       "sprite_key": "npc_cat",
       "interactable": false,
       "encounter_id": null,
@@ -735,6 +736,7 @@
         "x": 1,
         "y": 6
       },
+      "room_id": "store_01",
       "sprite_key": "npc_dog",
       "interactable": false,
       "encounter_id": null,
@@ -748,6 +750,7 @@
         "x": 7,
         "y": 6
       },
+      "room_id": "store_01",
       "sprite_key": "npc_dog",
       "interactable": false,
       "encounter_id": null,
@@ -761,6 +764,7 @@
         "x": 1,
         "y": 1
       },
+      "room_id": "store_01",
       "sprite_key": "npc_jon",
       "interactable": true,
       "encounter_id": "jon_shop",
@@ -774,6 +778,7 @@
         "x": 8,
         "y": 4
       },
+      "room_id": "store_01",
       "sprite_key": "npc_samael",
       "interactable": true,
       "encounter_id": "samael_lore",
@@ -787,6 +792,7 @@
         "x": 4,
         "y": 1
       },
+      "room_id": "store_01",
       "sprite_key": "npc_haylie",
       "interactable": true,
       "encounter_id": "haylie_inn",
@@ -800,6 +806,7 @@
         "x": 2,
         "y": 2
       },
+      "room_id": "tavern_01",
       "sprite_key": "npc_danna",
       "interactable": true,
       "encounter_id": "danna_audience",
@@ -813,6 +820,7 @@
         "x": 8,
         "y": 2
       },
+      "room_id": "tavern_01",
       "sprite_key": "npc_redvelvet",
       "interactable": true,
       "encounter_id": "redvelvet_performance",
