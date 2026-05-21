@@ -545,7 +545,10 @@ export class Lobby {
     if (!draft) return this._handleAButton(controllerId);
 
     if (controllerId === this._activeControllerId) {
-      if (draft.step === "race") {
+      if (draft.step === "era") {
+        const eras = ["before", "after"];
+        draft.startingEra = eras[this._focusIndex];
+      } else if (draft.step === "race") {
         const keys = Object.keys(this.catalog.races);
         draft.race = keys[this._focusIndex];
       } else if (draft.step === "state") {
@@ -591,12 +594,13 @@ export class Lobby {
       this._drafts.set(controllerId, {
         controllerId,
         slotIndex: result.slot_index,
-        step: "race",
+        step: "era",
         race: null,
         evolutionState: null,
         predatorRole: null,
         abilities: { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null },
         name: "",
+        startingEra: "after",
       });
       if (!this._activeControllerId) this._activeControllerId = controllerId;
       await this.onStateRefetch?.();
@@ -642,7 +646,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
 
-    const order = ["race", "state", "role", "abilities", "name"];
+    const order = ["era", "race", "state", "role", "abilities", "name"];
     const idx   = order.indexOf(draft.step);
 
     if (!this._isStepComplete(draft, draft.step)) {
@@ -667,7 +671,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
 
-    const order = ["race", "state", "role", "abilities", "name"];
+    const order = ["era", "race", "state", "role", "abilities", "name"];
     const idx   = order.indexOf(draft.step);
     if (idx === 0) return;
 
@@ -681,13 +685,14 @@ export class Lobby {
 
   async _commitDraft(draft) {
     try {
-      await createCharacter({
-        slotIndex:     draft.slotIndex,
-        name:          draft.name.trim(),
-        race:          draft.race,
+      const res = await createCharacter({
+        slotIndex:      draft.slotIndex,
+        name:           draft.name,
+        race:           draft.race,
         evolutionState: draft.evolutionState,
-        predatorRole:  draft.predatorRole,
-        abilities:     draft.abilities,
+        predatorRole:   draft.predatorRole,
+        abilities:      draft.abilities,
+        starting_era:   draft.startingEra,
       });
       this.audio?.playConfirm();
       this._drafts.delete(draft.controllerId);
@@ -829,7 +834,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) { this._renderAllReady(); return; }
 
-    const stepOrder  = ["race", "state", "role", "abilities", "name"];
+    const stepOrder  = ["era", "race", "state", "role", "abilities", "name"];
     const currentIdx = stepOrder.indexOf(draft.step);
 
     this._dom.stepPills.forEach((pill, i) => {
@@ -871,6 +876,7 @@ export class Lobby {
 
     this._dom.stage.innerHTML = "";
     switch (draft.step) {
+      case "era":       this._renderEraStep(draft);       break;
       case "race":      this._renderRaceStep(draft);      break;
       case "state":     this._renderStateStep(draft);     break;
       case "role":      this._renderRoleStep(draft);      break;
@@ -883,6 +889,23 @@ export class Lobby {
 
   _scrollFocusedIntoView() {
     this._dom.stage.querySelector(".focused")?.scrollIntoView({ block: "nearest" });
+  }
+
+  _renderEraStep(draft) {
+    const eras = [
+      { id: "before", name: "Before (Civilized)", flavor: "Start as the race you were before the Paradox. Your 'Feral' transformation will hit mid-game." },
+      { id: "after", name: "After (Feral)", flavor: "The Paradox has already taken you. You start in your evolved Feral Successor form." }
+    ];
+    const grid = document.createElement("div");
+    grid.className = "option-grid";
+    eras.forEach((era, idx) => {
+      const card = this._optionCard(era.name, era.flavor, "",
+        draft.startingEra === era.id, idx === this._focusIndex);
+      card.addEventListener("click",      () => { draft.startingEra = era.id; this._renderCreation(); this.audio?.playCursor(); });
+      card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
+      grid.appendChild(card);
+    });
+    this._dom.stage.appendChild(grid);
   }
 
   _renderRaceStep(draft) {
@@ -917,18 +940,34 @@ export class Lobby {
       groupEntries.forEach(([key, def]) => {
         const idx = globalIdx++;
         let card;
-        if (group === "Humanoid" && def.before) {
+        
+        const isBeforeEra = draft.startingEra === "before";
+        const primaryName = (isBeforeEra && def.before) ? def.before : def.name;
+        const secondaryName = (isBeforeEra && def.before) ? def.name : (def.before || "");
+        
+        if (def.before || isBeforeEra) {
           card = document.createElement("div");
           card.className = "option-card humanoid-card";
           if (draft.race === key) card.classList.add("selected");
           if (idx === this._focusIndex) card.classList.add("focused");
-          card.innerHTML = `
-            <div class="humanoid-before-label">Before: <span>${this._escape(def.before)}</span></div>
-            <div class="humanoid-arrow">↓</div>
-            <h3>${this._escape(def.name)}</h3>
-            <p class="flavor">${this._escape(def.flavor)}</p>
-            <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
-          `;
+          
+          if (isBeforeEra && def.before) {
+            card.innerHTML = `
+              <div class="humanoid-before-label">Start as: <span>${this._escape(def.before)}</span></div>
+              <div class="humanoid-arrow">↓</div>
+              <h3>${this._escape(def.name)} (Feral)</h3>
+              <p class="flavor">${this._escape(def.flavor)}</p>
+              <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
+            `;
+          } else {
+            card.innerHTML = `
+              <div class="humanoid-before-label">Before: <span>${this._escape(def.before || "Unknown")}</span></div>
+              <div class="humanoid-arrow">↓</div>
+              <h3>${this._escape(def.name)}</h3>
+              <p class="flavor">${this._escape(def.flavor)}</p>
+              <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
+            `;
+          }
         } else {
           card = this._optionCard(def.name, def.flavor,
             `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
@@ -1104,6 +1143,7 @@ export class Lobby {
 
   _isStepComplete(draft, step) {
     switch (step) {
+      case "era":       return draft.startingEra != null;
       case "race":      return draft.race != null;
       case "state":     return draft.evolutionState != null;
       case "role":      return draft.predatorRole != null;
@@ -1117,6 +1157,7 @@ export class Lobby {
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
     const stepSizes = {
+      era:       2,
       race:      Object.keys(this.catalog.races).length,
       state:     Object.keys(this.catalog.states).length,
       role:      Object.keys(this.catalog.roles).length,
@@ -1125,7 +1166,7 @@ export class Lobby {
     };
     const max     = stepSizes[draft.step] ?? 0;
     if (!max) return;
-    const columns = ["race", "state", "role"].includes(draft.step)
+    const columns = ["era", "race", "state", "role"].includes(draft.step)
       ? Math.max(1, Math.floor((this._dom.stage.clientWidth || 900) / 300))
       : 1;
     let next = this._focusIndex + dx + dy * columns;
@@ -1141,13 +1182,14 @@ export class Lobby {
       slotIndex:      slot.slot_index,
       step:           slot.race
         ? (slot.evolution_state ? (slot.predator_role ? "abilities" : "role") : "state")
-        : "race",
+        : "era",
       race:           slot.race,
       evolutionState: slot.evolution_state,
       predatorRole:   slot.predator_role,
       abilities:      slot.assigned_abilities
         ?? { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null },
       name:           slot.name_draft ?? "",
+      startingEra:    "after", // Default
     };
   }
 

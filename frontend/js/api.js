@@ -104,6 +104,13 @@ export async function startGame() {
   return jsonOrThrow(res);
 }
 
+export async function triggerParadox() {
+  const res = await fetch(`${API_BASE}/api/state/trigger_paradox`, {
+    method: "POST",
+  });
+  return jsonOrThrow(res);
+}
+
 export async function fetchCampaigns() {
   const res = await fetch(`${API_BASE}/api/campaigns`);
   return jsonOrThrow(res);

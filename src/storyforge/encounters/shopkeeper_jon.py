@@ -133,7 +133,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     SceneGenre.HORROR: [
         _item("silver_bullets_x6", "Silver Bullets (×6)",        90, "'Don't ask why I have these.' (He has been asked.)"),
         _item("holy_water_vial",   "Holy Water (×3 vials)",       25, "Genuine. 'Father Mike owes me a favor.'"),
-        _item("wolfsbane_bundle",  "Wolfsbane Bundle",            15, "Keep away from dogs. He had to learn this."),
+        _item("wolfsbane_bundle",  "Wolfsbane Bundle",            15, "Keep away from dogs. Cole had to learn this."),
         _item("iron_salt_pouch",   "Iron Filings + Salt Mix",     10, "'Sprinkle at doorways. Don't ask.'"),
         _item("crucifix_blessed",  "Blessed Crucifix",            30, "May or may not work. Depends on your faith."),
         _item("mirror_hand",       "Hand Mirror (unbroken)",       5, "'Keep it unbroken. For the love of...'"),
@@ -143,7 +143,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     SceneGenre.WESTERN: [
         _item("sixshooter_colt",   ".45 Revolver",               120, "'Came off a man who didn't need it anymore.'"),
         _item("ammo_box_45",       ".45 Rounds (×24)",            12, "Factory loads. Clean burns."),
-        _item("lasso_rope",        "Lasso (40ft)",                 8, "'Teddy keeps dragging mine around. Hence the surplus.'"),
+        _item("lasso_rope",        "Lasso (40ft)",                 8, "'Cole keeps dragging mine around. Hence the surplus.'"),
         _item("whiskey_flask",     "Whiskey Flask (full)",         4, "The good kind. Don't water it down."),
         _item("dynamite_x2",       "Dynamite Sticks (×2)",        25, "'I don't ask, you don't tell.'"),
         _item("wanted_poster",     "Blank Wanted Poster",          2, "Fill in your own name. Could save time later."),
@@ -151,13 +151,13 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
         _item("bowie_knife",       "Bowie Knife",                 18, "Still has an edge. Unlike some customers."),
     ],
     SceneGenre.POST_APOCALYPTIC: [
-        _item("duct_tape_roll",    "Duct Tape (full roll)",       20, "'Fix anything. Literally. Fixed Teddy's collar with this.'"),
+        _item("duct_tape_roll",    "Duct Tape (full roll)",       20, "'Fix anything. Literally. Fixed Cole's collar with this.'"),
         _item("canned_beans_x6",   "Canned Beans (×6)",           30, "No expiry date visible. Probably fine."),
         _item("rad_pills_x10",     "Radiation Blocker Pills (×10)", 50, "Reduces exposure. Does NOT cure. Read the label."),
         _item("shotgun_shells_x8", "12-Gauge Shells (×8)",        16, "'Standard load. The fancy stuff I keep out back.'"),
         _item("water_purifier",    "Hand-Pump Water Purifier",    80, "'Bink Bink knocked the last one off the shelf. Hence the sale.'"),
         _item("gas_mask",          "Gas Mask + 2 Filters",       110, "Seal checks out. Tested it on myself."),
-        _item("stun_baton",        "Jury-Rigged Stun Baton",      65, "'Cyrus bumped it on once. We don't talk about that.'"),
+        _item("stun_baton",        "Jury-Rigged Stun Baton",      65, "'Cole bumped it on once. We don't talk about that.'"),
         _item("scavenger_toolkit", "Scavenger Toolkit",           45, "Wire, pliers, fuses. The holy trinity."),
     ],
 }
@@ -178,12 +178,12 @@ THE_CACTUS = _item(
 
 _SUCCESS_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "You compliment the cactus, praise Teddy's coat, and back toward the door with practiced grace. Jon beams. You're gone before he can remember what he was about to say about his brother-in-law.",
+        "You compliment the cactus, praise Cole's coat, and back toward the door with practiced grace. Jon beams. You're gone before he can remember what he was about to say about his brother-in-law.",
         "A firm handshake, a 'we'll do this again soon,' and a smile that doesn't reach your eyes. Jon watches you go, genuinely touched. He's already planning what he'll tell you next time.",
     ],
     EscapeMethod.STEALTH: [
         "Bink Bink leaps onto the display case. Jon spins around. By the time the cat has knocked three items to the floor and Jon has apologized to all of them individually, you are gone. Bink Bink winks. You think.",
-        "You time your exit to the exact moment Teddy demands ear scratches. The bell above the door barely makes a sound.",
+        "You time your exit to the exact moment Cole demands ear scratches. The bell above the door barely makes a sound.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
         "You inform Jon that something is on fire approximately two blocks away. He says, 'Oh, is it the Hendersons again?' and turns to look out the window. You are a distant memory.",
@@ -206,7 +206,7 @@ _FAIL_MILD_FLAVOR: dict[EscapeMethod, list[str]] = {
     ],
     EscapeMethod.STEALTH: [
         "You miscalculate Bink Bink's trajectory. The cat knocks something toward you instead of away. Jon turns. Sees you near the door. 'Oh, were you heading out? Actually—'",
-        "The bell above the door is louder than you remembered. Jon spins around with the enthusiasm of a man who has been alone with a cat and two dogs all day.",
+        "The bell above the door is louder than you remembered. Jon spins around with the enthusiasm of a man who has been alone with a cat and a dog all day.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
         "Jon immediately offers to come help with your fictional emergency. He knows a guy. He's going to call the guy. He's telling you about the guy first.",
@@ -218,13 +218,13 @@ _FAIL_MILD_FLAVOR: dict[EscapeMethod, list[str]] = {
     ],
     EscapeMethod.BULLDOZE: [
         "Jon reciprocates the hug with significantly more force than expected. By the time you've extracted yourself, the moment has passed and he's already mid-sentence.",
-        "You push for the door. Teddy has sat down in front of it and will not move until acknowledged. Jon laughs and launches into Teddy's origin story.",
+        "You push for the door. Cole has sat down in front of it and will not move until acknowledged. Jon laughs and launches into Cole's origin story.",
     ],
 }
 
 _FAIL_SEVERE_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "Your charm backfires. Jon thinks you're his new best friend. He shows you photos — physical, printed photos. There are many. Your mind retreats to a soft, gray place.",
+        "Your charm backfires. Jon thinks you're his new best friend. He shows you photos — physical, printed photos. There are many. Your mind retreats to a soft, dark place.",
         "You complimented his hat. There is a story about the hat. The hat story leads to a boat story. The boat story leads to a fishing story. You briefly cease to be a person and become instead a pair of eyes, floating.",
     ],
     EscapeMethod.STEALTH: [
@@ -237,10 +237,10 @@ _FAIL_SEVERE_FLAVOR: dict[EscapeMethod, list[str]] = {
     ],
     EscapeMethod.SHEER_WILLPOWER: [
         "Your wall breaks at minute thirty-two. Jon says something tangentially related to something you once cared about. You engage. You don't know why you engage. The damage is done.",
-        "The anecdote has no ending. Jon has circled back to the beginning with new details. You stare into the middle distance. Cyrus makes eye contact with you. He has seen this before. He is very sorry.",
+        "The anecdote has no ending. Jon has circled back to the beginning with new details. You stare into the middle distance. Cole makes eye contact with you. He has seen this before. He is very sorry.",
     ],
     EscapeMethod.BULLDOZE: [
-        "Jon, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Cyrus sits on your foot. You cannot leave without disturbing the dog. Jon takes this as a sign you want to stay.",
+        "Jon, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Cole leans against your legs. You cannot leave without disturbing the dog. Jon takes this as a sign you want to stay.",
         "You push through but Jon follows, continuing the story onto the front stoop. He doesn't notice he is now outside. You are standing in the sun together. This is somehow worse. His rambling erodes something essential in you.",
     ],
 }

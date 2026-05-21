@@ -16,6 +16,12 @@ async def get_state(state: StateManager = Depends(get_state_manager)):
     return state.current
 
 
+@router.post("/state/trigger_paradox")
+async def trigger_paradox(state: StateManager = Depends(get_state_manager)):
+    """Manual trigger for the Race Switch."""
+    return await state.trigger_paradox()
+
+
 @router.get("/revision")
 async def get_revision(state: StateManager = Depends(get_state_manager)):
     return {"revision": state.current.revision}

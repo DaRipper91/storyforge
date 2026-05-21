@@ -624,7 +624,7 @@ export class GridCanvas {
 
     const NPC_COLORS = {
       npc_jon:      "#8B4513",  // saddle brown — shopkeeper warmth
-      npc_cat:      "#696969",  // dimgray — mysterious feline
+      npc_cat:      "#1a1a1a",  // dark charcoal — mysterious black feline
       npc_dog:      "#D2691E",  // chocolate — loyal hound
       npc_default:  "#556B2F",
       npc_samael:   "#4B0082",

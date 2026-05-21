@@ -34,86 +34,94 @@ class RaceDef:
 RACES: dict[Race, RaceDef] = {
     # Cosmic — born between stars, beneath suns, inside the void
     Race.VOIDWRAITH: RaceDef(
-        name="Voidwraith", speed=30, ability_bonuses={"INT": 2, "STR": 1}, group="Cosmic",
+        name="Voidwraith", speed=30, ability_bonuses={"INT": 2, "STR": 1}, group="Cosmic", before="Astral Spirit",
         flavor="Stellar scavengers that feast on dying magic and the bones of dead worlds."
     ),
     Race.NULLSHADE: RaceDef(
-        name="Nullshade", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Cosmic",
+        name="Nullshade", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Cosmic", before="Shadow-Wisp",
         flavor="Formless hunters that stalk prey from the dark spaces between worlds."
     ),
     Race.IRONLOCUST: RaceDef(
-        name="Iron-Locust", speed=35, ability_bonuses={"DEX": 2, "CON": 1}, group="Cosmic",
+        name="Iron-Locust", speed=35, ability_bonuses={"DEX": 2, "CON": 1}, group="Cosmic", before="Mining Drone",
         flavor="Chitinous swarms that strip metal, stone, and bone with equal hunger."
     ),
     Race.EMBERVEIN: RaceDef(
-        name="Embervein", speed=20, ability_bonuses={"STR": 2, "CON": 1}, group="Cosmic",
+        name="Embervein", speed=20, ability_bonuses={"STR": 2, "CON": 1}, group="Cosmic", before="Magma Elemental",
         flavor="Molten-blooded leviathans born in the cores of burning worlds."
     ),
     Race.RIFTWALKER: RaceDef(
-        name="Riftwalker", speed=30, ability_bonuses={"DEX": 1, "WIS": 2}, group="Cosmic",
+        name="Riftwalker", speed=30, ability_bonuses={"DEX": 1, "WIS": 2}, group="Cosmic", before="Planar Voyager",
         flavor="Phase-hunters that slip between realms leaving no shadow and no sound."
     ),
     # Primal — ancient, elemental, rooted in myth and living world
     Race.SOLARLORD: RaceDef(
-        name="Solar-Lord", speed=40, ability_bonuses={"CHA": 2, "WIS": 1}, group="Primal",
+        name="Solar-Lord", speed=40, ability_bonuses={"CHA": 2, "WIS": 1}, group="Primal", before="High Seraph",
         flavor="Celestial avians who ride light-paths between suns and speak in stellar fire."
     ),
     Race.THORNMIMIC: RaceDef(
-        name="Thornmimic", speed=30, ability_bonuses={"DEX": 1, "CHA": 2}, group="Primal",
+        name="Thornmimic", speed=30, ability_bonuses={"DEX": 1, "CHA": 2}, group="Primal", before="Wood Spirit",
         flavor="Bark-skinned shapeshifters who replace their prey in the oldest forests."
     ),
     Race.CINDERKIN: RaceDef(
-        name="Cinderkin", speed=35, ability_bonuses={"INT": 1, "DEX": 2}, group="Primal",
+        name="Cinderkin", speed=35, ability_bonuses={"INT": 1, "DEX": 2}, group="Primal", before="Sun-Spark",
         flavor="Crystalline fire-sprites forged in the hearts of volcanoes."
     ),
     Race.DEEPTYRANT: RaceDef(
-        name="Deep-Tyrant", speed=30, ability_bonuses={"STR": 1, "INT": 2}, group="Primal",
+        name="Deep-Tyrant", speed=30, ability_bonuses={"STR": 1, "INT": 2}, group="Primal", before="Abyssal Guard",
         flavor="Ancient cephalopodic minds who rule kingdoms from the lightless abyss."
     ),
     Race.GRIMCROW: RaceDef(
-        name="Grimcrow", speed=30, ability_bonuses={"WIS": 2, "INT": 1}, group="Primal",
+        name="Grimcrow", speed=30, ability_bonuses={"WIS": 2, "INT": 1}, group="Primal", before="Fate-Watcher",
         flavor="Obsidian-feathered oracles who steal living magic and bind it to bone."
     ),
     # Eldritch — things that should not be, things that persist anyway
     Race.BLOODWEAVER: RaceDef(
-        name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1}, group="Eldritch",
+        name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1}, group="Eldritch", before="High Vampire",
         flavor="Regal horrors who conquer entire bloodlines from the inside out."
     ),
     Race.DREAMHUSK: RaceDef(
-        name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch",
+        name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch", before="Sleep-Walker",
+        flavor="Spore-borne entities that project the faces of the beloved dead."
+    ),
+    Race.BLOODWEAVER: RaceDef(
+        name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1}, group="Eldritch", before="High Vampire",
+        flavor="Regal horrors who conquer entire bloodlines from the inside out."
+    ),
+    Race.DREAMHUSK: RaceDef(
+        name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch", before="Sleep-Walker",
         flavor="Spore-borne entities that project the faces of the beloved dead."
     ),
     Race.BONEDRIFTER: RaceDef(
-        name="Bonedrifter", speed=20, ability_bonuses={"CON": 2, "STR": 1}, group="Eldritch",
+        name="Bonedrifter", speed=20, ability_bonuses={"CON": 2, "STR": 1}, group="Eldritch", before="Bone-Construct",
         flavor="Parasitic beings that rewrite their hosts skeleton-first into living prisons."
     ),
     Race.MINDSPIDER: RaceDef(
-        name="Mindspider", speed=40, ability_bonuses={"INT": 2, "DEX": 1}, group="Eldritch",
+        name="Mindspider", speed=40, ability_bonuses={"INT": 2, "DEX": 1}, group="Eldritch", before="Telepath",
         flavor="Translucent arachnids that harvest plans and secrets from sleeping prey."
     ),
     Race.CHAOSLING: RaceDef(
-        name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1}, group="Eldritch",
+        name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1}, group="Eldritch", before="Wild Mage",
         flavor="Twitching fragments of unraveled reality stitched into borrowed flesh."
     ),
     # Mechanical — constructed, forged, refused to stop
     Race.IRONVEIL: RaceDef(
-        name="Ironveil", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Mechanical",
+        name="Ironveil", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Mechanical", before="Security Automaton",
         flavor="Gossamer-thin war constructs that fold themselves flat to slip through walls and armor plating. Deceptively fragile looking, catastrophically sharp."
     ),
     Race.FORGESPAWN: RaceDef(
-        name="Forgespawn", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Mechanical",
+        name="Forgespawn", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Mechanical", before="Industrial Golem",
         flavor="Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire."
     ),
     Race.CINDERPLATE: RaceDef(
-        name="Cinderplate", speed=20, ability_bonuses={"STR": 2, "WIS": 1}, group="Mechanical",
+        name="Cinderplate", speed=20, ability_bonuses={"STR": 2, "WIS": 1}, group="Mechanical", before="Furnace Guard",
         flavor="Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch."
     ),
     Race.HEXGEAR: RaceDef(
-        name="Hexgear", speed=35, ability_bonuses={"INT": 2, "DEX": 1}, group="Mechanical",
+        name="Hexgear", speed=35, ability_bonuses={"INT": 2, "DEX": 1}, group="Mechanical", before="Logic-Cube",
         flavor="Six-sided modular beings that reconfigure their body layout mid-combat. No consistent face, no consistent silhouette."
     ),
     Race.WIREWRAITH: RaceDef(
-        name="Wirewraith", speed=45, ability_bonuses={"DEX": 2, "WIS": 1}, group="Mechanical",
+        name="Wirewraith", speed=45, ability_bonuses={"DEX": 2, "WIS": 1}, group="Mechanical", before="Data-Ghost",
         flavor="Exposed-nerve constructs that transmit pain and data at the same speed. They feel everything, process it, and don't stop moving."
     ),
     # Humanoid — what the civilized races became after the Paradox
@@ -265,7 +273,8 @@ def build_character(
     state: EvolutionaryState,
     role: PredatorRole,
     abilities: AbilityScores,
-    game_state: GameState
+    game_state: GameState,
+    starting_era: str = "after"
 ) -> CharacterSheet:
     r_def = RACES[race]
     s_def = STATES[state]
@@ -301,6 +310,7 @@ def build_character(
         inventory=list(p_def.starting_inventory),
         position=spawn_pos,
         movement_remaining=r_def.speed,
+        is_transformed=(starting_era == "after"),
     )
 
 

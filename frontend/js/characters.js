@@ -149,6 +149,12 @@ export class CharacterPanel {
   _renderSummary() {
     const char = this.state.characters[this.activeId];
     if (!char) return;
+
+    const catalog = window.lobby?.catalog?.races?.[char.race];
+    const raceName = (!char.is_transformed && catalog?.before) 
+      ? catalog.before 
+      : char.race.replace(/_/g, " ");
+
     this.summary.name.textContent  = char.name;
     this.summary.state.textContent = char.evolution_state;
     this.summary.role.textContent  = char.predator_role;
@@ -169,6 +175,11 @@ export class CharacterPanel {
     const els = _getCardEls();
     if (!char || !els.name) return;
 
+    const catalog = window.lobby?.catalog?.races?.[char.race];
+    const raceName = (!char.is_transformed && catalog?.before) 
+      ? catalog.before 
+      : char.race.replace(/_/g, " ");
+
     const hpPct = char.hp_max > 0 ? char.hp_current / char.hp_max : 0;
 
     // Portrait gradient and initial
@@ -177,7 +188,7 @@ export class CharacterPanel {
 
     // Text fields
     els.name.textContent = char.name;
-    els.race.textContent = char.race.replace(/_/g, " ");
+    els.race.textContent = raceName;
     els.hpText.textContent = `${char.hp_current} / ${char.hp_max}`;
     els.ac.textContent    = char.armor_class;
     els.mv.textContent    = `${char.movement_remaining}/${char.speed}ft`;

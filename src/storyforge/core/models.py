@@ -70,6 +70,7 @@ class CharacterSheet(BaseModel):
     position: Coord
     movement_remaining: int = 0      # feet left this turn
     conditions: list[str] = Field(default_factory=list)  # "prone", "stunned"
+    is_transformed: bool = False     # False = shows "Before" name, True = Feral Successor
 
 
 # ─────────────────────── Grid / Room ───────────────────────
@@ -123,6 +124,11 @@ class TurnPhase(StrEnum):
     CREATION = "creation"        # claimed players picking race/class/name
     EXPLORATION = "exploration"
     COMBAT = "combat"
+
+
+class Era(StrEnum):
+    BEFORE = "before"
+    AFTER = "after"
 
 
 class CombatState(BaseModel):
@@ -214,6 +220,7 @@ class LobbySlot(BaseModel):
     race: Race | None = None
     evolution_state: EvolutionaryState | None = None
     predator_role: PredatorRole | None = None
+    starting_era: Literal["before", "after"] | None = None
     assigned_abilities: dict[str, int] | None = None
     name_draft: str | None = None
 
@@ -225,6 +232,7 @@ class CharacterCreationRequest(BaseModel):
     race: Race
     evolution_state: EvolutionaryState
     predator_role: PredatorRole
+    starting_era: Literal["before", "after"] = "after"
     # Player chose which ability gets which standard-array value.
     # Must be a permutation of [15, 14, 13, 12, 10, 8].
     abilities: AbilityScores
@@ -235,6 +243,7 @@ class GameState(BaseModel):
     campaign_id: str
     current_room_id: str
     phase: TurnPhase = TurnPhase.LOBBY
+    era: Era = Era.AFTER
     
     characters: dict[str, CharacterSheet] = Field(default_factory=dict)
     npcs: dict[str, NpcSheet] = Field(default_factory=dict)

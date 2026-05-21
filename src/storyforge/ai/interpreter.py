@@ -24,8 +24,10 @@ async def interpret_freeform(
     
     # Simple template rendering (string replace)
     prompt = template.replace("{{ state_json }}", state.model_dump_json(exclude={"rooms", "narrative_log"}, indent=2))
+    prompt = prompt.replace("{{ current_era }}", state.era.value)
     prompt = prompt.replace("{{ actor_id }}", actor.id)
     prompt = prompt.replace("{{ actor_name }}", actor.name)
+    prompt = prompt.replace("{{ is_transformed }}", str(actor.is_transformed))
     prompt = prompt.replace("{{ action_text }}", action.text)
     
     logger.info(f"Interpreting freeform action from {actor.name}: {action.text}")

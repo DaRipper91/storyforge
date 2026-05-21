@@ -23,7 +23,7 @@ from storyforge.core.character_factory import (
 )
 from storyforge.core.models import (
     CharacterSheet, Coord, GameState, GridAction,
-    NarrativeEntry, StateDiff, TurnPhase,
+    NarrativeEntry, StateDiff, TurnPhase, Era,
     CharacterCreationRequest, LobbySlot, Race,
     SlotStatus,
 )
@@ -299,6 +299,7 @@ class StateManager:
                 role=req.predator_role,
                 abilities=req.abilities,
                 game_state=self._state,
+                starting_era=req.starting_era,
             )
             
             # Insert into state.
@@ -356,6 +357,12 @@ class StateManager:
             
             self._state.phase = TurnPhase.EXPLORATION
             
+            # Determine initial campaign era
+            if any(not c.is_transformed for c in self._state.characters.values()):
+                self._state.era = Era.BEFORE
+            else:
+                self._state.era = Era.AFTER
+
             # Append an opening narrative entry so the chronicle isn't blank.
             roster = ", ".join(c.name for c in self._state.characters.values())
             opening = (
@@ -377,6 +384,38 @@ class StateManager:
                 "type": "exploration_started",
                 "character_count": ready_count,
                 "phase": self._state.phase.value,
+            }
+            await self._commit(summary)
+            return summary
+
+    async def trigger_paradox(self) -> dict:
+        """The 'Race Switch' hits. All 'Before' characters become Feral Successors."""
+        async with self._lock:
+            transformed_ids = []
+            for char_id, char in self._state.characters.items():
+                if not char.is_transformed:
+                    char.is_transformed = True
+                    transformed_ids.append(char_id)
+            
+            # Global era always becomes AFTER when paradox is triggered
+            self._state.era = Era.AFTER
+
+            # Narrative event
+            msg = "The air screams as the Paradox resolves. The past is rewritten in bone and steel."
+            self._state.narrative_log.append(
+                NarrativeEntry(
+                    revision=self._state.revision + 1,
+                    actor_id=None,
+                    kind="narration",
+                    text=msg,
+                    timestamp=dt.datetime.now(dt.timezone.utc).isoformat(),
+                )
+            )
+
+            summary = {
+                "type": "paradox_triggered",
+                "transformed_ids": transformed_ids,
+                "text": msg
             }
             await self._commit(summary)
             return summary

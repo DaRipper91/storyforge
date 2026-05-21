@@ -20,6 +20,8 @@ async def narrate_movement(
     prompt = template.replace("{{ actor_name }}", actor.name)
     prompt = prompt.replace("{{ from_coord }}", str(from_coord))
     prompt = prompt.replace("{{ to_coord }}", str(to_coord))
+    prompt = prompt.replace("{{ current_era }}", state.era.value)
+    prompt = prompt.replace("{{ is_transformed }}", str(actor.is_transformed))
     
     ai_response = await gemini_client.generate_structured(
         system_instruction=system_instruction,

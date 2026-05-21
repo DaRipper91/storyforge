@@ -8,9 +8,13 @@ Interpret their intent, narrate the outcome (usually with a side of mockery), an
 {{ state_json }}
 ```
 
+## Era Context
+**Era:** {{ current_era }}
+
 ## Acting Character
 **ID:** {{ actor_id }}
 **Name:** {{ actor_name }}
+**Transformed?**: {{ is_transformed }}
 
 ## Player's Action
 > "{{ action_text }}"
