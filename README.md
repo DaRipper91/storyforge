@@ -103,7 +103,7 @@ The world is populated by reactive NPCs, each with unique mechanics:
 | **Samael the Ascended** | Demigod | Lore Oracle — provides cryptic hints and opens jars with cosmic power. |
 | **Queen D.Anna** | Sovereign | Formal Address Protocol — petition her for divine boons and mercy. |
 | **Firey RedVelvet** | Bard | Tavern Performer — tip, heckle, or request songs. |
-| **The Pets** | Companions | **Bink Bink** (Black Cat), **Cole** (Shadow Guardian), **Teddy** (Angelic Hound), **Keeva** (Divine Dog). |
+| **The Pets** | Companions | **Bink Bink** (Black Cat), **Cole** (Shadow Guardian), **Teddy** (Queen D.Anna's Angelic Hound), **Keeva** (Heavenly Protector of D.Anna). |
 
 ---
 

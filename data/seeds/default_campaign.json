@@ -87,7 +87,7 @@
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "An angelic, pure white Great Pyrenees mix. She radiates a calm, divine energy and seems to have a halo made of soft fur. She sits gracefully near the Queen."
+      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating Great Pyrenees mix who seems to have a halo of soft light. She sits with divine grace at the Queen's left hand."
     },
     "danna": {
       "id": "danna",
@@ -101,7 +101,7 @@
       "interactable": true,
       "encounter_id": "danna_audience",
       "blocks_movement": true,
-      "description": "Seated at the best table in the room, which is now the best table in the room because she is sitting at it. Traveling. Not explaining where."
+      "description": "The Traveling Sovereign. She sits at the best table in the room, flanked by her heavenly protectors. She is currently traveling through the Feral worlds on matters of divine state."
     },
     "keeva": {
       "id": "keeva",
@@ -115,7 +115,7 @@
       "interactable": true,
       "encounter_id": "keeva_divine",
       "blocks_movement": false,
-      "description": "D.Anna's dog. Lies at the foot of the queen's table with the authority of someone who outranks most of the people in this room. Her eyes are the color of old gold and she is looking directly at you."
+      "description": "The Heavenly Protector of D.Anna. A majestic golden hound whose eyes are the color of old gold. She watches the room with a calm, judgmental authority that suggests she is the true guardian of the throne."
     },
     "redvelvet": {
       "id": "redvelvet",
