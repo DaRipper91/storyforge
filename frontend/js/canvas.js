@@ -631,7 +631,8 @@ export class GridCanvas {
       npc_haylie:   "#8B0000",
       npc_danna:    "#4a1060",  // deep regal purple
       npc_redvelvet:"#8B1a1a",  // deep crimson-red
-      npc_keeva:    "#B8860B",  // dark goldenrod — divine hound
+      npc_keeva:    "#F8F8FF",  // ghost white — angelic hound
+      npc_teddy:    "#B8860B",  // dark goldenrod — heavenly protector
     };
 
     for (const npc of Object.values(this.state.npcs)) {

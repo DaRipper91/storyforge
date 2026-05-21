@@ -83,11 +83,11 @@
         "y": 2
       },
       "room_id": "tavern_01",
-      "sprite_key": "npc_dog",
-      "interactable": false,
+      "sprite_key": "npc_teddy",
+      "interactable": true,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating Great Pyrenees mix who seems to have a halo of soft light. She sits with divine grace at the Queen's left hand."
+      "description": "The Heavenly Protector of D.Anna. A majestic golden Great Pyrenees mix whose eyes are the color of old gold. She watches the room with a calm, judgmental authority."
     },
     "danna": {
       "id": "danna",
@@ -115,7 +115,7 @@
       "interactable": true,
       "encounter_id": "keeva_divine",
       "blocks_movement": false,
-      "description": "The Heavenly Protector of D.Anna. A majestic golden hound whose eyes are the color of old gold. She watches the room with a calm, judgmental authority that suggests she is the true guardian of the throne."
+      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating hound who seems to have a halo of soft light. She sits with divine grace at the Queen's right hand."
     },
     "redvelvet": {
       "id": "redvelvet",
