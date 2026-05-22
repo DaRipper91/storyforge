@@ -7,6 +7,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
+# Pinned AI Model Versions
+STORYFORGE_PRIMARY_MODEL = "gemini-3.5-flash"
+STORYFORGE_PRO_MODEL = "gemini-3.1-pro-preview"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -16,7 +20,6 @@ class Settings(BaseSettings):
     )
     
     gemini_api_key: str = Field(..., description="Google AI Studio API key")
-    gemini_model: str = "gemini-3.5-flash"
     
     # Auth
     google_client_id: str = ""

@@ -11,6 +11,7 @@ args = [
     '--add-data=frontend:frontend',
     '--add-data=data:data',
     '--add-data=src/storyforge/ai/prompts:storyforge/ai/prompts',
+    '--add-data=client_secret.json:.',
     '--collect-all=webview',
     '--collect-all=fastapi',
     '--collect-all=uvicorn',

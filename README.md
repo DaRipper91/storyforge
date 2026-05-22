@@ -1,149 +1,84 @@
-# StoryForge: Feral Successors
+# StoryForge: The Feral World — D&D 5e AI Dungeon Master
 
 <p align="center">
   <img src="https://img.shields.io/badge/System-D%26D_5e-red?style=for-the-badge&logo=dungeons-and-dragons" alt="D&D 5e">
-  <img src="https://img.shields.io/badge/Engine-Python_3.14-blue?style=for-the-badge&logo=python" alt="Python">
-  <img src="https://img.shields.io/badge/AI-Gemini_2.0_Flash-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
-  <img src="https://img.shields.io/badge/Platform-Linux_%2F_Windows_%2F_Android-lightgrey?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Engine-Python_3.12-blue?style=for-the-badge&logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/AI-Gemini_3.5_Flash-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
+  <img src="https://img.shields.io/badge/Platform-Windows_10_Exec-lightgrey?style=for-the-badge" alt="Platform">
 </p>
 
-A hybrid Virtual Tabletop (VTT) and AI Dungeon Master for family D&D 5e — built desktop-first with a native window, gamepad support, and a custom species system built around the Weaver's Paradox setting.
+**StoryForge** is a hybrid Virtual Tabletop (VTT) and AI-driven Dungeon Master built specifically for the *Weaver's Paradox* campaign setting. It combines a structured 2D grid engine with the creative power of **Gemini 3.5 Flash** to deliver a reactive, persistent, and voice-enabled D&D 5e experience.
 
 ---
 
-## Setting: The Weaver's Paradox
+## 🎭 The Setting: The Feral World
 
-The "civilized" races have fallen. The world has been reorganized by the Paradox. 
+The "Civilized World" is a memory. Reality was unraveled by the Weaver's Paradox—a cosmic glitch that rewrote the laws of magic and biology. 
 
-### The Era System
-Players now choose their starting point in history:
-- **Era: BEFORE (The Civilized World)**: Start as the race you were (Human, Elf, Security Drone). The world is polite but brittle, with "glitches" in reality hinting at the coming end.
-- **Era: AFTER (The Feral World)**: The Paradox has already hit. You start as a **Feral Successor** — one of 20 unique species spanning Cosmic, Primal, Mechanical, and Eldritch themes.
-
-**The Race Switch:** In "Before" campaigns, the DM can trigger the Paradox mid-game. The air screams, reality is rewritten, and all characters instantly transform into their Feral Successor forms.
-
----
-
-## Authentication & Persistence
-
-Integrated **Google OAuth2** allows players to sign in and bind their characters to their Google ID.
-- **Cross-Device ownership:** Your heroes follow you across browser refreshes and different devices.
-- **Secure Sessions:** JWT-based session management using HttpOnly cookies.
+### Core Lore Elements
+- **The Paradox**: A reality-shattering event that transformed the humanoid races into **Feral Successors**.
+- **Ironhold Keep**: The last bastion of stability, ruled by **Queen D.Anna** and anchored by **Guildmaster Kodrik**.
+- **The Multiversal Bodega**: A shop that exists across all genres, managed by **Jon** (the talkative owner) and **Madame Haylie** (the actual manager).
+- **The Pantheon of the Mundane**: Beings like **Samael the Ascended**, who use omnipotence to perform household chores while offering cryptic lore.
 
 ---
 
-## Character System
+## 🛠️ Project Architecture
 
-Characters are built from four orthogonal choices:
+StoryForge is a full-stack Python application designed for zero-config deployment:
 
-| Choice | Options |
-|--------|---------|
-| **Era** | Before (Civilized) · After (Feral) |
-| **Race** (20 total) | Ironveil, Ashenborn, Voidwraith, Hollowsong, and 16 more |
-| **Evolutionary State** | Behemoth · Phantom · Swarm-Host · Mimic |
-| **Predator Role** | Stalker · Vanguard · Catalyst · Siphoner |
+- **Backend**: **FastAPI** provides the core engine, managing the state machine, grid rules, and AI orchestration.
+- **Frontend**: A high-performance **Vanilla JS** application utilizing **Konva.js** for the grid renderer.
+- **Desktop Wrapper**: Uses **pywebview** and **PyQt6** to provide a native Windows experience with gamepad support.
+- **AI Brain**: Integrated with **google-generativeai**, pinned to **Gemini 3.5 Flash** for high-speed agentic responses.
+- **Identity**: **Google OAuth2 (Desktop App Flow)** for character persistence and player mapping.
 
-Ability scores use the standard D&D array `[15, 14, 13, 12, 10, 8]` with racial bonuses applied on top.
-
----
-
-## Running Locally
-
-All commands use `uv`. No npm, no build step.
-
-```bash
-# Install dependencies
-uv sync
-
-# Dev server (hot-reload)
-uv run uvicorn storyforge.main:app --reload --host 127.0.0.1 --port 8765 --reload-dir src
-# or
-fish scripts/dev.fish
-
-# Desktop app (native window)
-uv run storyforge
-```
-
-App served at `http://127.0.0.1:8765`. Swagger UI at `/docs`.
+### Lobby-to-Exploration Flow
+The game operates on a robust state machine:
+1. **Lobby Phase**: Players join, authenticate via Google, and claim controller slots.
+2. **Creation Phase**: Players build their Feral Successors (Race, Evolutionary State, Predator Role).
+3. **Exploration Phase**: The AI DM narrates movements, handles freeform actions, and manages NPC encounters.
 
 ---
 
-## Configuration
+## 🚀 Tester Installation Guide (Windows)
 
-Copy `.env` and set your keys:
+Welcome to the StoryForge alpha! Follow these steps to join the Feral World:
 
-```env
-STORYFORGE_GEMINI_API_KEY=your_google_ai_studio_key
-STORYFORGE_GEMINI_MODEL=gemini-2.0-flash-exp
-STORYFORGE_GOOGLE_CLIENT_ID=your_google_client_id
-STORYFORGE_JWT_SECRET=your_random_secret
-STORYFORGE_CAMPAIGN_ID=family_campaign_01
-```
+### 1. Download the Release
+Go to the [Releases](https://github.com/your-repo/storyforge/releases) page and download `StoryForge.exe`.
 
-All settings use the `STORYFORGE_` prefix via `pydantic-settings`.
+### 2. Launch the Application
+Double-click `StoryForge.exe`. Windows may show a "SmartScreen" warning—click **"More Info"** -> **"Run Anyway"**.
 
----
+### 3. Authentication (Critical Step)
+During the lobby phase, you will be prompted to log in with Google. 
+- A browser window will open automatically.
+- Because this is an alpha application, Google will show an **"Unverified App"** screen.
+- **ACTION**: Click **"Advanced"** and then click **"Go to StoryForge (unsafe)"**.
+- This is required for the local Desktop App Flow to capture your identity and save your `token.json` for future sessions.
 
-## Architecture
-
-**FastAPI** backend → **vanilla JS** frontend → **Konva.js** grid renderer. State is local-first and JSON-snapshotted to disk. The desktop app wraps everything in a native window via **pywebview + PyQt6**.
-
-AI outputs are validated and sanitized by `core/validators.py` before being applied to the game state.
+### 4. Gameplay
+Once logged in, you can create your character and begin exploring. Use a keyboard or an Xbox-style gamepad.
 
 ---
 
-## NPC Encounters
+## ⌨️ Controls & Inputs
 
-The world is populated by reactive NPCs, each with unique mechanics:
-
-| NPC | Role | Encounter |
-|-----|------|-----------|
-| **Kodrik** | Guildmaster | Ironhold Keep — Central dispatch, repairs gear, Meta-Guide for lore drops. |
-| **Jon (The Boss)** | Shopkeeper | Multiversal Bodega — Husband to Haylie. Buy gear, avoid his "Cousin Dale" stories. |
-| **Madame Haylie** | Innkeeper | The Real Boss — Wife to Jon. Managing the books, the inn, and Jon's monologues. |
-| **Samael the Ascended** | Demigod | Lore Oracle — provides cryptic hints and opens jars with cosmic power. |
-| **Queen D.Anna** | Sovereign | Ironhold Keep (Castle) — Owner of Bink Bink & Keeva. Formal address protocol. |
-| **Firey RedVelvet** | Bard | Tavern Performer — tip, heckle, or request songs. |
-| **The Pets** | Companions | **Coco** (Ember Hound), **Cyrus** (Winter Wolf), **Bink Bink** (D.Anna's Cat), **Keeva** (Angelic Hound), **Teddy** (Protector-in-training). *Cole (Shadow Guardian) forthcoming.* |
-
+| Action | Keyboard | Gamepad |
+|--------|----------|---------|
+| Move Cursor | WASD / Arrows | Left Stick |
+| Interact | Enter / Space | A Button |
+| Speak (AI) | Y / T | X Button |
+| Zoom | - / = | LT / RT |
+| Inventory | V | Y Button |
 
 ---
 
-## Controls
-
-| Input | Action |
-|-------|--------|
-| WASD / Arrow keys | Move cursor |
-| Enter / F / Space | Confirm / interact |
-| I / X | Inspect cell |
-| Y / T | Speak (freeform) |
-| - / = | Zoom out / in |
-| Tab / Shift-Tab | Cycle active character |
-| V | Toggle inventory |
-| K / ? | Toggle keymap |
-| LT / RT (gamepad) | Zoom out / in |
-
-Gamepad (Xbox layout) is fully supported. UI scale (default 120%) and game zoom are adjustable in **View → Settings**.
-
----
-
-## Builds
-
-Cross-platform builds are automated via GitHub Actions:
-- **Linux** — `.deb`, `.rpm`, `.pkg.tar.zst`, `.AppImage`
-- **Windows** — standalone `.exe`
-- **Android** — `.apk`
-
----
-
-## Credits
-
-- **Haley** — the most awesome cuz ever, and for all the laughs
-- **John** — for everything he's taught me, and for never giving up, even when I made it ever so difficult
-- **Jason** — for being the brother I never had, and a friend when I needed one the most
-- **RedVelvet** — inspiration
-- **Gemini 2.0 Flash** — the DM
-
----
+## 📜 Credits
+- **Haley, John, & Jason**: For the constant support and testing.
+- **RedVelvet**: The inspiration for the bardic fire.
+- **Brad**: Our primary alpha tester.
+- **Google Gemini**: The silicon voice behind the Weaver's Paradox.
 
 <p align="center"><i>"The dice determine the fate, but the Forge shapes the story."</i></p>

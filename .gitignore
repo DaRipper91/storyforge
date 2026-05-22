@@ -18,3 +18,7 @@ data/campaigns/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Google OAuth
+client_secret.json
+token.json

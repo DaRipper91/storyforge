@@ -12,7 +12,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from storyforge.config import settings
+from storyforge.config import settings, STORYFORGE_PRIMARY_MODEL, STORYFORGE_PRO_MODEL
 from storyforge.core.models import AINarrationResponse
 
 logger = logging.getLogger(__name__)
@@ -77,8 +77,14 @@ class GeminiClient:
         raise RuntimeError(f"Gemini call failed after {max_attempts} attempts") from last_exc
 
 
-# Module-level singleton
+# Primary client for high-speed, agentic workflows (lobby, exploration, combat, NPCs)
 gemini_client = GeminiClient(
     api_key=settings.gemini_api_key,
-    model=settings.gemini_model,
+    model=STORYFORGE_PRIMARY_MODEL,
+)
+
+# Pro client for heavy world-building and codex generation (if needed)
+gemini_pro_client = GeminiClient(
+    api_key=settings.gemini_api_key,
+    model=STORYFORGE_PRO_MODEL,
 )
