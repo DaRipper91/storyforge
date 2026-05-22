@@ -20,13 +20,13 @@
     "cole": {
       "id": "cole",
       "name": "Cole",
-      "position": { "x": 0, "y": 0 },
-      "room_id": "pending",
-      "sprite_key": "npc_dog",
+      "position": { "x": 3, "y": 3 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_dog_black",
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "Owner: D.Anna's son (forthcoming NPC). Not yet in the realm. Arrives when D.Anna's son is added."
+      "description": "Bryne's companion. A massive black fluffy dog. He 'Leans' with the weight of a heavy blanket."
     },
     "jon": {
       "id": "jon",
@@ -137,6 +137,61 @@
       "encounter_id": "redvelvet_performance",
       "blocks_movement": true,
       "description": "The tavern's mood-setter. Delivers performances at twice the expected intensity. Emotional hub of the Crooked Tankard."
+    },
+    "bryne": {
+      "id": "bryne",
+      "name": "Bryne",
+      "position": { "x": 3, "y": 2 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_bryne",
+      "interactable": true,
+      "encounter_id": "bryne_warden",
+      "blocks_movement": true,
+      "description": "D.Anna's son and Kodrik's stepson. Quiet, stocky, and observant. A Warden's Apprentice who notices everything."
+    },
+    "nathis": {
+      "id": "nathis",
+      "name": "Nathis",
+      "position": { "x": 2, "y": 2 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_nathis",
+      "interactable": true,
+      "encounter_id": "nathis_frontman",
+      "blocks_movement": true,
+      "description": "D.Anna's adopted brother. The Front Man. Tall, fast, and always the first through the door."
+    },
+    "tyty": {
+      "id": "tyty",
+      "name": "Tyty",
+      "position": { "x": 1, "y": 2 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_dog",
+      "interactable": false,
+      "encounter_id": null,
+      "blocks_movement": false,
+      "description": "Nathis's dog. The Wandering Herald. Long ears, long hair, and full volume. Best friend to Teddy."
+    },
+    "snowie": {
+      "id": "snowie",
+      "name": "Snowie",
+      "position": { "x": 5, "y": 1 },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_cat_white",
+      "interactable": false,
+      "encounter_id": null,
+      "blocks_movement": false,
+      "description": "The household's sentinel. A white cat with blue eyes who watches the front gate from the highest point."
+    },
+    "mykael": {
+      "id": "mykael",
+      "name": "Mykael Greenwood",
+      "position": { "x": 6, "y": 1 },
+      "room_id": "store_01",
+      "sprite_key": "npc_bear",
+      "interactable": true,
+      "encounter_id": "mykael_hauler",
+      "blocks_movement": true,
+      "description": "The Supply Hauler and 'Fat Bear'. The strongest entity in the living world for 4 seconds at a time."
     }
   },
   "rooms": {
@@ -147,7 +202,7 @@
       "height": 8,
       "grid": [
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_jon"}, {"terrain": "floor", "occupant_id": "npc_coco"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_haylie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_jon"}, {"terrain": "floor", "occupant_id": "npc_coco"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_haylie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_mykael"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_samael"}, {"terrain": "wall", "occupant_id": null},
@@ -179,9 +234,9 @@
       "height": 8,
       "grid": [
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cyrus"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_bink_bink"}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cyrus"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_snowie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_tyty"}, {"terrain": "floor", "occupant_id": "npc_nathis"}, {"terrain": "floor", "occupant_id": "npc_bryne"}, {"terrain": "floor", "occupant_id": "npc_bink_bink"}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cole"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},

@@ -40,6 +40,19 @@ from storyforge.encounters.queen_danna import (
     QueenDAnna,
     QueenDAnnaEncounterState,
 )
+from storyforge.encounters.kodrik import (
+    DispatchType,
+    GuildmasterKodrik,
+    KodrikEncounterState,
+)
+from storyforge.encounters.bryne import (
+    BryneEncounterState,
+    WardenApprenticeBryne,
+)
+from storyforge.encounters.nathis import (
+    NathisEncounterState,
+    FrontManNathis,
+)
 from storyforge.encounters.redvelvet import (
     FireyRedVelvet,
     Mood,
@@ -84,6 +97,42 @@ def _get_haylie(request: Request) -> MadameHaylie:
 
 def _save_haylie(request: Request, haylie: MadameHaylie) -> None:
     request.app.state.haylie_encounter = haylie.encounter
+
+
+# ── Kodrik helpers ────────────────────────────────────────────────
+
+def _get_kodrik(request: Request) -> GuildmasterKodrik:
+    if not hasattr(request.app.state, "kodrik_encounter"):
+        request.app.state.kodrik_encounter = KodrikEncounterState(active=True)
+    return GuildmasterKodrik(request.app.state.kodrik_encounter)
+
+
+def _save_kodrik(request: Request, kodrik: GuildmasterKodrik) -> None:
+    request.app.state.kodrik_encounter = kodrik.encounter
+
+
+# ── Bryne helpers ─────────────────────────────────────────────────
+
+def _get_bryne(request: Request) -> WardenApprenticeBryne:
+    if not hasattr(request.app.state, "bryne_encounter"):
+        request.app.state.bryne_encounter = BryneEncounterState(active=True)
+    return WardenApprenticeBryne(request.app.state.bryne_encounter)
+
+
+def _save_bryne(request: Request, bryne: WardenApprenticeBryne) -> None:
+    request.app.state.bryne_encounter = bryne.encounter
+
+
+# ── Nathis helpers ────────────────────────────────────────────────
+
+def _get_nathis(request: Request) -> FrontManNathis:
+    if not hasattr(request.app.state, "nathis_encounter"):
+        request.app.state.nathis_encounter = NathisEncounterState(active=True)
+    return FrontManNathis(request.app.state.nathis_encounter)
+
+
+def _save_nathis(request: Request, nathis: FrontManNathis) -> None:
+    request.app.state.nathis_encounter = nathis.encounter
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -493,3 +542,68 @@ async def redvelvet_state(request: Request):
         **rv.encounter.model_dump(),
         "mood_label": rv.mood_label,
     }
+
+# ═══════════════════════════════════════════════════════════════════
+# KODRIK endpoints
+# ═══════════════════════════════════════════════════════════════════
+
+class RepairRequest(BaseModel):
+    item_name: str
+    silver_available: int
+
+@router.post("/kodrik/dispatch")
+async def kodrik_dispatch(request: Request, dispatch_type: DispatchType = DispatchType.SURVEY):
+    """Request a new dispatch/task from Kodrik."""
+    kodrik = _get_kodrik(request)
+    result = kodrik.get_dispatch(dispatch_type)
+    _save_kodrik(request, kodrik)
+    return result
+
+@router.post("/kodrik/repair")
+async def kodrik_repair(request: Request, body: RepairRequest):
+    """Request a gear repair from Kodrik."""
+    kodrik = _get_kodrik(request)
+    result = kodrik.repair_gear(body.item_name, body.silver_available)
+    _save_kodrik(request, kodrik)
+    return result
+
+# ═══════════════════════════════════════════════════════════════════
+# BRYNE endpoints
+# ═══════════════════════════════════════════════════════════════════
+
+@router.get("/bryne/observation")
+async def bryne_observation(request: Request):
+    """Get a silent observation from Bryne."""
+    bryne = _get_bryne(request)
+    result = bryne.get_observation()
+    _save_bryne(request, bryne)
+    return result
+
+@router.post("/bryne/cole-lean")
+async def bryne_cole_lean(request: Request):
+    """Trigger Cole's lean effect."""
+    bryne = _get_bryne(request)
+    flavor = bryne.trigger_cole_lean()
+    _save_bryne(request, bryne)
+    return {"flavor": flavor}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# NATHIS endpoints
+# ═══════════════════════════════════════════════════════════════════
+
+@router.get("/nathis/report")
+async def nathis_report(request: Request):
+    """Get a rapid-fire intelligence report from Nathis."""
+    nathis = _get_nathis(request)
+    result = nathis.get_report()
+    _save_nathis(request, nathis)
+    return result
+
+@router.post("/nathis/tyty-bark")
+async def nathis_tyty_bark(request: Request):
+    """Trigger Tyty's barking."""
+    nathis = _get_nathis(request)
+    flavor = nathis.trigger_tyty_bark()
+    _save_nathis(request, nathis)
+    return {"flavor": flavor}

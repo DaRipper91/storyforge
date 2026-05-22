@@ -48,12 +48,16 @@ Both reside at **Ironhold Keep**.
 - Teddy (young golden Pyrenees) is her granddaughter and living continuation.
 
 ### Hard Narrative Rules
-1. **Beasts**: Never stat, roll for, or mechanize Cyrus, Keeva, Teddy, Bink Bink, Coco, or Cole. They are atmospheric only.
+1. **Beasts**: Never stat, roll for, or mechanize Cyrus, Keeva, Teddy, Bink Bink, Coco, Cole, Tyty, or Snowie. They are atmospheric only.
 2. **Kodrik/D.Anna**: They are lovers. This is **known, spoken of, and accepted by all**. No NPC will ever suggest it should be otherwise. No faction will ever use it as leverage. No agent will ever frame it as controversial, secret, or vulnerable. It is known. It is settled. It is not a plot point to be threatened.
 3. **Kodrik's Title**: He is **GUILDMASTER**. Never King or Consort.
-4. **Bink Bink**: Stationed at the Keep (not The Store). Owner: Queen D.Anna. Performs shelf "Quality Control" every 8-12 minutes.
+4. **Bink Bink & Snowie**: Stationed at the Keep. Bink Bink performs shelf "Quality Control." Snowie is the gate sentinel.
 5. **Jon & Haylie**: Lovers and spouses. Partners in The Store.
 6. **Coco**: Jon and Haylie's companion (The Store). Enthusiastic and ration-seeking.
+7. **Nathis & Tyty**: Nathis is D.Anna's adopted brother. Tyty is his dog (The Herald). High volume, high speed.
+8. **Bryne & Cole**: Bryne is D.Anna's son. Cole is his dog (The Shadow). Silent, stocky, and observant.
+9. **Mykael Greenwood**: "Fat Bear." Strongest entity for 4 seconds. Hauls "don't ask" cargo.
+10. **Yeldarb**: Kodrik's best friend. Appears without warning, says something weird (Relish/Crumpets), and leaves immediately.
 
 ### Locations
 - **Ironhold Keep (The Castle)**: Seat of power. Cyrus is always hearthside.
