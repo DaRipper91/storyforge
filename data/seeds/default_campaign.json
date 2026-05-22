@@ -2,30 +2,31 @@
   "campaign_id": "family_campaign_01",
   "current_room_id": "tavern_01",
   "phase": "exploration",
-  "era": "after",
+  "era": "Iron Ledge",
+  "world_name": "The Feral World",
   "characters": {},
   "npcs": {
     "bink_bink": {
       "id": "bink_bink",
       "name": "Bink Bink",
-      "position": { "x": 6, "y": 3 },
-      "room_id": "store_01",
+      "position": { "x": 4, "y": 2 },
+      "room_id": "ironhold_keep",
       "sprite_key": "npc_cat",
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "Jon's cat. Small, black, and chaotic. Currently eyeing a shelf item with intent."
+      "description": "Queen D.Anna's cat. Quality control authority over the shelves. Every 8-12 minutes, something falls. She is an unshakeable fixture of Ironhold Keep."
     },
     "cole": {
       "id": "cole",
       "name": "Cole",
-      "position": { "x": 7, "y": 6 },
-      "room_id": "store_01",
+      "position": { "x": 0, "y": 0 },
+      "room_id": "pending",
       "sprite_key": "npc_dog",
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "A big black fluffy dog. He looks like a shadow with ears. He is incredibly soft and tends to lean against customers' legs with the weight of a heavy blanket."
+      "description": "Owner: D.Anna's son (forthcoming NPC). Not yet in the realm. Arrives when D.Anna's son is added."
     },
     "jon": {
       "id": "jon",
@@ -36,7 +37,7 @@
       "interactable": true,
       "encounter_id": "jon_shop",
       "blocks_movement": true,
-      "description": "The proprietor of The Store. Very friendly. Very chatty."
+      "description": "The proprietor of The Store. Lover and husband to Madame Haylie. Father of four (forthcoming). Shares Coco with Haylie. Genuinely warm and conversational."
     },
     "samael": {
       "id": "samael",
@@ -47,7 +48,7 @@
       "interactable": true,
       "encounter_id": "samael_lore",
       "blocks_movement": false,
-      "description": "Leaning against the back wall. Has been here longer than the wall."
+      "description": "Leaning against the back wall. 100% accurate oracle of cosmic and planar lore. Deeply bored."
     },
     "haylie": {
       "id": "haylie",
@@ -58,7 +59,18 @@
       "interactable": true,
       "encounter_id": "haylie_inn",
       "blocks_movement": false,
-      "description": "Jon's wife. Runs the inn. Runs the books. Runs the situation."
+      "description": "The Real Boss. Runs the inn and the books. Lover and wife to Jon. Maintains the Secret Ledger and Coco's damage reports."
+    },
+    "coco": {
+      "id": "coco",
+      "name": "Coco",
+      "position": { "x": 2, "y": 1 },
+      "room_id": "store_01",
+      "sprite_key": "npc_dog",
+      "interactable": false,
+      "encounter_id": null,
+      "blocks_movement": false,
+      "description": "Jon and Haylie's Ember Hound. Pure warmth and enthusiasm. Moves at one speed: Enthusiastic. Nose is a heat-seeker for rations."
     },
     "kodrik": {
       "id": "kodrik",
@@ -69,7 +81,7 @@
       "interactable": true,
       "encounter_id": "kodrik_guild",
       "blocks_movement": true,
-      "description": "Guildmaster of the Iron Ledge Company. Broad-shouldered and unhurried. His hands are stained with ink and machine oil. He is the arbitrator and quartermaster of the Keep."
+      "description": "Guildmaster of the Iron Ledge Company. Lover of Queen D.Anna (known and spoken). Meta-Guide, Mechanic, and Keeper of grounded Lore. His voice lowers as the stakes rise."
     },
     "cyrus": {
       "id": "cyrus",
@@ -80,7 +92,7 @@
       "interactable": false,
       "encounter_id": null,
       "blocks_movement": true,
-      "description": "A massive Winter Wolf with a smoke-white coat. He lies motionless by the hearth, a permanent fixture of Ironhold Keep. He issues no warnings, but his presence is a silent deterrent."
+      "description": "A massive Winter Wolf with a smoke-white coat. Kodrik's companion and mate to Keeva. A silent, hearthside deterrent in the Keep."
     },
     "danna": {
       "id": "danna",
@@ -91,7 +103,7 @@
       "interactable": true,
       "encounter_id": "danna_audience",
       "blocks_movement": true,
-      "description": "The Traveling Sovereign. She resides here in Ironhold Keep, the castle headquarters of the Iron Ledge Company. She sits with a regal poise that commands the room."
+      "description": "Head of State of The Feral World. Lover of Kodrik (known and spoken). Commands every room with quiet authority. Commands boons through formal petition."
     },
     "keeva": {
       "id": "keeva",
@@ -99,10 +111,10 @@
       "position": { "x": 8, "y": 2 },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_keeva",
-      "interactable": true,
-      "encounter_id": "keeva_divine",
+      "interactable": false,
+      "encounter_id": null,
       "blocks_movement": false,
-      "description": "Queen D.Anna's Angelic Hound. A pure white, radiating hound who seems to have a halo of soft light. She sits with divine grace at the Queen's side."
+      "description": "The Divine Source of the Realm. She is the light, warmth, and protection felt throughout the world. She IS the realm's foundation."
     },
     "teddy": {
       "id": "teddy",
@@ -110,10 +122,10 @@
       "position": { "x": 6, "y": 2 },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_teddy",
-      "interactable": true,
+      "interactable": false,
       "encounter_id": null,
       "blocks_movement": false,
-      "description": "A young, golden Great Pyrenees puppy. The granddaughter of Cyrus (the wolf) and Keeva, serving as a Heavenly Protector-in-training."
+      "description": "A young Divine Hound. Granddaughter of Cyrus and Keeva. Living continuation of Keeva's light. Learning the ways of the Heavenly Protector."
     },
     "redvelvet": {
       "id": "redvelvet",
@@ -124,7 +136,7 @@
       "interactable": true,
       "encounter_id": "redvelvet_performance",
       "blocks_movement": true,
-      "description": "The tavern's current performer. There is a scorch mark on the ceiling that was not there this morning. She does not appear concerned about this."
+      "description": "The tavern's mood-setter. Delivers performances at twice the expected intensity. Emotional hub of the Crooked Tankard."
     }
   },
   "rooms": {
@@ -135,12 +147,12 @@
       "height": 8,
       "grid": [
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_jon"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_haylie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_jon"}, {"terrain": "floor", "occupant_id": "npc_coco"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_haylie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_bink_bink"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_samael"}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cole"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}
       ]
     },
@@ -168,7 +180,7 @@
       "grid": [
         {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cyrus"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
+        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_bink_bink"}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
         {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},

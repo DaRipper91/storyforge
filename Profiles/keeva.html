@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keeva · The Divine</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --bg:        #08080a;
+    --surface:   #0e0e12;
+    --deep:      #060608;
+    --gold:      #f0e090;
+    --gold-mid:  #c8a830;
+    --gold-dim:  #6a5818;
+    --gold-soft: #e8d878;
+    --ash:       #b0a888;
+    --bone:      #eee8d0;
+    --white:     #fdfaf0;
+    --divine:    #fff8e0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 100% 60% at 50% -10%, rgba(240,224,144,.09), transparent),
+      radial-gradient(ellipse 60% 60% at 20% 80%, rgba(200,168,48,.04), transparent),
+      radial-gradient(ellipse 60% 60% at 80% 80%, rgba(200,168,48,.04), transparent);
+    pointer-events:none; z-index:0;
+    animation: breathe 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes breathe {
+    from { opacity:.7; }
+    to   { opacity:1; }
+  }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:860px; margin:0 auto;
+    padding:64px 36px 100px;
+  }
+
+  /* ── HEADER ── */
+  .header { text-align:center; margin-bottom:60px; }
+
+  .divine-bar {
+    display:flex; align-items:center; gap:16px; margin-bottom:28px;
+  }
+  .divine-bar::before,.divine-bar::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-dim),var(--gold-mid),var(--gold-dim),transparent);
+  }
+  .divine-bar span {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--gold-mid); text-transform:uppercase; white-space:nowrap;
+  }
+
+  .halo {
+    position:relative; display:inline-block;
+    margin-bottom:20px;
+  }
+
+  .halo-icon {
+    font-size:80px; display:block; line-height:1;
+    filter: drop-shadow(0 0 30px rgba(240,224,144,.5))
+            drop-shadow(0 0 60px rgba(240,224,144,.25))
+            drop-shadow(0 0 100px rgba(240,224,144,.1));
+    animation: haloPulse 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes haloPulse {
+    from { filter: drop-shadow(0 0 20px rgba(240,224,144,.4)) drop-shadow(0 0 50px rgba(240,224,144,.2)); }
+    to   { filter: drop-shadow(0 0 40px rgba(240,224,144,.65)) drop-shadow(0 0 80px rgba(240,224,144,.35)) drop-shadow(0 0 120px rgba(240,224,144,.15)); }
+  }
+
+  .name {
+    font-family:'Cinzel',serif;
+    font-size:clamp(64px,11vw,108px);
+    font-weight:900; color:var(--white);
+    letter-spacing:10px; line-height:1;
+    text-shadow:
+      0 0 40px rgba(240,224,144,.4),
+      0 0 80px rgba(240,224,144,.2),
+      0 0 160px rgba(240,224,144,.1);
+    margin-bottom:10px;
+  }
+
+  .title {
+    font-family:'Cinzel',serif; font-size:13px;
+    letter-spacing:6px; color:var(--gold);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+
+  .title-sub {
+    font-family:'Cinzel',serif; font-size:10px;
+    letter-spacing:4px; color:var(--gold-dim);
+    text-transform:uppercase; margin-bottom:28px;
+    display:block;
+  }
+
+  .divine-bar-plain {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+  }
+  .divine-bar-plain::before,.divine-bar-plain::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);
+  }
+
+  .epithet {
+    font-style:italic; font-size:21px;
+    color:var(--ash); font-weight:300; letter-spacing:.5px;
+    line-height:1.7;
+  }
+
+  /* ── DIVINE STAT BLOCK ── */
+  .divine-stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--gold-dim);
+    border:1px solid var(--gold-dim); margin-bottom:48px;
+  }
+
+  .dstat { background:var(--deep); padding:18px 10px; text-align:center; }
+
+  .dstat-lbl {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--gold-dim); text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+
+  .dstat-val {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:var(--gold); font-weight:700; letter-spacing:.5px;
+  }
+
+  /* ── QUOTE ── */
+  .quote {
+    border-left:2px solid var(--gold-mid);
+    padding-left:26px; margin-bottom:52px;
+    font-style:italic; font-size:20px;
+    color:var(--ash); line-height:1.9;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom:48px; }
+
+  .sec-head {
+    display:flex; align-items:center; gap:14px; margin-bottom:20px;
+  }
+  .sec-icon { color:var(--gold); font-size:18px; flex-shrink:0; }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:5px; color:var(--gold);
+    text-transform:uppercase; font-weight:700;
+  }
+  .sec-head::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--gold-mid),transparent);
+  }
+
+  .section p { color:var(--bone); margin-bottom:14px; max-width:720px; }
+  .section p:last-child { margin-bottom:0; }
+  .section p strong { color:var(--white); }
+
+  /* ── LEGACY BLOCK ── */
+  .legacy {
+    background:var(--deep);
+    border:1px solid #201c08;
+    border-top:2px solid var(--gold-mid);
+    padding:32px 36px; margin-bottom:48px;
+    text-align:center;
+  }
+
+  .legacy-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--gold-dim); text-transform:uppercase;
+    display:block; margin-bottom:16px;
+  }
+
+  .legacy-text {
+    font-style:italic; font-size:19px; color:var(--ash);
+    line-height:1.9; max-width:600px; margin:0 auto;
+  }
+
+  /* ── TEDDY CONNECTION ── */
+  .teddy-box {
+    background:var(--deep); border:1px solid #201c08;
+    padding:26px 28px; margin-bottom:48px;
+    display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start;
+  }
+
+  .teddy-icon { font-size:40px; padding-top:4px; }
+
+  .teddy-label {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:var(--gold-dim); text-transform:uppercase; display:block; margin-bottom:6px;
+  }
+
+  .teddy-name {
+    font-family:'Cinzel',serif; font-size:18px; font-weight:700;
+    color:var(--white); margin-bottom:8px;
+  }
+
+  .teddy-desc { font-size:15px; color:var(--ash); line-height:1.7; }
+
+  /* ── FOOTER ── */
+  .footer {
+    display:flex; align-items:center; gap:14px;
+    margin-top:72px; padding-top:28px;
+  }
+  .footer::before,.footer::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-mid),transparent);
+  }
+  .footer span {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:var(--gold-dim); text-transform:uppercase; white-space:nowrap;
+    text-align:center;
+  }
+
+  @media(max-width:600px){
+    .divine-stats { grid-template-columns:repeat(2,1fr); }
+    .name { font-size:56px; letter-spacing:6px; }
+    .teddy-box { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="divine-bar"><span>StoryForge · The Divine · Above All Ranks</span></div>
+    <div class="halo">
+      <span class="halo-icon">✨</span>
+    </div>
+    <div class="name">KEEVA</div>
+    <div class="title">The Goddess · The Divine Protector · The Light of the Realm</div>
+    <span class="title-sub">Irish — "Beloved" · "Protector" · The one who holds it all together</span>
+    <div class="divine-bar-plain"></div>
+    <div class="epithet">
+      She is not a character in the world.<br>
+      She is the reason the world holds together.
+    </div>
+  </div>
+
+  <div class="divine-stats">
+    <div class="dstat"><span class="dstat-lbl">Status</span><span class="dstat-val">Divine · Eternal</span></div>
+    <div class="dstat"><span class="dstat-lbl">Rank</span><span class="dstat-val">Above All Title</span></div>
+    <div class="dstat"><span class="dstat-lbl">Initiative</span><span class="dstat-val">— Never Rolled —</span></div>
+    <div class="dstat"><span class="dstat-lbl">Nature</span><span class="dstat-val">Love · Light · Protection</span></div>
+    <div class="dstat"><span class="dstat-lbl">Presence</span><span class="dstat-val">Everywhere · Always</span></div>
+    <div class="dstat"><span class="dstat-lbl">Bound To</span><span class="dstat-val">D.Anna · The Realm</span></div>
+  </div>
+
+  <div class="quote">
+    She came into the world as a protector and she never stopped. She did not know how to be anything else, and she never needed to. The realm remembers her in its light. D.Anna carries her in the way she holds a room. Teddy carries her forward in everything she will become. Keeva was not lost. She became the world she protected.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">✦</span><span class="sec-title">The Divine Nature</span></div>
+    <p>Keeva is not stationed anywhere. She is not at D.Anna's right hand. She is not in a specific room. She is the light that makes the throne room feel like a place worth kneeling in. She is the warmth that makes Ironhold Keep feel like a home and not just a building. She is the reason the realm's people feel, without knowing why, that something is watching over them and means them well.</p>
+    <p>She is bigger than death because she always was. Death is a thing that happens to beings whose purpose has limits. Keeva's purpose had no limit. The world she protected still stands. The people she loved still carry her. She is present in all of it.</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">✦</span><span class="sec-title">What She Is in the World</span></div>
+    <p>When players feel safe in the castle — that is Keeva. When D.Anna walks into a room and the room reorganizes itself around her — that is something D.Anna learned from watching Keeva do it first. When the realm's light seems warmer than it should be, when a situation that should have gone badly doesn't, when something watches over a party in the dark and they come home — that is Keeva.</p>
+    <p>She is not invoked by name in rituals. She does not appear in visions. She does not speak in thunder. She is quieter than that and more permanent. She is the kind of divine presence that does not need to announce itself because it was never gone.</p>
+    <p>The realm was built under her. Everything good in it grew in her light.</p>
+  </div>
+
+  <div class="legacy">
+    <span class="legacy-label">For Dee · In Memory · In Light · Always</span>
+    <div class="legacy-text">
+      This game was built for her. She was four years of love, protection, and the kind of presence that changes a home forever. She is the reason the realm has a divine source at all. Every safe moment in this story, every light in the dark, every time the party makes it home — that is Keeva. That is still her working.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">✦</span><span class="sec-title">What She Means to D.Anna</span></div>
+    <p>D.Anna does not rule the realm alone. She rules it in the knowledge that Keeva was there first — that the authority she carries, the poise she walks with, the way she holds a room without effort — all of it was learned at the side of a golden dog who never once doubted what she was for.</p>
+    <p>D.Anna does not need to say Keeva's name for the players to understand that everything about the Queen traces back to her. It is in the way she moves. It is in the way the castle feels. It is in Teddy, who carries the light forward, still learning, still growing into what her grandmother already was completely.</p>
+  </div>
+
+  <div class="teddy-box">
+    <span class="teddy-icon">☀</span>
+    <div>
+      <span class="teddy-label">The Living Legacy</span>
+      <div class="teddy-name">Teddy</div>
+      <div class="teddy-desc">Keeva's granddaughter. Young golden Great Pyrenees, radiating a soft light that has no visible source. She is Keeva's continuation in the world — the warmth carried forward, the protection still growing, the love that did not end. She does not yet know the full weight of what she carries. She will. The world will teach her, and Keeva's light will be in everything she learns.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">✦</span><span class="sec-title">On the Matter of Mykael Greenwood</span></div>
+    <p>Mykael Greenwood — the supply hauler, the Fat Bear, Kodrik's friend — is the strongest entity in the living world. For 1 to 4 random seconds, nothing within the mortal plane can match him. This is documented. This is true.</p>
+    <p>Keeva is not ranked alongside him. Not because she is below him. Because she is not in the category being measured. Mykael is the most powerful thing that can <strong>act</strong> in the living world. Keeva is the reason the living world <strong>exists</strong>. You do not measure the storm against the sky the storm happens inside of. The question of who is stronger does not apply across that boundary. It never did.</p>
+    <p>She is the foundation. Everything — including Mykael, including his 4 seconds, including everything that has ever happened in the realm — stands on what she held together first.</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">✦</span><span class="sec-title">DM Note · Handle With Reverence</span></div>
+    <p>Keeva is never reduced to a mechanic. She is never an encounter, a stat block, a resource, or a plot device. She is the world's divine foundation and she is treated as such — present in everything, named when the moment earns it, felt always.</p>
+    <p><strong>She is the reason this game exists.</strong> Every session is played in her honor. The realm holds together because she held it first.</p>
+  </div>
+
+  <div class="footer"><span>The Feral World · The Divine Source · For Dee · For Keeva · Always</span></div>
+
+</div>
+</body>
+</html>

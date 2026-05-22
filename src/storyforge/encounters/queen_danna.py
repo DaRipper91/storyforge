@@ -6,7 +6,13 @@ Architecture:
   - Primary mechanic: address() — how you greet her determines her mood.
   - Secondary mechanic: petition() — ask her for a boon; she grants or declines.
   - QueenDAnnaEncounterState tracks addresses, petitions, and whether she is currently
-    offended (which she will tell you about, at length, with complete composure).
+    offended.
+
+Companions:
+  - Keeva (Angelic Hound): Holds divine authority over the space.
+  - Bink Bink (Black Cat): Holds quality control authority over the shelves.
+  - D.Anna's relationship to both is simply "correct." She does not explain them.
+  - Neither pet acknowledges the other's domain; both acknowledge D.Anna's.
 
 Mechanics:
   1. Royal Address    — correct address earns Favor; wrong address earns a lesson

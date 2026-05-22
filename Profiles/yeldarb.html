@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yeldarb Nimajneb Ecurb · The Easter Egg</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE ═══ */
+  * { margin:0; padding:0; box-sizing:border-box; text-shadow:none !important; animation:none !important; }
+
+  body {
+    background: #181818;
+    color: #dcdcdc;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 880px; margin: 0 auto;
+    padding: 64px 40px 100px;
+  }
+
+  /* ── HEADER ── */
+  .header { text-align: center; margin-bottom: 56px; }
+
+  .top-bar {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+  }
+  .top-bar::before, .top-bar::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent);
+  }
+  .top-bar span {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 5px;
+    color: #808080; text-transform: uppercase; white-space: nowrap;
+  }
+
+  .char-icon {
+    font-size: 72px; display: block; margin-bottom: 18px; line-height: 1;
+  }
+
+  .name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(48px, 9vw, 88px);
+    font-weight: 900; color: #f4f4f4;
+    letter-spacing: 6px; line-height: 1; margin-bottom: 8px;
+  }
+
+  .full-name {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 4px; color: #686868;
+    text-transform: uppercase; display: block; margin-bottom: 8px;
+  }
+
+  .title {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 5px; color: #c0c0c0;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+
+  .title-sub {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 4px; color: #606060;
+    text-transform: uppercase; display: block; margin-bottom: 26px;
+  }
+
+  .bar-plain {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+  }
+  .bar-plain::before, .bar-plain::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #484848, transparent);
+  }
+
+  .epithet {
+    font-style: italic; font-size: 20px;
+    color: #a8a8a8; font-weight: 300; line-height: 1.75;
+  }
+
+  /* ── STATS ── */
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: #404040;
+    border: 1px solid #404040; margin-bottom: 44px;
+  }
+
+  .stat { background: #141414; padding: 16px 10px; text-align: center; }
+  .stat-lbl {
+    font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px;
+    color: #505050; text-transform: uppercase; display: block; margin-bottom: 5px;
+  }
+  .stat-val {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    color: #e8e8e8; font-weight: 700;
+  }
+
+  /* ── QUOTE ── */
+  .quote {
+    border-left: 2px solid #606060;
+    padding-left: 26px; margin-bottom: 44px;
+    font-style: italic; font-size: 19px;
+    color: #b0b0b0; line-height: 1.9;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 44px; }
+
+  .sec-head {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+  }
+  .sec-icon { font-size: 16px; flex-shrink: 0; }
+  .sec-title {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 5px; color: #e0e0e0;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .sec-head::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, #606060, transparent);
+  }
+
+  .section p { color: #c8c8c8; margin-bottom: 12px; max-width: 720px; }
+  .section p:last-child { margin-bottom: 0; }
+  .section p strong { color: #f0f0f0; }
+
+  /* ── EASTER EGG LINES ── */
+  .egg-box {
+    background: #1e1e1e; border: 1px solid #363636;
+    border-top: 2px solid #707070;
+    padding: 28px; margin-bottom: 44px;
+  }
+
+  .egg-label {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 5px;
+    color: #686868; text-transform: uppercase;
+    display: block; text-align: center; margin-bottom: 24px;
+  }
+
+  .egg-line {
+    background: #141414; border: 1px solid #2e2e2e;
+    padding: 16px 20px; margin-bottom: 10px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .egg-line:last-child { margin-bottom: 0; }
+
+  .egg-num {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+    color: #505050; flex-shrink: 0; padding-top: 2px;
+    text-transform: uppercase; min-width: 28px;
+  }
+
+  .egg-text {
+    font-size: 16px; color: #d8d8d8;
+    font-style: italic; line-height: 1.6;
+  }
+
+  /* ── RULES OF ENGAGEMENT ── */
+  .rules { list-style: none; }
+  .rules li {
+    padding: 12px 0; border-bottom: 1px solid #242424;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .rules li:last-child { border-bottom: none; }
+  .r-bullet { color: #909090; font-size: 14px; flex-shrink: 0; padding-top: 3px; }
+  .r-name {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: #e0e0e0; letter-spacing: 1px; display: block; margin-bottom: 3px;
+  }
+  .r-text { font-size: 15px; color: #b0b0b0; line-height: 1.65; }
+
+  /* ── AGENT INSTRUCTION BOX ── */
+  .agent-box {
+    background: #141414; border: 1px solid #2e2e2e;
+    border-left: 3px solid #808080;
+    padding: 22px 26px; margin-bottom: 44px;
+  }
+  .agent-label {
+    font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 4px;
+    color: #686868; text-transform: uppercase; display: block; margin-bottom: 10px;
+  }
+  .agent-box p {
+    font-size: 15px; color: #b0b0b0; line-height: 1.75; margin-bottom: 8px;
+  }
+  .agent-box p:last-child { margin-bottom: 0; }
+
+  /* ── FRIENDSHIP ── */
+  .friend-box {
+    background: #1e1e1e; border: 1px solid #2e2e2e;
+    border-top: 2px solid #707070;
+    padding: 26px 28px; margin-bottom: 44px;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 24px; align-items: center; text-align: center;
+  }
+  .friend-name {
+    font-family: 'Cinzel', serif; font-size: 18px;
+    font-weight: 700; color: #f0f0f0; margin-bottom: 4px;
+  }
+  .friend-role {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px;
+    color: #505050; text-transform: uppercase;
+  }
+  .friend-mid-label {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px;
+    color: #808080; text-transform: uppercase; display: block; margin-bottom: 8px;
+  }
+  .friend-mid-note {
+    font-size: 14px; color: #909090;
+    font-style: italic; line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    display: flex; align-items: center; gap: 14px;
+    margin-top: 64px; padding-top: 26px;
+  }
+  .footer::before, .footer::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #404040, transparent);
+  }
+  .footer span {
+    font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 4px;
+    color: #505050; text-transform: uppercase; white-space: nowrap;
+  }
+
+  @media(max-width: 640px){
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .friend-box { grid-template-columns: 1fr; }
+    .name { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="top-bar"><span>StoryForge · Character Codex · Everywhere & Nowhere</span></div>
+    <span class="char-icon">🥒</span>
+    <div class="name">YELDARB</div>
+    <span class="full-name">Yeldarb Nimajneb Ecurb · Best Friend of Kodrik · Easter Egg</span>
+    <div class="title">The Uninvited · The Unexpected · The Unscheduled</div>
+    <span class="title-sub">Appears Without Warning · Speaks Without Context · Leaves Without Explanation</span>
+    <div class="bar-plain" style="margin-bottom: 14px;"></div>
+    <div class="epithet">
+      "Who ate all the relish?"<br>
+      "Would you like a crumpet?"<br>
+      "He was gone before anyone could answer."
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Role</span><span class="stat-val">Easter Egg</span></div>
+    <div class="stat"><span class="stat-lbl">Frequency</span><span class="stat-val">Unknown · Unknowable</span></div>
+    <div class="stat"><span class="stat-lbl">Alignment</span><span class="stat-val">Chaotic Something</span></div>
+    <div class="stat"><span class="stat-lbl">Location</span><span class="stat-val">Wherever. Briefly.</span></div>
+    <div class="stat"><span class="stat-lbl">Connection</span><span class="stat-val">Kodrik's Best Friend</span></div>
+    <div class="stat"><span class="stat-lbl">Warning Given</span><span class="stat-val">None. Ever.</span></div>
+  </div>
+
+  <div class="quote">
+    Nobody summoned him. Nobody expected him. The party was mid-dungeon, or mid-negotiation, or mid-something that required focus — and then Yeldarb was simply there. He said the thing. Then he was gone. The thing he said had nothing to do with anything. The party will think about it for the rest of the session.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🥒</span><span class="sec-title">Who He Is</span></div>
+    <p>Yeldarb Nimajneb Ecurb is Kodrik's best friend. Beyond this, his role in the world is not defined by faction, guild, class, or territory. His role is to appear in places he has no business being, say something that has no bearing on the current situation, and disappear before the party has finished processing the sentence.</p>
+    <p>He is not a villain. He is not an ally. He is not a plot device. He is an <strong>Easter egg</strong> — a reward for paying attention, a disruption to the rhythm of the session, a moment that makes the whole table look at each other and laugh before anyone knows why.</p>
+    <p>He requested this role specifically. He knew exactly what he was asking for. This was his idea. Respect it accordingly.</p>
+  </div>
+
+  <!-- THE LINES -->
+  <div class="egg-box">
+    <span class="egg-label">Documented Appearances · Known Statements · On Record</span>
+
+    <div class="egg-line">
+      <span class="egg-num">I</span>
+      <div class="egg-text">"Who ate all the relish?"</div>
+    </div>
+    <div class="egg-line">
+      <span class="egg-num">II</span>
+      <div class="egg-text">"Would you like a crumpet?"</div>
+    </div>
+    <div class="egg-line">
+      <span class="egg-num">III</span>
+      <div class="egg-text">— [To be added as the sessions accumulate] —</div>
+    </div>
+    <div class="egg-line">
+      <span class="egg-num">IV</span>
+      <div class="egg-text">— [Yeldarb will provide more. He always does.] —</div>
+    </div>
+    <div class="egg-line">
+      <span class="egg-num">V</span>
+      <div class="egg-text">— [No one knows when. That is the point.] —</div>
+    </div>
+  </div>
+
+  <!-- RULES OF ENGAGEMENT -->
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🥒</span><span class="sec-title">Rules of Engagement</span></div>
+    <ul class="rules">
+      <li>
+        <span class="r-bullet">◈</span>
+        <div>
+          <span class="r-name">No Warning</span>
+          <span class="r-text">Yeldarb does not announce himself. He does not knock. There is no foreshadowing, no NPC mention, no environmental hint. He is simply not there and then he is there.</span>
+        </div>
+      </li>
+      <li>
+        <span class="r-bullet">◈</span>
+        <div>
+          <span class="r-name">No Context</span>
+          <span class="r-text">The thing he says has no connection to the current situation. The party may be in a dungeon, a throne room, or the middle of combat. Yeldarb's statement will be about relish, or crumpets, or something equally unrelated. This is by design. His design.</span>
+        </div>
+      </li>
+      <li>
+        <span class="r-bullet">◈</span>
+        <div>
+          <span class="r-name">No Explanation</span>
+          <span class="r-text">If a player asks a follow-up question, Yeldarb is already gone. He does not elaborate. He does not stay for the reaction. The statement was the entirety of his business here.</span>
+        </div>
+      </li>
+      <li>
+        <span class="r-bullet">◈</span>
+        <div>
+          <span class="r-name">No Schedule</span>
+          <span class="r-text">Yeldarb appears when the session least expects it and most needs it. The AI DM should deploy him sparingly — once per session at most, sometimes less. The rarity is what makes it land.</span>
+        </div>
+      </li>
+      <li>
+        <span class="r-bullet">◈</span>
+        <div>
+          <span class="r-name">No Stat Block</span>
+          <span class="r-text">Do not stat Yeldarb. Do not roll for Yeldarb. Do not give Yeldarb initiative, HP, or an action economy. Yeldarb transcends the mechanical framework of the game. He exists in a layer above it.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- AGENT INSTRUCTION -->
+  <div class="agent-box">
+    <span class="agent-label">AI Agent Instruction · The Storyteller</span>
+    <p>Yeldarb Nimajneb Ecurb is a rare, unscheduled Easter egg character. Deploy Yeldarb no more than once per session, and not every session. His appearances should feel genuinely unexpected — not forced, not telegraphed, not tied to any scene or plot beat.</p>
+    <p>When he appears: interrupt the current scene with a single line of dialogue from Yeldarb. He says the thing. He is gone. No description of how he got there. No description of how he left. The party may react. They will not get a response.</p>
+    <p>His lines should be completely disconnected from whatever is happening. The relish. The crumpet. Whatever feels most wrong for the moment is the correct choice. Add new lines to his registry as they occur in sessions. Yeldarb is a living document.</p>
+    <p><strong style="color:#d0d0d0;">He requested this role. His name is himself spelled backwards. He is Kodrik's best friend. Honor both of those things every time he appears.</strong></p>
+  </div>
+
+  <!-- FRIENDSHIP -->
+  <div class="friend-box">
+    <div>
+      <div class="friend-name">Kodrik</div>
+      <div class="friend-role">Guildmaster · The Desk · Always Present</div>
+    </div>
+    <div>
+      <span class="friend-mid-label">Best Friends</span>
+      <div class="friend-mid-note">
+        One runs the realm<br>
+        from a war table.<br>
+        One asks about the relish.<br>
+        Yeldarb Nimajneb Ecurb.<br>
+        Spelled backwards.<br>
+        All three names.<br>
+        Nobody will catch it immediately.<br>
+        This is a friendship<br>
+        that has lasted.
+      </div>
+    </div>
+    <div>
+      <div class="friend-name">Yeldarb</div>
+      <div class="friend-role">Easter Egg · Everywhere · Briefly</div>
+    </div>
+  </div>
+
+  <div class="footer"><span>Everywhere & Nowhere · The Easter Egg · Yeldarb Nimajneb Ecurb · Best Friend of Kodrik</span></div>
+
+</div>
+</body>
+</html>

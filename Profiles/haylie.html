@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haylie · The Real Boss</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; text-shadow:none !important; animation:none !important; }
+
+  body {
+    background: #181818;
+    color: #dcdcdc;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 880px; margin: 0 auto;
+    padding: 64px 40px 100px;
+  }
+
+  .header { text-align: center; margin-bottom: 56px; }
+
+  .top-bar {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+  }
+  .top-bar::before, .top-bar::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent);
+  }
+  .top-bar span {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 5px;
+    color: #808080; text-transform: uppercase; white-space: nowrap;
+  }
+
+  .char-icon { font-size: 72px; display: block; margin-bottom: 18px; line-height: 1; }
+
+  .name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(44px, 9vw, 88px);
+    font-weight: 900; color: #f4f4f4;
+    letter-spacing: 6px; line-height: 1; margin-bottom: 8px;
+  }
+
+  .full-name {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 4px; color: #686868;
+    text-transform: uppercase; display: block; margin-bottom: 8px;
+  }
+
+  .title {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 5px; color: #c0c0c0;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+
+  .title-sub {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 4px; color: #606060;
+    text-transform: uppercase; display: block; margin-bottom: 26px;
+  }
+
+  .bar-plain {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+  }
+  .bar-plain::before, .bar-plain::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #484848, transparent);
+  }
+
+  .epithet {
+    font-style: italic; font-size: 20px;
+    color: #a8a8a8; font-weight: 300; line-height: 1.75;
+  }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: #404040;
+    border: 1px solid #404040; margin-bottom: 44px;
+  }
+
+  .stat { background: #141414; padding: 16px 10px; text-align: center; }
+  .stat-lbl { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: #505050; text-transform: uppercase; display: block; margin-bottom: 5px; }
+  .stat-val { font-family: 'Cinzel', serif; font-size: 13px; color: #e8e8e8; font-weight: 700; }
+
+  .quote {
+    border-left: 2px solid #606060;
+    padding-left: 26px; margin-bottom: 44px;
+    font-style: italic; font-size: 19px;
+    color: #b0b0b0; line-height: 1.9;
+  }
+
+  .section { margin-bottom: 44px; }
+
+  .sec-head {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+  }
+  .sec-icon { font-size: 16px; flex-shrink: 0; }
+  .sec-title { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 5px; color: #e0e0e0; text-transform: uppercase; font-weight: 700; }
+  .sec-head::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, #606060, transparent); }
+
+  .section p { color: #c8c8c8; margin-bottom: 12px; max-width: 720px; }
+  .section p:last-child { margin-bottom: 0; }
+  .section p strong { color: #f0f0f0; }
+
+  /* CHAOS METER */
+  .chaos-box {
+    background: #1e1e1e; border: 1px solid #363636;
+    border-top: 2px solid #707070;
+    padding: 28px; margin-bottom: 44px;
+  }
+  .chaos-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 5px; color: #686868; text-transform: uppercase; display: block; text-align: center; margin-bottom: 24px; }
+  .c-bars { display: flex; flex-direction: column; gap: 12px; }
+  .c-row { display: grid; grid-template-columns: 160px 1fr 48px; gap: 12px; align-items: center; }
+  .c-key { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; color: #505050; text-transform: uppercase; text-align: right; }
+  .c-track { height: 8px; background: #202020; border-radius: 4px; overflow: hidden; }
+  .c-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #484848, #888888); }
+  .c-pct { font-family: 'Cinzel', serif; font-size: 10px; color: #505050; text-align: right; }
+
+  /* TRAITS */
+  .traits { list-style: none; }
+  .traits li { padding: 12px 0; border-bottom: 1px solid #242424; display: flex; gap: 14px; align-items: flex-start; }
+  .traits li:last-child { border-bottom: none; }
+  .t-bullet { color: #909090; font-size: 14px; flex-shrink: 0; padding-top: 3px; }
+  .t-name { font-family: 'Cinzel', serif; font-size: 11px; color: #e0e0e0; letter-spacing: 1px; display: block; margin-bottom: 3px; }
+  .t-text { font-size: 15px; color: #b0b0b0; line-height: 1.65; }
+
+  /* LEDGERS */
+  .ledgers {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: #404040;
+    border: 1px solid #404040; margin-bottom: 44px;
+  }
+  .ledger-card { background: #1e1e1e; padding: 22px 20px; }
+  .ledger-num { font-family: 'Cinzel', serif; font-size: 36px; font-weight: 900; color: #707070; display: block; margin-bottom: 6px; }
+  .ledger-name { font-family: 'Cinzel', serif; font-size: 13px; color: #e0e0e0; font-weight: 700; margin-bottom: 6px; }
+  .ledger-role { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: #505050; text-transform: uppercase; display: block; margin-bottom: 10px; }
+  .ledger-desc { font-size: 14px; color: #a8a8a8; line-height: 1.6; }
+
+  /* FAMILY */
+  .family {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: #404040;
+    border: 1px solid #404040; margin-bottom: 44px;
+  }
+  .fam-card { background: #1e1e1e; padding: 20px 18px; text-align: center; }
+  .fam-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+  .fam-name { font-family: 'Cinzel', serif; font-size: 15px; color: #f0f0f0; font-weight: 700; margin-bottom: 4px; }
+  .fam-role { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: #606060; text-transform: uppercase; display: block; margin-bottom: 8px; }
+  .fam-desc { font-size: 13px; color: #a8a8a8; line-height: 1.6; }
+
+  /* BOND */
+  .bond {
+    background: #1e1e1e; border: 1px solid #2e2e2e;
+    border-top: 2px solid #707070;
+    padding: 26px 28px; margin-bottom: 44px;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 24px; align-items: center; text-align: center;
+  }
+  .bond-name { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #f0f0f0; margin-bottom: 4px; }
+  .bond-role { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px; color: #505050; text-transform: uppercase; }
+  .bond-mid-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px; color: #808080; text-transform: uppercase; display: block; margin-bottom: 8px; }
+  .bond-mid-note { font-size: 13px; color: #909090; font-style: italic; line-height: 1.7; }
+
+  .footer {
+    display: flex; align-items: center; gap: 14px;
+    margin-top: 64px; padding-top: 26px;
+  }
+  .footer::before, .footer::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #404040, transparent); }
+  .footer span { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 4px; color: #505050; text-transform: uppercase; white-space: nowrap; }
+
+  @media(max-width: 640px){
+    .stats, .ledgers, .family { grid-template-columns: repeat(2, 1fr); }
+    .bond { grid-template-columns: 1fr; }
+    .name { font-size: 44px; }
+    .c-row { grid-template-columns: 110px 1fr 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="top-bar"><span>StoryForge · Character Codex · The Store</span></div>
+    <span class="char-icon">🗝</span>
+    <div class="name">HAYLIE</div>
+    <span class="full-name">"The Real Boss" · Center of the Group · Wife of Jon</span>
+    <div class="title">The Kinetic Force · Actions First · Questions Somewhere Later</div>
+    <span class="title-sub">Human → Fortress of Sanity · Chaotic Good · Loud · Funny · Already Doing It</span>
+    <div class="bar-plain" style="margin-bottom: 14px;"></div>
+    <div class="epithet">
+      "She is already three moves in<br>
+      before anyone else has decided<br>
+      if it's a good idea.<br>
+      It usually is. Mostly."
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Race</span><span class="stat-val">Human → Fortress of Sanity</span></div>
+    <div class="stat"><span class="stat-lbl">Class</span><span class="stat-val">Manager · Innkeeper</span></div>
+    <div class="stat"><span class="stat-lbl">Alignment</span><span class="stat-val">Chaotic Good</span></div>
+    <div class="stat"><span class="stat-lbl">Location</span><span class="stat-val">The Store · In Motion</span></div>
+    <div class="stat"><span class="stat-lbl">Lover</span><span class="stat-val">Jon</span></div>
+    <div class="stat"><span class="stat-lbl">Energy</span><span class="stat-val">Maximum · Always</span></div>
+  </div>
+
+  <div class="quote">
+    Haylie is the center of the group — not because she positioned herself there but because every group she enters reorganizes itself around her naturally, the way a room reorganizes around a fire. She is loud, funny, chaotic, and already doing the thing before the group has finished discussing the thing. The Store moves because Haylie moves. Jon makes it warm. Haylie makes it go.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🗝</span><span class="sec-title">Who She Is</span></div>
+    <p>Haylie is the Real Boss. This is not a title she claimed — it is a title the situation assigned her, and she wore it without stopping to acknowledge it because she was already doing something else. She runs The Store's finances, the guest rooms, and the general operational reality of a building that also contains a talkative husband, a chaotic black cat who visits from the castle, a chocolate lab with no impulse control around food, and inventory from dimensions that don't have names.</p>
+    <p>She is <strong>chaotic</strong> in the best way — not disorganized, not reckless, but genuinely action-first. She makes decisions fast, commits fully, and figures out the details in motion. She is funny without working at it. She is loud in the way that makes a room feel alive. She is the person everyone in the group is watching even when she's not the one talking.</p>
+    <p>She is smarter than Jon and comfortable with this. Jon is also comfortable with this. It is one of the reasons they work.</p>
+  </div>
+
+  <!-- CHAOS METER -->
+  <div class="chaos-box">
+    <span class="chaos-label">Haylie · Operational Profile · The Kinetic Force</span>
+    <div class="c-bars">
+      <div class="c-row"><span class="c-key">Action Speed</span><div class="c-track"><div class="c-fill" style="width:98%;"></div></div><span class="c-pct">98%</span></div>
+      <div class="c-row"><span class="c-key">Center of Room</span><div class="c-track"><div class="c-fill" style="width:100%;"></div></div><span class="c-pct">100%</span></div>
+      <div class="c-row"><span class="c-key">Funny</span><div class="c-track"><div class="c-fill" style="width:95%;"></div></div><span class="c-pct">95%</span></div>
+      <div class="c-row"><span class="c-key">Loud</span><div class="c-track"><div class="c-fill" style="width:90%;"></div></div><span class="c-pct">90%</span></div>
+      <div class="c-row"><span class="c-key">Questions First</span><div class="c-track"><div class="c-fill" style="width:8%;background:linear-gradient(90deg,#303030,#484848);"></div></div><span class="c-pct">8%</span></div>
+      <div class="c-row"><span class="c-key">Already Done It</span><div class="c-track"><div class="c-fill" style="width:100%;"></div></div><span class="c-pct">Yes</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🗝</span><span class="sec-title">Traits</span></div>
+    <ul class="traits">
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Center of the Group</span>
+          <span class="t-text">Every group she is in reorganizes itself around her. She does not orchestrate this. It simply happens because she is the most alive person in any room she occupies and people orient toward that the way they orient toward warmth.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Actions First</span>
+          <span class="t-text">She has made the decision before most people have finished identifying that a decision needs to be made. She is already moving. The questions come later, in motion, while the thing is being done. This works more often than it should.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Loud & Funny</span>
+          <span class="t-text">Both together. Simultaneously. She does not turn one down to make room for the other. When Haylie finds something funny the room knows about it. When the room needs energy she supplies it without being asked.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Real Boss</span>
+          <span class="t-text">Jon is The Boss in name and warmth. Haylie is The Real Boss in practice and outcome. She manages the finances, the rooms, the ledgers, and the general operational reality of The Store. Jon is aware of this. He thinks it's great. He is not wrong.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Kinetic Force</span>
+          <span class="t-text">Jon makes The Store warm. Haylie makes it move. Without Jon, it would be efficient but cold. Without Haylie, it would be warm but still. Together they are the most functional chaos in the realm and the best place to spend an afternoon.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- THE LEDGERS -->
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🗝</span><span class="sec-title">The Ledgers</span></div>
+    <p>Haylie maintains two private ledgers. Both are extensive. Both reflect a mind that notices everything even while already doing three other things.</p>
+  </div>
+
+  <div class="ledgers">
+    <div class="ledger-card">
+      <span class="ledger-num">I</span>
+      <div class="ledger-name">The Secret Ledger</div>
+      <span class="ledger-role">Reality Glitches · Dimensional Anomalies</span>
+      <div class="ledger-desc">A private record of inventory that arrived from sources that should not exist. Items from unnamed dimensions. Stock that appears without a delivery record. The Store has anomalies. Haylie has been documenting them. She has not shared the contents with anyone. She is not worried. This is either reassuring or the opposite.</div>
+    </div>
+    <div class="ledger-card">
+      <span class="ledger-num">II</span>
+      <div class="ledger-name">Coco's Ledger</div>
+      <span class="ledger-role">Incidental Collateral Damage · Ongoing</span>
+      <div class="ledger-desc">A separate accounting of Coco's incidental damage to The Store's inventory and fixtures. Currently as long as the Secret Ledger. The methods are entirely different — Coco acts through enthusiasm rather than dimensional anomaly. The outcomes rhyme.</div>
+    </div>
+  </div>
+
+  <!-- FAMILY -->
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🗝</span><span class="sec-title">Her People</span></div>
+  </div>
+
+  <div class="family">
+    <div class="fam-card">
+      <span class="fam-icon">🛒</span>
+      <div class="fam-name">Jon</div>
+      <span class="fam-role">Husband · Lover · The Warmth</span>
+      <div class="fam-desc">Laid back, warm, full conversational. The center of gravity. Haylie is the movement. Together they are The Store.</div>
+    </div>
+    <div class="fam-card">
+      <span class="fam-icon">✨</span>
+      <div class="fam-name">Four Children</div>
+      <span class="fam-role">Forthcoming · All Excitement</span>
+      <div class="fam-desc">Four kids, every one of them a ball of excitement. D.Anna has the placement plan. The world is not prepared.</div>
+    </div>
+    <div class="fam-card">
+      <span class="fam-icon">🐶</span>
+      <div class="fam-name">Coco</div>
+      <span class="fam-role">The Dog · The Second Ledger</span>
+      <div class="fam-desc">Haylie loves Coco and maintains the second ledger. Both things are true simultaneously and she sees no contradiction.</div>
+    </div>
+  </div>
+
+  <!-- BOND -->
+  <div class="bond">
+    <div>
+      <div class="bond-name">Haylie</div>
+      <div class="bond-role">Chaos · Action · The Center · The Movement</div>
+    </div>
+    <div>
+      <span class="bond-mid-label">Husband & Wife · Lovers</span>
+      <div class="bond-mid-note">
+        One is the warmth<br>
+        that makes people stay.<br>
+        One is the energy<br>
+        that makes everything move.<br>
+        The Store is both<br>
+        at the same time.
+      </div>
+    </div>
+    <div>
+      <div class="bond-name">Jon</div>
+      <div class="bond-role">Warmth · Conversation · The Center · The Gravity</div>
+    </div>
+  </div>
+
+  <div class="footer"><span>The Store · The Real Boss · The Kinetic Force · Wife of Jon · Already Done It</span></div>
+
+</div>
+</body>
+</html>

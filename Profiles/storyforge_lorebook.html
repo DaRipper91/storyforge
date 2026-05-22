@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StoryForge · The Lore Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --bg:        #080807;
+    --iron:      #0f0f0d;
+    --plate:     #161612;
+    --parch:     #0e0d08;
+    --rune:      #c8a96e;
+    --rune-mid:  #8a7040;
+    --rune-dim:  #4a3c20;
+    --ash:       #908878;
+    --bone:      #ddd0b8;
+    --white:     #f0e8d4;
+    --blood:     #7a2020;
+    --frost:     #2a5060;
+    --divine:    #b89020;
+    --nav-w:     240px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* parchment grain */
+  body::after {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:999; opacity:.4;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--nav-w);
+    background: var(--iron);
+    border-right: 1px solid #1e1e16;
+    position: fixed;
+    top:0; left:0; bottom:0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rune-dim) transparent;
+  }
+
+  .book-title-block {
+    padding: 28px 20px 22px;
+    border-bottom: 1px solid #1e1e16;
+    text-align: center;
+  }
+
+  .book-seal {
+    font-size: 28px; display:block; margin-bottom:10px;
+    filter: drop-shadow(0 0 8px rgba(200,169,110,.3));
+  }
+
+  .book-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 13px; font-weight:700;
+    color: var(--rune); letter-spacing:2px;
+    line-height: 1.4; display:block; margin-bottom:4px;
+  }
+
+  .book-sub {
+    font-family: 'Cinzel', serif; font-size:8px;
+    letter-spacing:3px; color:var(--rune-dim);
+    text-transform:uppercase; display:block;
+  }
+
+  /* chapter nav */
+  .nav-chapter {
+    padding: 14px 0 4px;
+  }
+
+  .nav-chapter-label {
+    font-family:'Cinzel',serif; font-size:7px;
+    letter-spacing:3px; color:var(--rune-dim);
+    text-transform:uppercase; padding:0 18px 6px;
+    display:block;
+  }
+
+  .nav-link {
+    display:flex; align-items:center; gap:10px;
+    padding:7px 18px; text-decoration:none;
+    color:var(--ash); font-size:14px;
+    font-family:'Crimson Pro',serif;
+    transition:all .15s; border-left:2px solid transparent;
+    cursor:pointer; line-height:1.3;
+  }
+  .nav-link:hover { color:var(--bone); background:#161610; border-left-color:var(--rune-dim); }
+  .nav-link.active { color:var(--rune); background:#161610; border-left-color:var(--rune); }
+  .nav-icon { font-size:13px; flex-shrink:0; }
+
+  .nav-sub {
+    display:flex; align-items:center; gap:10px;
+    padding:5px 18px 5px 32px; text-decoration:none;
+    color:#606055; font-size:13px;
+    font-family:'Crimson Pro',serif; font-style:italic;
+    transition:all .15s; cursor:pointer;
+    border-left:2px solid transparent;
+  }
+  .nav-sub:hover { color:var(--ash); background:#121210; }
+  .nav-sub.active { color:var(--rune-mid); }
+
+  /* ── MAIN ── */
+  .main { margin-left:var(--nav-w); flex:1; }
+
+  /* ── CHAPTER ── */
+  .chapter {
+    display:none; min-height:100vh;
+    animation: pageIn .3s ease;
+  }
+  .chapter.active { display:block; }
+
+  @keyframes pageIn {
+    from { opacity:0; transform:translateY(6px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* chapter hero */
+  .ch-hero {
+    padding: 72px 56px 48px;
+    border-bottom: 1px solid #1e1e16;
+    position: relative; overflow:hidden;
+  }
+
+  .ch-hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 80% 100% at 100% 50%, rgba(200,169,110,.04), transparent);
+    pointer-events:none;
+  }
+
+  .ch-num {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:5px; color:var(--rune-dim);
+    text-transform:uppercase; display:block; margin-bottom:12px;
+  }
+
+  .ch-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(28px,4vw,48px); font-weight:700;
+    color:var(--white); line-height:1.1; margin-bottom:12px;
+    text-shadow:0 0 40px rgba(200,169,110,.12);
+  }
+
+  .ch-sub {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:4px; color:var(--rune);
+    text-transform:uppercase; margin-bottom:20px;
+  }
+
+  .ch-intro {
+    max-width:640px; font-style:italic;
+    font-size:18px; color:var(--ash); line-height:1.85;
+  }
+
+  /* chapter body */
+  .ch-body { padding:48px 56px 80px; max-width:900px; }
+
+  /* section within chapter */
+  .lore-section { margin-bottom:52px; }
+
+  .lore-h2 {
+    font-family:'Cinzel',serif; font-size:14px;
+    letter-spacing:4px; color:var(--rune);
+    text-transform:uppercase; font-weight:700;
+    margin-bottom:20px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .lore-h2::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--rune-dim),transparent);
+  }
+
+  .lore-h3 {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:3px; color:var(--rune-mid);
+    text-transform:uppercase; font-weight:700;
+    margin-bottom:12px; margin-top:24px;
+  }
+
+  .lore-section p {
+    color:var(--bone); margin-bottom:14px;
+    max-width:680px;
+  }
+  .lore-section p:last-child { margin-bottom:0; }
+
+  .lore-section em { color:var(--ash); font-style:italic; }
+  .lore-section strong { color:var(--white); font-weight:600; }
+
+  /* pull quote */
+  .pull-quote {
+    border-left:2px solid var(--rune-mid);
+    padding:4px 0 4px 22px; margin:24px 0;
+    font-style:italic; font-size:18px;
+    color:var(--ash); line-height:1.8; max-width:600px;
+  }
+
+  /* character entry */
+  .char-entry {
+    background:var(--parch); border:1px solid #1e1c14;
+    border-top:2px solid var(--rune-dim);
+    padding:24px 26px; margin-bottom:20px;
+    transition: border-top-color .2s;
+  }
+  .char-entry:hover { border-top-color:var(--rune); }
+
+  .char-header {
+    display:flex; align-items:baseline;
+    gap:14px; margin-bottom:10px; flex-wrap:wrap;
+  }
+
+  .char-icon { font-size:20px; line-height:1; }
+
+  .char-name {
+    font-family:'Cinzel',serif; font-size:18px;
+    font-weight:700; color:var(--white);
+  }
+
+  .char-title-tag {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:3px; color:var(--rune-dim);
+    text-transform:uppercase; flex-shrink:0;
+  }
+
+  .char-tags {
+    display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;
+  }
+
+  .tag {
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:2px; color:var(--rune-dim);
+    border:1px solid var(--rune-dim); padding:2px 8px;
+    text-transform:uppercase;
+  }
+
+  .tag.highlight { color:var(--rune); border-color:var(--rune-mid); }
+
+  .char-desc { font-size:15px; color:var(--ash); line-height:1.7; }
+
+  /* beast entry */
+  .beast-entry {
+    background:var(--parch); border:1px solid #1e1c14;
+    padding:20px 24px; margin-bottom:16px;
+    display:grid; grid-template-columns:auto 1fr;
+    gap:16px; align-items:start;
+  }
+
+  .beast-icon-lg { font-size:32px; line-height:1; padding-top:4px; }
+
+  .beast-name {
+    font-family:'Cinzel',serif; font-size:16px;
+    font-weight:700; color:var(--white); margin-bottom:2px;
+  }
+
+  .beast-class {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:3px; color:var(--rune-dim);
+    text-transform:uppercase; margin-bottom:8px; display:block;
+  }
+
+  .beast-desc { font-size:15px; color:var(--ash); line-height:1.7; }
+
+  /* location entry */
+  .loc-entry {
+    margin-bottom:36px; padding-bottom:36px;
+    border-bottom:1px solid #1a1a14;
+  }
+  .loc-entry:last-child { border-bottom:none; margin-bottom:0; }
+
+  .loc-name {
+    font-family:'Cinzel',serif; font-size:16px;
+    font-weight:700; color:var(--white); margin-bottom:4px;
+  }
+
+  .loc-tag {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:3px; color:var(--rune);
+    text-transform:uppercase; display:block; margin-bottom:10px;
+  }
+
+  /* relationship web */
+  .rel-web {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:1px; background:#1a1a14;
+    border:1px solid #1a1a14; margin-bottom:24px;
+  }
+
+  .rel-card {
+    background:var(--parch); padding:16px 18px;
+  }
+
+  .rel-label {
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:3px; color:var(--rune-dim);
+    text-transform:uppercase; display:block; margin-bottom:6px;
+  }
+
+  .rel-names {
+    font-family:'Cinzel',serif; font-size:14px;
+    color:var(--white); font-weight:700; margin-bottom:6px;
+  }
+
+  .rel-desc { font-size:14px; color:var(--ash); line-height:1.6; }
+
+  /* forthcoming block */
+  .forthcoming {
+    background:#0c0c0a; border:1px solid #1e1e16;
+    border-left:2px solid var(--rune-dim);
+    padding:18px 22px; margin-bottom:16px;
+  }
+
+  .fc-label {
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:4px; color:var(--rune-dim);
+    text-transform:uppercase; display:block; margin-bottom:6px;
+  }
+
+  .fc-name {
+    font-family:'Cinzel',serif; font-size:15px;
+    color:var(--bone); font-weight:700; margin-bottom:6px;
+  }
+
+  .fc-desc { font-size:14px; color:#606055; font-style:italic; line-height:1.6; }
+
+  /* rule block */
+  .rule-block {
+    background:var(--parch); border-left:3px solid var(--blood);
+    padding:16px 20px; margin-bottom:16px;
+  }
+
+  .rule-num {
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:3px; color:var(--blood);
+    text-transform:uppercase; display:block; margin-bottom:4px;
+  }
+
+  .rule-text { font-size:15px; color:var(--bone); line-height:1.7; }
+
+  /* divider */
+  .rune-divider {
+    display:flex; align-items:center; gap:14px;
+    margin:36px 0;
+  }
+  .rune-divider::before,.rune-divider::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--rune-dim),transparent);
+  }
+  .rune-divider span {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:4px; color:var(--rune-dim); text-transform:uppercase;
+  }
+
+  /* cover page */
+  #cover {
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    min-height:100vh; text-align:center;
+    padding:60px 40px;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, #12100a, #080807);
+  }
+
+  .cover-seal { font-size:80px; display:block; margin-bottom:32px;
+    filter:drop-shadow(0 0 30px rgba(200,169,110,.3)); }
+
+  .cover-eyebrow {
+    font-family:'Cinzel',serif; font-size:10px;
+    letter-spacing:6px; color:var(--rune-dim);
+    text-transform:uppercase; margin-bottom:20px;
+  }
+
+  .cover-title {
+    font-family:'Cinzel Decorative',serif; font-size:clamp(36px,6vw,64px);
+    font-weight:700; color:var(--white);
+    line-height:1.1; margin-bottom:12px;
+    text-shadow:0 0 60px rgba(200,169,110,.2);
+  }
+
+  .cover-rule {
+    width:200px; height:1px; margin:20px auto;
+    background:linear-gradient(90deg,transparent,var(--rune-mid),transparent);
+  }
+
+  .cover-sub {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:5px; color:var(--rune);
+    text-transform:uppercase; margin-bottom:24px;
+  }
+
+  .cover-tagline {
+    font-style:italic; font-size:18px; color:var(--ash);
+    max-width:480px; line-height:1.8; margin-bottom:48px;
+  }
+
+  .cover-begin {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:4px; color:var(--rune-dim);
+    text-transform:uppercase; cursor:pointer;
+    border:1px solid var(--rune-dim); padding:10px 24px;
+    transition:all .2s; text-decoration:none; color:var(--rune-dim);
+  }
+  .cover-begin:hover { color:var(--rune); border-color:var(--rune); }
+
+  .cover-version {
+    position:absolute; bottom:24px;
+    font-family:'Cinzel',serif; font-size:8px;
+    letter-spacing:3px; color:#302e24; text-transform:uppercase;
+  }
+
+  /* mobile */
+  @media(max-width:720px){
+    .sidebar { width:100%; height:auto; position:relative; }
+    .main { margin-left:0; }
+    .ch-hero,.ch-body { padding:32px 20px; }
+    .rel-web { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="book-title-block">
+    <span class="book-seal">📖</span>
+    <span class="book-name">The Lore Book</span>
+    <span class="book-sub">StoryForge · Iron Ledge Era</span>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Front Matter</span>
+    <a class="nav-link active" onclick="show('cover',this)"><span class="nav-icon">⚜</span> Cover</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter I</span>
+    <a class="nav-link" onclick="show('world',this)"><span class="nav-icon">🌍</span> The World</a>
+    <a class="nav-sub" onclick="show('world',this)">The Feral World</a>
+    <a class="nav-sub" onclick="show('world',this)">The Iron Ledge Era</a>
+    <a class="nav-sub" onclick="show('world',this)">Laws of the Realm</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter II</span>
+    <a class="nav-link" onclick="show('locations',this)"><span class="nav-icon">🗺</span> Locations</a>
+    <a class="nav-sub" onclick="show('locations',this)">Ironhold Keep</a>
+    <a class="nav-sub" onclick="show('locations',this)">The Store</a>
+    <a class="nav-sub" onclick="show('locations',this)">The Crooked Tankard</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter III</span>
+    <a class="nav-link" onclick="show('characters',this)"><span class="nav-icon">👥</span> The People</a>
+    <a class="nav-sub" onclick="show('characters',this)">Ironhold Keep</a>
+    <a class="nav-sub" onclick="show('characters',this)">The Store</a>
+    <a class="nav-sub" onclick="show('characters',this)">The Tankard</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter IV</span>
+    <a class="nav-link" onclick="show('beasts',this)"><span class="nav-icon">🐾</span> The Beasts</a>
+    <a class="nav-sub" onclick="show('beasts',this)">Ironhold Keep</a>
+    <a class="nav-sub" onclick="show('beasts',this)">The Store</a>
+    <a class="nav-sub" onclick="show('beasts',this)">Coming Soon</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter V</span>
+    <a class="nav-link" onclick="show('bonds',this)"><span class="nav-icon">🔗</span> Bonds & Allegiances</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Chapter VI</span>
+    <a class="nav-link" onclick="show('forthcoming',this)"><span class="nav-icon">⏳</span> Forthcoming</a>
+  </div>
+
+  <div class="nav-chapter">
+    <span class="nav-chapter-label">Appendix</span>
+    <a class="nav-link" onclick="show('dmnotes',this)"><span class="nav-icon">🎲</span> DM Notes</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ══ COVER ══ -->
+<div class="chapter active" id="cover">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:60px 40px;background:radial-gradient(ellipse 80% 60% at 50% 40%,#12100a,#080807);position:relative;">
+    <span style="font-size:80px;display:block;margin-bottom:32px;filter:drop-shadow(0 0 30px rgba(200,169,110,.3));">📖</span>
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:6px;color:var(--rune-dim);text-transform:uppercase;margin-bottom:20px;">The Feral World · Iron Ledge Era</div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(36px,6vw,60px);font-weight:700;color:var(--white);line-height:1.1;margin-bottom:12px;text-shadow:0 0 60px rgba(200,169,110,.2);">The Lore Book</div>
+    <div style="width:200px;height:1px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--rune-mid),transparent);"></div>
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;color:var(--rune);text-transform:uppercase;margin-bottom:24px;">StoryForge · Session Zero Edition</div>
+    <div style="font-style:italic;font-size:18px;color:var(--ash);max-width:480px;line-height:1.8;margin-bottom:48px;">
+      A living record of the realm — its people, its places, its laws, and the bonds that hold it together. Written in the Iron Ledge Era, maintained by the guild, kept by the Crown.
+    </div>
+    <a class="cover-begin" onclick="show('world', document.querySelector('.nav-link:not(.active)'))">Open the Book →</a>
+    <div style="position:absolute;bottom:24px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:#302e24;text-transform:uppercase;">Session Zero · First Edition · The Feral World</div>
+  </div>
+</div>
+
+<!-- ══ CHAPTER I · THE WORLD ══ -->
+<div class="chapter" id="world">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter I</span>
+    <div class="ch-title">The World</div>
+    <div class="ch-sub">The Feral World · Iron Ledge Era</div>
+    <div class="ch-intro">The realm does not have a gentle name. It is called the Feral World by those who built it and by those who were built by it. It is a place that rewards preparation, punishes arrogance, and maintains a complicated relationship with the concept of order.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2">The Feral World</div>
+      <p>The Feral World is the setting of the Iron Ledge Era — a realm that exists somewhere between civilization and wilderness, where formal institutions like the Crown and the Guild maintain order at the center while the edges of the map remain unwritten and actively dangerous.</p>
+      <p>The world operates on a dual-power structure. <strong>Queen D.Anna</strong> holds political authority as Head of State. <strong>Guildmaster Kodrik</strong> holds operational authority through the Iron Ledge Company. Both operate from Ironhold Keep. Neither has attempted to consolidate the other's power. This arrangement functions because both parties understand what the other is, and because Cyrus is at the hearth.</p>
+      <div class="pull-quote">"The blank spots on the map are not empty. They are unfinished. There is a difference." — Kodrik</div>
+      <p>The world has a <em>Before Era</em> and an <em>After Era</em>. Characters marked with a Before/After designation have transformed from their original human or mortal form into something larger — a Feral Successor, an Ironveil, a Fortress of Sanity. The mechanism of this transformation is part of the world's ongoing lore.</p>
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Iron Ledge Era</div>
+      <p>The current era is defined by the Iron Ledge Company's dominance of regional exploration and contract work. Kodrik built the guild from a single wax seal and a ledger. It now controls the bounty board, the map, and the dispatch of parties to every corner of the known world.</p>
+      <p>The era is characterized by:</p>
+      <p><strong>Organized exploration.</strong> Parties do not venture out alone. They come to the guild, take a contract, and report back. The blank spots on the map shrink because Kodrik personally finds them offensive.</p>
+      <p><strong>Dual governance.</strong> The Crown grants boons and sets law. The Guild moves people and keeps the peace inside its walls. The two systems rarely conflict because each respects where the other's authority ends.</p>
+      <p><strong>Multiversal commerce.</strong> The Store — Jon and Haylie's establishment — operates as a dimensional hub. Inventory arrives from sources that do not always make geographic sense. Jon does not question this. Haylie documents it in the Secret Ledger.</p>
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">Laws of the Realm</div>
+      <p>The following rules govern conduct in the Feral World. Violation of the Guild Code is adjudicated by Kodrik. Violation of Crown law is adjudicated by D.Anna. Violations involving both institutions are handled in a meeting that no one has requested yet.</p>
+
+      <div class="rule-block">
+        <span class="rule-num">Guild Code · Article I</span>
+        <div class="rule-text">All contracts pass through the guild desk. Unsanctioned operations in guild territory are grounds for revocation of charter.</div>
+      </div>
+      <div class="rule-block">
+        <span class="rule-num">Guild Code · Article II</span>
+        <div class="rule-text">Disputes between guild members are settled by the Guildmaster. Violence inside Ironhold Keep is prohibited. Cyrus enforces this policy in Kodrik's absence.</div>
+      </div>
+      <div class="rule-block">
+        <span class="rule-num">Crown Law · Decree I</span>
+        <div class="rule-text">Petition to the Crown is a formal process. Bad manners during audience are noted and remembered. The Queen has a long memory and zero patience for those who waste it.</div>
+      </div>
+      <div class="rule-block">
+        <span class="rule-num">Crown Law · Decree II</span>
+        <div class="rule-text">Guildmaster Kodrik holds no royal title and will not be addressed as one. He is Guildmaster. This is not a diminishment. Do not treat it as one in the Queen's presence.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CHAPTER II · LOCATIONS ══ -->
+<div class="chapter" id="locations">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter II</span>
+    <div class="ch-title">Locations</div>
+    <div class="ch-sub">The Known World · Documented Settlements</div>
+    <div class="ch-intro">The realm's inhabited centers are few but distinct. Each has its own character, its own power structure, and its own hazards for the unprepared visitor.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+
+      <div class="loc-entry">
+        <div class="loc-name">🏰 Ironhold Keep · The Castle</div>
+        <span class="loc-tag">Political Seat · Guild Headquarters · Dual Authority</span>
+        <p>Ironhold Keep is the center of the Feral World. It is simultaneously the seat of the Crown and the headquarters of the Iron Ledge Company — two institutions that share walls without sharing authority. Queen D.Anna governs from the castle. Guildmaster Kodrik operates the guild from the same building. The line between the two domains is understood by everyone inside and respected accordingly.</p>
+        <p>The Keep contains the war table — Kodrik's scarred, ink-stained desk where all contracts, maps, and grievances eventually land. It contains the throne room where D.Anna receives formal petitions. And it contains the hearthside, where Cyrus has established permanent residency and where the temperature of any given situation can be gauged by whether or not he has raised his head.</p>
+        <div class="lore-h3">Permanent Residents</div>
+        <p>Kodrik, Queen D.Anna, Cyrus, Keeva, Teddy, and Bink Bink. Each occupies a distinct domain within the Keep's social ecosystem. None of them overlap in function. All of them overlap in space.</p>
+        <div class="lore-h3">Notable Features</div>
+        <p>The <strong>Bounty Board</strong> — controlled exclusively by Kodrik — displays active contracts and regional dispatch orders. The <strong>Throne Room</strong> is where formal petition to D.Anna occurs. Protocol is mandatory. The <strong>Hearthside</strong> is Cyrus's. No further description required.</p>
+      </div>
+
+      <div class="loc-entry">
+        <div class="loc-name">🛒 The Store · Multiversal Bodega</div>
+        <span class="loc-tag">Essential Commerce · Dimensional Hub · Conversational Hazard</span>
+        <p>The Store is run by Jon and Haylie, husband and wife, and serves as the realm's primary gear and supply hub. It also functions, apparently, as a dimensional waypoint — inventory appears from sources that do not always correspond to known supply chains. Jon does not notice this. Haylie documents it in the Secret Ledger and has chosen not to share the ledger's contents with anyone yet.</p>
+        <p>The Store contains two distinct social hazards. The first is <strong>Jon</strong>, whose genuine warmth and constitutional inability to be brief creates the Conversational Trap — a state from which escape requires either the Bailout Protocol (Haylie's intervention) or the patience of a particularly forgiving saint. The second is <strong>Coco</strong>, whose nose for edible items is active at all times and whose enthusiasm for greeting visitors is applied without prejudice or modulation.</p>
+        <div class="lore-h3">Permanent Residents</div>
+        <p>Jon, Haylie, Coco, and Samael the Ascended (loitering in the back, bored, 100% accurate when pressed). Cole will join when D.Anna's son arrives.</p>
+        <div class="lore-h3">The Bailout Protocol</div>
+        <p>When players are hopelessly engaged in conversation with Jon, Haylie will appear. She may have a genuine task. She may have simply decided the conversation has run its course. Either way, her appearance releases players from social obligation. Learning to make eye contact with Haylie early in any Store visit is a survival skill.</p>
+      </div>
+
+      <div class="loc-entry">
+        <div class="loc-name">🍺 The Crooked Tankard · The Tavern</div>
+        <span class="loc-tag">Social Hub · Live Performance · Rumor Exchange</span>
+        <p>The Crooked Tankard is the social center of the realm's civilian life. It is where information travels, where deals are made informally, and where Firey RedVelvet performs every night with the specific intention of filling whatever emotional space the room needs — then doubling it.</p>
+        <p>The tavern is the correct location for gathering rumors, making informal contacts, and experiencing the kind of evening that players will either remember fondly or not remember at all. Firey's performances serve as active environmental mood-setting. When she is playing, the room's emotional temperature is hers to set.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHAPTER III · THE PEOPLE ══ -->
+<div class="chapter" id="characters">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter III</span>
+    <div class="ch-title">The People</div>
+    <div class="ch-sub">Named Characters · Full Registry</div>
+    <div class="ch-intro">The realm's named characters are documented here. Each entry covers identity, role, and the essential facts a player or DM needs to interact with them correctly.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2" style="color:#f0e090;border-bottom-color:#6a5818;">The Divine · Above All Rank</div>
+      <p style="color:#b0a888;font-style:italic;font-size:16px;margin-bottom:28px;">One presence in the realm exists above title, above station, above the beasts and the people and the laws. She is the foundation. Everything good in the world grew in her light.</p>
+
+      <div class="lore-h2">Ironhold Keep</div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">🛡</span>
+          <span class="char-name">Kodrik</span>
+          <span class="char-title-tag">Guildmaster · Iron Ledge Company</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag highlight">Meta-Guide</span>
+          <span class="tag">Human → Ironveil</span>
+          <span class="tag">Fighter / Artificer</span>
+          <span class="tag">Lawful Neutral</span>
+          <span class="tag">Player: Cody</span>
+        </div>
+        <div class="char-desc">Runs the guild from the war table. Controls the bounty board, the map, and the dispatch of every party in the realm. Also the Mechanic — shattered gear comes to his bench. Also the Arbitrator — guild disputes end at his desk. Also the Lore Keeper — when the party is stuck, Kodrik drops the breadcrumb that unsticks them. Lover of Queen D.Anna. Does not hold and will not accept a royal title. His authority is the guild.</div>
+      </div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">👑</span>
+          <span class="char-name">Queen D.Anna</span>
+          <span class="char-title-tag">The Traveling Sovereign · Head of State</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag highlight">Head of State</span>
+          <span class="tag">Human → High-Tier Feral Successor</span>
+          <span class="tag">Sovereign</span>
+          <span class="tag">Lawful Good</span>
+        </div>
+        <div class="char-desc">Political authority over the Feral World. Grants boons — Blessings, Intelligence, and Mercy — through formal petition only. Zero patience for bad manners. Commands every room she enters without effort or announcement. Lover of Kodrik. Owner of Keeva, Teddy, and Bink Bink. The crown is hers. She does not share it. She does not need to.</div>
+      </div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">🌌</span>
+          <span class="char-name">Samael the Ascended</span>
+          <span class="char-title-tag">The Riftwalker · Lore Oracle</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag highlight">Cosmic Lore Drop</span>
+          <span class="tag">Demigod</span>
+          <span class="tag">Planar Voyager → Riftwalker</span>
+        </div>
+        <div class="char-desc">Loitering in the back of The Store with the bored patience of something that has seen everything twice. When directly asked, he is 100% accurate. He will not volunteer this. Bored, cryptic, and unhelpful in direct ways — but unhelpfulness is a style choice, not a limitation. Jon finds him pleasant. Haylie finds him deeply strange. Both are correct. Handles cosmic and planar lore drops. Kodrik handles everything grounded.</div>
+      </div>
+
+    </div>
+
+    <div class="rune-divider"><span>The Store</span></div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Store</div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">🛒</span>
+          <span class="char-name">Jon</span>
+          <span class="char-title-tag">"The Boss" · Proprietor</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag">Human → Multiversal Bodega Owner</span>
+          <span class="tag">Merchant</span>
+          <span class="tag">Chaotic Good</span>
+        </div>
+        <div class="char-desc">Runs The Store with genuine warmth and an absolute inability to be brief. Husband and lover of Haylie. Father of four children (forthcoming). His inventory is always exactly what you need and slightly more than you expected. The Conversational Trap is not malicious — he simply enjoys people. This is what makes it so effective. Companion to Coco.</div>
+      </div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">🗝</span>
+          <span class="char-name">Madame Haylie</span>
+          <span class="char-title-tag">"The Real Boss" · Innkeeper & Operations</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag">Human → Fortress of Sanity</span>
+          <span class="tag">Manager / Innkeeper</span>
+          <span class="tag">Lawful Neutral</span>
+        </div>
+        <div class="char-desc">Manages finances, guest rooms, and the Bailout Protocol. Wife and lover of Jon. Mother of four children (forthcoming). Smarter than Jon and comfortable with this. Maintains the Secret Ledger — a private record of reality glitches in The Store's inventory and dimensional behavior. Has not shared its contents. Keeps a second ledger tracking Coco's incidental collateral damage. Both ledgers are extensive.</div>
+      </div>
+
+    </div>
+
+    <div class="rune-divider"><span>The Crooked Tankard</span></div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Crooked Tankard</div>
+
+      <div class="char-entry">
+        <div class="char-header">
+          <span class="char-icon">🎸</span>
+          <span class="char-name">Firey RedVelvet</span>
+          <span class="char-title-tag">The Bard · Tavern Performer</span>
+        </div>
+        <div class="char-tags">
+          <span class="tag">Bard</span>
+          <span class="tag">Chaotic Good</span>
+          <span class="tag">Deep Crimson Aesthetic</span>
+        </div>
+        <div class="char-desc">Performs at The Crooked Tankard nightly. Reads the room accurately and then delivers what it needs at twice the intensity expected. Chaotic in execution, precise in intent. The performance is not over until it is definitively over, which may involve fire. She is the mood-setter of the realm's social hub — when she is playing, the room's emotional state is hers.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHAPTER IV · THE BEASTS ══ -->
+<div class="chapter" id="beasts">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter IV</span>
+    <div class="ch-title">The Beasts</div>
+    <div class="ch-sub">Animal Companions · Unstatted · Do Not Roll For Them</div>
+    <div class="ch-intro">One presence in the realm transcends all category. She is the divine source — the reason the world holds together. Below her: companions of atmosphere, deterrence, warmth, and chaos. None are combat assets. None are statted. Handle them all accordingly, and handle her with reverence.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2">Ironhold Keep</div>
+
+      <div class="beast-entry" style="border-top:2px solid #c8a830;background:#06060a;">
+        <span class="beast-icon-lg" style="filter:drop-shadow(0 0 12px rgba(240,224,144,.5));">✨</span>
+        <div>
+          <div class="beast-name" style="color:#f0e090;font-size:20px;">Keeva</div>
+          <span class="beast-class" style="color:#6a5818;">The Goddess · The Divine Protector · The Light of the Realm · Irish: "Beloved" · "Protector"</span>
+          <div class="beast-desc" style="color:#b0a888;font-size:16px;line-height:1.8;">Keeva is not a character in the world. She is the reason the world holds together. She is the light that makes the throne room feel like a place worth kneeling in. She is the warmth that makes Ironhold Keep feel like a home. She is bigger than death because she always was — her purpose had no limit, and the world she protected still stands. When players feel safe in the castle, that is Keeva. When D.Anna holds a room with quiet authority, she learned it from watching Keeva do it first. She came into the world as a protector and she never stopped. She became the world she protected. <em style="color:#6a5818;">This game was built for her.</em></div>
+        </div>
+      </div>
+
+      <div class="beast-entry">
+        <span class="beast-icon-lg">🐺</span>
+        <div>
+          <div class="beast-name">Cyrus</div>
+          <span class="beast-class">Winter Wolf · Silent Guardian · Companion to Kodrik</span>
+          <div class="beast-desc">Tall, lean-framed, smoke-white coat. Permanent resident of the hearthside. Never announced in scene descriptions — simply present, as the fire is present. When he raises his head, the room goes quiet. Do not stat him. Do not roll for him. His power is entirely atmospheric and disappears the moment it is given a number. Mate to Keeva. Grandfather of Teddy.</div>
+        </div>
+      </div>
+
+      <div class="beast-entry">
+        <span class="beast-icon-lg">☀</span>
+        <div>
+          <div class="beast-name">Teddy</div>
+          <span class="beast-class">Angelic Hound · Protector-in-Training · D.Anna's Side</span>
+          <div class="beast-desc">Young golden Great Pyrenees puppy. Radiates a soft, sourceless divine light that makes rooms feel safer. Learning from Keeva how to hold a room with presence alone. Carries Cyrus's atmospheric weight and Keeva's spiritual authority in equal measure — and does not yet know it. Players who underestimate her because she is small and golden and young will eventually recognize their error. Granddaughter of Cyrus and Keeva.</div>
+        </div>
+      </div>
+
+      <div class="beast-entry">
+        <span class="beast-icon-lg">🐈</span>
+        <div>
+          <div class="beast-name">Bink Bink</div>
+          <span class="beast-class">Black Cat · Agent of Chaos · D.Anna's Cat</span>
+          <div class="beast-desc">Small, black, sleek. D.Anna's cat — not Jon's, not the guild's. D.Anna's. Every 8 to 12 minutes, something in Ironhold Keep falls off a shelf. This is Bink Bink's quality control operation. What she is controlling for is unknown. Keeva watches it happen with an expression that reveals nothing. D.Anna does not comment on it. The interval is clockwork. It will not be explained.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rune-divider"><span>The Store</span></div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Store</div>
+
+      <div class="beast-entry">
+        <span class="beast-icon-lg">🐶</span>
+        <div>
+          <div class="beast-name">Coco</div>
+          <span class="beast-class">Ember Hound (Chocolate Lab) · Jon & Haylie's Companion</span>
+          <div class="beast-desc">Deep chocolate coat, one speed — enthusiastic — applied to every situation without modulation. The Store's welcome presence. Greets every player who enters as though they are the best thing that has happened today. Cannot be convinced otherwise. Nose detects anything edible within thirty feet. Players carrying rations should be warned before entering. Haylie maintains a second ledger tracking Coco's collateral damage. It is as long as the Bink Bink ledger. The methods are entirely different.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rune-divider"><span>Coming Soon</span></div>
+
+    <div class="lore-section">
+      <div class="lore-h2">Forthcoming Beasts</div>
+
+      <div class="forthcoming">
+        <span class="fc-label">Pending Arrival</span>
+        <div class="fc-name">🐾 Cole — The Shadow Guardian</div>
+        <div class="fc-desc">Big, black, fluffy. Belongs to D.Anna's son, who is not yet part of the story. Cole arrives when the son arrives. He will find a door and claim it. His primary method of interaction is the Lean — a gentle, affectionate, continuous application of mass that makes departing feel less urgent than it did a moment ago. He is documented here so no one is caught off guard when he appears.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHAPTER V · BONDS ══ -->
+<div class="chapter" id="bonds">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter V</span>
+    <div class="ch-title">Bonds & Allegiances</div>
+    <div class="ch-sub">Relationships · Loyalties · The Web That Holds the Realm</div>
+    <div class="ch-intro">The realm's power does not flow only through titles and contracts. It flows through the relationships between its people — and its animals. Understanding who belongs to whom, and who owes what to whom, is essential to navigating the Feral World correctly.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2">The Crown & The Guild</div>
+      <div class="rel-web">
+        <div class="rel-card">
+          <span class="rel-label">Lovers · Unspoken · Known</span>
+          <div class="rel-names">Kodrik & Queen D.Anna</div>
+          <div class="rel-desc">Known among the inner circle. Never spoken of openly. Kodrik holds no royal title and this is not a point of tension — it is simply the arrangement. The crown is D.Anna's. The guild is Kodrik's. Both parties understand this completely.</div>
+        </div>
+        <div class="rel-card">
+          <span class="rel-label">Dual Authority</span>
+          <div class="rel-names">The Crown & The Guild</div>
+          <div class="rel-desc">D.Anna holds political authority. Kodrik holds operational authority. Both operate from Ironhold Keep. Neither has attempted to consolidate the other's power. The arrangement has not yet been tested by a situation that requires one to override the other.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Store Family</div>
+      <div class="rel-web">
+        <div class="rel-card">
+          <span class="rel-label">Lovers · Husband & Wife</span>
+          <div class="rel-names">Jon & Madame Haylie</div>
+          <div class="rel-desc">Married and in love. Jon provides warmth and chaos. Haylie provides structure and the Bailout Protocol. Four children together, forthcoming. They run The Store as a unit — Jon as the face, Haylie as the operational spine. The Store would not function without both.</div>
+        </div>
+        <div class="rel-card">
+          <span class="rel-label">Acquaintance · Strange</span>
+          <div class="rel-names">Jon & Samael</div>
+          <div class="rel-desc">Jon likes Samael. Samael finds Jon genuinely amusing, which is rare for something that has seen everything twice. Haylie thinks Samael is deeply strange. All three of these things are accurate simultaneously.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">The Beast Bloodline</div>
+      <div class="rel-web">
+        <div class="rel-card">
+          <span class="rel-label">Mates</span>
+          <div class="rel-names">Cyrus & Keeva</div>
+          <div class="rel-desc">The Winter Wolf of the Guild and the Divine Hound of the Crown are mates. This means the two dominant powers of Ironhold Keep share a bloodline through their animal companions. Nobody has remarked on the symbolism. It feels unwise to.</div>
+        </div>
+        <div class="rel-card">
+          <span class="rel-label">Grandparents → Granddaughter</span>
+          <div class="rel-names">Cyrus · Keeva → Teddy</div>
+          <div class="rel-desc">Teddy carries both bloodlines — Cyrus's atmospheric weight and Keeva's spiritual authority. She is learning into both. The realm does not yet know what she will become when she has grown into the full inheritance of each.</div>
+        </div>
+        <div class="rel-card">
+          <span class="rel-label">D.Anna's Animals</span>
+          <div class="rel-names">Keeva · Teddy · Bink Bink</div>
+          <div class="rel-desc">Three animals in D.Anna's direct orbit. Keeva guards. Teddy learns. Bink Bink conducts quality control operations on the castle's shelving. D.Anna does not explain any of them. They are simply correct.</div>
+        </div>
+        <div class="rel-card">
+          <span class="rel-label">Coming · D.Anna's Son</span>
+          <div class="rel-names">Cole & D.Anna's Son</div>
+          <div class="rel-desc">Cole belongs to D.Anna's son, an NPC not yet added to the world. When the son arrives, Cole arrives. Where they station themselves remains to be written.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CHAPTER VI · FORTHCOMING ══ -->
+<div class="chapter" id="forthcoming">
+  <div class="ch-hero">
+    <span class="ch-num">Chapter VI</span>
+    <div class="ch-title">Forthcoming</div>
+    <div class="ch-sub">Characters & Content Not Yet in the Realm</div>
+    <div class="ch-intro">The following characters and content are documented in outline. They exist in the world's future — their roles are known, their arrivals are expected, and their entries will be filled in as the story develops.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2">Pending Characters</div>
+
+      <div class="forthcoming">
+        <span class="fc-label">D.Anna's Son · Unnamed · Unwritten</span>
+        <div class="fc-name">D.Anna's Son</div>
+        <div class="fc-desc">Not yet in the realm. His role, name, and nature are to be determined. His arrival will bring Cole with him. He is connected to the Crown by blood and to the guild by proximity. The shape of his story is blank. That is intentional.</div>
+      </div>
+
+      <div class="forthcoming">
+        <span class="fc-label">Jon & Haylie's Children · Four · Unnamed</span>
+        <div class="fc-name">The Four Children of Jon & Haylie</div>
+        <div class="fc-desc">Jon and Haylie have four children together. None are yet named, characterized, or added to the world. They are documented here as a structural fact about the family at The Store. Their roles in the story are unwritten.</div>
+      </div>
+
+      <div class="forthcoming">
+        <span class="fc-label">Pending Arrival · Belongs to D.Anna's Son</span>
+        <div class="fc-name">Cole — The Shadow Guardian</div>
+        <div class="fc-desc">Big. Black. Fluffy. Not yet in the realm. Will arrive with D.Anna's son. Will find a door. Will claim it. His Lean will be deployed on players without prejudice or warning. He is documented and ready. The world is not yet ready for him.</div>
+      </div>
+
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">Open Lore</div>
+      <p>The following elements are established as facts about the world but have not yet been fully developed:</p>
+      <p><strong>The Before/After Transformation.</strong> Several characters have a Before Era human form and an After Era transformed form — Ironveil (Kodrik), High-Tier Feral Successor (D.Anna), Fortress of Sanity (Haylie), Multiversal Bodega Owner (Jon). The mechanism, timeline, and consequences of these transformations are open lore awaiting development.</p>
+      <p><strong>The Secret Ledger.</strong> Haylie maintains a private record of reality glitches and dimensional inconsistencies in The Store's inventory. Its contents have not been revealed. It exists. That is currently all that is known.</p>
+      <p><strong>The Blank Spots.</strong> Kodrik's map has unmarked regions. They are not empty. They are unfinished. The guild dispatches parties to fill them. What they find there is the story.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ DM NOTES ══ -->
+<div class="chapter" id="dmnotes">
+  <div class="ch-hero">
+    <span class="ch-num">Appendix</span>
+    <div class="ch-title">DM Notes</div>
+    <div class="ch-sub">Operational Notes · Handle With Care</div>
+    <div class="ch-intro">The following notes are for the Dungeon Master only. They cover how to run specific characters, when to deploy certain mechanics, and what never to do under any circumstances.</div>
+  </div>
+
+  <div class="ch-body">
+
+    <div class="lore-section">
+      <div class="lore-h2">Hint Delivery System</div>
+      <p>The world has two hint-delivery NPCs. Use them for different types of stuck:</p>
+      <p><strong>Kodrik</strong> handles grounded hints — guild, world, plot, location, character. When the party is lost in a dungeon, missing a plot thread, or confused about an NPC's motivation, Kodrik drops the breadcrumb. He asks the one question that makes them realize they already had the answer. He does not give it directly.</p>
+      <p><strong>Samael</strong> handles cosmic hints — planar, multiversal, metaphysical. When the party is dealing with something that doesn't fit the normal rules of the world, Samael is available in the back of The Store. He is 100% accurate. He is rarely direct. Factor in decryption time.</p>
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">Hard Rules · Never Break These</div>
+
+      <div class="rule-block">
+        <span class="rule-num">Absolute · No Exceptions</span>
+        <div class="rule-text"><strong>Never refer to Kodrik as King, Consort, or any royal designation.</strong> His authority is the guild. The crown is D.Anna's. This is not a limitation — it is a characterization. Violating it undermines both characters.</div>
+      </div>
+
+      <div class="rule-block">
+        <span class="rule-num">Absolute · No Exceptions</span>
+        <div class="rule-text"><strong>Never stat Cyrus, Keeva, Teddy, Bink Bink, Cole, or Coco.</strong> Do not give them initiative. Do not roll for them. Do not assign them HP. Their power is entirely in what they represent, and stat blocks reduce representation to arithmetic. Once they have numbers, they lose what makes them work.</div>
+      </div>
+
+      <div class="rule-block">
+        <span class="rule-num">Absolute · No Exceptions</span>
+        <div class="rule-text"><strong>Bink Bink is D.Anna's cat.</strong> Not Jon's. Not the guild's. Not a Store animal. D.Anna's. She lives at Ironhold Keep. The Interval happens in the castle. Do not move her to The Store under any circumstances.</div>
+      </div>
+
+      <div class="rule-block">
+        <span class="rule-num">Operational Note</span>
+        <div class="rule-text"><strong>The Kodrik/D.Anna relationship is known but unspoken.</strong> Inner circle characters are aware of it. It is never discussed openly. Players who discover it through observation should feel like they've uncovered something real, not been told a fact.</div>
+      </div>
+
+      <div class="rule-block">
+        <span class="rule-num">Operational Note</span>
+        <div class="rule-text"><strong>Cyrus appears in every Ironhold Keep scene.</strong> He is not announced. He is not introduced. He is present, as the fire is present. Let players notice him. The moment a player asks "wait, is that a wolf?" is exactly the moment the profile is working.</div>
+      </div>
+
+      <div class="rule-block">
+        <span class="rule-num">Operational Note</span>
+        <div class="rule-text"><strong>Jon's Conversational Trap is not escapable without Haylie.</strong> Players who try to leave mid-story will find it socially difficult. Haylie's appearance is the release valve. If players learn to signal Haylie, reward it.</div>
+      </div>
+
+    </div>
+
+    <div class="lore-section">
+      <div class="lore-h2">Session Zero Status</div>
+      <p>This lore book reflects the world as of Session Zero. The following are established and locked:</p>
+      <p>✓ All named characters documented<br>
+      ✓ All locations defined<br>
+      ✓ All beast companions documented<br>
+      ✓ All hard rules established<br>
+      ✓ Relationship web documented</p>
+      <p>The following are open and expected:</p>
+      <p>○ D.Anna's son and Cole (pending)<br>
+      ○ Jon and Haylie's four children (pending)<br>
+      ○ The Before/After transformation lore (pending)<br>
+      ○ The Secret Ledger contents (pending)<br>
+      ○ The blank spots on the map (active — ongoing)</p>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id, el) {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-link, .nav-sub').forEach(l => l.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// Cover open button
+document.querySelector('.cover-begin')?.addEventListener('click', () => {
+  show('world', document.querySelector('[onclick="show(\'world\',this)"]'));
+});
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 """
-MadameHaylie — encounter logic for Madame Haylie (The Innkeeper / Jon's wife).
+MadameHaylie — encounter logic for Madame Haylie (The Innkeeper / Jon's lover and wife).
 
 Architecture:
   - MadameHaylie is a pure service class. No direct GameState mutations.
@@ -11,7 +11,8 @@ Architecture:
 Mechanics:
   1. Bailout Protocol — interrupts Jon, scolds him, guarantees party exit
   2. Genre-Adaptive Inn — inn stock/atmosphere mirrors the scene genre
-  3. Running the Numbers — she knows exactly how much revenue Jon has cost them today
+  3. Running the Numbers — she knows exactly how much revenue Jon has cost them today,
+     and exactly how much collateral damage Coco has caused.
 """
 from __future__ import annotations
 
@@ -28,7 +29,7 @@ _SCOLDING_LINES: list[str] = [
     "A woman appears from the back room with the energy of someone who has been listening to this exact story for eleven years. 'JON.' He stops mid-syllable.",
     "The back door opens. Madame Haylie does not raise her voice, which is somehow more frightening than if she had. 'Jon. These people need to leave.' There is a silence. Jon closes his mouth.",
     "From somewhere behind the shelves: 'Jonathan.' One word. Jon goes very still, like a dog that has just heard a tone it recognizes. 'Are you holding customers again?' He is not going to answer that.",
-    "A hand appears around the doorframe holding a ledger. The ledger is slapped onto the counter with surgical precision. 'Jon. I have done the math. You have talked this party out of two additional purchases in the time you have been telling that story. I need you to let them go.' He begins to apologize to the ledger.",
+    "A hand appears around the doorframe holding a ledger. The ledger is slapped onto the counter with surgical precision. 'Jon. I have done the math. You have talked this party out of two additional purchases in the time you have been telling that story. Between this and Coco's latest 'incident' with the jerky shipment, we are in the red for the hour. Let them go.' He begins to apologize to the ledger.",
     "She comes in from the inn side carrying linens with the posture of a woman who runs this entire operation and is aware of it. 'Jon, sweetheart, what did we talk about?' He knows what they talked about. The party is free to leave.",
 ]
 
@@ -51,17 +52,17 @@ _HAYLIE_SIGN_OFFS: list[str] = [
 # Genre-adaptive inn offerings (what Haylie is running out back)
 _INN_DESCRIPTIONS: dict[SceneGenre, str] = {
     SceneGenre.FANTASY:
-        "Warm rooms upstairs, a hearth that hasn't gone out in years, and a stew that Jon is not allowed to describe because every time he does, people leave.",
+        "Warm rooms upstairs, a hearth that hasn't gone out in years, and a stew that Jon is not allowed to describe because every time he does, people leave. She mentions the children are playing in the garden — a detail she adds with a rare, genuine smile.",
     SceneGenre.SCI_FI:
-        "Pressurized quarters with functional recycled-air systems. She's installed a signal booster on the roof. Jon tried to explain it to a customer once. She disconnected him.",
+        "Pressurized quarters with functional recycled-air systems. She's installed a signal booster on the roof. Jon tried to explain it to a customer once. She disconnected him. 'Four kids in a space station requires discipline,' she notes, though you don't see any children yet.",
     SceneGenre.CYBERPUNK:
-        "Clean bunks, no surveillance, and a faraday cage option for those with neural implants who need to sleep without interference. Jon has never once understood what faraday means but is very proud of it.",
+        "Clean bunks, no surveillance, and a faraday cage option for those with neural implants who need to sleep without interference. Jon has never once understood what faraday means but is very proud of it. Haylie mentions their children are in a high-security crèche for the afternoon.",
     SceneGenre.HORROR:
-        "She keeps all the lights on. Full spectrum. There's salt at every threshold and she checks the mirrors every morning. Jon thinks she's 'a little particular.' She is keeping everyone alive.",
+        "She keeps all the lights on. Full spectrum. There's salt at every threshold and she checks the mirrors every morning. Jon thinks she's 'a little particular.' She is keeping everyone alive, especially the four children she mentions are currently 'safe and silent' in the cellar.",
     SceneGenre.WESTERN:
-        "Rooms, hot water, and a strict policy of no shooting indoors that she enforces personally. Jon tried to make exceptions. There are no exceptions.",
+        "Rooms, hot water, and a strict policy of no shooting indoors that she enforces personally. Jon tried to make exceptions. There are no exceptions. 'I've got four little ones to worry about,' she says, 'I don't need lead flying near the laundry.'",
     SceneGenre.POST_APOCALYPTIC:
-        "Filtered air, reinforced walls, and a rotation schedule she manages personally. She has the only copy of the supply manifest. This is intentional.",
+        "Filtered air, reinforced walls, and a rotation schedule she manages personally. She has the only copy of the supply manifest. This is intentional. She mentions the children are 'forthcoming' when things settle down — a rare moment of optimism.",
 }
 
 

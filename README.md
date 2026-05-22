@@ -99,12 +99,12 @@ The world is populated by reactive NPCs, each with unique mechanics:
 | NPC | Role | Encounter |
 |-----|------|-----------|
 | **Kodrik** | Guildmaster | Ironhold Keep — Central dispatch, repairs gear, Meta-Guide for lore drops. |
-| **Jon (The Boss)** | Shopkeeper | Multiversal Bodega — buy gear, avoid his "Cousin Dale" stories. |
-| **Madame Haylie** | Innkeeper | The Real Boss — managing the books, the inn, and Jon's monologues. |
+| **Jon (The Boss)** | Shopkeeper | Multiversal Bodega — Husband to Haylie. Buy gear, avoid his "Cousin Dale" stories. |
+| **Madame Haylie** | Innkeeper | The Real Boss — Wife to Jon. Managing the books, the inn, and Jon's monologues. |
 | **Samael the Ascended** | Demigod | Lore Oracle — provides cryptic hints and opens jars with cosmic power. |
-| **Queen D.Anna** | Sovereign | Ironhold Keep (Castle) — formal address protocol, petition for boons. |
+| **Queen D.Anna** | Sovereign | Ironhold Keep (Castle) — Owner of Bink Bink & Keeva. Formal address protocol. |
 | **Firey RedVelvet** | Bard | Tavern Performer — tip, heckle, or request songs. |
-| **The Pets** | Companions | **Cyrus** (Winter Wolf Deterrent), **Bink Bink** (Black Cat), **Cole** (Shadow Guardian), **Teddy** (Heavenly Protector-in-training), **Keeva** (Angelic Hound). |
+| **The Pets** | Companions | **Coco** (Ember Hound), **Cyrus** (Winter Wolf), **Bink Bink** (D.Anna's Cat), **Keeva** (Angelic Hound), **Teddy** (Protector-in-training). *Cole (Shadow Guardian) forthcoming.* |
 
 
 ---

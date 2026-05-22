@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bryne · The Warden's Apprentice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --bg:        #080a08;
+    --surface:   #0e100e;
+    --deep:      #050705;
+    --forest:    #4a7040;
+    --forest-mid:#2a5020;
+    --forest-dim:#1a3014;
+    --stone:     #7a8070;
+    --stone-lt:  #a0a890;
+    --ash:       #909880;
+    --bone:      #d8dcc8;
+    --white:     #eef0e4;
+    --iron:      #506050;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74,112,64,.07), transparent),
+      radial-gradient(ellipse 50% 40% at 0% 100%, rgba(42,80,32,.05), transparent),
+      repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(42,80,32,.012) 60px,rgba(42,80,32,.012) 61px),
+      repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(42,80,32,.012) 60px,rgba(42,80,32,.012) 61px);
+    pointer-events:none; z-index:0;
+  }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:880px; margin:0 auto;
+    padding:64px 40px 100px;
+  }
+
+  .header { text-align:center; margin-bottom:56px; }
+
+  .forest-bar {
+    display:flex; align-items:center; gap:16px; margin-bottom:24px;
+  }
+  .forest-bar::before,.forest-bar::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--forest-dim),var(--forest-mid),var(--forest-dim),transparent);
+  }
+  .forest-bar span {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--forest-mid); text-transform:uppercase; white-space:nowrap;
+  }
+
+  .char-icon {
+    font-size:68px; display:block; margin-bottom:18px; line-height:1;
+    filter: drop-shadow(0 0 16px rgba(74,112,64,.35));
+  }
+
+  .name {
+    font-family:'Cinzel',serif;
+    font-size:clamp(56px,10vw,96px);
+    font-weight:900; color:var(--white);
+    letter-spacing:8px; line-height:1;
+    text-shadow:0 0 60px rgba(74,112,64,.2), 0 0 120px rgba(74,112,64,.08);
+    margin-bottom:8px;
+  }
+
+  .title {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:5px; color:var(--forest);
+    text-transform:uppercase; margin-bottom:6px;
+  }
+
+  .title-sub {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:4px; color:var(--forest-dim);
+    text-transform:uppercase; display:block; margin-bottom:26px;
+  }
+
+  .bar-plain {
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+  }
+  .bar-plain::before,.bar-plain::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--forest-dim),transparent);
+  }
+
+  .epithet {
+    font-style:italic; font-size:20px;
+    color:var(--ash); font-weight:300; line-height:1.75;
+  }
+
+  .stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--forest-dim);
+    border:1px solid var(--forest-dim); margin-bottom:44px;
+  }
+
+  .stat { background:var(--deep); padding:16px 10px; text-align:center; }
+  .stat-lbl {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--forest-dim); text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+  .stat-val {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:var(--forest); font-weight:700;
+  }
+
+  .quote {
+    border-left:2px solid var(--forest-mid);
+    padding-left:26px; margin-bottom:44px;
+    font-style:italic; font-size:19px;
+    color:var(--ash); line-height:1.9;
+  }
+
+  .section { margin-bottom:44px; }
+
+  .sec-head {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+  }
+  .sec-icon { font-size:16px; color:var(--forest); flex-shrink:0; }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:5px; color:var(--forest);
+    text-transform:uppercase; font-weight:700;
+  }
+  .sec-head::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--forest-mid),transparent);
+  }
+
+  .section p { color:var(--bone); margin-bottom:12px; max-width:720px; }
+  .section p:last-child { margin-bottom:0; }
+  .section p strong { color:var(--white); }
+
+  /* BODY BUILD DIAGRAM */
+  .build-box {
+    background:var(--deep); border:1px solid var(--forest-dim);
+    padding:28px; margin-bottom:44px;
+  }
+
+  .build-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--forest-dim); text-transform:uppercase;
+    display:block; text-align:center; margin-bottom:24px;
+  }
+
+  .build-bars { display:flex; flex-direction:column; gap:12px; }
+
+  .build-row {
+    display:grid; grid-template-columns:140px 1fr 48px;
+    gap:12px; align-items:center;
+  }
+
+  .build-key {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+    color:var(--forest-dim); text-transform:uppercase; text-align:right;
+  }
+
+  .build-track {
+    height:8px; background:#0e140e; border-radius:4px; overflow:hidden;
+  }
+
+  .build-fill {
+    height:100%; border-radius:4px;
+    background:linear-gradient(90deg,var(--forest-mid),var(--forest));
+  }
+
+  .build-pct {
+    font-family:'Cinzel',serif; font-size:10px;
+    color:var(--forest-dim); text-align:right;
+  }
+
+  /* TRAITS */
+  .traits { list-style:none; }
+  .traits li {
+    padding:12px 0; border-bottom:1px solid #101410;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .traits li:last-child { border-bottom:none; }
+  .t-bullet { color:var(--forest); font-size:14px; flex-shrink:0; padding-top:3px; }
+  .t-name {
+    font-family:'Cinzel',serif; font-size:11px;
+    color:var(--forest); letter-spacing:1px; display:block; margin-bottom:3px;
+  }
+  .t-text { font-size:15px; color:var(--ash); line-height:1.65; }
+
+  /* COMPANIONS */
+  .companions {
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:var(--forest-dim); border:1px solid var(--forest-dim);
+    margin-bottom:44px;
+  }
+  .comp-card { background:var(--deep); padding:22px 20px; }
+  .comp-icon { font-size:28px; display:block; margin-bottom:8px; }
+  .comp-name {
+    font-family:'Cinzel',serif; font-size:15px;
+    color:var(--white); font-weight:700; margin-bottom:4px;
+  }
+  .comp-role {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--forest-dim); text-transform:uppercase; display:block; margin-bottom:8px;
+  }
+  .comp-desc { font-size:14px; color:var(--ash); line-height:1.6; }
+
+  /* BOND WITH NATHIS */
+  .bond {
+    background:var(--deep); border:1px solid #141814;
+    border-top:2px solid var(--forest-mid);
+    padding:26px 28px; margin-bottom:44px;
+    display:grid; grid-template-columns:1fr auto 1fr;
+    gap:20px; align-items:center; text-align:center;
+  }
+  .bond-name {
+    font-family:'Cinzel',serif; font-size:18px;
+    font-weight:700; color:var(--white); margin-bottom:4px;
+  }
+  .bond-role {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:var(--forest-dim); text-transform:uppercase;
+  }
+  .bond-mid-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:var(--forest-mid); text-transform:uppercase;
+    display:block; margin-bottom:6px;
+  }
+  .bond-mid-note {
+    font-size:13px; color:var(--ash);
+    font-style:italic; line-height:1.6;
+  }
+
+  /* FAMILY */
+  .family-box {
+    background:var(--deep); border:1px solid #141814;
+    border-left:3px solid var(--forest-mid);
+    padding:20px 24px; margin-bottom:44px;
+  }
+  .fam-label {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:var(--forest-dim); text-transform:uppercase; display:block; margin-bottom:8px;
+  }
+  .fam-text { font-size:15px; color:var(--ash); line-height:1.75; }
+
+  .footer {
+    display:flex; align-items:center; gap:14px;
+    margin-top:64px; padding-top:26px;
+  }
+  .footer::before,.footer::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--forest-dim),transparent);
+  }
+  .footer span {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:var(--forest-dim); text-transform:uppercase; white-space:nowrap;
+  }
+
+  @media(max-width:640px){
+    .stats,.companions,.bond { grid-template-columns:1fr; }
+    .name { font-size:52px; }
+    .build-row { grid-template-columns:100px 1fr 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="forest-bar"><span>StoryForge · Character Codex · Ironhold Keep</span></div>
+    <span class="char-icon">🪓</span>
+    <div class="name">BRYNE</div>
+    <div class="title">The Warden's Apprentice · Son of the Crown</div>
+    <span class="title-sub">D.Anna's Son · Kodrik's Household · Age 12</span>
+    <div class="bar-plain" style="margin-bottom:14px;"></div>
+    <div class="epithet">
+      "Quiet. Stocky. Watching.<br>
+      If he hits you, your shoulders will remember it."
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Age</span><span class="stat-val">12</span></div>
+    <div class="stat"><span class="stat-lbl">Build</span><span class="stat-val">Stocky · Tank Frame</span></div>
+    <div class="stat"><span class="stat-lbl">Class</span><span class="stat-val">Warden's Apprentice</span></div>
+    <div class="stat"><span class="stat-lbl">Mother</span><span class="stat-val">Queen D.Anna</span></div>
+    <div class="stat"><span class="stat-lbl">Stepfather</span><span class="stat-val">Kodrik</span></div>
+    <div class="stat"><span class="stat-lbl">Companion</span><span class="stat-val">Cole</span></div>
+  </div>
+
+  <div class="quote">
+    He doesn't announce himself. He is already there — in the back of the room, in the trees above the path, three steps behind you on a trail you thought you were alone on. He noticed everything before you sat down. He will not tell you what he noticed unless it matters. When it matters, he will have already handled it.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🌲</span><span class="sec-title">Who He Is</span></div>
+    <p>Bryne is twelve years old. He is D.Anna's son and lives at Ironhold Keep, which means he grew up with the Crown on one side and the guild on the other — royalty he never asked for and operational knowledge he absorbed without being taught. He has watched Kodrik run the table long enough to understand how it works. He has watched D.Anna hold a room long enough to know he doesn't need to do it the same way.</p>
+    <p>He disappears into the woods for hours and comes back with something he built. Traps, tools, weapons — functional things made with his hands from whatever the forest offered. He does not explain them. He does not show them off. He simply uses them when it becomes relevant that he has them.</p>
+    <p>He hangs back. He watches. He is <strong>stockier than you expect</strong> for his age — built like a consequence waiting to happen. If he hits you, your shoulders will know it. He does not hit people unless there is a good reason. When there is a good reason, the reason does not get a second chance.</p>
+  </div>
+
+  <!-- BUILD -->
+  <div class="build-box">
+    <span class="build-label">Physical Profile · Age 12 · Built Wrong for His Age</span>
+    <div class="build-bars">
+      <div class="build-row">
+        <span class="build-key">Raw Strength</span>
+        <div class="build-track"><div class="build-fill" style="width:88%;"></div></div>
+        <span class="build-pct">88%</span>
+      </div>
+      <div class="build-row">
+        <span class="build-key">Silence</span>
+        <div class="build-track"><div class="build-fill" style="width:95%;"></div></div>
+        <span class="build-pct">95%</span>
+      </div>
+      <div class="build-row">
+        <span class="build-key">Observation</span>
+        <div class="build-track"><div class="build-fill" style="width:98%;"></div></div>
+        <span class="build-pct">98%</span>
+      </div>
+      <div class="build-row">
+        <span class="build-key">Words Used</span>
+        <div class="build-track"><div class="build-fill" style="width:12%;background:linear-gradient(90deg,#1a3014,#2a5020);"></div></div>
+        <span class="build-pct">12%</span>
+      </div>
+      <div class="build-row">
+        <span class="build-key">Craft Skill</span>
+        <div class="build-track"><div class="build-fill" style="width:90%;"></div></div>
+        <span class="build-pct">90%</span>
+      </div>
+      <div class="build-row">
+        <span class="build-key">Woods Knowledge</span>
+        <div class="build-track"><div class="build-fill" style="width:96%;"></div></div>
+        <span class="build-pct">96%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🌲</span><span class="sec-title">Traits</span></div>
+    <ul class="traits">
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Watcher</span>
+          <span class="t-text">Hangs back in every situation. Reads the room before engaging with it. By the time Nathis has introduced himself to everyone, Bryne already knows which one to watch.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Built Like a Consequence</span>
+          <span class="t-text">Stockier and stronger than any twelve year old has a right to be. He does not use it to intimidate. He uses it when there is a reason to use it. The reason does not get a second chance.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Builder</span>
+          <span class="t-text">Disappears into the woods for hours. Returns with something he made — a trap, a tool, a weapon. Never explains it. Uses it when it becomes relevant. It is always relevant eventually.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Knows the Woods</span>
+          <span class="t-text">Knows the terrain around Ironhold Keep better than anyone including the guild's scouts. Cole always knows where Bryne is. This is a useful navigation system in both directions.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Nathis's Anchor</span>
+          <span class="t-text">Nathis goes first into everything. Bryne is the reason Nathis comes back. He does not announce this role. He simply occupies it every time it becomes necessary.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="companions">
+    <div class="comp-card">
+      <span class="comp-icon">🐾</span>
+      <div class="comp-name">Cole</div>
+      <span class="comp-role">His Dog · The Shadow · Always Knows</span>
+      <div class="comp-desc">Big. Black. Fluffy. Cole belongs to Bryne completely. Cole always knows where Bryne is — in the woods, in the castle, three rooms ahead of where anyone expected. Cole does not follow Bryne. Cole is simply already where Bryne is going.</div>
+    </div>
+    <div class="comp-card">
+      <span class="comp-icon">⚔</span>
+      <div class="comp-name">Nathis</div>
+      <span class="comp-role">Best Friend · The Front Man · Always First</span>
+      <div class="comp-desc">Four years older and the opposite of Bryne in every measurable way. Tall, slender, loud, first through every door. Bryne is the reason Nathis survives being first through every door. Inseparable. Always together. Always trouble.</div>
+    </div>
+  </div>
+
+  <div class="family-box">
+    <span class="fam-label">Family · The Crown & The Guild</span>
+    <div class="fam-text">Bryne grew up with Queen D.Anna as his mother and Guildmaster Kodrik under the same roof. He did not ask for either of these things. He absorbed both of them anyway — D.Anna's certainty, Kodrik's operational precision — and combined them into something quieter and more dangerous than either parent fully anticipated. Kodrik has noticed. He has not said anything yet. He is watching. So is Bryne. They understand each other.</div>
+  </div>
+
+  <div class="bond">
+    <div>
+      <div class="bond-name">Bryne</div>
+      <div class="bond-role">Watches · Builds · Holds the Line</div>
+    </div>
+    <div>
+      <span class="bond-mid-label">Always Together</span>
+      <div class="bond-mid-note">One goes first.<br>One makes sure<br>first isn't last.</div>
+    </div>
+    <div>
+      <div class="bond-name">Nathis</div>
+      <div class="bond-role">Talks · Moves · Goes First</div>
+    </div>
+  </div>
+
+  <div class="footer"><span>Ironhold Keep · Son of D.Anna · The Warden's Apprentice · The Woods</span></div>
+</div>
+</body>
+</html>

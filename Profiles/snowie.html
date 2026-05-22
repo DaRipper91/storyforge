@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snowie · The Rooftop Sentinel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  * { text-shadow: none !important; animation: none !important; }
+  body { background: #181818 !important; color: #dcdcdc !important; }
+  body::before { background: none !important; opacity:0 !important; }
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+  .stat { background: #141414 !important; }
+  .stat-lbl { color: #606060 !important; }
+  .stat-val { color: #e8e8e8 !important; }
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+  .sec-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+  .section p { color: #c8c8c8 !important; }
+  .section p strong { color: #f0f0f0 !important; }
+  .t-name { color: #e0e0e0 !important; }
+  .t-bullet { color: #909090 !important; }
+  .t-text { color: #b0b0b0 !important; }
+  .traits li { border-bottom-color: #242424 !important; }
+  .sentinel-box, .jump-box, .bond, .owners, .contrast-card { background: #1e1e1e !important; border-color: #363636 !important; }
+  .sentinel-label, .jump-label, .own-label, .bond-label { color: #686868 !important; }
+  .jump-text, .own-text, .bond-note { color: #a8a8a8 !important; }
+  .s-key { color: #606060 !important; }
+  .s-track { background: #202020 !important; }
+  .s-pct { color: #606060 !important; }
+  .s-fill { background: linear-gradient(90deg, #484848, #888888) !important; }
+  .bond-name { color: #f0f0f0 !important; }
+  .bond-role { color: #606060 !important; }
+  .bond-icon { filter: grayscale(100%) !important; }
+  .beast-icon { filter: grayscale(100%) !important; }
+  .cc-name { color: #f0f0f0 !important; }
+  .cc-eye { color: #686868 !important; }
+  .cc-list li { color: #a8a8a8 !important; border-bottom-color: #1e1e1e !important; }
+  .cc-bullet { color: #707070 !important; }
+  .contrast { background: #363636 !important; border-color: #363636 !important; }
+  .stats { background: #404040 !important; border-color: #404040 !important; }
+  .top-bar span { color: #808080 !important; }
+  .footer span { color: #606060 !important; }
+  .footer::before, .footer::after { background: linear-gradient(90deg, transparent, #404040, transparent) !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818;
+    --surface:     #202020;
+    --deep:        #141414;
+    --accent:      #e8e8e8;
+    --accent-mid:  #909090;
+    --accent-dim:  #505050;
+    --ash:         #b0b0b0;
+    --bone:        #dcdcdc;
+    --white:       #f4f4f4;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:880px; margin:0 auto;
+    padding:64px 40px 100px;
+  }
+
+  /* ── HEADER ── */
+  .header { text-align:center; margin-bottom:56px; }
+
+  .top-bar {
+    display:flex; align-items:center; gap:16px; margin-bottom:24px;
+  }
+  .top-bar::before,.top-bar::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,#505050,#909090,#505050,transparent);
+  }
+  .top-bar span {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:#808080; text-transform:uppercase; white-space:nowrap;
+  }
+
+  .beast-icon {
+    font-size:72px; display:block; margin-bottom:18px; line-height:1;
+  }
+
+  .name {
+    font-family:'Cinzel',serif;
+    font-size:clamp(56px,10vw,96px);
+    font-weight:900; color:var(--white);
+    letter-spacing:8px; line-height:1;
+    margin-bottom:8px;
+  }
+
+  .title {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:5px; color:#d0d0d0;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+
+  .title-sub {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:4px; color:#606060;
+    text-transform:uppercase; display:block; margin-bottom:26px;
+  }
+
+  .bar-plain {
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+  }
+  .bar-plain::before,.bar-plain::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,#484848,transparent);
+  }
+
+  .epithet {
+    font-style:italic; font-size:20px;
+    color:#a8a8a8; font-weight:300; line-height:1.75;
+  }
+
+  /* ── STATS ── */
+  .stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:#404040;
+    border:1px solid #404040; margin-bottom:44px;
+  }
+
+  .stat { background:var(--deep); padding:16px 10px; text-align:center; }
+  .stat-lbl {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:#505050; text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+  .stat-val {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:#e8e8e8; font-weight:700;
+  }
+
+  /* ── QUOTE ── */
+  .quote {
+    border-left:2px solid #606060;
+    padding-left:26px; margin-bottom:44px;
+    font-style:italic; font-size:19px;
+    color:#b0b0b0; line-height:1.9;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom:44px; }
+
+  .sec-head {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+  }
+  .sec-icon { font-size:16px; flex-shrink:0; }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:5px; color:#e0e0e0;
+    text-transform:uppercase; font-weight:700;
+  }
+  .sec-head::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,#606060,transparent);
+  }
+
+  .section p { color:#c8c8c8; margin-bottom:12px; max-width:720px; }
+  .section p:last-child { margin-bottom:0; }
+  .section p strong { color:#f0f0f0; }
+
+  /* ── SENTINEL DIAGRAM ── */
+  .sentinel-box {
+    background:var(--deep); border:1px solid #303030;
+    border-top:2px solid #707070;
+    padding:28px; margin-bottom:44px;
+  }
+
+  .sentinel-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:#505050; text-transform:uppercase;
+    display:block; text-align:center; margin-bottom:24px;
+  }
+
+  .sentinel-bars { display:flex; flex-direction:column; gap:12px; }
+
+  .s-row {
+    display:grid; grid-template-columns:160px 1fr 48px;
+    gap:12px; align-items:center;
+  }
+
+  .s-key {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+    color:#505050; text-transform:uppercase; text-align:right;
+  }
+
+  .s-track {
+    height:8px; background:#202020; border-radius:4px; overflow:hidden;
+  }
+
+  .s-fill {
+    height:100%; border-radius:4px;
+    background:linear-gradient(90deg,#484848,#888888);
+  }
+
+  .s-pct {
+    font-family:'Cinzel',serif; font-size:10px;
+    color:#505050; text-align:right;
+  }
+
+  /* ── TRAITS ── */
+  .traits { list-style:none; }
+  .traits li {
+    padding:12px 0; border-bottom:1px solid #242424;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .traits li:last-child { border-bottom:none; }
+  .t-bullet { color:#909090; font-size:14px; flex-shrink:0; padding-top:3px; }
+  .t-name {
+    font-family:'Cinzel',serif; font-size:11px;
+    color:#e0e0e0; letter-spacing:1px; display:block; margin-bottom:3px;
+  }
+  .t-text { font-size:15px; color:#b0b0b0; line-height:1.65; }
+
+  /* ── BINK BINK BOND ── */
+  .bond {
+    background:var(--deep); border:1px solid #2e2e2e;
+    border-top:2px solid #707070;
+    padding:28px 30px; margin-bottom:44px;
+    display:grid; grid-template-columns:1fr auto 1fr;
+    gap:24px; align-items:center; text-align:center;
+  }
+
+  .bond-icon { font-size:36px; display:block; margin-bottom:10px; }
+  .bond-name {
+    font-family:'Cinzel',serif; font-size:18px;
+    font-weight:700; color:#f0f0f0; margin-bottom:4px;
+  }
+  .bond-role {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:#505050; text-transform:uppercase;
+  }
+  .bond-center { padding:0 8px; }
+  .bond-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:#808080; text-transform:uppercase;
+    display:block; margin-bottom:8px;
+  }
+  .bond-note {
+    font-size:14px; color:#909090;
+    font-style:italic; line-height:1.7;
+  }
+
+  /* ── CONTRAST TABLE ── */
+  .contrast {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:1px; background:#363636;
+    border:1px solid #363636; margin-bottom:44px;
+  }
+
+  .contrast-card { background:var(--deep); padding:22px 20px; }
+
+  .cc-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:14px;
+  }
+
+  .cc-icon { font-size:28px; }
+
+  .cc-name {
+    font-family:'Cinzel',serif; font-size:16px;
+    color:#f0f0f0; font-weight:700; margin-bottom:2px;
+  }
+
+  .cc-eye {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:#606060; text-transform:uppercase;
+  }
+
+  .cc-list { list-style:none; }
+  .cc-list li {
+    font-size:14px; color:#a8a8a8; line-height:1.6;
+    padding:4px 0; border-bottom:1px solid #1e1e1e;
+    display:flex; gap:8px;
+  }
+  .cc-list li:last-child { border-bottom:none; }
+  .cc-bullet { color:#707070; flex-shrink:0; }
+
+  /* ── OWNERS ── */
+  .owners {
+    background:var(--deep); border:1px solid #2e2e2e;
+    border-left:3px solid #707070;
+    padding:20px 24px; margin-bottom:44px;
+  }
+  .own-label {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:#505050; text-transform:uppercase; display:block; margin-bottom:8px;
+  }
+  .own-text { font-size:15px; color:#b0b0b0; line-height:1.75; }
+
+  /* ── THE JUMP ── */
+  .jump-box {
+    background:var(--deep); border:1px solid #2e2e2e;
+    padding:28px; margin-bottom:44px; text-align:center;
+  }
+  .jump-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:#505050; text-transform:uppercase;
+    display:block; margin-bottom:16px;
+  }
+  .jump-text {
+    font-style:italic; font-size:18px; color:#a8a8a8;
+    line-height:1.9; max-width:580px; margin:0 auto;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    display:flex; align-items:center; gap:14px;
+    margin-top:64px; padding-top:26px;
+  }
+  .footer::before,.footer::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,#404040,transparent);
+  }
+  .footer span {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:#505050; text-transform:uppercase; white-space:nowrap;
+  }
+
+  @media(max-width:640px){
+    .stats,.contrast,.bond { grid-template-columns:1fr; }
+    .name { font-size:52px; }
+    .s-row { grid-template-columns:110px 1fr 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="top-bar"><span>StoryForge · Beast Codex · Ironhold Keep</span></div>
+    <span class="beast-icon">🐱</span>
+    <div class="name">SNOWIE</div>
+    <div class="title">The Rooftop Sentinel · Guardian of the Gate</div>
+    <span class="title-sub">White Cat · Blue Eyes · Cody & D.Anna's · Bink Bink's Opposite & Bestie</span>
+    <div class="bar-plain" style="margin-bottom:14px;"></div>
+    <div class="epithet">
+      "She was on the roof before you pulled into the drive.<br>
+      She has been up there all day.<br>
+      She needs you to know this."
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Fantasy Form</span><span class="stat-val">Rooftop Sentinel</span></div>
+    <div class="stat"><span class="stat-lbl">Initiative</span><span class="stat-val">— Unstatted —</span></div>
+    <div class="stat"><span class="stat-lbl">Alignment</span><span class="stat-val">Chaotic Good</span></div>
+    <div class="stat"><span class="stat-lbl">Location</span><span class="stat-val">Above the Front Gate</span></div>
+    <div class="stat"><span class="stat-lbl">Owners</span><span class="stat-val">Kodrik & D.Anna</span></div>
+    <div class="stat"><span class="stat-lbl">Bestie</span><span class="stat-val">Bink Bink</span></div>
+  </div>
+
+  <div class="quote">
+    White coat. Blue eyes that have already assessed the situation and formed a complete opinion before you finished parking. Every day she climbs to the highest point above the castle's front gate, watches the entire approach, and the moment Kodrik and D.Anna return — she makes absolutely certain they see her up there. She has been holding this position. She needs that acknowledged.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🏔</span><span class="sec-title">The Sentinel</span></div>
+    <p>Snowie's post is the highest accessible point above Ironhold Keep's front gate. She does not choose this position for the view, though the view is excellent. She chooses it because it is the position from which she can see everything that approaches and be seen by everyone who arrives. Both halves of this are equally important to her.</p>
+    <p>She has been watching all day. She has catalogued every approach, every sound, every movement in the surrounding area. When Kodrik and D.Anna return, she announces this. Not as a warning. As a report. She was up here. She saw everything. She handled it. She needs this acknowledged before she will consider coming down.</p>
+    <p>She does not always climb down. <strong>Sometimes she jumps.</strong> The tree is the careful option. Snowie is not interested in careful. She is interested in the landing, and in the look on your face when she makes it.</p>
+  </div>
+
+  <!-- SENTINEL PROFILE -->
+  <div class="sentinel-box">
+    <span class="sentinel-label">Snowie · Operational Profile · Daily Rotation</span>
+    <div class="sentinel-bars">
+      <div class="s-row">
+        <span class="s-key">Perimeter Watch</span>
+        <div class="s-track"><div class="s-fill" style="width:100%;"></div></div>
+        <span class="s-pct">100%</span>
+      </div>
+      <div class="s-row">
+        <span class="s-key">Height Sought</span>
+        <div class="s-track"><div class="s-fill" style="width:100%;"></div></div>
+        <span class="s-pct">Maximum</span>
+      </div>
+      <div class="s-row">
+        <span class="s-key">Announcement Vol.</span>
+        <div class="s-track"><div class="s-fill" style="width:95%;"></div></div>
+        <span class="s-pct">95%</span>
+      </div>
+      <div class="s-row">
+        <span class="s-key">Fight Commitment</span>
+        <div class="s-track"><div class="s-fill" style="width:96%;"></div></div>
+        <span class="s-pct">96%</span>
+      </div>
+      <div class="s-row">
+        <span class="s-key">Use of the Tree</span>
+        <div class="s-track"><div class="s-fill" style="width:40%;background:linear-gradient(90deg,#383838,#606060);"></div></div>
+        <span class="s-pct">Sometimes</span>
+      </div>
+      <div class="s-row">
+        <span class="s-key">The Jump</span>
+        <div class="s-track"><div class="s-fill" style="width:60%;"></div></div>
+        <span class="s-pct">Often</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🏔</span><span class="sec-title">Traits</span></div>
+    <ul class="traits">
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Post</span>
+          <span class="t-text">Highest accessible point above the front gate. Every day. Without fail. She is there before you expect her and she has been there longer than you realize. The entire approach has been observed and documented.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Announcement</span>
+          <span class="t-text">The moment Kodrik and D.Anna are visible on the approach, Snowie begins her report. This is not an alarm. This is a debrief. She was up here. She saw everything. She is making sure they know this before anything else happens.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Jump</span>
+          <span class="t-text">The tree is for coming down carefully. Snowie chooses the jump with some regularity. She lands. She looks at you. She walks away. She does not explain herself. The jump was the point.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">White & Visible</span>
+          <span class="t-text">Where Bink Bink operates in dark coat and shadow, Snowie is white. She is visible from a distance. This is not a liability — it is the design. A sentinel who cannot be seen cannot be acknowledged. Acknowledgement is the point.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">A Fighter</span>
+          <span class="t-text">Like Bink Bink, Snowie is a fighter. Unlike Bink Bink, there is no schedule and no subtlety. What needs handling gets handled. She does not sneak up on situations. She arrives visibly, at height, and with full commitment.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- THE JUMP -->
+  <div class="jump-box">
+    <span class="jump-label">On the Matter of the Jump</span>
+    <div class="jump-text">
+      The tree is there. She knows the tree is there. She has used the tree. On the days she chooses the jump instead — and there are many such days — she makes the calculation, commits fully, and lands. Then she looks at you. Then she walks away. The tree was an option. The jump was a choice. There is a difference and she knows it and she needs you to know that she knows it.
+    </div>
+  </div>
+
+  <!-- CONTRAST WITH BINK BINK -->
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🏔</span><span class="sec-title">The Dynamic · Snowie & Bink Bink</span></div>
+    <p>Bink Bink and Snowie are best friends and complete opposites. The castle's interior and the castle's exterior. The shadow and the light. The schedule and the standing post. Both fighters. Entirely different methods.</p>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-card">
+      <div class="cc-header">
+        <span class="cc-icon">🐱</span>
+        <div>
+          <div class="cc-name">Snowie</div>
+          <span class="cc-eye">White Coat · Blue Eyes</span>
+        </div>
+      </div>
+      <ul class="cc-list">
+        <li><span class="cc-bullet">◈</span> Exterior. Above the gate.</li>
+        <li><span class="cc-bullet">◈</span> Visible. Always visible.</li>
+        <li><span class="cc-bullet">◈</span> Announces herself.</li>
+        <li><span class="cc-bullet">◈</span> Fights with full commitment upfront.</li>
+        <li><span class="cc-bullet">◈</span> Jumps when the tree is right there.</li>
+        <li><span class="cc-bullet">◈</span> Needs to be seen and acknowledged.</li>
+      </ul>
+    </div>
+    <div class="contrast-card">
+      <div class="cc-header">
+        <span class="cc-icon">🐈</span>
+        <div>
+          <div class="cc-name">Bink Bink</div>
+          <span class="cc-eye">Black Coat · Green Eyes</span>
+        </div>
+      </div>
+      <ul class="cc-list">
+        <li><span class="cc-bullet">◈</span> Interior. The shelves. The shadows.</li>
+        <li><span class="cc-bullet">◈</span> Operates without announcement.</li>
+        <li><span class="cc-bullet">◈</span> Scheduled. Precise. Clockwork.</li>
+        <li><span class="cc-bullet">◈</span> Fights with quiet deliberate precision.</li>
+        <li><span class="cc-bullet">◈</span> Knocks things off shelves on a timer.</li>
+        <li><span class="cc-bullet">◈</span> Does not explain herself.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- BOND -->
+  <div class="bond">
+    <div>
+      <span class="bond-icon">🐱</span>
+      <div class="bond-name">Snowie</div>
+      <div class="bond-role">White · Blue Eyes · Above the Gate</div>
+    </div>
+    <div class="bond-center">
+      <span class="bond-label">Best Friends · Opposites</span>
+      <div class="bond-note">
+        One watches the exterior from height.<br>
+        One runs quality control inside.<br>
+        Together they cover the whole castle.<br>
+        Nobody asked them to do this.<br>
+        They did it anyway.
+      </div>
+    </div>
+    <div>
+      <span class="bond-icon">🐈</span>
+      <div class="bond-name">Bink Bink</div>
+      <div class="bond-role">Black · Green Eyes · The Shelves</div>
+    </div>
+  </div>
+
+  <div class="owners">
+    <span class="own-label">Owners · The Household</span>
+    <div class="own-text">Snowie belongs to Kodrik and D.Anna together. She is the household's sentinel — not the guild's, not the Crown's, but the shared home's. Every day she climbs to the highest point and watches. Every day when they come home, she makes sure they see her. This is her way of saying she was here the whole time. Holding it down. Waiting. She needs them to know that.</div>
+  </div>
+
+  <div class="footer"><span>Ironhold Keep · The Rooftop · Sentinel · Kodrik & D.Anna's · Bink Bink's Bestie</span></div>
+
+</div>
+</body>
+</html>

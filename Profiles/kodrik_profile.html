@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kodrik — Guildmaster</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --iron: #1a1a1f;
+    --forge: #0f0f12;
+    --rune: #c8a96e;
+    --rune-dim: #7a6540;
+    --ash: #a09080;
+    --bone: #e8dcc8;
+    --blood: #8b2020;
+    --frost: #4a6878;
+    --parchment: #1e1a14;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--forge);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Norse knotwork texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(200,169,110,0.015) 40px, rgba(200,169,110,0.015) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(200,169,110,0.015) 40px, rgba(200,169,110,0.015) 41px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+    position: relative;
+  }
+
+  .rune-border {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .rune-border::before,
+  .rune-border::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rune-dim), var(--rune), var(--rune-dim), transparent);
+  }
+  .rune-mark {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--rune-dim);
+    text-transform: uppercase;
+  }
+
+  .name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(52px, 10vw, 88px);
+    font-weight: 900;
+    color: var(--bone);
+    letter-spacing: 6px;
+    line-height: 1;
+    text-shadow: 0 0 60px rgba(200,169,110,0.2), 0 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 8px;
+  }
+
+  .title-line {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--rune);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .epithet {
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ash);
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  /* ── STAT BLOCK ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rune-dim);
+    border: 1px solid var(--rune-dim);
+    margin-bottom: 48px;
+  }
+
+  .stat {
+    background: var(--parchment);
+    padding: 18px 12px;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--rune-dim);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--rune);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* ── LORE BLOCK ── */
+  .lore {
+    border-left: 2px solid var(--rune-dim);
+    padding-left: 24px;
+    margin-bottom: 48px;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ash);
+    line-height: 1.8;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 44px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .section-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--rune);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--rune-dim), transparent);
+  }
+
+  .section p {
+    color: var(--bone);
+    margin-bottom: 12px;
+  }
+
+  .section p:last-child { margin-bottom: 0; }
+
+  /* ── ROLE CARDS ── */
+  .roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  @media (max-width: 600px) {
+    .roles { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .name { font-size: 52px; }
+  }
+
+  .role-card {
+    background: var(--parchment);
+    border: 1px solid #2a2520;
+    border-top: 2px solid var(--rune-dim);
+    padding: 22px 20px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .role-card:hover {
+    border-top-color: var(--rune);
+  }
+
+  .role-num {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--rune-dim);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .role-name {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--bone);
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .role-desc {
+    font-size: 15px;
+    color: var(--ash);
+    line-height: 1.6;
+  }
+
+  /* ── TRAITS ── */
+  .trait-list {
+    list-style: none;
+  }
+
+  .trait-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1c18;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .trait-list li:last-child { border-bottom: none; }
+
+  .trait-bullet {
+    color: var(--rune);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .trait-name {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--rune);
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .trait-text {
+    font-size: 15px;
+    color: var(--ash);
+    line-height: 1.6;
+  }
+
+  /* ── CYRUS CALLOUT ── */
+  .companion {
+    background: #12100d;
+    border: 1px solid #2a2520;
+    border-left: 3px solid var(--blood);
+    padding: 22px 24px;
+    margin-bottom: 48px;
+  }
+
+  .companion-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--blood);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .companion-name {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: var(--bone);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  /* ── FOOTER ── */
+  .footer-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 56px;
+    padding-top: 24px;
+  }
+  .footer-rule::before,
+  .footer-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rune-dim), transparent);
+  }
+  .footer-rune {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--rune-dim);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="rune-border">
+      <span class="rune-mark">StoryForge · Character Codex</span>
+    </div>
+    <div class="name">KODRIK</div>
+    <div class="title-line">Guildmaster · Iron Ledge Company</div>
+    <div class="rune-border" style="margin-top:24px; margin-bottom:16px;"></div>
+    <div class="epithet">"He who holds the map, holds the realm."</div>
+  </div>
+
+  <!-- STAT BLOCK -->
+  <div class="stat-row">
+    <div class="stat">
+      <span class="stat-label">Race</span>
+      <span class="stat-value">Human</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Class</span>
+      <span class="stat-value">Fighter / Artificer</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Alignment</span>
+      <span class="stat-value">Lawful Neutral</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Role</span>
+      <span class="stat-value">Guildmaster</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Base</span>
+      <span class="stat-value">Ironhold Keep</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Player</span>
+      <span class="stat-value">Cody</span>
+    </div>
+  </div>
+
+  <!-- LORE INTRO -->
+  <div class="lore">
+    Kodrik does not lead from the front. He leads from the desk — the scarred, ink-stained war table at the center of the Iron Ledge guildhall, where every contract, every map, and every grievance eventually lands. He built this operation from a single wax seal and a ledger, and he will be damned if anyone unmakes it.
+  </div>
+
+  <!-- FOUR ROLES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">⚔</span>
+      <span class="section-title">The Four Pillars</span>
+    </div>
+  </div>
+
+  <div class="roles">
+    <div class="role-card">
+      <span class="role-num">I</span>
+      <div class="role-name">Central Dispatch & Mission Control</div>
+      <div class="role-desc">The bounty board is his. The map is his. No party moves without Kodrik's dispatch. He sees every blank space on the chart and decides who fills it — and when.</div>
+    </div>
+    <div class="role-card">
+      <span class="role-num">II</span>
+      <div class="role-name">Master Mechanic & Quartermaster</div>
+      <div class="role-desc">Shattered armor, jammed arcane rifles, busted wagon axles — it all comes to his bench. Kodrik understands the underlying mechanics of the world's gear better than any smithy or artificer in three regions.</div>
+    </div>
+    <div class="role-card">
+      <span class="role-num">III</span>
+      <div class="role-name">Arbitrator of the Code</div>
+      <div class="role-desc">A guild full of armed mercenaries is a powder keg. Kodrik is the fuse cutter. He enforces the guild's code, settles disputes, and keeps factions from tearing each other apart inside his walls.</div>
+    </div>
+    <div class="role-card">
+      <span class="role-num">IV</span>
+      <div class="role-name">Keeper of the Lore</div>
+      <div class="role-desc">When the party hits a wall, they come back to Kodrik. Because he built this world piece by piece, he holds the deepest well of knowledge — the right breadcrumb dropped at exactly the right moment.</div>
+    </div>
+  </div>
+
+  <!-- CYRUS -->
+  <div class="companion">
+    <span class="companion-label">Companion · The Deterrent</span>
+    <div class="companion-name">Cyrus</div>
+    <p style="font-size:15px; color:var(--ash); line-height:1.7;">A massive, ancient bear who claims the hearthside of Ironhold Keep as his permanent territory. Cyrus requires no introduction and issues no warnings. When arguments inside the guildhall escalate past Kodrik's patience, a single low rumble from Cyrus — shifting his enormous weight by the fire — is sufficient to de-escalate any room. No one has ever tested what happens next.</p>
+  </div>
+
+  <!-- TRAITS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">◈</span>
+      <span class="section-title">Character Traits</span>
+    </div>
+    <ul class="trait-list">
+      <li>
+        <span class="trait-bullet">ᚱ</span>
+        <div>
+          <span class="trait-name">The Desk Never Lies</span>
+          <span class="trait-text">Kodrik tracks everything in his ledger — contracts, debts, favors owed. He doesn't forget. He just waits.</span>
+        </div>
+      </li>
+      <li>
+        <span class="trait-bullet">ᚱ</span>
+        <div>
+          <span class="trait-name">Low Voice, High Consequence</span>
+          <span class="trait-text">He never raises his voice. The quieter Kodrik gets, the more serious the situation. Veteran guild members know this instinctively.</span>
+        </div>
+      </li>
+      <li>
+        <span class="trait-bullet">ᚱ</span>
+        <div>
+          <span class="trait-name">The Right Question</span>
+          <span class="trait-text">When the party is lost, Kodrik doesn't give the answer. He asks the one question that makes them realize they already have it.</span>
+        </div>
+      </li>
+      <li>
+        <span class="trait-bullet">ᚱ</span>
+        <div>
+          <span class="trait-name">Mechanic's Eye</span>
+          <span class="trait-text">He can assess the structural integrity of any piece of equipment — or any plan — within moments of laying hands on it.</span>
+        </div>
+      </li>
+      <li>
+        <span class="trait-bullet">ᚱ</span>
+        <div>
+          <span class="trait-name">Blank Spots on the Map</span>
+          <span class="trait-text">Kodrik is personally offended by unexplored territory. Every unmarked region is unfinished business. He dispatches parties to the edges of the known world like a man paying off debts.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- APPEARANCE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">◈</span>
+      <span class="section-title">Appearance</span>
+    </div>
+    <p>Broad-shouldered and unhurried in his movements, Kodrik looks like a man built for hauling freight who decided administration suited him better. His hands are permanently stained with ink and machine oil in equal measure. He wears a heavy leather vest over a dark linen shirt, the guild seal stamped into a brass clasp at his collar. A worn shortsword hangs at his belt — not for show, not for ceremony. He simply never saw the point in taking it off.</p>
+    <p>His eyes do most of the talking.</p>
+  </div>
+
+  <div class="footer-rule">
+    <span class="footer-rune">Iron Ledge Company · Ironhold Keep · Est. Year of the Grey Forge</span>
+  </div>
+
+</div>
+</body>
+</html>

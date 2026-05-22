@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tyty · The Wandering Herald</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --bg:        #0a0906;
+    --surface:   #121008;
+    --deep:      #080704;
+    --warm:      #c09050;
+    --warm-mid:  #806030;
+    --warm-dim:  #403018;
+    --ash:       #a09070;
+    --bone:      #e0d4b8;
+    --white:     #f8f0e0;
+    --chaos:     #c08030;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 0%, rgba(192,144,80,.06), transparent),
+      radial-gradient(ellipse 60% 40% at 70% 100%, rgba(192,144,80,.04), transparent),
+      repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(128,96,48,.012) 60px,rgba(128,96,48,.012) 61px),
+      repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(128,96,48,.012) 60px,rgba(128,96,48,.012) 61px);
+    pointer-events:none; z-index:0;
+  }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:880px; margin:0 auto;
+    padding:64px 40px 100px;
+  }
+
+  .header { text-align:center; margin-bottom:56px; }
+
+  .warm-bar {
+    display:flex; align-items:center; gap:16px; margin-bottom:24px;
+  }
+  .warm-bar::before,.warm-bar::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--warm-dim),var(--warm-mid),var(--warm-dim),transparent);
+  }
+  .warm-bar span {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--warm-mid); text-transform:uppercase; white-space:nowrap;
+  }
+
+  .beast-icon {
+    font-size:72px; display:block; margin-bottom:18px; line-height:1;
+    filter: drop-shadow(0 0 18px rgba(192,144,80,.35));
+    animation: wobble 3s ease-in-out infinite;
+  }
+
+  @keyframes wobble {
+    0%,100% { transform: rotate(-2deg); }
+    50%      { transform: rotate(2deg); }
+  }
+
+  .name {
+    font-family:'Cinzel',serif;
+    font-size:clamp(56px,10vw,96px);
+    font-weight:900; color:var(--white);
+    letter-spacing:8px; line-height:1;
+    text-shadow:0 0 60px rgba(192,144,80,.2), 0 0 120px rgba(192,144,80,.08);
+    margin-bottom:8px;
+  }
+
+  .title {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:5px; color:var(--warm);
+    text-transform:uppercase; margin-bottom:6px;
+  }
+
+  .title-sub {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:4px; color:var(--warm-dim);
+    text-transform:uppercase; display:block; margin-bottom:26px;
+  }
+
+  .bar-plain {
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+  }
+  .bar-plain::before,.bar-plain::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--warm-dim),transparent);
+  }
+
+  .epithet {
+    font-style:italic; font-size:20px;
+    color:var(--ash); font-weight:300; line-height:1.75;
+  }
+
+  .stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--warm-dim);
+    border:1px solid var(--warm-dim); margin-bottom:44px;
+  }
+
+  .stat { background:var(--deep); padding:16px 10px; text-align:center; }
+  .stat-lbl {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--warm-dim); text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+  .stat-val {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:var(--warm); font-weight:700;
+  }
+
+  .quote {
+    border-left:2px solid var(--warm-mid);
+    padding-left:26px; margin-bottom:44px;
+    font-style:italic; font-size:19px;
+    color:var(--ash); line-height:1.9;
+  }
+
+  .section { margin-bottom:44px; }
+
+  .sec-head {
+    display:flex; align-items:center; gap:14px; margin-bottom:18px;
+  }
+  .sec-icon { font-size:16px; color:var(--warm); flex-shrink:0; }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:5px; color:var(--warm);
+    text-transform:uppercase; font-weight:700;
+  }
+  .sec-head::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--warm-mid),transparent);
+  }
+
+  .section p { color:var(--bone); margin-bottom:12px; max-width:720px; }
+  .section p:last-child { margin-bottom:0; }
+  .section p strong { color:var(--white); }
+
+  /* PANIC METER */
+  .panic-box {
+    background:var(--deep); border:1px solid var(--warm-dim);
+    padding:28px; margin-bottom:44px;
+  }
+  .panic-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--warm-dim); text-transform:uppercase;
+    display:block; text-align:center; margin-bottom:24px;
+  }
+  .panic-bars { display:flex; flex-direction:column; gap:12px; }
+  .panic-row {
+    display:grid; grid-template-columns:140px 1fr 48px;
+    gap:12px; align-items:center;
+  }
+  .panic-key {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+    color:var(--warm-dim); text-transform:uppercase; text-align:right;
+  }
+  .panic-track {
+    height:8px; background:#100e08; border-radius:4px; overflow:hidden;
+  }
+  .panic-fill {
+    height:100%; border-radius:4px;
+  }
+  .panic-pct {
+    font-family:'Cinzel',serif; font-size:10px;
+    color:var(--warm-dim); text-align:right;
+  }
+
+  /* TRAITS */
+  .traits { list-style:none; }
+  .traits li {
+    padding:12px 0; border-bottom:1px solid #141008;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .traits li:last-child { border-bottom:none; }
+  .t-bullet { color:var(--warm); font-size:14px; flex-shrink:0; padding-top:3px; }
+  .t-name {
+    font-family:'Cinzel',serif; font-size:11px;
+    color:var(--warm); letter-spacing:1px; display:block; margin-bottom:3px;
+  }
+  .t-text { font-size:15px; color:var(--ash); line-height:1.65; }
+
+  /* TEDDY BOND */
+  .teddy-bond {
+    background:var(--deep); border:1px solid #181408;
+    border-top:2px solid var(--warm-mid);
+    padding:26px 28px; margin-bottom:44px;
+    display:grid; grid-template-columns:1fr auto 1fr;
+    gap:20px; align-items:center; text-align:center;
+  }
+  .bond-name {
+    font-family:'Cinzel',serif; font-size:18px;
+    font-weight:700; color:var(--white); margin-bottom:4px;
+  }
+  .bond-role {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:var(--warm-dim); text-transform:uppercase;
+  }
+  .bond-mid-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+    color:var(--warm-mid); text-transform:uppercase;
+    display:block; margin-bottom:6px;
+  }
+  .bond-mid-note {
+    font-size:13px; color:var(--ash);
+    font-style:italic; line-height:1.6;
+  }
+
+  /* CREW */
+  .crew {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:1px; background:var(--warm-dim);
+    border:1px solid var(--warm-dim); margin-bottom:44px;
+  }
+  .crew-card { background:var(--deep); padding:18px 14px; text-align:center; }
+  .crew-icon { font-size:24px; display:block; margin-bottom:8px; }
+  .crew-name {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:var(--white); font-weight:700; margin-bottom:4px;
+  }
+  .crew-role {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px;
+    color:var(--warm-dim); text-transform:uppercase; display:block; margin-bottom:6px;
+  }
+  .crew-desc { font-size:12px; color:var(--ash); line-height:1.5; }
+
+  .footer {
+    display:flex; align-items:center; gap:14px;
+    margin-top:64px; padding-top:26px;
+  }
+  .footer::before,.footer::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--warm-dim),transparent);
+  }
+  .footer span {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+    color:var(--warm-dim); text-transform:uppercase; white-space:nowrap;
+  }
+
+  @media(max-width:640px){
+    .stats,.crew { grid-template-columns:repeat(2,1fr); }
+    .teddy-bond { grid-template-columns:1fr; }
+    .name { font-size:52px; }
+    .panic-row { grid-template-columns:100px 1fr 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="warm-bar"><span>StoryForge · Beast Codex · The Field</span></div>
+    <span class="beast-icon">🐕</span>
+    <div class="name">TYTY</div>
+    <div class="title">The Wandering Herald · Nathis's Dog</div>
+    <span class="title-sub">Long Ears · Long Hair · Full Volume · Teddy's Best Friend</span>
+    <div class="bar-plain" style="margin-bottom:14px;"></div>
+    <div class="epithet">
+      "Not a coward. A herald.<br>
+      Someone has to tell the forest what is happening.<br>
+      Tyty takes this responsibility seriously."
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Fantasy Form</span><span class="stat-val">Wandering Herald</span></div>
+    <div class="stat"><span class="stat-lbl">Initiative</span><span class="stat-val">— Unstatted —</span></div>
+    <div class="stat"><span class="stat-lbl">Alignment</span><span class="stat-val">Chaotic Good</span></div>
+    <div class="stat"><span class="stat-lbl">Owner</span><span class="stat-val">Nathis</span></div>
+    <div class="stat"><span class="stat-lbl">Best Friend</span><span class="stat-val">Teddy</span></div>
+    <div class="stat"><span class="stat-lbl">Method</span><span class="stat-val">Loud · Running</span></div>
+  </div>
+
+  <div class="quote">
+    Long ears that arrive before the rest of him. Long hair going in every direction without a plan. A face that was assembled with great enthusiasm and came out perfect anyway. When something goes wrong, Tyty ensures that the surrounding half mile is immediately informed, then relocates to continue the briefing from a safer position. He is doing his job. The job is important. He takes it seriously.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">📣</span><span class="sec-title">The Herald</span></div>
+    <p>Tyty's role in any situation is threat communication. He detects danger — often before anyone else — and immediately begins the announcement. Volume is not a limitation he operates within. Range is whatever the terrain allows. He does not wait for confirmation before broadcasting. Speed of information is the priority.</p>
+    <p>Once the announcement is complete, Tyty relocates to a more strategic position to continue operations. This is not cowardice. A herald who gets eliminated cannot continue heraldry. Tyty understands this instinctively. He is <strong>deeply committed to continued heraldry</strong>.</p>
+    <p>Teddy stands her ground. Tyty covers the communications. Together they form a complete threat-response system — one holds the line, one makes sure everyone within half a mile knows there is a line being held. The party always gets a warning when Tyty is around. The party and everything nearby always gets a warning.</p>
+  </div>
+
+  <!-- PANIC METER -->
+  <div class="panic-box">
+    <span class="panic-label">Tyty · Operational Profile</span>
+    <div class="panic-bars">
+      <div class="panic-row">
+        <span class="panic-key">Volume Output</span>
+        <div class="panic-track"><div class="panic-fill" style="width:100%;background:linear-gradient(90deg,var(--warm-mid),var(--warm));"></div></div>
+        <span class="panic-pct">100%</span>
+      </div>
+      <div class="panic-row">
+        <span class="panic-key">Threat Detection</span>
+        <div class="panic-track"><div class="panic-fill" style="width:92%;background:linear-gradient(90deg,var(--warm-mid),var(--warm));"></div></div>
+        <span class="panic-pct">92%</span>
+      </div>
+      <div class="panic-row">
+        <span class="panic-key">Agility (Running)</span>
+        <div class="panic-track"><div class="panic-fill" style="width:95%;background:linear-gradient(90deg,var(--warm-mid),var(--warm));"></div></div>
+        <span class="panic-pct">95%</span>
+      </div>
+      <div class="panic-row">
+        <span class="panic-key">Standing Ground</span>
+        <div class="panic-track"><div class="panic-fill" style="width:6%;background:#403018;"></div></div>
+        <span class="panic-pct">6%</span>
+      </div>
+      <div class="panic-row">
+        <span class="panic-key">Dignity</span>
+        <div class="panic-track"><div class="panic-fill" style="width:3%;background:#302010;"></div></div>
+        <span class="panic-pct">3%</span>
+      </div>
+      <div class="panic-row">
+        <span class="panic-key">Loyalty</span>
+        <div class="panic-track"><div class="panic-fill" style="width:100%;background:linear-gradient(90deg,var(--warm-mid),#e0a850);"></div></div>
+        <span class="panic-pct">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">📣</span><span class="sec-title">Traits</span></div>
+    <ul class="traits">
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">The Ears</span>
+          <span class="t-text">Long, floppy, arriving before the rest of him. They function as excellent threat detection equipment and as the most immediately recognizable thing about him from any distance. Players learn to spot the ears first.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Full Volume Herald</span>
+          <span class="t-text">When Tyty detects a threat, the forest knows. The party knows. Adjacent parties know. Whatever the threat is, it also now knows that it has been detected and reported. This removes the element of surprise from most situations for everyone involved.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Strategic Relocation</span>
+          <span class="t-text">Tyty does not flee. He relocates strategically to continue heraldry operations from a more sustainable position. He will continue broadcasting from that position until the situation resolves or a better position becomes available.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Teddy's Partner</span>
+          <span class="t-text">Where Teddy stands and holds, Tyty announces and moves. They have been best friends long enough to have developed an unconscious operational rhythm — divine light and full-volume chaos, deployed simultaneously. It works better than it should.</span>
+        </div>
+      </li>
+      <li>
+        <span class="t-bullet">◈</span>
+        <div>
+          <span class="t-name">Goofy · Perfect</span>
+          <span class="t-text">Long hair going in every direction. A face assembled with great enthusiasm. The kind of creature that makes people smile before they know why. This is not a limitation. It is a feature. Nobody expects the herald to be this funny looking. The herald is always already watching.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- TEDDY BOND -->
+  <div class="teddy-bond">
+    <div>
+      <div class="bond-name">Teddy</div>
+      <div class="bond-role">Stands · Holds · Divine Light</div>
+    </div>
+    <div>
+      <span class="bond-mid-label">Best Friends</span>
+      <div class="bond-mid-note">One holds the line.<br>One tells the forest<br>there is a line.</div>
+    </div>
+    <div>
+      <div class="bond-name">Tyty</div>
+      <div class="bond-role">Announces · Relocates · Loud</div>
+    </div>
+  </div>
+
+  <!-- THE CREW -->
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">📣</span><span class="sec-title">The Field Crew</span></div>
+    <p>When Nathis and Bryne go into the field, Teddy and Tyty go with them. This four-way unit has developed an operational rhythm nobody designed and everyone relies on.</p>
+  </div>
+
+  <div class="crew">
+    <div class="crew-card">
+      <span class="crew-icon">⚡</span>
+      <div class="crew-name">Nathis</div>
+      <span class="crew-role">Goes First</span>
+      <div class="crew-desc">First through the door. Already talking. Three rooms ahead.</div>
+    </div>
+    <div class="crew-card">
+      <span class="crew-icon">🪓</span>
+      <div class="crew-name">Bryne</div>
+      <span class="crew-role">Holds the Line</span>
+      <div class="crew-desc">Watching. Stocky. Already knows how this ends.</div>
+    </div>
+    <div class="crew-card">
+      <span class="crew-icon">☀</span>
+      <div class="crew-name">Teddy</div>
+      <span class="crew-role">Divine Light</span>
+      <div class="crew-desc">Stands her ground. Glows. Outranks the threat.</div>
+    </div>
+    <div class="crew-card">
+      <span class="crew-icon">🐕</span>
+      <div class="crew-name">Tyty</div>
+      <span class="crew-role">The Herald</span>
+      <div class="crew-desc">Announces everything. Relocates. Continues announcing.</div>
+    </div>
+  </div>
+
+  <div class="footer"><span>The Field · Nathis's Dog · Teddy's Best Friend · The Herald · The Ears</span></div>
+</div>
+</body>
+</html>

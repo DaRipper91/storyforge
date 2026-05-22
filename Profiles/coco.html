@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coco · The Ember Hound</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ═══ GRAYSCALE OVERRIDE ═══ */
+  :root {
+    --bg:          #181818 !important;
+    --iron:        #202020 !important;
+    --plate:       #282828 !important;
+    --surface:     #202020 !important;
+    --deep:        #141414 !important;
+    --parch:       #1a1a1a !important;
+    --forge:       #181818 !important;
+    --rune:        #e0e0e0 !important;
+    --rune-mid:    #909090 !important;
+    --rune-dim:    #505050 !important;
+    --ash:         #b0b0b0 !important;
+    --bone:        #dcdcdc !important;
+    --white:       #f4f4f4 !important;
+    --blood:       #888888 !important;
+    --frost:       #707070 !important;
+    --frost-lt:    #c0c0c0 !important;
+    --frost-dark:  #141414 !important;
+    --frost-mid:   #606060 !important;
+    --frost-dim:   #383838 !important;
+    --divine:      #e0e0e0 !important;
+    --divine-lt:   #f0f0f0 !important;
+    --divine-soft: #f4f4f4 !important;
+    --chaos:       #808080 !important;
+    --chaos-mid:   #505050 !important;
+    --chaos-dim:   #303030 !important;
+    --shadow:      #a0a0a0 !important;
+    --shadow-mid:  #606060 !important;
+    --shadow-dim:  #383838 !important;
+    --gold:        #e8e8e8 !important;
+    --gold-mid:    #909090 !important;
+    --gold-dim:    #484848 !important;
+    --gold-soft:   #d0d0d0 !important;
+    --warm:        #d0d0d0 !important;
+    --warm-mid:    #808080 !important;
+    --warm-dim:    #404040 !important;
+    --forest:      #d0d0d0 !important;
+    --forest-mid:  #808080 !important;
+    --forest-dim:  #404040 !important;
+    --blade:       #d0d0d0 !important;
+    --blade-mid:   #808080 !important;
+    --blade-dim:   #404040 !important;
+    --ember:       #d0d0d0 !important;
+    --ember-mid:   #808080 !important;
+    --ember-dim:   #404040 !important;
+    --crown:       #e8e8e8 !important;
+    --crown-mid:   #909090 !important;
+    --crown-dim:   #484848 !important;
+    --crown-soft:  #d0d0d0 !important;
+    --halo:        #f0f0f0 !important;
+    --halo-mid:    #a0a0a0 !important;
+    --halo-dim:    #505050 !important;
+    --choc:        #484848 !important;
+    --royal:       #606060 !important;
+    --royal-mid:   #404040 !important;
+    --divine-bg:   #141414 !important;
+    --nav-w:       220px;
+  }
+
+  /* Force body and backgrounds */
+  body {
+    background: #181818 !important;
+    color: #dcdcdc !important;
+  }
+
+  /* Kill all colored glows and animations */
+  * {
+    text-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Force all inline color styles to be readable */
+  [style*="color:#f0e090"], [style*="color:#e8d060"],
+  [style*="color:#c8a96e"], [style*="color:#c8a830"],
+  [style*="color:#d4a840"], [style*="color:#f0e898"],
+  [style*="color:#c87840"], [style*="color:#c060bc"],
+  [style*="color:#9090a8"], [style*="color:#5aaccc"],
+  [style*="color:#c080bc"], [style*="color:#e8c860"] {
+    color: #e8e8e8 !important;
+  }
+
+  [style*="color:#6a5818"], [style*="color:#4a2410"],
+  [style*="color:#5a205a"], [style*="color:#404048"],
+  [style*="color:#3a7090"], [style*="color:#6a5010"],
+  [style*="color:#7a7020"], [style*="color:#606055"],
+  [style*="color:#606070"] {
+    color: #888888 !important;
+  }
+
+  [style*="color:#b0a888"], [style*="color:#b0a880"],
+  [style*="color:#9878a0"], [style*="color:#8aaab8"],
+  [style*="color:#ash"], [style*="color:#9090a0"] {
+    color: #b8b8b8 !important;
+  }
+
+  /* Kill colored backgrounds on stat blocks etc */
+  [style*="background:#0e1e2a"], [style*="background:#141000"],
+  [style*="background:#0e060e"], [style*="background:#0a0a0c"],
+  [style*="background:#121006"], [style*="background:#06060a"],
+  [style*="background:#040406"], [style*="background:#0a0604"],
+  [style*="background:#0e0d08"], [style*="background:#14140e"],
+  [style*="background:#0c1418"], [style*="background:#08111a"],
+  [style*="background:#13131a"], [style*="background:#1a1a24"],
+  [style*="background:#130a13"], [style*="background:#0e0c18"] {
+    background: #141414 !important;
+  }
+
+  /* Colored outlines → gray */
+  [style*="outline:1px solid #"] {
+    outline-color: #404040 !important;
+  }
+
+  /* Colored borders */
+  [style*="border-top:2px solid #c8a830"],
+  [style*="border-top:2px solid #c87840"],
+  [style*="border-top:2px solid #8a4820"],
+  [style*="border:1px solid #c8a830"],
+  [style*="border-left:3px solid #c8a830"],
+  [style*="border-color:#c8a830"] {
+    border-color: #606060 !important;
+  }
+
+  /* Glowing filters → none */
+  [style*="filter:drop-shadow"],
+  [style*="filter: drop-shadow"] {
+    filter: none !important;
+  }
+
+  /* Named bg colors in sidebar / nav */
+  .sidebar, .book-title-block { background:#202020 !important; }
+  .nav-link { color: #b0b0b0 !important; }
+  .nav-link:hover { background:#2a2a2a !important; color:#f0f0f0 !important; }
+  .nav-link.active { color:#f0f0f0 !important; background:#2a2a2a !important; border-left-color:#909090 !important; }
+
+  /* Gradient bars → neutral */
+  .build-fill, .panic-fill, .energy-fill {
+    background: linear-gradient(90deg, #484848, #888888) !important;
+  }
+
+  /* Colored gradient lines → gray */
+  .rune-bar::before, .rune-bar::after,
+  .crown-bar::before, .crown-bar::after,
+  .forest-bar::before, .forest-bar::after,
+  .blade-bar::before, .blade-bar::after,
+  .warm-bar::before, .warm-bar::after,
+  .divine-bar::before, .divine-bar::after {
+    background: linear-gradient(90deg, transparent, #505050, #808080, #505050, transparent) !important;
+  }
+
+  .rune-bar span, .crown-bar span, .forest-bar span,
+  .blade-bar span, .warm-bar span, .divine-bar span {
+    color: #808080 !important;
+  }
+
+  /* Stat blocks */
+  .stat, .dstat { background: #141414 !important; }
+  .stat-val, .dstat-val { color: #e8e8e8 !important; }
+  .stat-lbl, .dstat-lbl { color: #606060 !important; }
+
+  /* Quote blocks */
+  .quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Section headers */
+  .sec-title, .sec-head-title { color: #e0e0e0 !important; }
+  .sec-head::after { background: linear-gradient(90deg, #505050, transparent) !important; }
+
+  /* Trait names */
+  .t-name, .trait-name { color: #e0e0e0 !important; }
+  .t-bullet, .trait-bullet { color: #909090 !important; }
+  .t-text, .trait-text { color: #b0b0b0 !important; }
+
+  /* Cards */
+  .char-entry, .beast-entry, .role-card,
+  .fam-card, .comp-card, .crew-card,
+  .stat, .loc-card, .rel-card, .forthcoming,
+  .rule-block, .callout, .companion,
+  .lean-stage, .interval-box, .energy-box,
+  .build-box, .panic-box {
+    background: #1e1e1e !important;
+    border-color: #363636 !important;
+  }
+
+  /* Pull quotes */
+  .pull-quote { border-left-color: #606060 !important; color: #b8b8b8 !important; }
+
+  /* Lore headings */
+  .lore-h2 { color: #e0e0e0 !important; border-bottom-color: #484848 !important; }
+  .lore-h3 { color: #b0b0b0 !important; }
+
+  /* Relation cards */
+  .rel-names { color: #f0f0f0 !important; }
+  .rel-label { color: #606060 !important; }
+  .rel-desc { color: #b0b0b0 !important; }
+
+  /* Chapter heroes */
+  .ch-title { color: #f0f0f0 !important; }
+  .ch-sub { color: #909090 !important; }
+  .ch-intro { color: #b0b0b0 !important; }
+  .ch-num { color: #606060 !important; }
+
+  /* Body text everywhere */
+  .section p, .lore-section p, .char-desc,
+  .beast-desc, .fam-desc, .comp-desc, .crew-desc,
+  .role-desc, .fc-desc, .dm-box p, .fam-text,
+  .cr-text, .bond-mid-note, .legacy-text {
+    color: #c8c8c8 !important;
+  }
+
+  /* All headers */
+  .char-name, .beast-name, .loc-name,
+  .bond-name, .fc-name, .comp-name,
+  .crew-name, .fam-name, .callout-name,
+  .partner-name, .rel-name {
+    color: #f0f0f0 !important;
+  }
+
+  /* Small labels */
+  .char-title-tag, .beast-class, .loc-tag,
+  .bond-role, .fc-label, .comp-role, .crew-role,
+  .fam-role, .callout-label, .dm-label,
+  .companion-label, .interval-label, .energy-label,
+  .build-label, .panic-label, .legacy-label,
+  .teddy-label, .lean-label, .tree-title {
+    color: #686868 !important;
+  }
+
+  /* Tags */
+  .tag { color: #909090 !important; border-color: #484848 !important; }
+  .tag.highlight { color: #e0e0e0 !important; border-color: #707070 !important; }
+
+  /* Card accent bars */
+  .card-accent { background: #606060 !important; }
+
+  /* Nav section labels */
+  .nav-section-label, .nav-group-label, .nav-chapter-label,
+  .s-label, .book-sub { color: #606060 !important; }
+
+  .s-name, .book-name { color: #e0e0e0 !important; }
+
+  /* Name on profiles */
+  .name { color: #f4f4f4 !important; }
+  .title { color: #c0c0c0 !important; }
+  .title-sub { color: #686868 !important; }
+  .epithet { color: #a8a8a8 !important; }
+
+  /* Footer */
+  .footer span, .prof-footer span,
+  .page-footer span { color: #606060 !important; }
+  .footer::before, .footer::after,
+  .prof-footer::before, .prof-footer::after {
+    background: linear-gradient(90deg, transparent, #404040, transparent) !important;
+  }
+
+  /* Tables - rule boxes */
+  .rule-block { border-left-color: #707070 !important; }
+  .rule-num { color: #909090 !important; }
+  .rule-text { color: #c8c8c8 !important; }
+
+  /* Intervals */
+  .interval-number { color: #e0e0e0 !important; }
+  .interval-unit { color: #808080 !important; }
+  .interval-note { color: #a0a0a0 !important; }
+
+  /* Lean stages */
+  .lean-num { color: #808080 !important; }
+  .lean-stage-title { color: #d0d0d0 !important; }
+  .lean-stage-desc { color: #a0a0a0 !important; }
+
+  /* Bloodline tree */
+  .tc-name { color: #e0e0e0 !important; }
+  .tc-sub, .tp-sub { color: #909090 !important; }
+  .tp-name { color: #f0f0f0 !important; }
+  .tp-role, .tc-role { color: #606060 !important; }
+  .conn-dot, .conn-line { background: #505050 !important; }
+
+  /* Bond mid */
+  .bond-mid-label { color: #808080 !important; }
+  .bond-mid-note { color: #a8a8a8 !important; }
+
+  /* Cover page */
+  .cover-title { color: #f0f0f0 !important; }
+  .cover-eyebrow, .cover-sub { color: #808080 !important; }
+  .cover-tagline { color: #a8a8a8 !important; }
+  .cover-begin { color: #808080 !important; border-color: #505050 !important; }
+  .cover-version { color: #383838 !important; }
+
+  /* Kill all gradient backgrounds on body::before */
+  body::before { background: none !important; opacity:0 !important; }
+
+  /* Kill halo animation */
+  .halo-icon { animation: none !important; filter: none !important; }
+  .beast-icon { animation: none !important; filter: none !important; }
+
+  /* Ensure roster grid is readable */
+  .card { background: #1e1e1e !important; }
+  .card:hover { background: #262626 !important; }
+  .card-name { color: #f0f0f0 !important; }
+  .card-title { color: #686868 !important; }
+  .card-key { color: #606060 !important; }
+  .card-val { color: #b0b0b0 !important; }
+  .card-val.highlight { color: #e0e0e0 !important; }
+  .card-trait { color: #909090 !important; }
+
+  /* Roster grid bg */
+  .roster-grid, .locations, .rel-grid,
+  .relations, .boons, .companions,
+  .family, .partner, .crew {
+    background: #303030 !important;
+  }
+
+  /* Location cards */
+  .loc-name { color: #e0e0e0 !important; }
+  .loc-leader { color: #b0b0b0 !important; }
+  .loc-function { color: #808080 !important; }
+
+  /* Boon cards */
+  .boon { background: #1e1e1e !important; }
+  .boon-name { color: #e0e0e0 !important; }
+  .boon-desc { color: #a8a8a8 !important; }
+  .boon-icon { filter: grayscale(100%) !important; }
+
+  /* Profile sections */
+  .profile { background: #181818 !important; }
+  .chapter { background: #181818 !important; }
+  .ch-hero { background: #1e1e1e !important; border-bottom-color: #303030 !important; }
+  .ch-body { background: #181818 !important; }
+
+  /* Sidebar */
+  .sidebar { background: #202020 !important; border-right-color: #303030 !important; }
+
+  /* Nav sub */
+  .nav-sub { color: #686868 !important; }
+  .nav-sub:hover { color: #b0b0b0 !important; }
+
+  /* Gold rule in lorebook */
+  .rune-divider span { color: #686868 !important; }
+  .rune-divider::before, .rune-divider::after {
+    background: linear-gradient(90deg, transparent, #484848, transparent) !important;
+  }
+
+  /* Lore section borders */
+  .loc-entry { border-bottom-color: #2e2e2e !important; }
+  .traits li { border-bottom-color: #2a2a2a !important; }
+
+  /* Page header */
+  .page-header { border-bottom-color: #303030 !important; }
+  .page-title { color: #f0f0f0 !important; }
+  .page-sub { color: #707070 !important; }
+
+  /* Section label */
+  .section-label span { color: #606060 !important; }
+  .section-label::after { background: linear-gradient(90deg, #484848, transparent) !important; }
+
+  /* TOC in docx doesn't apply here */
+  
+  /* Inline colored spans from updates */
+  span[style*="color:#f0e090"],
+  span[style*="color:#e8d878"],
+  span[style*="color:#c8a96e"],
+  span[style*="color:#gold"],
+  div[style*="color:#f0e090"],
+  div[style*="color:#b0a888"] {
+    color: #d8d8d8 !important;
+  }
+
+  /* Kill radial gradient body backgrounds */
+  body { background: #181818 !important; }
+  /* ═══ END GRAYSCALE OVERRIDE ═══ */
+
+  :root {
+    --bg:        #0e0806;
+    --surface:   #160e08;
+    --deep:      #0a0604;
+    --ember:     #c87840;
+    --ember-mid: #8a4820;
+    --ember-dim: #4a2410;
+    --ash:       #a07860;
+    --bone:      #e0c8b0;
+    --white:     #f8ece0;
+    --choc:      #6a3818;
+    --warm:      #d09060;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 70% 40% at 50% 0%, rgba(200,120,64,.07), transparent),
+      radial-gradient(ellipse 50% 30% at 80% 100%, rgba(138,72,32,.05), transparent),
+      repeating-linear-gradient(0deg,transparent,transparent 50px,rgba(138,72,32,.015) 50px,rgba(138,72,32,.015) 51px),
+      repeating-linear-gradient(90deg,transparent,transparent 50px,rgba(138,72,32,.015) 50px,rgba(138,72,32,.015) 51px);
+    pointer-events:none; z-index:0;
+  }
+
+  .container {
+    position:relative; z-index:1;
+    max-width:860px; margin:0 auto;
+    padding:64px 36px 88px;
+  }
+
+  .header { text-align:center; margin-bottom:52px; }
+
+  .rune-bar {
+    display:flex; align-items:center; gap:16px; margin-bottom:22px;
+  }
+  .rune-bar::before,.rune-bar::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--ember-dim),var(--ember-mid),var(--ember-dim),transparent);
+  }
+  .rune-bar span {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--ember-mid); text-transform:uppercase; white-space:nowrap;
+  }
+
+  .beast-icon {
+    font-size:64px; display:block; margin-bottom:18px; line-height:1;
+    filter: drop-shadow(0 0 20px rgba(200,120,64,.35));
+  }
+
+  .name {
+    font-family:'Cinzel',serif;
+    font-size:clamp(56px,10vw,96px);
+    font-weight:900; color:var(--white);
+    letter-spacing:8px; line-height:1;
+    text-shadow:0 0 60px rgba(200,120,64,.22), 0 0 120px rgba(200,120,64,.08);
+    margin-bottom:8px;
+  }
+
+  .title {
+    font-family:'Cinzel',serif; font-size:12px;
+    letter-spacing:5px; color:var(--ember);
+    text-transform:uppercase; margin-bottom:26px;
+  }
+
+  .epithet {
+    font-style:italic; font-size:20px;
+    color:var(--ash); font-weight:300;
+  }
+
+  .stats {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--ember-dim);
+    border:1px solid var(--ember-dim); margin-bottom:44px;
+  }
+
+  .stat { background:var(--deep); padding:16px 10px; text-align:center; }
+
+  .stat-lbl {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--ember-dim); text-transform:uppercase; display:block; margin-bottom:5px;
+  }
+
+  .stat-val {
+    font-family:'Cinzel',serif; font-size:13px;
+    color:var(--ember); font-weight:700;
+  }
+
+  .quote {
+    border-left:2px solid var(--ember-mid);
+    padding-left:24px; margin-bottom:44px;
+    font-style:italic; font-size:19px;
+    color:var(--ash); line-height:1.85;
+  }
+
+  .section { margin-bottom:40px; }
+
+  .sec-head {
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .sec-icon { color:var(--ember); font-size:16px; flex-shrink:0; }
+  .sec-title {
+    font-family:'Cinzel',serif; font-size:11px;
+    letter-spacing:4px; color:var(--ember);
+    text-transform:uppercase; font-weight:700;
+  }
+  .sec-head::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--ember-mid),transparent);
+  }
+
+  .section p { color:var(--bone); margin-bottom:10px; }
+  .section p:last-child { margin-bottom:0; }
+
+  .traits { list-style:none; }
+  .traits li {
+    padding:11px 0; border-bottom:1px solid #160e08;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .traits li:last-child { border-bottom:none; }
+  .t-bullet { color:var(--ember); font-size:14px; flex-shrink:0; padding-top:2px; }
+  .t-name {
+    font-family:'Cinzel',serif; font-size:11px;
+    color:var(--ember); letter-spacing:1px; display:block; margin-bottom:3px;
+  }
+  .t-text { font-size:15px; color:var(--ash); line-height:1.6; }
+
+  /* ENERGY METER */
+  .energy-box {
+    background:var(--deep); border:1px solid var(--ember-dim);
+    padding:26px 28px; margin-bottom:40px;
+  }
+  .energy-label {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:5px;
+    color:var(--ember-dim); text-transform:uppercase;
+    display:block; text-align:center; margin-bottom:20px;
+  }
+  .energy-bar-wrap { margin-bottom:10px; }
+  .energy-row {
+    display:grid; grid-template-columns:120px 1fr 36px;
+    gap:12px; align-items:center; margin-bottom:10px;
+  }
+  .energy-key {
+    font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px;
+    color:var(--ember-dim); text-transform:uppercase; text-align:right;
+  }
+  .energy-track {
+    height:6px; background:#1a0e08; border-radius:3px; overflow:hidden;
+  }
+  .energy-fill { height:100%; border-radius:3px; }
+  .energy-pct {
+    font-family:'Cinzel',serif; font-size:10px;
+    color:var(--ember-dim); text-align:right;
+  }
+
+  /* FAMILY */
+  .family {
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:var(--ember-dim); border:1px solid var(--ember-dim);
+    margin-bottom:40px;
+  }
+  .fam-card { background:var(--deep); padding:18px 20px; }
+  .fam-role {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--ember-dim); text-transform:uppercase; display:block; margin-bottom:4px;
+  }
+  .fam-name {
+    font-family:'Cinzel',serif; font-size:15px;
+    color:var(--white); font-weight:700; margin-bottom:6px;
+  }
+  .fam-desc { font-size:14px; color:var(--ash); line-height:1.6; }
+
+  .footer {
+    display:flex; align-items:center; gap:14px;
+    margin-top:60px; padding-top:24px;
+  }
+  .footer::before,.footer::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--ember-dim),transparent);
+  }
+  .footer span {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px;
+    color:var(--ember-dim); text-transform:uppercase; white-space:nowrap;
+  }
+
+  @media(max-width:600px){
+    .stats,.family { grid-template-columns:repeat(2,1fr); }
+    .name { font-size:52px; }
+    .energy-row { grid-template-columns:80px 1fr 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="rune-bar"><span>StoryForge · Beast Codex · The Store</span></div>
+    <span class="beast-icon">🐶</span>
+    <div class="name">COCO</div>
+    <div class="title">The Ember Hound · Companion of The Store</div>
+    <div class="rune-bar" style="margin-bottom:16px;"></div>
+    <div class="epithet">"Warm as the hearth she never sits still enough to enjoy."</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-lbl">Fantasy Form</span><span class="stat-val">Ember Hound</span></div>
+    <div class="stat"><span class="stat-lbl">Real Form</span><span class="stat-val">Chocolate Labrador</span></div>
+    <div class="stat"><span class="stat-lbl">Initiative</span><span class="stat-val">— Unstatted —</span></div>
+    <div class="stat"><span class="stat-lbl">Location</span><span class="stat-val">The Store</span></div>
+    <div class="stat"><span class="stat-lbl">Owners</span><span class="stat-val">Jon & Haylie</span></div>
+    <div class="stat"><span class="stat-lbl">Alignment</span><span class="stat-val">Chaotic Good</span></div>
+  </div>
+
+  <div class="quote">
+    Deep chocolate coat the color of dark timber after a long fire. She moves at one speed — enthusiastic — and applies that speed to every situation equally, whether it warrants it or not. She is warm in the way that a hearth is warm: completely, indiscriminately, and available to anyone who comes close enough to feel it.
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🔥</span><span class="sec-title">The Ember Hound</span></div>
+    <p>In the fantasy world Coco is classified as an Ember Hound — a rare breed native to trading settlements and waystation inns, known for their unconditional warmth toward strangers, their inability to sit still, and their uncanny nose for anything edible within a thirty-foot radius.</p>
+    <p>Ember Hounds do not guard. They do not deter. They welcome, relentlessly and without discrimination, which in a store that also contains Bink Bink's Interval and Cole's eventual Lean, provides important emotional counterbalance.</p>
+  </div>
+
+  <!-- ENERGY -->
+  <div class="energy-box">
+    <span class="energy-label">Coco · Current Energy Levels</span>
+    <div class="energy-row">
+      <span class="energy-key">Enthusiasm</span>
+      <div class="energy-track"><div class="energy-fill" style="width:100%;background:linear-gradient(90deg,var(--ember-mid),var(--ember));"></div></div>
+      <span class="energy-pct">100%</span>
+    </div>
+    <div class="energy-row">
+      <span class="energy-key">Patience</span>
+      <div class="energy-track"><div class="energy-fill" style="width:12%;background:#4a2410;"></div></div>
+      <span class="energy-pct">12%</span>
+    </div>
+    <div class="energy-row">
+      <span class="energy-key">Stillness</span>
+      <div class="energy-track"><div class="energy-fill" style="width:4%;background:#3a1c08;"></div></div>
+      <span class="energy-pct">4%</span>
+    </div>
+    <div class="energy-row">
+      <span class="energy-key">Food Focus</span>
+      <div class="energy-track"><div class="energy-fill" style="width:100%;background:linear-gradient(90deg,#6a3818,var(--ember));"></div></div>
+      <span class="energy-pct">100%</span>
+    </div>
+    <div class="energy-row">
+      <span class="energy-key">Warmth</span>
+      <div class="energy-track"><div class="energy-fill" style="width:100%;background:linear-gradient(90deg,var(--ember-mid),#e8a060);"></div></div>
+      <span class="energy-pct">100%</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🔥</span><span class="sec-title">Role in The Store</span></div>
+    <p>Where Bink Bink introduces chaos on a schedule and Cole manages departures through affectionate structural interference, Coco is pure welcome energy. She greets every player who enters The Store with the full force of her enthusiasm, which is considerable and non-negotiable.</p>
+    <p>Jon adores her. Haylie tracks the number of things Coco has knocked over, which is a separate ledger from the one she keeps for Bink Bink. The two ledgers are roughly equal in length. The methods are entirely different.</p>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🔥</span><span class="sec-title">Traits</span></div>
+    <ul class="traits">
+      <li><span class="t-bullet">◆</span><div><span class="t-name">One Speed</span><span class="t-text">Enthusiastic. Applied universally. To greetings, to meals, to strangers, to familiar faces, to the discovery that there might be something edible nearby. The speed does not vary by context.</span></div></li>
+      <li><span class="t-bullet">◆</span><div><span class="t-name">The Nose</span><span class="t-text">Coco can detect anything edible within thirty feet. This is not an exaggeration. Players carrying rations should be aware of this before entering The Store.</span></div></li>
+      <li><span class="t-bullet">◆</span><div><span class="t-name">Unconditional Welcome</span><span class="t-text">She does not assess. She does not evaluate. She does not judge. Every person who enters The Store is greeted as though they are the best thing that has happened today. This is her entire policy on strangers.</span></div></li>
+      <li><span class="t-bullet">◆</span><div><span class="t-name">The Chaos Complement</span><span class="t-text">Where Bink Bink's chaos is precise and scheduled, Coco's is ambient and constant. Together they create a Store environment that is warm, unpredictable, and somehow deeply comfortable.</span></div></li>
+      <li><span class="t-bullet">◆</span><div><span class="t-name">Haylie's Second Ledger</span><span class="t-text">Madame Haylie maintains a separate accounting of Coco's incidental collateral damage. It is currently as long as the Bink Bink ledger. The methods are entirely different. The outcomes are similar.</span></div></li>
+    </ul>
+  </div>
+
+  <div class="family">
+    <div class="fam-card">
+      <span class="fam-role">Owner & Family</span>
+      <div class="fam-name">Jon</div>
+      <div class="fam-desc">Jon loves Coco with the same warm, unconditional energy she returns to everyone. They are well matched. He does not notice when she steals things. He does not notice when Bink Bink knocks things over either. He is simply happy the store is full of life.</div>
+    </div>
+    <div class="fam-card">
+      <span class="fam-role">Owner & Manager</span>
+      <div class="fam-name">Madame Haylie</div>
+      <div class="fam-desc">Haylie loves Coco and maintains the second ledger. Both things are true simultaneously. She has developed a system for keeping Coco away from the inventory shelves at peak hours. The system works approximately seventy percent of the time.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="sec-icon">🔥</span><span class="sec-title">The Store Animal Hierarchy</span></div>
+    <p>The Store operates with three animal presences, each occupying a distinct niche. <strong style="color:var(--ember);">Bink Bink</strong> holds interior chaos operations on a precise schedule. <strong style="color:var(--ember);">Coco</strong> holds the welcome and ambient warmth of the space, along with secondary chaos as a byproduct of enthusiasm. <strong style="color:var(--ember);">Cole</strong> will eventually hold the door, when D.Anna's son arrives to bring him.</p>
+    <p>Together they form a complete ecosystem. Haylie keeps records on all of them. Jon loves all of them equally and unconditionally, which is both his greatest quality and the primary source of the second ledger.</p>
+  </div>
+
+  <div class="footer"><span>The Store · Ember Hound · Companion to Jon & Haylie · The Welcome</span></div>
+</div>
+</body>
+</html>

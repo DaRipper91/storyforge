@@ -106,7 +106,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
         _item("rope_50ft",        "Hempen Rope, 50ft",          10, "'You'd be surprised how often people need this.'"),
         _item("torches_x5",       "Torch Bundle (×5)",           5, "Come back when you need more. He'll be here."),
         _item("lockpick_set",     "Thieves' Tools",             25, "'For the locks in your own home. Wink.'"),
-        _item("trail_rations",    "Trail Rations (7 days)",     35, "'The jerky is the good stuff. My wife's recipe.'"),
+        _item("trail_rations",    "Trail Rations (7 days)",     35, "'The jerky is the good stuff. My lover and wife's recipe.'"),
         _item("light_crossbow",   "Light Crossbow",             25, "Bolts sold separately. Of course they are."),
         _item("lantern_hooded",   "Hooded Lantern",              5, "Oil not included. Also sold separately."),
     ],
@@ -116,7 +116,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
         _item("nano_stimpack",     "Nano-Stimpack (×3)",         60, "Inject, wait six seconds, feel 40% better."),
         _item("energy_cells_x10",  "Energy Cells (×10)",         40, "'These work in most brands. Mostly.'"),
         _item("vac_suit_patch",    "Vacuum Suit Patch Kit",      15, "For the small holes. Big ones, you're on your own."),
-        _item("holo_decoy",        "Holographic Decoy Unit",    200, "'Bink Bink keeps batting mine off the shelf.'"),
+        _item("holo_decoy",        "Holographic Decoy Unit",    200, "'Coco keeps batting mine off the shelf.'"),
         _item("grav_boots",        "Magnetic Grav-Boots",       350, "Rated to 1.2G. 'Don't test that.'"),
         _item("scrambler_grenade", "Signal Scrambler Grenade (×2)", 90, "Disables sensors. And apparently, toasters."),
     ],
@@ -133,7 +133,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     SceneGenre.HORROR: [
         _item("silver_bullets_x6", "Silver Bullets (×6)",        90, "'Don't ask why I have these.' (He has been asked.)"),
         _item("holy_water_vial",   "Holy Water (×3 vials)",       25, "Genuine. 'Father Mike owes me a favor.'"),
-        _item("wolfsbane_bundle",  "Wolfsbane Bundle",            15, "Keep away from dogs. Cole had to learn this."),
+        _item("wolfsbane_bundle",  "Wolfsbane Bundle",            15, "Keep away from dogs. Coco had to learn this."),
         _item("iron_salt_pouch",   "Iron Filings + Salt Mix",     10, "'Sprinkle at doorways. Don't ask.'"),
         _item("crucifix_blessed",  "Blessed Crucifix",            30, "May or may not work. Depends on your faith."),
         _item("mirror_hand",       "Hand Mirror (unbroken)",       5, "'Keep it unbroken. For the love of...'"),
@@ -143,7 +143,7 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
     SceneGenre.WESTERN: [
         _item("sixshooter_colt",   ".45 Revolver",               120, "'Came off a man who didn't need it anymore.'"),
         _item("ammo_box_45",       ".45 Rounds (×24)",            12, "Factory loads. Clean burns."),
-        _item("lasso_rope",        "Lasso (40ft)",                 8, "'Cole keeps dragging mine around. Hence the surplus.'"),
+        _item("lasso_rope",        "Lasso (40ft)",                 8, "'Coco keeps dragging mine around. Hence the surplus.'"),
         _item("whiskey_flask",     "Whiskey Flask (full)",         4, "The good kind. Don't water it down."),
         _item("dynamite_x2",       "Dynamite Sticks (×2)",        25, "'I don't ask, you don't tell.'"),
         _item("wanted_poster",     "Blank Wanted Poster",          2, "Fill in your own name. Could save time later."),
@@ -151,13 +151,13 @@ _INVENTORY_TABLES: dict[SceneGenre, list[InventoryItem]] = {
         _item("bowie_knife",       "Bowie Knife",                 18, "Still has an edge. Unlike some customers."),
     ],
     SceneGenre.POST_APOCALYPTIC: [
-        _item("duct_tape_roll",    "Duct Tape (full roll)",       20, "'Fix anything. Literally. Fixed Cole's collar with this.'"),
+        _item("duct_tape_roll",    "Duct Tape (full roll)",       20, "'Fix anything. Literally. Fixed Coco's collar with this.'"),
         _item("canned_beans_x6",   "Canned Beans (×6)",           30, "No expiry date visible. Probably fine."),
         _item("rad_pills_x10",     "Radiation Blocker Pills (×10)", 50, "Reduces exposure. Does NOT cure. Read the label."),
         _item("shotgun_shells_x8", "12-Gauge Shells (×8)",        16, "'Standard load. The fancy stuff I keep out back.'"),
-        _item("water_purifier",    "Hand-Pump Water Purifier",    80, "'Bink Bink knocked the last one off the shelf. Hence the sale.'"),
+        _item("water_purifier",    "Hand-Pump Water Purifier",    80, "'Coco knocked the last one off the shelf. Hence the sale.'"),
         _item("gas_mask",          "Gas Mask + 2 Filters",       110, "Seal checks out. Tested it on myself."),
-        _item("stun_baton",        "Jury-Rigged Stun Baton",      65, "'Cole bumped it on once. We don't talk about that.'"),
+        _item("stun_baton",        "Jury-Rigged Stun Baton",      65, "'Coco bumped it on once. We don't talk about that.'"),
         _item("scavenger_toolkit", "Scavenger Toolkit",           45, "Wire, pliers, fuses. The holy trinity."),
     ],
 }
@@ -178,12 +178,12 @@ THE_CACTUS = _item(
 
 _SUCCESS_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
-        "You compliment the cactus, praise Cole's coat, and back toward the door with practiced grace. Jon beams. You're gone before he can remember what he was about to say about his brother-in-law.",
+        "You compliment the cactus, praise Coco's enthusiasm, and back toward the door with practiced grace. Jon beams. You're gone before he can remember what he was about to say about his brother-in-law.",
         "A firm handshake, a 'we'll do this again soon,' and a smile that doesn't reach your eyes. Jon watches you go, genuinely touched. He's already planning what he'll tell you next time.",
     ],
     EscapeMethod.STEALTH: [
-        "Bink Bink leaps onto the display case. Jon spins around. By the time the cat has knocked three items to the floor and Jon has apologized to all of them individually, you are gone. Bink Bink winks. You think.",
-        "You time your exit to the exact moment Cole demands ear scratches. The bell above the door barely makes a sound.",
+        "Coco chooses that exact moment to investigate a potentially edible smell in the back room. Jon spins around to intercept. By the time he's finished negotiating with the hound, you are gone.",
+        "You time your exit to the exact moment Coco demands belly rubs. The bell above the door barely makes a sound.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
         "You inform Jon that something is on fire approximately two blocks away. He says, 'Oh, is it the Hendersons again?' and turns to look out the window. You are a distant memory.",
@@ -202,11 +202,11 @@ _SUCCESS_FLAVOR: dict[EscapeMethod, list[str]] = {
 _FAIL_MILD_FLAVOR: dict[EscapeMethod, list[str]] = {
     EscapeMethod.SMOOTH_TALK: [
         "You make your move, but Jon's face lights up. 'Oh! That reminds me—' You sink back. Seventeen minutes about his cousin's second wedding. The details are extraordinary in their mundanity.",
-        "You're almost out the door when Jon asks if you've met Bink Bink. You have. He introduces you anyway. At length.",
+        "You're almost out the door when Jon asks if you've met Coco. You have. He introduces you anyway. At length.",
     ],
     EscapeMethod.STEALTH: [
-        "You miscalculate Bink Bink's trajectory. The cat knocks something toward you instead of away. Jon turns. Sees you near the door. 'Oh, were you heading out? Actually—'",
-        "The bell above the door is louder than you remembered. Jon spins around with the enthusiasm of a man who has been alone with a cat and a dog all day.",
+        "You miscalculate Coco's trajectory as she lunges for a dropped ration. The hound knocks something toward you instead of away. Jon turns. Sees you near the door. 'Oh, were you heading out? Actually—'",
+        "The bell above the door is louder than you remembered. Jon spins around with the enthusiasm of a man who has been alone with a very enthusiastic hound all day.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
         "Jon immediately offers to come help with your fictional emergency. He knows a guy. He's going to call the guy. He's telling you about the guy first.",
@@ -218,7 +218,7 @@ _FAIL_MILD_FLAVOR: dict[EscapeMethod, list[str]] = {
     ],
     EscapeMethod.BULLDOZE: [
         "Jon reciprocates the hug with significantly more force than expected. By the time you've extracted yourself, the moment has passed and he's already mid-sentence.",
-        "You push for the door. Cole has sat down in front of it and will not move until acknowledged. Jon laughs and launches into Cole's origin story.",
+        "You push for the door. Coco has sat down in front of it and will not move until acknowledged. Jon laughs and launches into Coco's origin story.",
     ],
 }
 
@@ -228,8 +228,8 @@ _FAIL_SEVERE_FLAVOR: dict[EscapeMethod, list[str]] = {
         "You complimented his hat. There is a story about the hat. The hat story leads to a boat story. The boat story leads to a fishing story. You briefly cease to be a person and become instead a pair of eyes, floating.",
     ],
     EscapeMethod.STEALTH: [
-        "Bink Bink lands on your shoulder and yowls directly into your ear. Jon is delighted. Bink Bink has *chosen* you. There is extensive commentary on this. Your sanity absorbs the impact.",
-        "You slip on something Bink Bink knocked over. Jon helps you up. At length. With a story about a similar fall in 2003. The cognitive erosion begins immediately.",
+        "Coco lands her front paws on your shoulders and licks your face with absolute enthusiasm. Jon is delighted. Coco has *chosen* you. There is extensive commentary on this. Your sanity absorbs the impact.",
+        "You slip on something Coco knocked over in her excitement. Jon helps you up. At length. With a story about a similar fall in 2003. The cognitive erosion begins immediately.",
     ],
     EscapeMethod.FABRICATE_EMERGENCY: [
         "Jon has a cousin who went through EXACTLY that. He is going to call them. You listen to both sides of the conversation. By the end, you are no longer certain of your own name.",
@@ -237,10 +237,10 @@ _FAIL_SEVERE_FLAVOR: dict[EscapeMethod, list[str]] = {
     ],
     EscapeMethod.SHEER_WILLPOWER: [
         "Your wall breaks at minute thirty-two. Jon says something tangentially related to something you once cared about. You engage. You don't know why you engage. The damage is done.",
-        "The anecdote has no ending. Jon has circled back to the beginning with new details. You stare into the middle distance. Cole makes eye contact with you. He has seen this before. He is very sorry.",
+        "The anecdote has no ending. Jon has circled back to the beginning with new details. You stare into the middle distance. Coco makes eye contact with you. She has seen this before. She is very sorry.",
     ],
     EscapeMethod.BULLDOZE: [
-        "Jon, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Cole leans against your legs. You cannot leave without disturbing the dog. Jon takes this as a sign you want to stay.",
+        "Jon, apparently raised by huggers, follows you to the door for a goodbye that lasts eleven minutes. Coco leans against your legs. You cannot leave without disturbing the dog. Jon takes this as a sign you want to stay.",
         "You push through but Jon follows, continuing the story onto the front stoop. He doesn't notice he is now outside. You are standing in the sun together. This is somehow worse. His rambling erodes something essential in you.",
     ],
 }
@@ -332,7 +332,7 @@ class ShopkeeperJon:
                 "*plant*. A rare, carefully cultivated *succulent*. For my *sister*. "
                 "She has a collection. It is a *hobby*. Now I'm going to need you to "
                 "step back from the counter until you can conduct yourselves with some "
-                "basic human decency. Unbelievable. In front of Teddy, even.'"
+                "basic human decency. Unbelievable. In front of Coco, even.'"
             )
 
         early_responses = [
