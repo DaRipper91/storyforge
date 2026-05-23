@@ -230,14 +230,32 @@ class LobbySlot(BaseModel):
     status: SlotStatus = SlotStatus.EMPTY
     controller_id: str | None = None      # GamepadID string from frontend
     character_id: str | None = None        # set when SlotStatus.READY
-    
-    # Creation draft (temporary)
+
+    # Creation draft (persisted so page-refresh restores progress)
     race: Race | None = None
     evolution_state: EvolutionaryState | None = None
     predator_role: PredatorRole | None = None
     starting_era: Literal["before", "after"] | None = None
     assigned_abilities: dict[str, int] | None = None
     name_draft: str | None = None
+    # Extended customisation draft
+    equipment_choice_id: str | None = None
+    background: str | None = None
+    skill_proficiencies: list[str] = Field(default_factory=list)
+    feat: str | None = None
+    cantrips: list[str] = Field(default_factory=list)
+    alignment: str | None = None
+    pronouns: str = "they/them"
+    title: str | None = None
+    dialogue_style: str | None = None
+    physical_description: str = ""
+    backstory: str = ""
+    personality_traits: str = ""
+    flaws: str = ""
+    bonds: str = ""
+    ideals: str = ""
+    keepsake_name: str | None = None
+    creation_step: str = "era"            # last confirmed step
 
 
 class CharacterCreationRequest(BaseModel):

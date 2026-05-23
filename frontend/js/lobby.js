@@ -12,7 +12,7 @@
 
 import {
   fetchCatalog, joinLobby, leaveLobby, createCharacter, startGame,
-  updateLobbyName, setPhase,
+  updateLobbyName, setPhase, saveDraft,
   fetchCampaigns, newCampaign, loadCampaign,
 } from "./api.js";
 
@@ -832,6 +832,8 @@ export class Lobby {
       this._pendingValue = null;
       this._renderCreation();
       this.audio?.playPageTurn();
+      // Persist draft so a page refresh can restore this step
+      saveDraft(this._draftToServerPatch(draft)).catch(() => {});
     }
   }
 
@@ -1783,18 +1785,62 @@ export class Lobby {
 
   _draftFromSlot(slot) {
     const draft = this._emptyDraft(slot.controller_id, slot.slot_index);
-    draft.race           = slot.race ?? null;
-    draft.evolutionState = slot.evolution_state ?? null;
-    draft.predatorRole   = slot.predator_role ?? null;
-    draft.abilities      = slot.assigned_abilities
+    // Core fields
+    draft.race              = slot.race ?? null;
+    draft.evolutionState    = slot.evolution_state ?? null;
+    draft.predatorRole      = slot.predator_role ?? null;
+    draft.startingEra       = slot.starting_era ?? "after";
+    draft.abilities         = slot.assigned_abilities
       ?? { STR: null, DEX: null, CON: null, INT: null, WIS: null, CHA: null };
-    draft.name           = slot.name_draft ?? "";
-    // Restore step based on how far the slot got
-    if (!draft.race) draft.step = "era";
-    else if (!draft.evolutionState) draft.step = "race";
-    else if (!draft.predatorRole) draft.step = "state";
-    else draft.step = "role";
+    draft.name              = slot.name_draft ?? "";
+    // Extended customisation fields
+    draft.equipmentChoiceId  = slot.equipment_choice_id ?? null;
+    draft.background         = slot.background ?? null;
+    draft.skillProficiencies = slot.skill_proficiencies ?? [];
+    draft.feat               = slot.feat ?? null;
+    draft.cantrips           = slot.cantrips ?? [];
+    draft.alignment          = slot.alignment ?? null;
+    draft.pronouns           = slot.pronouns ?? "they/them";
+    draft.title              = slot.title ?? null;
+    draft.dialogueStyle      = slot.dialogue_style ?? null;
+    draft.physicalDescription = slot.physical_description ?? "";
+    draft.backstory          = slot.backstory ?? "";
+    draft.personalityTraits  = slot.personality_traits ?? "";
+    draft.flaws              = slot.flaws ?? "";
+    draft.bonds              = slot.bonds ?? "";
+    draft.ideals             = slot.ideals ?? "";
+    draft.keepsakeName       = slot.keepsake_name ?? null;
+    // Restore the step the player was on
+    draft.step = slot.creation_step ?? "era";
     return draft;
+  }
+
+  _draftToServerPatch(draft) {
+    return {
+      controller_id:        draft.controllerId,
+      creation_step:        draft.step,
+      race:                 draft.race,
+      evolution_state:      draft.evolutionState,
+      predator_role:        draft.predatorRole,
+      starting_era:         draft.startingEra,
+      assigned_abilities:   Object.values(draft.abilities).every(v => v != null) ? draft.abilities : null,
+      equipment_choice_id:  draft.equipmentChoiceId,
+      background:           draft.background,
+      skill_proficiencies:  draft.skillProficiencies,
+      feat:                 draft.feat,
+      cantrips:             draft.cantrips,
+      alignment:            draft.alignment,
+      pronouns:             draft.pronouns,
+      title:                draft.title,
+      dialogue_style:       draft.dialogueStyle,
+      physical_description: draft.physicalDescription,
+      backstory:            draft.backstory,
+      personality_traits:   draft.personalityTraits,
+      flaws:                draft.flaws,
+      bonds:                draft.bonds,
+      ideals:               draft.ideals,
+      keepsake_name:        draft.keepsakeName,
+    };
   }
 
   _escape(s) {

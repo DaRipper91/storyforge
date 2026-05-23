@@ -232,6 +232,22 @@ class StateManager:
             return summary
 
 
+    async def save_draft(self, *, controller_id: str, patch: dict) -> dict:
+        """Persist mid-creation draft fields so a page-refresh can restore progress."""
+        async with self._lock:
+            for slot in self._state.lobby_slots:
+                if slot.controller_id == controller_id:
+                    if slot.status not in (SlotStatus.CLAIMED, SlotStatus.CREATING):
+                        raise StateError(f"slot for {controller_id} is not in a creation state")
+                    slot.status = SlotStatus.CREATING
+                    for key, value in patch.items():
+                        if hasattr(slot, key):
+                            setattr(slot, key, value)
+                    summary = {"type": "draft_saved", "controller_id": controller_id}
+                    await self._commit(summary)
+                    return summary
+            raise StateError(f"no slot found for controller {controller_id}")
+
     async def release_slot(self, *, controller_id: str) -> dict:
         """A controller pressed B to leave. Clear their slot."""
         async with self._lock:
@@ -251,6 +267,23 @@ class StateManager:
                     slot.predator_role = None
                     slot.assigned_abilities = None
                     slot.name_draft = None
+                    slot.equipment_choice_id = None
+                    slot.background = None
+                    slot.skill_proficiencies = []
+                    slot.feat = None
+                    slot.cantrips = []
+                    slot.alignment = None
+                    slot.pronouns = "they/them"
+                    slot.title = None
+                    slot.dialogue_style = None
+                    slot.physical_description = ""
+                    slot.backstory = ""
+                    slot.personality_traits = ""
+                    slot.flaws = ""
+                    slot.bonds = ""
+                    slot.ideals = ""
+                    slot.keepsake_name = None
+                    slot.creation_step = "era"
                     
                     # If nobody is in any slot, revert to LOBBY phase.
                     if all(s.status == SlotStatus.EMPTY for s in self._state.lobby_slots):

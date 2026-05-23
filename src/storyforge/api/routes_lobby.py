@@ -46,6 +46,33 @@ class UpdateNameRequest(BaseModel):
     controller_id: str | None = Field(default=None, min_length=1, max_length=200)
 
 
+class SaveDraftRequest(BaseModel):
+    controller_id: str = Field(min_length=1, max_length=200)
+    # Only the fields that change at each step are sent
+    creation_step: str | None = None
+    race: str | None = None
+    evolution_state: str | None = None
+    predator_role: str | None = None
+    starting_era: str | None = None
+    assigned_abilities: dict | None = None
+    equipment_choice_id: str | None = None
+    background: str | None = None
+    skill_proficiencies: list[str] | None = None
+    feat: str | None = None
+    cantrips: list[str] | None = None
+    alignment: str | None = None
+    pronouns: str | None = None
+    title: str | None = None
+    dialogue_style: str | None = None
+    physical_description: str | None = None
+    backstory: str | None = None
+    personality_traits: str | None = None
+    flaws: str | None = None
+    bonds: str | None = None
+    ideals: str | None = None
+    keepsake_name: str | None = None
+
+
 # ───────────────────────── Endpoints ─────────────────────────
 
 @router.get("/lobby/catalog")
@@ -186,6 +213,18 @@ async def update_name(
             name=req.name,
             controller_id=controller_id,
         )
+    except StateError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.post("/lobby/save_draft")
+async def save_draft(
+    req: SaveDraftRequest,
+    state: StateManager = Depends(get_state_manager),
+) -> dict:
+    patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
+    try:
+        return await state.save_draft(controller_id=req.controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

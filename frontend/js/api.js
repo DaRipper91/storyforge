@@ -72,6 +72,15 @@ export async function updateLobbyName({ slotIndex, name, controllerId }) {
   return jsonOrThrow(res);
 }
 
+export async function saveDraft(patch) {
+  const res = await fetch(`${API_BASE}/api/lobby/save_draft`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  return jsonOrThrow(res);
+}
+
 export async function setPhase(phase) {
   const res = await fetch(`${API_BASE}/api/lobby/set_phase`, {
     method: "POST",
