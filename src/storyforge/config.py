@@ -1,6 +1,7 @@
 """Environment + path resolution. No secrets in code."""
 import sys
 from pathlib import Path
+import secrets
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
     # Auth
     google_client_id: str = ""
     google_client_secret: str = ""
-    jwt_secret: str = "dev-secret-change-me-in-production"
+    jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     jwt_algorithm: str = "HS256"
     
     campaign_id: str = "family_campaign_01"

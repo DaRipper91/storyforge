@@ -9,7 +9,7 @@ Endpoints:
     GET  /api/lobby/catalog   — race + class definitions for the UI
 """
 from __future__ import annotations
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 import jwt
 

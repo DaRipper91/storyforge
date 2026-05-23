@@ -55,7 +55,6 @@ from storyforge.encounters.nathis import (
 )
 from storyforge.encounters.redvelvet import (
     FireyRedVelvet,
-    Mood,
     RedVelvetEncounterState,
     SongRequest,
 )

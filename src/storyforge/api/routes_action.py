@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from storyforge.core.models import (
-    GridAction, FreeformAction, AINarrationResponse, TurnPhase,
+    GridAction, FreeformAction, TurnPhase,
 )
 from storyforge.core.state_manager import StateManager
-from storyforge.core import grid, rules, validators
+from storyforge.core import rules, validators
 from storyforge.ai import narrator, interpreter
-from storyforge.events.bus import event_bus
 from storyforge.api.deps import get_state_manager
 
 router = APIRouter(prefix="/api/action", tags=["action"])
