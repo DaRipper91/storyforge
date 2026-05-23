@@ -1,21 +1,27 @@
-[gd_scene load_steps=6 format=3 uid="uid://u1i2m3a4n5g6"]
+[gd_scene load_steps=9 format=3 uid="uid://u1i2m3a4n5g6"]
 
 [ext_resource type="Script" path="res://scripts/UIManager.gd" id="1_ui"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(0.25, 0.25, 0.25, 0.6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.862745, 0.709804, 0.380392, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
 
 [sub_resource type="Theme" id="Theme_1"]
 Button/colors/font_color = Color(0.862745, 0.709804, 0.380392, 1)
 Button/colors/font_hover_color = Color(1, 1, 1, 1)
-Button/styles/hover = StyleBoxFlat.new()
-Button/styles/hover.bg_color = Color(0.25, 0.25, 0.25, 0.6)
-Button/styles/normal = StyleBoxFlat.new()
-Button/styles/normal.bg_color = Color(0.1, 0.1, 0.1, 0.6)
-Button/styles/normal.border_width_bottom = 2
-Button/styles/normal.border_width_left = 2
-Button/styles/normal.border_width_right = 2
-Button/styles/normal.border_width_top = 2
-Button/styles/normal.border_color = Color(0.862745, 0.709804, 0.380392, 0.5)
-Button/styles/pressed = StyleBoxFlat.new()
-Button/styles/pressed.bg_color = Color(0.1, 0.1, 0.1, 1)
+Button/styles/hover = SubResource("StyleBoxFlat_hover")
+Button/styles/normal = SubResource("StyleBoxFlat_normal")
+Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
 
 [sub_resource type="Curve" id="Curve_ash_scale"]
 _data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
