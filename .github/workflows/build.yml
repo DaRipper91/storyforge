@@ -148,7 +148,7 @@ jobs:
 
       - name: Build AppImage
         run: |
-          curl -LO https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          curl -LO https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
           mkdir -p StoryForge.AppDir/usr/bin
           cp dist/StoryForge StoryForge.AppDir/usr/bin/storyforge
