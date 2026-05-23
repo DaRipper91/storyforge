@@ -83,14 +83,6 @@ RACES: dict[Race, RaceDef] = {
         name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch", before="Sleep-Walker",
         flavor="Spore-borne entities that project the faces of the beloved dead."
     ),
-    Race.BLOODWEAVER: RaceDef(
-        name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1}, group="Eldritch", before="High Vampire",
-        flavor="Regal horrors who conquer entire bloodlines from the inside out."
-    ),
-    Race.DREAMHUSK: RaceDef(
-        name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch", before="Sleep-Walker",
-        flavor="Spore-borne entities that project the faces of the beloved dead."
-    ),
     Race.BONEDRIFTER: RaceDef(
         name="Bonedrifter", speed=20, ability_bonuses={"CON": 2, "STR": 1}, group="Eldritch", before="Bone-Construct",
         flavor="Parasitic beings that rewrite their hosts skeleton-first into living prisons."
@@ -220,7 +212,8 @@ STATES: dict[EvolutionaryState, StateDef] = {
 @dataclass(frozen=True)
 class RoleDef:
     name: str
-    starting_inventory: tuple[InventoryItem, ...]
+    primary_item: InventoryItem
+    equipment_choices: tuple[InventoryItem, ...]
     flavor: str
 
 def _item(item_id: str, name: str, equipped: bool = False, qty: int = 1,
@@ -231,25 +224,210 @@ def _item(item_id: str, name: str, equipped: bool = False, qty: int = 1,
 ROLES: dict[PredatorRole, RoleDef] = {
     PredatorRole.STALKER: RoleDef(
         name="Stalker",
-        starting_inventory=(_item("razor_claws", "Razor Claws", equipped=True), _item("smoke_pellets", "Smoke Pellets", qty=3)),
+        primary_item=_item("razor_claws", "Razor Claws", equipped=True),
+        equipment_choices=(
+            _item("smoke_pellets", "Smoke Pellets", qty=3, notes="Blind pursuers for one round."),
+            _item("grappling_hook", "Grappling Hook", notes="Reach elevated positions instantly."),
+            _item("caltrops", "Caltrops", qty=10, notes="Scatter to slow pursuit."),
+        ),
         flavor="Single-target elimination and ambushing."
     ),
     PredatorRole.VANGUARD: RoleDef(
         name="Vanguard",
-        starting_inventory=(_item("heavy_mandibles", "Heavy Mandibles", equipped=True), _item("reinforced_plating", "Reinforced Plating", equipped=True)),
+        primary_item=_item("heavy_mandibles", "Heavy Mandibles", equipped=True),
+        equipment_choices=(
+            _item("reinforced_plating", "Reinforced Plating", equipped=True, notes="+1 AC while worn."),
+            _item("war_banner", "War Banner", notes="Allies within 10ft gain advantage on morale saves."),
+            _item("battle_horn", "Battle Horn", notes="Demoralize enemies on a successful Intimidation check."),
+        ),
         flavor="Zone control and intimidation."
     ),
     PredatorRole.CATALYST: RoleDef(
         name="Catalyst",
-        starting_inventory=(_item("venom_sac", "Venom Sac", equipped=True), _item("web_strands", "Web Strands", qty=5)),
+        primary_item=_item("venom_sac", "Venom Sac", equipped=True),
+        equipment_choices=(
+            _item("web_strands", "Web Strands", qty=5, notes="Restrain a target on a hit."),
+            _item("explosive_spore", "Explosive Spore", qty=3, notes="5ft burst on impact."),
+            _item("paralytic_dust", "Paralytic Dust", notes="DC 13 CON or target is slowed."),
+        ),
         flavor="Environmental manipulation and trapping."
     ),
     PredatorRole.SIPHONER: RoleDef(
         name="Siphoner",
-        starting_inventory=(_item("energy_leech", "Energy Leech", equipped=True), _item("void_battery", "Void Battery")),
+        primary_item=_item("energy_leech", "Energy Leech", equipped=True),
+        equipment_choices=(
+            _item("void_battery", "Void Battery", notes="Store stolen energy for a burst attack."),
+            _item("essence_vial", "Essence Vial", qty=3, notes="Distilled lifeforce; heals 1d6 HP."),
+            _item("null_trap", "Null Trap", qty=2, notes="Suppresses magic in a 10ft radius."),
+        ),
         flavor="Resource theft and adaptation."
     ),
 }
+
+
+# ─────────────────────── Background definitions ───────────────────────
+
+@dataclass(frozen=True)
+class BackgroundDef:
+    name: str
+    flavor: str
+    perk_name: str
+    perk_description: str
+    bonus_skills: tuple[str, ...]   # auto-granted
+    skill_pool: tuple[str, ...]     # player picks 2 from this
+
+
+BACKGROUNDS: dict[str, BackgroundDef] = {
+    "void_scavenger": BackgroundDef(
+        name="Void Scavenger",
+        flavor="You stripped remnants from dead worlds and dying ships before the Paradox. You know how to find value in decay.",
+        perk_name="Salvage Sense",
+        perk_description="You can identify the approximate value and origin of any object with a moment's study.",
+        bonus_skills=("Survival", "Sleight of Hand"),
+        skill_pool=("Athletics", "Perception", "Stealth", "Investigation"),
+    ),
+    "paradox_cultist": BackgroundDef(
+        name="Paradox Cultist",
+        flavor="You worshipped the coming change, believing the Paradox was divine reckoning. You prepared for it — and it noticed.",
+        perk_name="Paradox Scar",
+        perk_description="You have uncanny insight into transformations and can sense when someone is about to change.",
+        bonus_skills=("Arcana", "Religion"),
+        skill_pool=("Insight", "Persuasion", "Deception", "History"),
+    ),
+    "remnant_soldier": BackgroundDef(
+        name="Remnant Soldier",
+        flavor="You served in the armies of the old world and lived through the Paradox. Your training survived the silence — barely.",
+        perk_name="Battle Hardened",
+        perk_description="You cannot be frightened while at full HP.",
+        bonus_skills=("Athletics", "Intimidation"),
+        skill_pool=("Acrobatics", "Perception", "Survival", "Animal Handling"),
+    ),
+    "archive_scholar": BackgroundDef(
+        name="Archive Scholar",
+        flavor="You preserved knowledge of what existed before, cataloguing species and civilizations as they dissolved.",
+        perk_name="Living Catalogue",
+        perk_description="Advantage on History and Nature checks related to pre-Paradox civilizations.",
+        bonus_skills=("History", "Arcana"),
+        skill_pool=("Investigation", "Nature", "Religion", "Medicine"),
+    ),
+    "feral_wanderer": BackgroundDef(
+        name="Feral Wanderer",
+        flavor="You had no home before the Paradox, and nothing to lose when it came. You drifted and survived on instinct alone.",
+        perk_name="Apex Instinct",
+        perk_description="You always have advantage on initiative rolls.",
+        bonus_skills=("Survival", "Perception"),
+        skill_pool=("Athletics", "Stealth", "Animal Handling", "Nature"),
+    ),
+    "syndicate_broker": BackgroundDef(
+        name="Syndicate Broker",
+        flavor="You ran deals, moved cargo no one was supposed to know about, and kept the underground's lights on through the silence.",
+        perk_name="Network Ghost",
+        perk_description="In any settlement, you can find someone who owes you a favor with a DC 12 Persuasion check.",
+        bonus_skills=("Deception", "Persuasion"),
+        skill_pool=("Stealth", "Investigation", "Sleight of Hand", "Intimidation"),
+    ),
+    "settlement_warden": BackgroundDef(
+        name="Settlement Warden",
+        flavor="You defended one of the fragile post-Paradox communities that clawed their way back to order. Some even survived.",
+        perk_name="Guardian's Presence",
+        perk_description="Allies within 10 feet have advantage on saving throws against fear effects.",
+        bonus_skills=("Insight", "Medicine"),
+        skill_pool=("Athletics", "Persuasion", "Perception", "Animal Handling"),
+    ),
+    "void_oracle": BackgroundDef(
+        name="Void Oracle",
+        flavor="The Paradox showed you things — glimpses of what was, what could be, what should never be. You're not sure if it was a gift.",
+        perk_name="Fractured Sight",
+        perk_description="Once per day, you may ask the DM a yes/no question about the immediate future.",
+        bonus_skills=("Insight", "History"),
+        skill_pool=("Arcana", "Perception", "Religion", "Deception"),
+    ),
+}
+
+
+# ─────────────────────── Feat definitions ───────────────────────
+
+@dataclass(frozen=True)
+class FeatDef:
+    name: str
+    flavor: str
+    mechanical_effect: str
+
+
+FEATS: dict[str, FeatDef] = {
+    "apex_predator": FeatDef(
+        name="Apex Predator",
+        flavor="Your transformed form inspires primal terror in prey.",
+        mechanical_effect="+2 to Intimidation checks while transformed.",
+    ),
+    "hive_mind": FeatDef(
+        name="Hive Mind",
+        flavor="You share a wordless psychic link with those you trust.",
+        mechanical_effect="Communicate telepathically with party members within 30 feet.",
+    ),
+    "regenerator": FeatDef(
+        name="Regenerator",
+        flavor="Your body knits itself back together faster than it can be broken.",
+        mechanical_effect="At the start of your turn, if above 0 HP, regain 1 HP.",
+    ),
+    "phase_shift": FeatDef(
+        name="Phase Shift",
+        flavor="For a single suspended heartbeat, you exist between states.",
+        mechanical_effect="Once per rest, pass through solid objects up to 5 feet.",
+    ),
+    "pack_tactics": FeatDef(
+        name="Pack Tactics",
+        flavor="Predators hunt better together.",
+        mechanical_effect="Advantage on attack rolls when an ally is adjacent to the target.",
+    ),
+    "void_touched": FeatDef(
+        name="Void Touched",
+        flavor="The silence between worlds has left its mark on your biology.",
+        mechanical_effect="Resistance to necrotic and psychic damage.",
+    ),
+    "echo_memory": FeatDef(
+        name="Echo Memory",
+        flavor="A touch can unlock what a creature knew, felt, or feared.",
+        mechanical_effect="By touching a creature, access its most recent memory (DM discretion).",
+    ),
+    "apex_form": FeatDef(
+        name="Apex Form",
+        flavor="Desperation unlocks your most dangerous instincts.",
+        mechanical_effect="Advantage on STR checks and saving throws when below half maximum HP.",
+    ),
+}
+
+
+# ─────────────────────── Skills, Cantrips, Alignments, Dialogue Styles ────
+
+SKILLS: list[str] = [
+    "Athletics",
+    "Acrobatics", "Sleight of Hand", "Stealth",
+    "Arcana", "History", "Investigation", "Nature", "Religion",
+    "Animal Handling", "Insight", "Medicine", "Perception", "Survival",
+    "Deception", "Intimidation", "Performance", "Persuasion",
+]
+
+CANTRIPS: list[str] = [
+    "Voidbolt", "Shadowweave", "Mindspike", "Entangle",
+    "Toll the Dead", "Minor Illusion", "Chill Touch", "Eldritch Blast",
+    "Acid Splash", "Prestidigitation",
+]
+
+ALIGNMENTS: list[str] = [
+    "Lawful Good", "Neutral Good", "Chaotic Good",
+    "Lawful Neutral", "True Neutral", "Chaotic Neutral",
+    "Lawful Evil", "Neutral Evil", "Chaotic Evil",
+]
+
+DIALOGUE_STYLES: list[dict] = [
+    {"id": "formal",      "name": "Formal & Eloquent",    "flavor": "Precise, measured language. You choose every word deliberately."},
+    {"id": "casual",      "name": "Casual & Earthy",       "flavor": "Plain speech, direct and honest. No pretense."},
+    {"id": "sarcastic",   "name": "Sarcastic & Dry",       "flavor": "Wit is your armor. You deflect with humor."},
+    {"id": "stoic",       "name": "Stoic & Minimal",       "flavor": "Silence speaks loudest. You say only what matters."},
+    {"id": "boisterous",  "name": "Boisterous & Loud",     "flavor": "Everything deserves enthusiasm. Volume is your birthright."},
+    {"id": "cryptic",     "name": "Cryptic & Mysterious",  "flavor": "You speak in metaphor and half-truths. Listeners work for it."},
+]
 
 # ─────────────────────── Factory logic ───────────────────────
 
@@ -274,7 +452,24 @@ def build_character(
     role: PredatorRole,
     abilities: AbilityScores,
     game_state: GameState,
-    starting_era: str = "after"
+    starting_era: str = "after",
+    # Customization
+    background: str | None = None,
+    equipment_choice_id: str | None = None,
+    skill_proficiencies: list[str] | None = None,
+    feat: str | None = None,
+    cantrips: list[str] | None = None,
+    alignment: str | None = None,
+    pronouns: str = "they/them",
+    title: str | None = None,
+    dialogue_style: str | None = None,
+    physical_description: str = "",
+    backstory: str = "",
+    personality_traits: str = "",
+    flaws: str = "",
+    bonds: str = "",
+    ideals: str = "",
+    keepsake_name: str | None = None,
 ) -> CharacterSheet:
     r_def = RACES[race]
     s_def = STATES[state]
@@ -288,6 +483,34 @@ def build_character(
 
     hp_max = s_def.hit_die + _ability_modifier(final_scores.CON)
     ac = s_def.base_armor_class + _ability_modifier(final_scores.DEX)
+
+    # Build inventory: primary item + one chosen secondary (default to first)
+    chosen_secondary: InventoryItem | None = None
+    if equipment_choice_id and p_def.equipment_choices:
+        for item in p_def.equipment_choices:
+            if item.id == equipment_choice_id:
+                chosen_secondary = item
+                break
+    if chosen_secondary is None and p_def.equipment_choices:
+        chosen_secondary = p_def.equipment_choices[0]
+    inventory: list[InventoryItem] = [p_def.primary_item]
+    if chosen_secondary is not None:
+        inventory.append(chosen_secondary)
+
+    # Add keepsake trinket
+    if keepsake_name:
+        inventory.append(_item(
+            f"keepsake_{char_id}", keepsake_name,
+            notes="A personal keepsake. No mechanical value."
+        ))
+
+    # Merge background auto-skills with player-picked skills (deduplicated)
+    final_skills: list[str] = list(skill_proficiencies or [])
+    if background and background in BACKGROUNDS:
+        bg_def = BACKGROUNDS[background]
+        for skill in bg_def.bonus_skills:
+            if skill not in final_skills:
+                final_skills.append(skill)
 
     # Find a starting position on the grid.
     spawn_pos = find_starting_position(game_state)
@@ -307,10 +530,24 @@ def build_character(
         speed=r_def.speed,
         abilities=final_scores,
         proficiency_bonus=2,
-        inventory=list(p_def.starting_inventory),
+        skill_proficiencies=final_skills,
+        inventory=inventory,
         position=spawn_pos,
         movement_remaining=r_def.speed,
         is_transformed=(starting_era == "after"),
+        background=background,
+        feat=feat,
+        cantrips=cantrips or [],
+        alignment=alignment,
+        pronouns=pronouns,
+        title=title,
+        dialogue_style=dialogue_style,
+        physical_description=physical_description,
+        backstory=backstory,
+        personality_traits=personality_traits,
+        flaws=flaws,
+        bonds=bonds,
+        ideals=ideals,
     )
 
 
