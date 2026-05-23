@@ -16,7 +16,7 @@ cat <<EOF > "$DESKTOP_FILE"
 [Desktop Entry]
 Name=StoryForge
 Comment=A Feral World Adventure
-Exec=godot "$PROJECT_ROOT/godot/scenes/Boot.tscn"
+Exec="$PROJECT_ROOT/launch.sh"
 Icon=$ICON_PATH
 Terminal=false
 Type=Application
