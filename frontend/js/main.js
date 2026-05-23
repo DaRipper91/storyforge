@@ -64,6 +64,11 @@ let appState = null;
 let session  = null;
 let currentUser = null;
 
+const _esc = (() => {
+  const d = document.createElement("div");
+  return (s) => { d.textContent = String(s ?? ""); return d.innerHTML; };
+})();
+
 // Expose auth to window for Google SDK callback
 window.onGoogleLogin = async (response) => {
   try {
@@ -745,10 +750,10 @@ function renderShopInventory(items) {
     const li = document.createElement("li");
     li.className = "jon-item";
     li.innerHTML = `
-      <span class="jon-item-name">${item.name}</span>
-      <span class="jon-item-notes">${item.notes ?? ""}</span>
-      <span class="jon-item-price">${item.value}s</span>
-      <button class="jon-item-buy" data-item-id="${item.id}">Buy</button>
+      <span class="jon-item-name">${_esc(item.name)}</span>
+      <span class="jon-item-notes">${_esc(item.notes)}</span>
+      <span class="jon-item-price">${_esc(item.value)}s</span>
+      <button class="jon-item-buy" data-item-id="${_esc(item.id)}">Buy</button>
     `;
     li.querySelector(".jon-item-buy").addEventListener("click", () => buyItem(item.id, item.name));
     shopEls.inventoryList.appendChild(li);
@@ -857,7 +862,7 @@ function showShopMessage(text, extraClass = "") {
 function showEscapeResult(text, success) {
   shopEls.escapeResult.className = `escape-result${success ? " is-success" : " is-fail"}`;
   // Render simple markdown bold
-  shopEls.escapeResult.innerHTML = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
+  shopEls.escapeResult.innerHTML = _esc(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
   shopEls.escapeResult.classList.remove("hidden");
 }
 

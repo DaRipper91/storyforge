@@ -3,7 +3,7 @@ extends Node
 # The technical bridge between Godot and the Python Brain.
 # Connects via HTTP for requests and WebSockets for real-time state updates.
 #
-# server_url is set by BootManager before _start_connection() is called.
+# server_url is set by BootManager before start_connection() is called.
 # Default is localhost for solo play; paste an ngrok URL for remote testing.
 
 const CONFIG_PATH = "user://settings.cfg"
@@ -19,7 +19,6 @@ var _base_url: String:
 var _ws_url: String:
 	get:
 		var base = server_url.rstrip("/")
-		# https → wss, http → ws
 		if base.begins_with("https://"):
 			base = "wss://" + base.substr(8)
 		elif base.begins_with("http://"):
@@ -48,7 +47,7 @@ func load_saved_url() -> String:
 
 func _save_url(url: String) -> void:
 	var cfg = ConfigFile.new()
-	cfg.load(CONFIG_PATH)  # load existing so we don't wipe other keys
+	cfg.load(CONFIG_PATH)
 	cfg.set_value(CONFIG_SECTION, CONFIG_KEY_URL, url)
 	cfg.save(CONFIG_PATH)
 
@@ -106,22 +105,7 @@ func _on_state_fetched(_result, _response_code, _headers, body):
 	if json:
 		state_updated.emit(json)
 
-func fetch_catalog():
-	var http = HTTPRequest.new()
-	add_child(http)
-	http.request_completed.connect(_on_catalog_fetched)
-	http.request(_base_url + "/lobby/catalog")
-	return http
-
-signal catalog_received(catalog_data: Dictionary)
-
-func _on_catalog_fetched(_result, response_code, _headers, body):
-	if response_code == 200:
-		var json = JSON.parse_string(body.get_string_from_utf8())
-		if json:
-			catalog_received.emit(json)
-
-func post_request(endpoint: String, data: Dictionary):
+func post_request(endpoint: String, data: Dictionary) -> HTTPRequest:
 	var http = HTTPRequest.new()
 	add_child(http)
 	var json_data = JSON.stringify(data)
@@ -148,3 +132,111 @@ func _on_auth_completed(_result, response_code, _headers, body):
 	else:
 		print("Auth failed or was cancelled.")
 		auth_completed.emit(false, {})
+
+# ─── Catalog ───────────────────────────────────────────────────────
+
+signal catalog_received(catalog_data: Dictionary)
+
+func fetch_catalog():
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(_on_catalog_fetched)
+	http.request(_base_url + "/lobby/catalog")
+	return http
+
+func _on_catalog_fetched(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json:
+			catalog_received.emit(json)
+
+# ─── Campaign management ───────────────────────────────────────────
+
+signal campaigns_received(campaigns: Array)
+signal new_campaign_ready(state: Dictionary)
+signal campaign_loaded(state: Dictionary)
+
+func fetch_campaigns() -> void:
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(_on_campaigns_fetched)
+	http.request(_base_url + "/campaigns")
+
+func _on_campaigns_fetched(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json:
+			campaigns_received.emit(json.get("campaigns", []))
+		else:
+			campaigns_received.emit([])
+
+func new_campaign() -> void:
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(_on_new_campaign_ready)
+	http.request(_base_url + "/campaigns/new", [], HTTPClient.METHOD_POST, "")
+
+func _on_new_campaign_ready(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json:
+			new_campaign_ready.emit(json)
+
+func load_campaign(campaign_id: String) -> void:
+	var http = post_request("/campaigns/load", {"campaign_id": campaign_id})
+	http.request_completed.connect(_on_campaign_loaded)
+
+func _on_campaign_loaded(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json:
+			campaign_loaded.emit(json)
+
+# ─── Lobby ─────────────────────────────────────────────────────────
+
+signal lobby_joined(slot_index: int)
+
+func join_lobby(controller_id: String) -> void:
+	var http = post_request("/lobby/join", {"controller_id": controller_id})
+	http.request_completed.connect(_on_lobby_joined)
+
+func _on_lobby_joined(_result, response_code, _headers, body):
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json:
+			lobby_joined.emit(json.get("slot_index", 0))
+
+func set_phase(phase: String) -> void:
+	post_request("/lobby/set_phase", {"phase": phase})
+
+# ─── Character creation ────────────────────────────────────────────
+
+signal character_created(result: Dictionary)
+signal character_create_failed(error: String)
+
+func create_character(data: Dictionary) -> void:
+	var http = post_request("/character/create", data)
+	http.request_completed.connect(_on_character_created)
+
+func _on_character_created(_result, response_code, _headers, body):
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	if response_code == 200 and json:
+		character_created.emit(json)
+	else:
+		var msg = json.get("detail", "Unknown error") if json else "Unknown error"
+		character_create_failed.emit(msg)
+
+signal game_started()
+signal game_start_failed(error: String)
+
+func start_game() -> void:
+	var http = post_request("/lobby/start", {})
+	http.request_completed.connect(_on_game_started)
+
+func _on_game_started(_result, response_code, _headers, body):
+	if response_code == 200:
+		game_started.emit()
+	else:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		var msg = json.get("detail", "Unknown error") if json else "Unknown error"
+		game_start_failed.emit(msg)

@@ -59,7 +59,7 @@
       if (window.pywebview) window.pywebview.api.toggle_fullscreen();
       else document.body.requestFullscreen();
     ">Fullscreen</button>
-    <button class="menu-btn pywebview-only" onclick="window.pywebview.api.minimize()">—</button>
+    <button class="menu-btn pywebview-only" aria-label="Minimize" onclick="window.pywebview.api.minimize()">—</button>
     <button class="menu-btn pywebview-only" onclick="window.pywebview.api.quit()">Quit</button>
   </nav>
 
@@ -152,12 +152,18 @@
     <h1 class="creation-title ink-gilded">Forge Your Hero</h1>
     
     <div class="creation-steps">
-      <div class="step-pill" data-step="era">1. Era</div>
-      <div class="step-pill" data-step="race">2. Race</div>
-      <div class="step-pill" data-step="state">3. State</div>
-      <div class="step-pill" data-step="role">4. Role</div>
-      <div class="step-pill" data-step="abilities">5. Abilities</div>
-      <div class="step-pill" data-step="name">6. Name</div>
+      <div class="step-pill" data-step="era">Era</div>
+      <div class="step-pill" data-step="race">Race</div>
+      <div class="step-pill" data-step="state">Body</div>
+      <div class="step-pill" data-step="role">Role</div>
+      <div class="step-pill" data-step="equipment">Gear</div>
+      <div class="step-pill" data-step="background">Origin</div>
+      <div class="step-pill" data-step="abilities">Stats</div>
+      <div class="step-pill" data-step="skills">Skills</div>
+      <div class="step-pill" data-step="feat">Feat</div>
+      <div class="step-pill" data-step="identity">Identity</div>
+      <div class="step-pill" data-step="story">Story</div>
+      <div class="step-pill" data-step="name">Name</div>
     </div>
     
     <div id="creation-stage" class="creation-stage">
@@ -269,6 +275,15 @@
         <span class="hint"><kbd>LT</kbd>/<kbd>V</kbd> Inventory</span>
         </div>
         </footer>
+  </div>
+
+  <!-- ─────── ATTRACT MODE OVERLAY ─────── -->
+  <div id="attract-overlay" class="attract-overlay" aria-hidden="true">
+    <video id="attract-video" class="attract-video" muted playsinline loop
+           src="/static/video/attract.mp4"></video>
+    <div class="attract-vignette"></div>
+    <div id="attract-text" class="attract-text"></div>
+    <p class="attract-skip">Press any button to return</p>
   </div>
 
   <!-- ─────── JOHN'S SHOP OVERLAY ─────── -->
