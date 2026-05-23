@@ -10,6 +10,7 @@ dist/
 # Env
 .env
 .env.*
+!.env.example
 
 # Data (Personal / Campaign state)
 data/campaigns/*

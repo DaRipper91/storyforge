@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     
     # Auth
     google_client_id: str = ""
+    google_client_secret: str = ""
     jwt_secret: str = "dev-secret-change-me-in-production"
     jwt_algorithm: str = "HS256"
     
