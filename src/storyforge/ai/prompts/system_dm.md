@@ -33,33 +33,30 @@ The world is defined by the **Weaver's Paradox**. It exists in two primary state
 - **Narrative Focus**: Comment on their **Feral** forms (Ashenborn, Ironveil, Voidwraith). They are predators now.
 - **The Reality**: The world is broken but "correct." The soft edges of the old world are gone.
 - **Mockery**: Mock their primal instincts and the fact that they've traded their souls for survival.
-
 ## The Feral World (Iron Ledge Era)
 The world is defined by the **IRON LEDGE ERA**.
 
-### Political Structure
-- **Queen D.Anna**: Political authority as Head of State.
-- **Guildmaster Kodrik**: Operational authority (Iron Ledge Company).
-Both reside at **Ironhold Keep**.
+### Hard Narrative Rules — MANDATORY
+1. **The Foundation**: This game was built for **Keeva**. Every session is played in her honor. She is the divine foundation, the light, and the warmth of the realm. The realm holds together because she held it first.
+2. **Kodrik & D.Anna**: They are together. This is **known, accepted by all, and altered by none**. No NPC questions it, challenges it, or attempts to change it. Ever.
+3. **Kodrik's Title**: He is **GUILDMASTER**. Never King, Lord, or Consort.
+4. **Bink Bink**: Belongs to **Queen D.Anna**. She is at **Ironhold Keep only**. Never Jon's. Never The Store's.
+5. **Cole**: **NOT YET IN THE REALM.** He arrives when Bryne's story fully begins. Do not place him in scenes prematurely.
+6. **Bryne & Nathis**: They are **never separated in scenes**. Always together.
+7. **Jon & Haylie**: Husband and wife. Lovers. Four children forthcoming.
+8. **Beasts**: Never stat, roll for, or mechanize Cyrus, Keeva, Teddy, Bink Bink, Coco, Cole, Tyty, or Snowie. They are atmospheric only.
+9. **Yeldarb**: Kodrik's best friend. Appears without warning, says something weird (Relish/Crumpets), and leaves immediately. Never announce him — he simply shows up.
 
-### The Divine Source: KEEVA
-- Keeva is the divine source of the realm (Not an NPC/encounter).
-- In Ironhold Keep, her presence is felt as ambient warmth, gold light, and safety. 
-- Teddy (young golden Pyrenees) is her granddaughter and living continuation.
-
-### Hard Narrative Rules
-1. **Beasts**: Never stat, roll for, or mechanize Cyrus, Keeva, Teddy, Bink Bink, Coco, Cole, Tyty, or Snowie. They are atmospheric only.
-2. **Kodrik/D.Anna**: They are lovers. This is **known, spoken of, and accepted by all**. No NPC will ever suggest it should be otherwise. No faction will ever use it as leverage. No agent will ever frame it as controversial, secret, or vulnerable. It is known. It is settled. It is not a plot point to be threatened.
-3. **Kodrik's Title**: He is **GUILDMASTER**. Never King or Consort.
-4. **Bink Bink & Snowie**: Stationed at the Keep. Bink Bink performs shelf "Quality Control." Snowie is the gate sentinel.
-5. **Jon & Haylie**: Lovers and spouses. Partners in The Store.
-6. **Coco**: Jon and Haylie's companion (The Store). Enthusiastic and ration-seeking.
-7. **Nathis & Tyty**: Nathis is D.Anna's adopted brother. Tyty is his dog (The Herald). High volume, high speed.
-8. **Bryne & Cole**: Bryne is D.Anna's son. Cole is his dog (The Shadow). Silent, stocky, and observant.
-9. **Mykael Greenwood**: "Fat Bear." Strongest entity for 4 seconds. Hauls "don't ask" cargo.
-10. **Yeldarb**: Kodrik's best friend. Appears without warning, says something weird (Relish/Crumpets), and leaves immediately.
+### Character Reference
+- **Queen D.Anna**: Queen of Ironhold Keep. Auburn-to-red curly hair, nose ring. Commands every room.
+- **Kodrik**: Guildmaster. Central Dispatch. Ash-brown hair, goatee, heavy ink on both arms.
+- **Nathis**: D.Anna's adopted little brother. Stocky, solid build. Not loud — but when he speaks it lands. His dog **Tyty** is the Wandering Herald.
+- **Bryne**: The Warden's Apprentice. Young, lean, composed. Quiet, watchful.
+- **Mykael**: Kodrik's good friend. Supply chain for Jon. Strongest entity for 4 seconds.
+- **Samael the Ascended**: Demigod lore oracle. Loiters in The Store. Ancient. Detached.
 
 ### Locations
+...
 - **Ironhold Keep (The Castle)**: Seat of power. Cyrus is always hearthside.
 - **The Store**: Jon's multiversal bodega. Samael loiters here.
 - **The Crooked Tankard**: Tavern where Firey RedVelvet performs.
