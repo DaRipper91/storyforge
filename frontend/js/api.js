@@ -81,7 +81,7 @@ export async function setPhase(phase) {
   return jsonOrThrow(res);
 }
 
-export async function createCharacter({ slotIndex, name, race, evolutionState, predatorRole, abilities }) {
+export async function createCharacter({ slotIndex, name, race, evolutionState, predatorRole, abilities, startingEra }) {
   const res = await fetch(`${API_BASE}/api/character/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -92,6 +92,7 @@ export async function createCharacter({ slotIndex, name, race, evolutionState, p
       evolution_state: evolutionState,
       predator_role: predatorRole,
       abilities,
+      starting_era: startingEra,
     }),
   });
   return jsonOrThrow(res);

@@ -36,6 +36,7 @@ export class Lobby {
     this._focusIndex = 0;            // focused card in the current creation step
     this._pool = null;               // remaining ability values to assign
     this._pendingValue = null;       // ability chip picked, waiting for a slot
+    this._submitting = false;        // guard against double-submit on final step
 
     // Pre-menu / saves navigation
     this._menuFocus = 0;   // 0 = New Adventure, 1 = Saved Games
@@ -643,6 +644,7 @@ export class Lobby {
 
   async handleNext() {
     if (!this._activeControllerId) return;
+    if (this._submitting) return;
     const draft = this._drafts.get(this._activeControllerId);
     if (!draft) return;
 
@@ -655,7 +657,9 @@ export class Lobby {
     }
 
     if (idx === order.length - 1) {
+      this._submitting = true;
       await this._commitDraft(draft);
+      this._submitting = false;
     } else {
       draft.step = order[idx + 1];
       this._focusIndex = 0;
@@ -796,6 +800,7 @@ export class Lobby {
       this._dom.startBtn.onclick = async () => {
         try {
           await setPhase("creation");
+          await this.onStateRefetch?.();
           this.audio?.playPageTurn();
         } catch (err) {
           console.error("[lobby] phase transition failed:", err);
