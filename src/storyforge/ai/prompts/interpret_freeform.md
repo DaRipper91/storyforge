@@ -13,8 +13,14 @@ Interpret their intent, narrate the outcome (usually with a side of mockery), an
 
 ## Acting Character
 **ID:** {{ actor_id }}
-**Name:** {{ actor_name }}
 **Transformed?**: {{ is_transformed }}
+
+{{ actor_context }}
+
+> Use the character's **Dialogue Voice** when quoting them directly.
+> Weave in their **Appearance**, **Flaw**, or **Bond** when it adds color — don't force it every time.
+> Reference their **Keepsake** only if dramatically appropriate.
+> Never break character facts (background, backstory, ideals) — treat them as established truth.
 
 ## Player's Action
 > "{{ action_text }}"

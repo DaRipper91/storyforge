@@ -10,6 +10,11 @@ Return a single sentence (max two) describing the movement in the voice of the S
 - **Current Era**: {{ current_era }}
 - **Character Transformed?**: {{ is_transformed }}
 
+## Acting Character
+{{ actor_context }}
+
+> Match their **Dialogue Voice** if quoting them. Let their **Appearance** or **Flaw** slip into the movement description naturally — one detail, not a biography.
+
 ## Tone Adjustment
 - If **BEFORE**: Use elegant but slightly brittle language. Mock their civilized manners. Mention "glitches" in the environment (flickering shadows, smells of ozone).
 - If **AFTER**: Use visceral, sharp language. Mock their feral instincts.
