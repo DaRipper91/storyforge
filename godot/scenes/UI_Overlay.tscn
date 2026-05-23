@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://u1i2m3a4n5g6"]
+[gd_scene load_steps=6 format=3 uid="uid://u1i2m3a4n5g6"]
 
 [ext_resource type="Script" path="res://scripts/UIManager.gd" id="1_ui"]
 
@@ -23,28 +23,6 @@ Button/styles/hover = SubResource("StyleBoxFlat_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_normal")
 Button/styles/pressed = SubResource("StyleBoxFlat_pressed")
 
-[sub_resource type="Curve" id="Curve_ash_scale"]
-_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_ash_alpha"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ash"]
-emission_shape = 3
-emission_box_extents = Vector3(600, 1, 1)
-particle_flag_disable_z = true
-direction = Vector3(0, 1, 0)
-spread = 20.0
-gravity = Vector3(0, 5, 0)
-initial_velocity_min = 10.0
-initial_velocity_max = 25.0
-orbit_velocity_min = 0.0
-orbit_velocity_max = 0.0
-scale_curve = SubResource("Curve_ash_scale")
-color_alpha_curve = SubResource("Curve_ash_alpha")
-
 [node name="UI_Overlay" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -62,11 +40,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.08, 0.08, 0.08, 1)
-
-[node name="AshParticles" type="CPUParticles2D" parent="."]
-position = Vector2(576, 0)
-amount = 100
-process_material = SubResource("ParticleProcessMaterial_ash")
 
 [node name="TitleScreen" type="Control" parent="."]
 layout_mode = 1
