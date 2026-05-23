@@ -3,8 +3,8 @@ extends Node
 # The technical bridge between Godot and the Python Brain.
 # Connects via HTTP for requests and WebSockets for real-time state updates.
 
-const BASE_URL = "http://localhost:8765/api"
-const WS_URL = "ws://localhost:8765/ws"
+const BASE_URL = "http://127.0.0.1:8765/api"
+const WS_URL = "ws://127.0.0.1:8765/ws"
 
 signal state_updated(new_state)
 signal narration_received(text)
