@@ -9,7 +9,6 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Literal
 from pydantic import BaseModel, Field, ConfigDict
-import datetime as dt
 
 # ─────────────────────── Primitives ───────────────────────
 
@@ -56,21 +55,37 @@ class CharacterSheet(BaseModel):
     level: int = Field(ge=1, le=20, default=1)
     evolution_points: int = Field(ge=0, default=0)
     silver: int = Field(ge=0, default=0)
-    
+
     hp_current: int = Field(ge=0)
     hp_max: int = Field(ge=1)
     armor_class: int = Field(ge=1, default=10)
     speed: int = Field(ge=0, default=30)   # feet per turn; grid = 5ft/cell
-    
+
     abilities: AbilityScores
     proficiency_bonus: int = Field(ge=2, le=6, default=2)
+    skill_proficiencies: list[str] = Field(default_factory=list)
     inventory: list[InventoryItem] = Field(default_factory=list)
-    
+
     # Combat-turn ephemeral state
     position: Coord
     movement_remaining: int = 0      # feet left this turn
     conditions: list[str] = Field(default_factory=list)  # "prone", "stunned"
     is_transformed: bool = False     # False = shows "Before" name, True = Feral Successor
+
+    # Customization — all optional for backward compat with old saves
+    background: str | None = None
+    feat: str | None = None
+    cantrips: list[str] = Field(default_factory=list)
+    alignment: str | None = None
+    pronouns: str = "they/them"
+    title: str | None = None
+    dialogue_style: str | None = None
+    physical_description: str = ""
+    backstory: str = ""
+    personality_traits: str = ""
+    flaws: str = ""
+    bonds: str = ""
+    ideals: str = ""
 
 
 # ─────────────────────── Grid / Room ───────────────────────
@@ -236,6 +251,23 @@ class CharacterCreationRequest(BaseModel):
     # Player chose which ability gets which standard-array value.
     # Must be a permutation of [15, 14, 13, 12, 10, 8].
     abilities: AbilityScores
+    # Optional customization
+    equipment_choice_id: str | None = None
+    background: str | None = None
+    skill_proficiencies: list[str] = Field(default_factory=list)
+    feat: str | None = None
+    cantrips: list[str] = Field(default_factory=list)
+    alignment: str | None = None
+    pronouns: str = "they/them"
+    title: str | None = None
+    dialogue_style: str | None = None
+    physical_description: str = Field(default="", max_length=1000)
+    backstory: str = Field(default="", max_length=2000)
+    personality_traits: str = Field(default="", max_length=500)
+    flaws: str = Field(default="", max_length=500)
+    bonds: str = Field(default="", max_length=500)
+    ideals: str = Field(default="", max_length=500)
+    keepsake_name: str | None = Field(default=None, max_length=100)
 
 
 class GameState(BaseModel):

@@ -24,8 +24,7 @@ from storyforge.core.character_factory import (
 from storyforge.core.models import (
     CharacterSheet, Coord, GameState, GridAction,
     NarrativeEntry, StateDiff, TurnPhase, Era,
-    CharacterCreationRequest, LobbySlot, Race,
-    SlotStatus,
+    CharacterCreationRequest, SlotStatus,
 )
 from storyforge.events.bus import event_bus
 from storyforge.persistence import snapshot
@@ -300,6 +299,22 @@ class StateManager:
                 abilities=req.abilities,
                 game_state=self._state,
                 starting_era=req.starting_era,
+                background=req.background,
+                equipment_choice_id=req.equipment_choice_id,
+                skill_proficiencies=req.skill_proficiencies,
+                feat=req.feat,
+                cantrips=req.cantrips,
+                alignment=req.alignment,
+                pronouns=req.pronouns,
+                title=req.title,
+                dialogue_style=req.dialogue_style,
+                physical_description=req.physical_description,
+                backstory=req.backstory,
+                personality_traits=req.personality_traits,
+                flaws=req.flaws,
+                bonds=req.bonds,
+                ideals=req.ideals,
+                keepsake_name=req.keepsake_name,
             )
             
             # Insert into state.

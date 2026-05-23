@@ -9,13 +9,15 @@ Endpoints:
     GET  /api/lobby/catalog   — race + class definitions for the UI
 """
 from __future__ import annotations
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 import jwt
 
 from storyforge.config import settings
 from storyforge.api.deps import get_state_manager
-from storyforge.core.character_factory import RACES, STATES, ROLES
+from storyforge.core.character_factory import (
+    RACES, STATES, ROLES, BACKGROUNDS, FEATS, SKILLS, CANTRIPS, ALIGNMENTS, DIALOGUE_STYLES,
+)
 from storyforge.core.models import CharacterCreationRequest, TurnPhase
 from storyforge.core.state_manager import StateError, StateManager
 
@@ -73,13 +75,37 @@ async def get_catalog() -> dict:
         "roles": {
             role.value: {
                 "name": pdef.name,
-                "starting_inventory": [
-                    item.model_dump(mode="json") for item in pdef.starting_inventory
+                "primary_item": pdef.primary_item.model_dump(mode="json"),
+                "equipment_choices": [
+                    item.model_dump(mode="json") for item in pdef.equipment_choices
                 ],
                 "flavor": pdef.flavor,
             }
             for role, pdef in ROLES.items()
         },
+        "backgrounds": {
+            key: {
+                "name": bdef.name,
+                "flavor": bdef.flavor,
+                "perk_name": bdef.perk_name,
+                "perk_description": bdef.perk_description,
+                "bonus_skills": list(bdef.bonus_skills),
+                "skill_pool": list(bdef.skill_pool),
+            }
+            for key, bdef in BACKGROUNDS.items()
+        },
+        "feats": {
+            key: {
+                "name": fdef.name,
+                "flavor": fdef.flavor,
+                "mechanical_effect": fdef.mechanical_effect,
+            }
+            for key, fdef in FEATS.items()
+        },
+        "skills": SKILLS,
+        "cantrips": CANTRIPS,
+        "alignments": ALIGNMENTS,
+        "dialogue_styles": DIALOGUE_STYLES,
         "standard_array": [15, 14, 13, 12, 10, 8],
     }
 

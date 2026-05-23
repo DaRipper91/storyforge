@@ -37,6 +37,8 @@ export class GridCanvas {
     this.cellSize = 64;
     this.zoomLevel = 0.7; // <1.0 = zoomed out from fit, 1.0 = fit to screen, >1.0 = zoomed in
 
+    this._gridCacheKey = null; // tracks last rendered room+cellSize+offsets
+
     this._initStage();
     this._observeResize();
   }
@@ -344,10 +346,16 @@ export class GridCanvas {
   }
 
   _renderGrid() {
-    this.gridLayer.destroyChildren();
     const room = this._currentRoom();
     const cs = this.cellSize;
     const ox = this.offsetX, oy = this.offsetY;
+
+    const cacheKey = `${this.state.current_room_id}:${cs}:${ox}:${oy}`;
+    if (cacheKey === this._gridCacheKey) return;
+    this._gridCacheKey = cacheKey;
+
+    this.gridLayer.destroyChildren();
+    this.gridLayer.clearCache();
 
     for (let y = 0; y < room.height; y++) {
       for (let x = 0; x < room.width; x++) {
@@ -382,6 +390,15 @@ export class GridCanvas {
         strokeWidth: 3,
       }));
     }
+
+    // Rasterize the static grid into a single bitmap so Konva draws
+    // 1 image instead of 80+ shapes on every subsequent frame.
+    this.gridLayer.cache({
+      x: ox - 2,
+      y: oy - 2,
+      width:  room.width  * cs + 4,
+      height: room.height * cs + 4,
+    });
     this.gridLayer.batchDraw();
   }
 

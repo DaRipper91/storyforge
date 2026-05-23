@@ -1,9 +1,15 @@
 import os
+import stat
+from pathlib import Path
 from typing import Dict, Any, Optional
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+
+# Store OAuth token in the user's home data dir, not the project root.
+_TOKEN_DIR = Path.home() / ".local" / "share" / "storyforge"
+DEFAULT_TOKEN_PATH = str(_TOKEN_DIR / "token.json")
 
 DEFAULT_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
@@ -12,7 +18,7 @@ DEFAULT_SCOPES = [
 ]
 
 def authenticate_google_user(
-    token_path: str = 'token.json',
+    token_path: str = DEFAULT_TOKEN_PATH,
     scopes: Optional[list[str]] = None
 ) -> Dict[Any, Any]:
     """
@@ -59,8 +65,10 @@ def authenticate_google_user(
             flow = InstalledAppFlow.from_client_config(client_config, auth_scopes)
             creds = flow.run_local_server(port=0)
 
-        with open(token_path, 'w') as token:
-            token.write(creds.to_json())
+        token_file = Path(token_path)
+        token_file.parent.mkdir(parents=True, exist_ok=True)
+        token_file.write_text(creds.to_json())
+        token_file.chmod(stat.S_IRUSR | stat.S_IWUSR)  # 600 — owner only
 
     try:
         service = build('oauth2', 'v2', credentials=creds)

@@ -1,5 +1,11 @@
 extends Control
 
+# Steps: 0=race, 1=state, 2=role, 3=name+era
+const STEPS = ["Race", "Evolutionary State", "Predator Role", "Name & Era"]
+# Standard array auto-assigned STR→DEX→CON→INT→WIS→CHA
+const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
+
+@onready var step_label      = $MarginContainer/VBoxContainer/StepLabel
 @onready var race_list       = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
 @onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
 @onready var portrait_rect   = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitRect
@@ -8,77 +14,218 @@ extends Control
 
 var catalog: Dictionary = {}
 var current_step: int = 0
+var slot_index: int = 0
 var selection: Dictionary = {
 	"race": null,
-	"state": null,
-	"role": null,
-	"abilities": {},
-	"name": ""
+	"evolution_state": null,
+	"predator_role": null,
+	"name": "",
+	"starting_era": "after",
 }
 var button_group = ButtonGroup.new()
+var _submitting: bool = false
 
 func _ready():
-	back_btn.grab_focus()
 	button_group.set("allow_unpress", true)
+	back_btn.pressed.connect(_on_back_btn_pressed)
+	next_btn.pressed.connect(_on_next_btn_pressed)
+	next_btn.disabled = true
 
-	var python_client = get_node_or_null("/root/PythonClient")
-	if python_client:
-		python_client.catalog_received.connect(_on_catalog_received)
-		python_client.fetch_catalog()
+	var pc = get_node_or_null("/root/PythonClient")
+	if pc:
+		pc.catalog_received.connect(_on_catalog_received)
+		pc.character_created.connect(_on_character_created)
+		pc.character_create_failed.connect(_on_character_create_failed)
+		pc.game_started.connect(_on_game_started)
+		# Try to read slot_index from state
+		pc.state_updated.connect(_on_state_updated, CONNECT_ONE_SHOT)
+		pc.fetch_catalog()
+		pc.fetch_full_state()
 	else:
 		_setup_mock_catalog()
-		_render_race_step()
+		_render_step()
+
+func _on_state_updated(state: Dictionary):
+	# Find our slot — first claimed/creating slot.
+	for slot in state.get("lobby_slots", []):
+		if slot.get("status") in ["claimed", "creating"]:
+			slot_index = slot.get("slot_index", 0)
+			break
 
 func _on_catalog_received(new_catalog: Dictionary):
 	catalog = new_catalog
-	_render_race_step()
+	_render_step()
 
 func _setup_mock_catalog():
 	catalog = {
 		"races": {
-			"ashenborn": {"name": "Ashenborn", "before": "Human", "flavor": "Charred survivors of the Paradox, they are defined by their resilience and grim determination. They rise from the ashes of the old world, their humanity both a memory and a curse."},
-			"ashcrown":  {"name": "Ashcrown",  "before": "High Elf", "flavor": "Once regal, now brittle. The Ashcrown carry the sorrow of a lost age in their very bones. Their grace is a ghost, their beauty a fading ember."},
-			"ironfast":  {"name": "Ironfast",  "before": "Dwarf", "flavor": "Calcified and dense, the Ironfast are as unyielding as the mountains they once carved. The Paradox turned their stubbornness into physical reality."}
-		}
+			"voidwraith": {"name": "Voidwraith", "before": "Astral Spirit", "flavor": "Stellar scavengers that feast on dying magic."},
+		},
+		"states": {
+			"behemoth":   {"name": "Behemoth",   "flavor": "Unstoppable bulk. High HP, solid AC."},
+			"phantom":    {"name": "Phantom",    "flavor": "Evasive and swift. Low HP but hard to hit."},
+			"swarm_host": {"name": "Swarm-Host", "flavor": "Adaptive colony. Balanced all-rounder."},
+			"mimic":      {"name": "Mimic",      "flavor": "Flexible predator. Copies strengths."},
+		},
+		"roles": {
+			"stalker":  {"name": "Stalker",  "flavor": "Ambush predator. Starts with stealth gear."},
+			"vanguard": {"name": "Vanguard", "flavor": "Front-line crusher. Starts with heavy weapons."},
+			"catalyst": {"name": "Catalyst", "flavor": "Arcane disruptor. Starts with volatile reagents."},
+			"siphoner": {"name": "Siphoner", "flavor": "Life-drain specialist. Starts with drain tools."},
+		},
 	}
 
-func _render_race_step():
-	description_label.text = "Select an ancestry to learn its story..."
+# ─── Rendering ─────────────────────────────────────────────────────
+
+func _render_step():
+	if catalog.is_empty():
+		return
+
+	# Clear the list panel
+	for child in race_list.get_children():
+		child.queue_free()
+	description_label.text = ""
 	portrait_rect.texture = null
 	next_btn.disabled = true
 
-	for child in race_list.get_children():
-		child.queue_free()
+	step_label.text = "Step %d / %d — %s" % [current_step + 1, STEPS.size(), STEPS[current_step]]
 
-	for race_id in catalog.races:
-		var race_data = catalog.races[race_id]
+	match current_step:
+		0: _render_choice_step(catalog.get("races", {}), "race",           "Select an ancestry...")
+		1: _render_choice_step(catalog.get("states", {}), "evolution_state", "Choose your evolutionary form...")
+		2: _render_choice_step(catalog.get("roles", {}), "predator_role",  "Choose your predator role...")
+		3: _render_name_step()
+
+func _render_choice_step(options: Dictionary, field: String, placeholder: String):
+	description_label.text = placeholder
+	var new_group = ButtonGroup.new()
+	new_group.set("allow_unpress", true)
+
+	for key in options:
+		var data = options[key]
 		var btn = Button.new()
-		btn.text = race_data.get("name", race_id) + "  [color=#888](formerly " + race_data.get("before", "") + ")[/color]"
+		btn.text = data.get("name", key)
 		btn.toggle_mode = true
-		btn.button_group = button_group
-
-		# Show preview on hover, keyboard focus, AND click
-		btn.mouse_entered.connect(func(): _preview_race(race_id))
-		btn.focus_entered.connect(func(): _preview_race(race_id))
-		btn.pressed.connect(func(): _on_race_selected(race_id))
+		btn.button_group = new_group
+		if selection[field] == key:
+			btn.set_pressed_no_signal(true)
+			next_btn.disabled = false
+			_preview_item(options, key)
+		btn.mouse_entered.connect(func(): _preview_item(options, key))
+		btn.focus_entered.connect(func(): _preview_item(options, key))
+		btn.pressed.connect(func():
+			selection[field] = key
+			next_btn.disabled = false
+			_preview_item(options, key)
+		)
 		race_list.add_child(btn)
 
-func _preview_race(race_id: String):
-	var race_data = catalog.races[race_id]
-	var feral_name  = race_data.get("name", race_id)
-	var before_name = race_data.get("before", "")
-	var flavor      = race_data.get("flavor", "No description available.")
+func _preview_item(options: Dictionary, key: String):
+	var data = options.get(key, {})
+	var name_str   = data.get("name", key)
+	var before_str = data.get("before", "")
+	var flavor     = data.get("flavor", "")
+	var text = "[b]%s[/b]" % name_str
+	if before_str:
+		text += "\n[i](Formerly %s)[/i]" % before_str
+	if flavor:
+		text += "\n\n%s" % flavor
+	description_label.text = text
 
-	description_label.text = "[b]%s[/b]\n[i](Formerly %s)[/i]\n\n%s" % [feral_name, before_name, flavor]
+	var path = "res://assets/characters/" + key + ".png"
+	portrait_rect.texture = load(path) if ResourceLoader.exists(path) else null
 
-	var path = "res://assets/characters/" + race_id + ".png"
-	var tex: Texture2D = ResourceLoader.load(path, "Texture2D") if ResourceLoader.exists(path) else null
-	portrait_rect.texture = tex
+func _render_name_step():
+	# Name input
+	var name_input = LineEdit.new()
+	name_input.placeholder_text = "Enter your hero's name..."
+	name_input.text = selection["name"]
+	name_input.text_changed.connect(func(val):
+		selection["name"] = val.strip_edges()
+		next_btn.disabled = selection["name"].is_empty()
+	)
+	name_input.text_submitted.connect(func(_val): _on_next_btn_pressed())
+	race_list.add_child(name_input)
+	name_input.grab_focus()
 
-func _on_race_selected(race_id: String):
-	selection.race = race_id
-	next_btn.disabled = false
-	_preview_race(race_id)
+	# Era choice
+	var era_label = Label.new()
+	era_label.text = "\nStarting Era:"
+	race_list.add_child(era_label)
+
+	for era_id in ["after", "before"]:
+		var btn = Button.new()
+		btn.text = "After (Feral form)" if era_id == "after" else "Before (Civilized form, transforms mid-game)"
+		btn.toggle_mode = true
+		if selection["starting_era"] == era_id:
+			btn.set_pressed_no_signal(true)
+		btn.pressed.connect(func(): selection["starting_era"] = era_id)
+		race_list.add_child(btn)
+
+	if not selection["name"].is_empty():
+		next_btn.disabled = false
+
+	description_label.text = "Name your hero and choose when your story begins.\n\n[b]After[/b]: Start in full feral form.\n[b]Before[/b]: Start humanoid — your beast form awakens mid-game."
+
+# ─── Navigation ────────────────────────────────────────────────────
+
+func _on_next_btn_pressed():
+	if _submitting:
+		return
+	if current_step < STEPS.size() - 1:
+		current_step += 1
+		_render_step()
+	else:
+		_submit_creation()
 
 func _on_back_btn_pressed():
-	get_tree().change_scene_to_file("res://scenes/UI_Overlay.tscn")
+	if current_step > 0:
+		current_step -= 1
+		_render_step()
+	else:
+		get_tree().change_scene_to_file("res://scenes/UI_Overlay.tscn")
+
+# ─── Submission ────────────────────────────────────────────────────
+
+func _submit_creation():
+	_submitting = true
+	next_btn.disabled = true
+	next_btn.text = "Forging..."
+
+	var abilities = {
+		"STR": STANDARD_ARRAY[0],
+		"DEX": STANDARD_ARRAY[1],
+		"CON": STANDARD_ARRAY[2],
+		"INT": STANDARD_ARRAY[3],
+		"WIS": STANDARD_ARRAY[4],
+		"CHA": STANDARD_ARRAY[5],
+	}
+
+	get_node("/root/PythonClient").create_character({
+		"slot_index":      slot_index,
+		"name":            selection["name"],
+		"race":            selection["race"],
+		"evolution_state": selection["evolution_state"],
+		"predator_role":   selection["predator_role"],
+		"starting_era":    selection["starting_era"],
+		"abilities":       abilities,
+	})
+
+func _on_character_created(_result: Dictionary):
+	get_node("/root/PythonClient").game_start_failed.connect(_on_game_start_failed, CONNECT_ONE_SHOT)
+	get_node("/root/PythonClient").start_game()
+
+func _on_character_create_failed(error: String):
+	_submitting = false
+	next_btn.disabled = false
+	next_btn.text = "Next"
+	description_label.text = "[color=red]Creation failed: %s[/color]" % error
+
+func _on_game_started():
+	get_tree().change_scene_to_file("res://scenes/Tabletop.tscn")
+
+func _on_game_start_failed(error: String):
+	_submitting = false
+	next_btn.disabled = false
+	next_btn.text = "Next"
+	description_label.text = "[color=red]Could not start game: %s[/color]" % error

@@ -43,13 +43,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS: open to local network for family devices
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Open for MVP on local LAN
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # API routes

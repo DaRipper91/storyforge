@@ -81,7 +81,12 @@ export async function setPhase(phase) {
   return jsonOrThrow(res);
 }
 
-export async function createCharacter({ slotIndex, name, race, evolutionState, predatorRole, abilities }) {
+export async function createCharacter({
+  slotIndex, name, race, evolutionState, predatorRole, abilities, startingEra,
+  equipmentChoiceId, background, skillProficiencies, feat, cantrips,
+  alignment, pronouns, title, dialogueStyle,
+  physicalDescription, backstory, personalityTraits, flaws, bonds, ideals, keepsakeName,
+}) {
   const res = await fetch(`${API_BASE}/api/character/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -92,6 +97,23 @@ export async function createCharacter({ slotIndex, name, race, evolutionState, p
       evolution_state: evolutionState,
       predator_role: predatorRole,
       abilities,
+      starting_era: startingEra,
+      equipment_choice_id: equipmentChoiceId ?? null,
+      background: background ?? null,
+      skill_proficiencies: skillProficiencies ?? [],
+      feat: feat ?? null,
+      cantrips: cantrips ?? [],
+      alignment: alignment ?? null,
+      pronouns: pronouns ?? "they/them",
+      title: title ?? null,
+      dialogue_style: dialogueStyle ?? null,
+      physical_description: physicalDescription ?? "",
+      backstory: backstory ?? "",
+      personality_traits: personalityTraits ?? "",
+      flaws: flaws ?? "",
+      bonds: bonds ?? "",
+      ideals: ideals ?? "",
+      keepsake_name: keepsakeName ?? null,
     }),
   });
   return jsonOrThrow(res);
