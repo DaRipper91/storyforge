@@ -1,13 +1,17 @@
+<p align="center">
+  <img src="godot/icon.svg" width="200" height="200" alt="StoryForge Anvil Icon">
+</p>
+
 # StoryForge: The Feral World — D&D 5e AI Dungeon Master
 
 <p align="center">
   <img src="https://img.shields.io/badge/System-D%26D_5e-red?style=for-the-badge&logo=dungeons-and-dragons" alt="D&D 5e">
-  <img src="https://img.shields.io/badge/Engine-Python_3.12-blue?style=for-the-badge&logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/Engine-Godot_4.6-blue?style=for-the-badge&logo=godotengine" alt="Godot 4.6">
+  <img src="https://img.shields.io/badge/Backend-Python_3.12-blue?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/AI-Gemini_3.5_Flash-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
-  <img src="https://img.shields.io/badge/Platform-Windows_10_Exec-lightgrey?style=for-the-badge" alt="Platform">
 </p>
 
-**StoryForge** is a hybrid Virtual Tabletop (VTT) and AI-driven Dungeon Master built specifically for the *Weaver's Paradox* campaign setting. It combines a structured 2D grid engine with the creative power of **Gemini 3.5 Flash** to deliver a reactive, persistent, and voice-enabled D&D 5e experience.
+**StoryForge** is a hybrid Virtual Tabletop (VTT) and AI-driven Dungeon Master built specifically for the *Weaver's Paradox* campaign setting. It combines a cinematic 2.5D client built in **Godot 4** with the creative power of a headless **Python/FastAPI** brain powered by **Gemini 3.5 Flash** to deliver a reactive, persistent, and voice-enabled D&D 5e experience.
 
 ---
 
@@ -25,41 +29,48 @@ The "Civilized World" is a memory. Reality was unraveled by the Weaver's Paradox
 
 ## 🛠️ Project Architecture
 
-StoryForge is a full-stack Python application designed for zero-config deployment:
+StoryForge is a full-stack application divided into two decoupled layers:
 
-- **Backend**: **FastAPI** provides the core engine, managing the state machine, grid rules, and AI orchestration.
-- **Frontend**: A high-performance **Vanilla JS** application utilizing **Konva.js** for the grid renderer.
-- **Desktop Wrapper**: Uses **pywebview** and **PyQt6** to provide a native Windows experience with gamepad support.
-- **AI Brain**: Integrated with **google-generativeai**, pinned to **Gemini 3.5 Flash** for high-speed agentic responses.
-- **Identity**: **Google OAuth2 (Desktop App Flow)** for character persistence and player mapping.
+- **Headless DM (Backend)**: Built with **Python 3.12** and **FastAPI**, this manages the state machine, grid rules, save files, and AI orchestration using the `google-genai` SDK.
+- **Cinematic Client (Frontend)**: Built in **Godot 4**, this layer handles the UI, grimdark 2.5D visual rendering, shaders, audio, and player input.
+- **Communications**: Real-time WebSockets (`/ws`) handle live grid and state updates, while REST endpoints (`/api/*`) handle static fetches and commands.
+- **Identity**: **Google OAuth2** for character persistence and player mapping.
 
 ### Lobby-to-Exploration Flow
 The game operates on a robust state machine:
 1. **Lobby Phase**: Players join, authenticate via Google, and claim controller slots.
-2. **Creation Phase**: Players build their Feral Successors (Race, Evolutionary State, Predator Role).
+2. **Creation Phase (Character Forge)**: Players build their Feral Successors (Race, Evolutionary State, Predator Role).
 3. **Exploration Phase**: The AI DM narrates movements, handles freeform actions, and manages NPC encounters.
 
 ---
 
-## 🚀 Tester Installation Guide (Windows)
+## 🚀 Running StoryForge Locally
 
-Welcome to the StoryForge alpha! Follow these steps to join the Feral World:
+The project includes an integrated launcher that spins up both the Python backend and the Godot client seamlessly.
 
-### 1. Download the Release
-Go to the [Releases](https://github.com/your-repo/storyforge/releases) page and download `StoryForge.exe`.
+### Prerequisites
+- **Python 3.12+** and [uv](https://github.com/astral-sh/uv) (Python package manager).
+- **Godot 4** installed and available in your system path (or `GODOT_PATH` env var set).
 
-### 2. Launch the Application
-Double-click `StoryForge.exe`. Windows may show a "SmartScreen" warning—click **"More Info"** -> **"Run Anyway"**.
+### Installation & Execution
 
-### 3. Authentication (Critical Step)
-During the lobby phase, you will be prompted to log in with Google. 
-- A browser window will open automatically.
-- Because this is an alpha application, Google will show an **"Unverified App"** screen.
-- **ACTION**: Click **"Advanced"** and then click **"Go to StoryForge (unsafe)"**.
-- This is required for the local Desktop App Flow to capture your identity and save your `token.json` for future sessions.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/DaRipper91/storyforge.git
+   cd storyforge
+   ```
 
-### 4. Gameplay
-Once logged in, you can create your character and begin exploring. Use a keyboard or an Xbox-style gamepad.
+2. **Sync Python dependencies:**
+   ```bash
+   uv sync
+   ```
+
+3. **Launch the Game:**
+   ```bash
+   uv run python main.py
+   ```
+
+*(Linux Users: You can also use `./update_menu.sh` to generate a desktop shortcut, putting StoryForge directly into your application launcher!)*
 
 ---
 
