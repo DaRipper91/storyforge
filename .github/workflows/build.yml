@@ -148,8 +148,7 @@ jobs:
 
       - name: Build AppImage
         run: |
-          sudo apt-get install -y fuse libfuse2
-          curl -LO https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          curl -LO https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
           mkdir -p StoryForge.AppDir/usr/bin
           cp dist/StoryForge StoryForge.AppDir/usr/bin/storyforge
