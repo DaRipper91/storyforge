@@ -86,13 +86,13 @@ The project includes an integrated launcher that spins up both the Python backen
 
 ---
 
+◈ Acknowledgments ◈
+​A Dedication to Queen D. Anna
+​Every world requires an architect, and every forge needs its spark. While the mechanics of StoryForge are built on code and logic, its soul belongs entirely to my anchor, my inspiration, and my Queen, D. Anna. Far beyond the visuals, she breathed actual life into this realm. The rich context, the intricate backstories, and the very essence of the NPCs that populate StoryForge exist because of her creativity, her guidance, and her incredible ideas.When the logic fails and the technical walls feel insurmountable, she is the clarity that pulls me through. Without her unwavering support and brilliant perspective, these worlds would be nothing more than empty text on a screen.
+​StoryForge is a shared victory, but the magic within it is hers.
+​Thank you, Dee.
+
 ## 📜 Credits
-
--------MY QUEEN, D.ANNA--------
-
-She isn't a coder and she doesn't care much for Linux, but she is the reason any of this exists. D.Anna is my inspiration and my anchor. She was the one who picked out that first deep purple theme—the spark that started the whole look of this project. More than that, she’s the one I turn to when I’m completely stuck. Even without knowing the technical side, her ideas and her support are what pull me through the toughest blocks. This project belongs to her as much as it does to me.
-
-
 - **Haley, John, & Jason**: For the constant support.
 - **RedVelvet**: The inspiration.
 - **Brad**: Our primary alpha tester.
