@@ -7,7 +7,8 @@ Backend verifies the token, creates a local session, and sets an HttpOnly cookie
 from fastapi import APIRouter, HTTPException, Response, Request, Depends
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from jose import jwt, JWTError
+import jwt
+from jwt import PyJWTError
 from pydantic import BaseModel
 import time
 import anyio
@@ -123,7 +124,7 @@ async def get_me(request: Request):
             token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
         )
         return {"authenticated": True, "user": payload}
-    except JWTError:
+    except PyJWTError:
         return {"authenticated": False}
 
 

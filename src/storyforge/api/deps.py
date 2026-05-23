@@ -1,5 +1,6 @@
 from fastapi import Request, HTTPException
-from jose import jwt, JWTError
+import jwt
+from jwt import PyJWTError
 from storyforge.config import settings
 from storyforge.core.state_manager import StateManager
 
@@ -19,5 +20,5 @@ def get_current_user(request: Request) -> dict:
             token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
         )
         return payload
-    except JWTError:
+    except PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid session")

@@ -11,7 +11,7 @@ Endpoints:
 from __future__ import annotations
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
-from jose import jwt
+import jwt
 
 from storyforge.config import settings
 from storyforge.api.deps import get_state_manager
