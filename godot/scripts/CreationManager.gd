@@ -4,7 +4,8 @@ extends Control
 # Still transitions: Race -> State -> Role -> Abilities -> Name.
 
 @onready var race_list = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
-@onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/DescriptionLabel
+@onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
+@onready var portrait_rect = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitRect
 @onready var next_btn = $MarginContainer/VBoxContainer/Footer/NextBtn
 @onready var back_btn = $MarginContainer/VBoxContainer/Footer/BackBtn
 
@@ -67,12 +68,18 @@ func _on_race_hover(race_id: String):
 	var feral_name = race_data.name
 	var before_name = race_data.get("before", "")
 	var flavor = race_data.get("flavor", "No description available.")
-	
+
 	description_label.text = "[b]{feral}[/b]\n(Formerly [i]{before}[/i])\n\n{desc}".format({
 		"feral": feral_name,
 		"before": before_name,
 		"desc": flavor
 	})
+
+	var portrait_path = "res://assets/characters/" + race_id + ".png"
+	if ResourceLoader.exists(portrait_path):
+		portrait_rect.texture = load(portrait_path)
+	else:
+		portrait_rect.texture = null
 
 func _on_race_selected(race_id: String):
 	selection.race = race_id
