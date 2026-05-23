@@ -99,13 +99,17 @@ theme_override_constants/separation = 12
 
 [node name="PortraitRect" type="TextureRect" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(200, 280)
+custom_minimum_size = Vector2(0, 320)
 size_hint_horizontal = 4
-stretch_mode = 6
+size_hint_vertical = 4
+expand_mode = 1
+stretch_mode = 5
 
 [node name="DescriptionLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_hint_vertical = 1
 bbcode_enabled = true
+scroll_active = false
 text = "Select an ancestry to learn its story..."
 fit_content = true
 
