@@ -16,6 +16,9 @@ args = [
     '--collect-all=uvicorn',
 ]
 
+if os.path.exists('client_secret.json'):
+    args.append('--add-data=client_secret.json:.')
+
 # Add platform-specific options if needed
 if platform.system() == 'Windows':
     pass # Icon conversion with SVG is failing on CI
