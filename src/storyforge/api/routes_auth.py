@@ -10,13 +10,45 @@ from google.auth.transport import requests
 from jose import jwt, JWTError
 from pydantic import BaseModel
 import time
+import anyio
 
 from storyforge.config import settings
 from storyforge.api.deps import get_state_manager
 from storyforge.core.state_manager import StateManager
+from storyforge.auth import authenticate_google_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+@router.post("/desktop_login")
+async def desktop_login(response: Response):
+    """Triggers the InstalledAppFlow for desktop clients (like Godot)."""
+    try:
+        # Run the blocking OAuth flow in a separate thread to keep FastAPI responsive
+        user_info = await anyio.to_thread.run_sync(authenticate_google_user)
+        
+        # Create our session JWT using the fetched profile
+        # Use 'id' from userinfo as 'sub', fallback to email
+        sub_id = user_info.get("id", user_info.get("email"))
+        payload = {
+            "sub": sub_id, 
+            "email": user_info.get("email"),
+            "name": user_info.get("name"),
+            "picture": user_info.get("picture"),
+            "exp": int(time.time()) + (24 * 3600)
+        }
+        token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+
+        response.set_cookie(
+            key="storyforge_session",
+            value=token,
+            httponly=True,
+            samesite="lax",
+            max_age=24 * 3600
+        )
+        
+        return {"status": "ok", "user": payload}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Desktop Auth Failed: {str(e)}")
 
 class AuthToken(BaseModel):
     token: str

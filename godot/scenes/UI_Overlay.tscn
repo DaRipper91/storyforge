@@ -1,0 +1,186 @@
+[gd_scene load_steps=6 format=3 uid="uid://u1i2m3a4n5g6"]
+
+[ext_resource type="Script" path="res://scripts/UIManager.gd" id="1_ui"]
+
+[sub_resource type="Theme" id="Theme_1"]
+Button/colors/font_color = Color(0.862745, 0.709804, 0.380392, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/styles/hover = StyleBoxFlat.new()
+Button/styles/hover.bg_color = Color(0.25, 0.25, 0.25, 0.6)
+Button/styles/normal = StyleBoxFlat.new()
+Button/styles/normal.bg_color = Color(0.1, 0.1, 0.1, 0.6)
+Button/styles/normal.border_width_bottom = 2
+Button/styles/normal.border_width_left = 2
+Button/styles/normal.border_width_right = 2
+Button/styles/normal.border_width_top = 2
+Button/styles/normal.border_color = Color(0.862745, 0.709804, 0.380392, 0.5)
+Button/styles/pressed = StyleBoxFlat.new()
+Button/styles/pressed.bg_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="Curve" id="Curve_ash_scale"]
+_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_ash_alpha"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ash"]
+emission_shape = 3
+emission_box_extents = Vector3(600, 1, 1)
+particle_flag_disable_z = true
+direction = Vector3(0, 1, 0)
+spread = 20.0
+gravity = Vector3(0, 5, 0)
+initial_velocity_min = 10.0
+initial_velocity_max = 25.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_curve = SubResource("Curve_ash_scale")
+color_alpha_curve = SubResource("Curve_ash_alpha")
+
+[node name="UI_Overlay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.08, 1)
+
+[node name="AshParticles" type="CPUParticles2D" parent="."]
+position = Vector2(576, 0)
+amount = 100
+process_material = SubResource("ParticleProcessMaterial_ash")
+
+[node name="TitleScreen" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="TitleScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.862745, 0.709804, 0.380392, 1)
+theme_override_font_sizes/font_size = 64
+text = "StoryForge"
+horizontal_alignment = 1
+
+[node name="PressStart" type="Label" parent="TitleScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = 50.0
+offset_right = 150.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Press ANY KEY to Begin"
+horizontal_alignment = 1
+
+[node name="MainMenu" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -50.0
+offset_right = 150.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="NewGameBtn" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "New Adventure"
+
+[node name="LoadGameBtn" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Continue Journey"
+
+[node name="SaveGameMenu" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SaveGameMenu"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SaveGameMenu/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="SaveGameMenu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Select a Chronicle"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="SaveGameMenu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_hint_vertical = 3
+
+[node name="SaveList" type="VBoxContainer" parent="SaveGameMenu/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_hint_horizontal = 3
+
+[node name="SaveBackBtn" type="Button" parent="SaveGameMenu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_1")
+text = "Back"
+
+[connection signal="pressed" from="MainMenu/VBoxContainer/NewGameBtn" to="." method="_on_new_game_btn_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/LoadGameBtn" to="." method="_on_load_game_btn_pressed"]
+[connection signal="pressed" from="SaveGameMenu/MarginContainer/VBoxContainer/SaveBackBtn" to="." method="_on_save_back_btn_pressed"]

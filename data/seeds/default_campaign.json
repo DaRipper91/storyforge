@@ -1,15 +1,18 @@
 {
   "campaign_id": "family_campaign_01",
   "current_room_id": "tavern_01",
-  "phase": "exploration",
-  "era": "Iron Ledge",
+  "phase": "lobby",
+  "era": "after",
   "world_name": "The Feral World",
   "characters": {},
   "npcs": {
     "bink_bink": {
       "id": "bink_bink",
       "name": "Bink Bink",
-      "position": { "x": 4, "y": 2 },
+      "position": {
+        "x": 4,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_cat",
       "interactable": false,
@@ -20,7 +23,10 @@
     "cole": {
       "id": "cole",
       "name": "Cole",
-      "position": { "x": 3, "y": 3 },
+      "position": {
+        "x": 3,
+        "y": 3
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_dog_black",
       "interactable": false,
@@ -31,7 +37,10 @@
     "jon": {
       "id": "jon",
       "name": "Jon",
-      "position": { "x": 1, "y": 1 },
+      "position": {
+        "x": 1,
+        "y": 1
+      },
       "room_id": "store_01",
       "sprite_key": "npc_jon",
       "interactable": true,
@@ -42,7 +51,10 @@
     "samael": {
       "id": "samael",
       "name": "Samael the Ascended",
-      "position": { "x": 8, "y": 4 },
+      "position": {
+        "x": 8,
+        "y": 4
+      },
       "room_id": "store_01",
       "sprite_key": "npc_samael",
       "interactable": true,
@@ -53,7 +65,10 @@
     "haylie": {
       "id": "haylie",
       "name": "Madame Haylie",
-      "position": { "x": 4, "y": 1 },
+      "position": {
+        "x": 4,
+        "y": 1
+      },
       "room_id": "store_01",
       "sprite_key": "npc_haylie",
       "interactable": true,
@@ -64,7 +79,10 @@
     "coco": {
       "id": "coco",
       "name": "Coco",
-      "position": { "x": 2, "y": 1 },
+      "position": {
+        "x": 2,
+        "y": 1
+      },
       "room_id": "store_01",
       "sprite_key": "npc_dog",
       "interactable": false,
@@ -75,7 +93,10 @@
     "kodrik": {
       "id": "kodrik",
       "name": "Guildmaster Kodrik",
-      "position": { "x": 5, "y": 2 },
+      "position": {
+        "x": 5,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_kodrik",
       "interactable": true,
@@ -86,7 +107,10 @@
     "cyrus": {
       "id": "cyrus",
       "name": "Cyrus",
-      "position": { "x": 1, "y": 1 },
+      "position": {
+        "x": 1,
+        "y": 1
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_wolf",
       "interactable": false,
@@ -97,7 +121,10 @@
     "danna": {
       "id": "danna",
       "name": "Queen D.Anna",
-      "position": { "x": 7, "y": 2 },
+      "position": {
+        "x": 7,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_danna",
       "interactable": true,
@@ -108,7 +135,10 @@
     "keeva": {
       "id": "keeva",
       "name": "Keeva",
-      "position": { "x": 8, "y": 2 },
+      "position": {
+        "x": 8,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_keeva",
       "interactable": false,
@@ -119,7 +149,10 @@
     "teddy": {
       "id": "teddy",
       "name": "Teddy",
-      "position": { "x": 6, "y": 2 },
+      "position": {
+        "x": 6,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_teddy",
       "interactable": false,
@@ -130,7 +163,10 @@
     "redvelvet": {
       "id": "redvelvet",
       "name": "Firey RedVelvet",
-      "position": { "x": 8, "y": 2 },
+      "position": {
+        "x": 8,
+        "y": 2
+      },
       "room_id": "tavern_01",
       "sprite_key": "npc_redvelvet",
       "interactable": true,
@@ -141,7 +177,10 @@
     "bryne": {
       "id": "bryne",
       "name": "Bryne",
-      "position": { "x": 3, "y": 2 },
+      "position": {
+        "x": 3,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_bryne",
       "interactable": true,
@@ -152,7 +191,10 @@
     "nathis": {
       "id": "nathis",
       "name": "Nathis",
-      "position": { "x": 2, "y": 2 },
+      "position": {
+        "x": 2,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_nathis",
       "interactable": true,
@@ -163,7 +205,10 @@
     "tyty": {
       "id": "tyty",
       "name": "Tyty",
-      "position": { "x": 1, "y": 2 },
+      "position": {
+        "x": 1,
+        "y": 2
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_dog",
       "interactable": false,
@@ -174,7 +219,10 @@
     "snowie": {
       "id": "snowie",
       "name": "Snowie",
-      "position": { "x": 5, "y": 1 },
+      "position": {
+        "x": 5,
+        "y": 1
+      },
       "room_id": "ironhold_keep",
       "sprite_key": "npc_cat_white",
       "interactable": false,
@@ -185,7 +233,10 @@
     "mykael": {
       "id": "mykael",
       "name": "Mykael Greenwood",
-      "position": { "x": 6, "y": 1 },
+      "position": {
+        "x": 6,
+        "y": 1
+      },
       "room_id": "store_01",
       "sprite_key": "npc_bear",
       "interactable": true,
@@ -200,48 +251,987 @@
       "name": "The Store",
       "width": 10,
       "height": 8,
-      "grid": [
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_jon"}, {"terrain": "floor", "occupant_id": "npc_coco"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_haylie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_mykael"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_samael"}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}
-      ]
+      "cells": [
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_jon"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_coco"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_haylie"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_mykael"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_samael"
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "door",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        }
+      ],
+      "description": "A standard room."
     },
     "tavern_01": {
       "id": "tavern_01",
       "name": "The Crooked Tankard",
       "width": 10,
       "height": 8,
-      "grid": [
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_redvelvet"}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}
-      ]
+      "cells": [
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "door",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_redvelvet"
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        }
+      ],
+      "description": "A standard room."
     },
     "ironhold_keep": {
       "id": "ironhold_keep",
       "name": "Ironhold Keep",
       "width": 10,
       "height": 8,
-      "grid": [
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "door", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cyrus"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_snowie"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_tyty"}, {"terrain": "floor", "occupant_id": "npc_nathis"}, {"terrain": "floor", "occupant_id": "npc_bryne"}, {"terrain": "floor", "occupant_id": "npc_bink_bink"}, {"terrain": "floor", "occupant_id": "npc_kodrik"}, {"terrain": "floor", "occupant_id": "npc_teddy"}, {"terrain": "floor", "occupant_id": "npc_danna"}, {"terrain": "floor", "occupant_id": "npc_keeva"}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": "npc_cole"}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "floor", "occupant_id": null}, {"terrain": "wall", "occupant_id": null},
-        {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}, {"terrain": "wall", "occupant_id": null}
-      ]
+      "cells": [
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "door",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_cyrus"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_snowie"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_tyty"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_nathis"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_bryne"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_bink_bink"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_kodrik"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_teddy"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_danna"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_keeva"
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_cole"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        }
+      ],
+      "description": "A standard room."
     }
   },
   "narrative_log": [

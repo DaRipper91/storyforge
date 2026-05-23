@@ -88,19 +88,18 @@ async function checkAuthStatus() {
 }
 
 // ─────────────────────── Boot ───────────────────────
-
 (async function boot() {
   try {
+    await initGoogleLogin();
     await checkAuthStatus();
     appState = await fetchState();
-    // Only skip the title screen if the server is already mid-game (exploration).
-    // For lobby/creation the user navigates there via the menu flow.
-    if (appState.phase === "exploration") {
-      document.body.dataset.phase = "exploration";
-    }
-    // else: keep body[data-phase="title"] that was set in HTML
+
+    // We always start at the title screen to give the user the choice 
+    // to continue or start a new game.
+    // document.body.dataset.phase = "title" is set in index.html.
 
     lobby = new Lobby({
+
       state: appState,
       audio,
       onExplorationStarted: () => initExplorationView(),

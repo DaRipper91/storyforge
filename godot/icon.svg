@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background with a more "magical" deep purple/black gradient feel -->
+  <defs>
+    <radialGradient id="forgeGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#2e1a47;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1428;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="100" height="100" rx="15" fill="url(#forgeGradient)" />
+  
+  <!-- An anvil or forge hearth silhouette -->
+  <path d="M25 75 L75 75 L70 65 L30 65 Z" fill="#3d334d" />
+  <path d="M20 65 L80 65 L80 45 C80 35 70 30 50 30 C30 30 20 35 20 45 Z" fill="#4d415f" />
+  
+  <!-- The "Spark" of Storytelling / Magic -->
+  <circle cx="50" cy="45" r="8" fill="#c9a14a">
+    <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Stylized hammer or quill crossing -->
+  <path d="M35 30 L65 60" stroke="#c9a14a" stroke-width="4" stroke-linecap="round" />
+  <path d="M30 35 L40 25" stroke="#c9a14a" stroke-width="4" stroke-linecap="round" />
+</svg>

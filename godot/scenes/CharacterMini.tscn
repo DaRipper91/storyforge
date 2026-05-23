@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://m1n2i3c4a5r6"]
+
+[ext_resource type="Script" path="res://scripts/CharacterMini.gd" id="1_mini"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glow"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 1)
+emission_enabled = true
+emission = Color(0, 0.4, 1, 1)
+emission_energy_multiplier = 1.5
+billboard_mode = 1
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sprite"]
+size = Vector2(128, 128)
+
+[node name="CharacterMini" type="Node3D"]
+script = ExtResource("1_mini")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_glow")
+pixel_size = 0.015
+billboard = 1
+alpha_cut = 1
+texture = SubResource("PlaceholderTexture2D_sprite")
