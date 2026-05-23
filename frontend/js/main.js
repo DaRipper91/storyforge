@@ -13,7 +13,7 @@ import { fetchState, openSession, postGridAction, postFreeformAction,
          rvPerform, rvTip, rvHeckle, rvRequestSong,
          samaelConsult, samaelGetState,
          hailieBailout, hailieGetState,
-         loginGoogle, fetchMe, logout
+         loginGoogle, fetchMe, logout, fetchAuthConfig
 } from "./api.js";
 import { GridCanvas } from "./canvas.js";
 import { GamepadManager, XBOX } from "./gamepad.js";
@@ -84,6 +84,38 @@ async function checkAuthStatus() {
   if (data.authenticated) {
     currentUser = data.user;
     document.getElementById("auth-container").style.display = "none";
+  }
+}
+
+// ─────────────────────── Google Sign-In init ────────────────────
+async function initGoogleLogin() {
+  try {
+    const { google_client_id } = await fetchAuthConfig();
+    if (!google_client_id) return; // server has auth disabled
+
+    // GIS loads async — wait until it's ready
+    await new Promise((resolve) => {
+      if (window.google?.accounts?.id) { resolve(); return; }
+      const script = document.querySelector('script[src*="accounts.google.com/gsi"]');
+      if (script) script.addEventListener("load", resolve);
+      else resolve(); // no GIS script, skip
+    });
+
+    if (!window.google?.accounts?.id) return;
+
+    google.accounts.id.initialize({
+      client_id: google_client_id,
+      callback: window.onGoogleLogin,
+      ux_mode: "popup",
+      context: "signin",
+      auto_prompt: false,
+    });
+    google.accounts.id.renderButton(
+      document.querySelector(".g_id_signin"),
+      { type: "standard" }
+    );
+  } catch (err) {
+    console.warn("[auth] Google Sign-In init failed:", err.message);
   }
 }
 

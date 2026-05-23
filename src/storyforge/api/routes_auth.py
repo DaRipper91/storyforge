@@ -112,6 +112,12 @@ async def google_auth(body: AuthToken, response: Response):
         raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(e)}")
 
 
+@router.get("/config")
+async def auth_config():
+    """Return public auth config the frontend needs to initialize Google Sign-In."""
+    return {"google_client_id": settings.google_client_id}
+
+
 @router.get("/me")
 async def get_me(request: Request):
     """Return current user session info from cookie."""

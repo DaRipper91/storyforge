@@ -141,6 +141,11 @@ export async function loginGoogle(idToken) {
   return jsonOrThrow(res);
 }
 
+export async function fetchAuthConfig() {
+  const res = await fetch(`${API_BASE}/api/auth/config`);
+  return jsonOrThrow(res);
+}
+
 export async function fetchMe() {
   const res = await fetch(`${API_BASE}/api/auth/me`);
   return jsonOrThrow(res);
