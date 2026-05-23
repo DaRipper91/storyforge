@@ -1,23 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Background with a more "magical" deep purple/black gradient feel -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <defs>
-    <radialGradient id="forgeGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-      <stop offset="0%" style="stop-color:#2e1a47;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a1428;stop-opacity:1" />
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#3a2e28"/>
+      <stop offset="100%" stop-color="#0f0c0a"/>
     </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe699"/>
+      <stop offset="50%" stop-color="#dca331"/>
+      <stop offset="100%" stop-color="#6b4c16"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
   </defs>
-  <rect width="100" height="100" rx="15" fill="url(#forgeGradient)" />
   
-  <!-- An anvil or forge hearth silhouette -->
-  <path d="M25 75 L75 75 L70 65 L30 65 Z" fill="#3d334d" />
-  <path d="M20 65 L80 65 L80 45 C80 35 70 30 50 30 C30 30 20 35 20 45 Z" fill="#4d415f" />
+  <!-- Background -->
+  <rect width="256" height="256" rx="50" fill="url(#bg)"/>
+  <rect x="10" y="10" width="236" height="236" rx="40" fill="none" stroke="#1f1814" stroke-width="6"/>
+  <rect x="18" y="18" width="220" height="220" rx="32" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.4"/>
+
+  <g filter="url(#dropShadow)">
+    <!-- Anvil -->
+    <!-- Base -->
+    <path d="M 70 200 L 186 200 L 176 170 L 80 170 Z" fill="#1c1c1c" stroke="url(#gold)" stroke-width="2"/>
+    <!-- Mid -->
+    <path d="M 96 170 L 160 170 L 150 130 L 106 130 Z" fill="#262626" stroke="url(#gold)" stroke-width="2"/>
+    <!-- Top -->
+    <path d="M 60 100 L 186 100 L 186 130 L 60 130 Z" fill="#333333" stroke="url(#gold)" stroke-width="2"/>
+    <!-- Horn -->
+    <path d="M 60 100 C 30 100 30 130 60 130 Z" fill="#2c2c2c" stroke="url(#gold)" stroke-width="2"/>
+    <!-- Tail -->
+    <path d="M 186 100 L 210 100 L 186 130 Z" fill="#262626" stroke="url(#gold)" stroke-width="2"/>
+  </g>
+
+  <!-- Flame -->
+  <path d="M 128 30 C 150 60 160 80 150 100 C 140 120 116 120 106 100 C 96 80 106 60 128 30 Z" fill="url(#gold)" filter="url(#glow)"/>
+  <!-- Inner Flame -->
+  <path d="M 128 50 C 140 70 146 86 138 96 C 130 106 126 106 118 96 C 110 86 116 70 128 50 Z" fill="#fff7d6" filter="url(#glow)"/>
   
-  <!-- The "Spark" of Storytelling / Magic -->
-  <circle cx="50" cy="45" r="8" fill="#c9a14a">
-    <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite" />
-  </circle>
-  
-  <!-- Stylized hammer or quill crossing -->
-  <path d="M35 30 L65 60" stroke="#c9a14a" stroke-width="4" stroke-linecap="round" />
-  <path d="M30 35 L40 25" stroke="#c9a14a" stroke-width="4" stroke-linecap="round" />
+  <!-- Sparkles -->
+  <circle cx="90" cy="70" r="3" fill="#ffe699" filter="url(#glow)"/>
+  <circle cx="170" cy="60" r="2.5" fill="#ffe699" filter="url(#glow)"/>
+  <circle cx="150" cy="40" r="1.5" fill="#ffe699" filter="url(#glow)"/>
+  <circle cx="80" cy="90" r="2" fill="#ffe699" filter="url(#glow)"/>
 </svg>
