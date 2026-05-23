@@ -87,6 +87,12 @@ The project includes an integrated launcher that spins up both the Python backen
 ---
 
 ## 📜 Credits
+
+-------MY QUEEN, D.ANNA--------
+
+She isn't a coder and she doesn't care much for Linux, but she is the reason any of this exists. D.Anna is my inspiration and my anchor. She was the one who picked out that first deep purple theme—the spark that started the whole look of this project. More than that, she’s the one I turn to when I’m completely stuck. Even without knowing the technical side, her ideas and her support are what pull me through the toughest blocks. This project belongs to her as much as it does to me.
+
+
 - **Haley, John, & Jason**: For the constant support.
 - **RedVelvet**: The inspiration.
 - **Brad**: Our primary alpha tester.
