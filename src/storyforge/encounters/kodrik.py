@@ -13,7 +13,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 from enum import StrEnum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 # ─────────────────────── Enums ───────────────────────

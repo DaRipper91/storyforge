@@ -4,7 +4,7 @@ Google OAuth2 Authentication.
 Uses Google Identity Services (GIS) ID Tokens.
 Backend verifies the token, creates a local session, and sets an HttpOnly cookie.
 """
-from fastapi import APIRouter, HTTPException, Response, Request, Depends
+from fastapi import APIRouter, HTTPException, Response, Request
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import jwt
@@ -14,8 +14,6 @@ import time
 import anyio
 
 from storyforge.config import settings
-from storyforge.api.deps import get_state_manager
-from storyforge.core.state_manager import StateManager
 from storyforge.auth import authenticate_google_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
