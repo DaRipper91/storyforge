@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     jwt_secret: str = "dev-secret-change-me-in-production"
     jwt_algorithm: str = "HS256"
+
+    # CORS — space-separated list of allowed origins.
+    # Add your ngrok URL here each session, e.g.:
+    #   STORYFORGE_ALLOWED_ORIGINS=http://localhost:8765 https://abc123.ngrok-free.app
+    allowed_origins: str = "http://localhost:8765 http://127.0.0.1:8765"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.allowed_origins.split() if o.strip()]
     
     campaign_id: str = "family_campaign_01"
     
