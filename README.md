@@ -87,8 +87,8 @@ The project includes an integrated launcher that spins up both the Python backen
 ---
 
 ## 📜 Credits
-- **Haley, John, & Jason**: For the constant support and testing.
-- **RedVelvet**: The inspiration for the bardic fire.
+- **Haley, John, & Jason**: For the constant support.
+- **RedVelvet**: The inspiration.
 - **Brad**: Our primary alpha tester.
 - **Google Gemini**: The silicon voice behind the Weaver's Paradox.
 
