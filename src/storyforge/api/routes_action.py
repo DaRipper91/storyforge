@@ -6,6 +6,7 @@ from storyforge.core.state_manager import StateManager
 from storyforge.core import rules, validators
 from storyforge.ai import narrator, interpreter
 from storyforge.api.deps import get_state_manager
+from storyforge.events.bus import event_bus
 
 router = APIRouter(prefix="/api/action", tags=["action"])
 
@@ -89,6 +90,13 @@ async def handle_freeform(
     # 3. Log narrative + broadcast
     await state.append_narration(actor_id=action.actor_id, kind="action", text=action.text)
     await state.append_narration(actor_id=None, kind="narration", text=response.narrative)
-    # Broadcast is handled by state.commit() called inside apply_diff
-    
+
+    pos = char.position
+    await event_bus.publish({
+        "type": "particle_event",
+        "actor_id": action.actor_id,
+        "position": {"x": pos.x, "y": pos.y},
+        "effect": "magic_burst",
+    })
+
     return {"narrative": response.narrative, "revision": state.current.revision}

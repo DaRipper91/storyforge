@@ -28,6 +28,10 @@ var _ws_url: String:
 signal state_updated(new_state)
 signal narration_received(text)
 signal connection_status_changed(connected)
+signal paradox_triggered(transformed_ids: Array)
+signal phase_changed(phase: String)
+signal npc_event_received(ev: Dictionary)
+signal particle_event_received(ev: Dictionary)
 
 var ws_client: WebSocketPeer = WebSocketPeer.new()
 var is_connected: bool = false
@@ -91,8 +95,15 @@ func _handle_ws_message(json_str: String):
 				fetch_full_state()
 			"narration":
 				narration_received.emit(json["text"])
+			"paradox_triggered":
+				paradox_triggered.emit(json.get("transformed_ids", []))
+			"phase_changed":
+				phase_changed.emit(json.get("phase", ""))
 			"npc_event":
 				_handle_npc_event(json)
+				npc_event_received.emit(json)
+			"particle_event":
+				particle_event_received.emit(json)
 
 
 func _handle_npc_event(ev: Dictionary):

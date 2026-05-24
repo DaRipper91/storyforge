@@ -32,6 +32,10 @@ func _ready():
 	var pc = get_node_or_null("/root/PythonClient")
 	if pc:
 		pc.state_updated.connect(_on_state_updated)
+		pc.paradox_triggered.connect(_on_paradox_triggered)
+		pc.phase_changed.connect(_on_phase_changed)
+		pc.npc_event_received.connect(_on_npc_event)
+		pc.particle_event_received.connect(_on_particle_event)
 
 	_update_camera()
 
@@ -159,3 +163,47 @@ func _spawn_particles(scene: PackedScene, world_pos: Vector3):
 	inst.emitting = true
 	var timer = get_tree().create_timer(inst.lifetime + 0.2)
 	timer.timeout.connect(inst.queue_free)
+
+
+# ─── Event handlers ─────────────────────────────────────────────────
+
+func _on_paradox_triggered(_transformed_ids: Array):
+	for cid in _miniatures:
+		spawn_paradox_glitch(_miniatures[cid].global_position)
+	AudioManager.play_sfx("res://assets/audio/sfx_paradox_glitch.wav")
+	AudioManager.play_ambient("res://assets/audio/ambient_paradox.wav")
+
+
+func _on_phase_changed(phase: String):
+	match phase:
+		"LOBBY":       AudioManager.play_ambient("res://assets/audio/ambient_inn.wav")
+		"CREATION":    AudioManager.play_ambient("res://assets/audio/ambient_keep.wav")
+		"EXPLORATION": AudioManager.play_ambient("res://assets/audio/ambient_wilderness.wav")
+
+
+func _on_npc_event(ev: Dictionary):
+	var npc    = ev.get("npc", "")
+	var action = ev.get("action", "")
+	match npc + "/" + action:
+		"haylie/entrance":
+			spawn_magic_burst(Vector3.ZERO)
+			AudioManager.play_sfx("res://assets/audio/sfx_haylie_entrance.wav")
+		"danna/boon_granted", "redvelvet/boon_granted":
+			spawn_magic_burst(Vector3.ZERO)
+			AudioManager.play_sfx("res://assets/audio/sfx_boon_granted.wav")
+		"redvelvet/tip":
+			AudioManager.play_sfx("res://assets/audio/sfx_tip_silver.wav")
+		"redvelvet/heckle":
+			AudioManager.play_sfx("res://assets/audio/sfx_heckle.wav")
+		"jon/cactus":
+			AudioManager.play_sfx("res://assets/audio/sfx_cactus.wav")
+		"kodrik/dispatch":
+			spawn_magic_burst(Vector3(3.0, 0.5, 3.0))
+
+
+func _on_particle_event(ev: Dictionary):
+	var pos  = ev.get("position", {"x": 0, "y": 0})
+	var wpos = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
+	match ev.get("effect", "magic_burst"):
+		"magic_burst":    spawn_magic_burst(wpos)
+		"paradox_glitch": spawn_paradox_glitch(wpos)

@@ -205,6 +205,7 @@ async def jon_cactus(body: CactusRequest, request: Request):
     except Exception:
         jon_response = pool_response
 
+    await event_bus.publish({"type": "npc_event", "npc": "jon", "action": "cactus"})
     return {
         "jon_response": jon_response,
         "cactus_offense_count": jon.encounter.cactus_offense_count,
@@ -408,6 +409,7 @@ async def haylie_bailout(body: BailoutRequest, request: Request):
         jon_response = result.jon_response
         haylie_sign_off = result.haylie_sign_off
 
+    await event_bus.publish({"type": "npc_event", "npc": "haylie", "action": "entrance"})
     return {
         "triggered": True,
         "scolding": scolding,
@@ -511,6 +513,8 @@ async def danna_petition(body: PetitionRequest, request: Request):
     except Exception:
         response_text = result.response
 
+    if result.granted:
+        await event_bus.publish({"type": "npc_event", "npc": "danna", "action": "boon_granted"})
     return {
         "granted": result.granted,
         "petition_type": result.petition_type,
@@ -566,12 +570,9 @@ async def redvelvet_perform(request: Request):
         perf_text = result.performance_text
 
     mood_name = result.mood.name.lower()
-    await event_bus.publish({
-        "type": "npc_event",
-        "npc": "redvelvet",
-        "action": "perform",
-        "mood": mood_name,
-    })
+    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "perform", "mood": mood_name})
+    if result.grants_boon:
+        await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "boon_granted"})
 
     return {
         "performance_text": perf_text,
@@ -608,6 +609,7 @@ async def redvelvet_tip(body: TipRequest, request: Request):
     except Exception:
         response_text = result.response
 
+    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "tip"})
     return {
         "response": response_text,
         "silver_spent": result.silver_spent,
@@ -638,6 +640,7 @@ async def redvelvet_heckle(request: Request):
     except Exception:
         response_text = result.response
 
+    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "heckle"})
     return {
         "response": response_text,
         "mood_before": result.mood_before.name,
@@ -713,6 +716,7 @@ async def kodrik_dispatch(request: Request, dispatch_type: DispatchType = Dispat
     except Exception:
         flavor = result.flavor
 
+    await event_bus.publish({"type": "npc_event", "npc": "kodrik", "action": "dispatch"})
     return {**dataclasses.asdict(result), "flavor": flavor}
 
 

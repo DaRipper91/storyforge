@@ -118,6 +118,7 @@ func _render_era_step():
 		if selection["starting_era"] == era["id"]:
 			btn.set_pressed_no_signal(true)
 			next_btn.disabled = false
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav"))
 		btn.pressed.connect(func():
 			selection["starting_era"] = era["id"]
 			next_btn.disabled = false
@@ -173,7 +174,7 @@ func _render_race_step():
 				btn.set_pressed_no_signal(true)
 				next_btn.disabled = false
 				_preview_race(data, is_before)
-			btn.mouse_entered.connect(func(): _preview_race(data, is_before))
+			btn.mouse_entered.connect(func(): AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav"); _preview_race(data, is_before))
 			btn.focus_entered.connect(func(): _preview_race(data, is_before))
 			btn.pressed.connect(func():
 				selection["race"] = key
@@ -228,7 +229,7 @@ func _render_choice_step(options: Dictionary, field: String, placeholder: String
 			btn.set_pressed_no_signal(true)
 			next_btn.disabled = false
 			_preview_item(data)
-		btn.mouse_entered.connect(func(): _preview_item(data))
+		btn.mouse_entered.connect(func(): AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav"); _preview_item(data))
 		btn.focus_entered.connect(func(): _preview_item(data))
 		btn.pressed.connect(func():
 			selection[field] = key

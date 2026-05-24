@@ -27,13 +27,13 @@ We are currently transitioning from a web-based (HTML/JS/Konva.js) frontend to a
 - [ ] **Next Task**: Recreate Character Forge UI in Godot (Focus: 'Before' vs 'After' Transition).
 - [x] Implement Google OAuth2 login flow within Godot UI.
 
-### 🔮 Milestone 3: Cinematic Polish - IN PROGRESS
+### ✅ Milestone 3: Cinematic Polish - COMPLETE
 - [x] Dynamic 3D lighting — WorldEnvironment, candlelit OmniLight with flicker, bloom + SSAO.
 - [x] Godot Particle effects — ParadoxParticles (chromatic burst) + MagicBurst (golden sparkle).
 - [x] Gimbal Camera — orbit (right-drag), zoom (scroll), DoF (CameraAttributesPractical), R to reset.
 - [x] Audio infrastructure — AudioManager autoload, Music/SFX buses, play_ambient/sfx/npc_performance.
-- [ ] Actual audio assets (ambient loops, SFX, RedVelvet performance tracks).
-- [ ] Particle triggers wired to all game events (ability use, Paradox phase change, NPC entrance).
+- [x] Synthesized placeholder audio assets — 27 .wav files (6 ambient, 5 RedVelvet performances, 16 SFX).
+- [x] Particle triggers wired to all game events (freeform actions, Paradox phase change, NPC entrances, 8 NPC event SFX).
 
 ### 🚀 Milestone 4: Final Release - PLANNED
 - [ ] Unified Windows Release packaging (Godot + Python).
