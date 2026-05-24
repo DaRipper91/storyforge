@@ -38,7 +38,7 @@ jobs:
           mkdir -p dist
           godot --headless --path godot \
             --export-release "Windows Desktop" \
-            "../../dist/StoryForge_client.exe" 2>&1
+            "$(pwd)/dist/StoryForge_client.exe" 2>&1
 
       - name: Upload Godot Windows artifact
         uses: actions/upload-artifact@v4
@@ -138,7 +138,7 @@ jobs:
           mkdir -p dist
           godot --headless --path godot \
             --export-release "Linux/X11" \
-            "../../dist/StoryForge_client_linux" 2>&1
+            "$(pwd)/dist/StoryForge_client_linux" 2>&1
 
       - name: Upload Linux Godot artifact
         uses: actions/upload-artifact@v4
