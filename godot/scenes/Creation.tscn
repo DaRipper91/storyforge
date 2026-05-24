@@ -64,6 +64,13 @@ theme_override_font_sizes/font_size = 48
 text = "The Character Forge"
 horizontal_alignment = 1
 
+[node name="StepLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.3, 0.25, 1)
+theme_override_font_sizes/font_size = 18
+text = "Step 1 / 6  —  Era"
+horizontal_alignment = 1
+
 [node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_hint_vertical = 3

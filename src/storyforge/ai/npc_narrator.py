@@ -31,8 +31,7 @@ async def narrate_npc(npc_name: str, situation: str) -> str:
                       and fall back to pool text).
     """
     system_instruction = load_prompt(f"npc_{npc_name}.md")
-    result = await gemini_client.generate_structured(
+    return await gemini_client.generate_text(
         system_instruction=system_instruction,
         prompt=situation,
     )
-    return result.narrative

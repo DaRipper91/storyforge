@@ -24,6 +24,39 @@ class GeminiClient:
         self.client = genai.Client(api_key=api_key)
         self.model = model
 
+    async def generate_text(
+        self,
+        system_instruction: str,
+        prompt: str,
+        max_attempts: int = 3,
+    ) -> str:
+        """Call Gemini for plain text — no JSON schema. Used for NPC dialogue."""
+        config = types.GenerateContentConfig(
+            system_instruction=system_instruction,
+            temperature=0.85,
+        )
+        last_exc = None
+        delays = [0.5, 1.0, 2.0]
+        for attempt in range(max_attempts):
+            try:
+                response = await asyncio.to_thread(
+                    self.client.models.generate_content,
+                    model=self.model,
+                    contents=prompt,
+                    config=config,
+                )
+                if not response.text:
+                    raise ValueError("Gemini returned empty text")
+                return response.text
+            except Exception as e:
+                last_exc = e
+                if attempt < max_attempts - 1:
+                    logger.warning(f"Gemini call failed (attempt {attempt+1}/{max_attempts}): {e}")
+                    await asyncio.sleep(delays[attempt])
+                else:
+                    logger.error(f"Gemini call failed permanently: {e}")
+        raise RuntimeError(f"Gemini call failed after {max_attempts} attempts") from last_exc
+
     async def generate_structured(
         self,
         system_instruction: str,

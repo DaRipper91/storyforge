@@ -14,6 +14,8 @@ NPCs:
 """
 from __future__ import annotations
 
+import dataclasses
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
@@ -187,10 +189,23 @@ class CactusRequest(BaseModel):
 async def jon_cactus(body: CactusRequest, request: Request):
     """Player makes a comment about the cactus."""
     jon = _get_jon(request)
-    response = jon.handle_cactus_comment(body.is_lewd_or_mocking)
+    pool_response = jon.handle_cactus_comment(body.is_lewd_or_mocking)
     _save_jon(request, jon)
+
+    situation = (
+        f"A player {'made a lewd or mocking comment about' if body.is_lewd_or_mocking else 'casually noticed'} "
+        f"the cactus on the counter. This is cactus offense #{jon.encounter.cactus_offense_count}. "
+        f"Jon does not register the offense — he responds with genuine warmth and treats the cactus with dignity. "
+        f"{'Jon is still not selling to them right now.' if not jon.jon_will_sell else ''} "
+        f"Respond as Jon only. One short reply."
+    )
+    try:
+        jon_response = await narrate_npc("jon", situation)
+    except Exception:
+        jon_response = pool_response
+
     return {
-        "jon_response": response,
+        "jon_response": jon_response,
         "cactus_offense_count": jon.encounter.cactus_offense_count,
         "jon_will_sell": jon.jon_will_sell,
     }
@@ -373,11 +388,30 @@ async def haylie_bailout(body: BailoutRequest, request: Request):
     _save_jon(request, jon)
     _save_haylie(request, haylie)
 
+    situation = (
+        f"Haylie has walked into The Store. She is in motion — not rescuing anyone, just arriving. "
+        f"Jon has been deep in a story trap. This is bailout #{result.bailouts_delivered}. "
+        f"The room's energy shifts when she enters. Players find it easier to leave — not because she "
+        f"intervened, but because the room reorganized around her. "
+        f"Genre context: {body.genre.value}. "
+        f"Write three short beats: Haylie's casual remark as she moves through (loud, warm, chaotic), "
+        f"Jon's quiet chastened murmur, Haylie's sign-off as she reaches the door. "
+        f"Keep it light — Haylie is noise and forward motion, Jon is fond of her exactly as she is."
+    )
+    try:
+        scolding = await narrate_npc("haylie", situation)
+        jon_response = result.jon_response
+        haylie_sign_off = result.haylie_sign_off
+    except Exception:
+        scolding = result.scolding
+        jon_response = result.jon_response
+        haylie_sign_off = result.haylie_sign_off
+
     return {
         "triggered": True,
-        "scolding": result.scolding,
-        "jon_response": result.jon_response,
-        "haylie_sign_off": result.haylie_sign_off,
+        "scolding": scolding,
+        "jon_response": jon_response,
+        "haylie_sign_off": haylie_sign_off,
         "inn_note": result.inn_note,
         "bailouts_delivered": result.bailouts_delivered,
         "party_can_leave": jon.party_can_leave,
@@ -429,10 +463,23 @@ async def danna_address(body: AddressRequest, request: Request):
     danna = _get_danna(request)
     result = danna.address(body.form)
     _save_danna(request, danna)
+
+    situation = (
+        f"A player addressed Queen D.Anna using form: '{body.form.value}'. "
+        f"Address was {'correct' if result.correct else 'incorrect — she does not raise her voice, she simply clarifies'}. "
+        f"Favor delta: {result.favor_delta:+d}. Current favor: {result.new_favor}. Standing: {danna.standing_label}. "
+        f"D.Anna is measured, precise, warm but never soft. She holds space without announcing it. "
+        f"Deliver her response in one or two sentences."
+    )
+    try:
+        response_text = await narrate_npc("danna", situation)
+    except Exception:
+        response_text = result.response
+
     return {
         "form": result.form,
         "correct": result.correct,
-        "response": result.response,
+        "response": response_text,
         "favor_delta": result.favor_delta,
         "new_favor": result.new_favor,
         "standing": danna.standing_label,
@@ -450,10 +497,23 @@ async def danna_petition(body: PetitionRequest, request: Request):
     danna = _get_danna(request)
     result = danna.petition(body.petition_type)
     _save_danna(request, danna)
+
+    situation = (
+        f"A player petitioned Queen D.Anna for: {body.petition_type.value}. "
+        f"Petition {'granted' if result.granted else 'declined'}. "
+        f"Favor cost: {result.favor_cost}. Remaining favor: {result.new_favor}. Standing: {danna.standing_label}. "
+        f"{'Grant it with weight — this costs something, politically.' if result.granted else 'Decline with clarity — no apology, just a closed door and a path forward.'} "
+        f"One or two sentences as D.Anna."
+    )
+    try:
+        response_text = await narrate_npc("danna", situation)
+    except Exception:
+        response_text = result.response
+
     return {
         "granted": result.granted,
         "petition_type": result.petition_type,
-        "response": result.response,
+        "response": response_text,
         "favor_cost": result.favor_cost,
         "new_favor": result.new_favor,
         "standing": danna.standing_label,
@@ -490,8 +550,22 @@ async def redvelvet_perform(request: Request):
     rv = _get_redvelvet(request)
     result = rv.perform()
     _save_redvelvet(request, rv)
+
+    situation = (
+        f"Firey RedVelvet is performing at {result.mood.name} mood (performance #{rv.encounter.performances_given}). "
+        f"COLD = technically perfect but going through motions; WARM = locked in, genuinely good; "
+        f"HOT = something real is happening here, the room feels it; "
+        f"BLAZING = transcendent — the fire performs with her, it is finished and perfect, the room goes quiet. "
+        f"{'BLAZING: this moment is complete. Write it that way.' if result.grants_boon else ''} "
+        f"Write her performance text for exactly this mood. Match the energy precisely. No hedging."
+    )
+    try:
+        perf_text = await narrate_npc("redvelvet", situation)
+    except Exception:
+        perf_text = result.performance_text
+
     return {
-        "performance_text": result.performance_text,
+        "performance_text": perf_text,
         "mood": result.mood.name,
         "mood_value": int(result.mood),
         "grants_boon": result.grants_boon,
@@ -512,8 +586,21 @@ async def redvelvet_tip(body: TipRequest, request: Request):
     rv = _get_redvelvet(request)
     result = rv.tip(body.silver)
     _save_redvelvet(request, rv)
+
+    situation = (
+        f"Someone tipped Firey RedVelvet {body.silver} silver. "
+        f"Mood moved from {result.mood_before.name} to {result.mood_after.name}. "
+        f"{'Mood improved one step.' if result.mood_changed else 'Already at peak mood — she acknowledges it anyway.'} "
+        f"She never stops the performance for a tip — she acknowledges it in character, mid-movement. "
+        f"Write her response in one sentence. Stylish. In character."
+    )
+    try:
+        response_text = await narrate_npc("redvelvet", situation)
+    except Exception:
+        response_text = result.response
+
     return {
-        "response": result.response,
+        "response": response_text,
         "silver_spent": result.silver_spent,
         "mood_before": result.mood_before.name,
         "mood_after": result.mood_after.name,
@@ -528,8 +615,22 @@ async def redvelvet_heckle(request: Request):
     rv = _get_redvelvet(request)
     result = rv.heckle()
     _save_redvelvet(request, rv)
+
+    situation = (
+        f"Someone heckled Firey RedVelvet. Heckle #{rv.encounter.heckles_received}. "
+        f"Mood dropped from {result.mood_before.name} to {result.mood_after.name}. "
+        f"She finishes the phrase first. Then she addresses it — with the calm of someone who has "
+        f"already composed the response and is deciding whether to use the polite version. "
+        f"She is never rattled. The fire does not agree with the heckler. "
+        f"Two sentences max: finish the phrase, then the address."
+    )
+    try:
+        response_text = await narrate_npc("redvelvet", situation)
+    except Exception:
+        response_text = result.response
+
     return {
-        "response": result.response,
+        "response": response_text,
         "mood_before": result.mood_before.name,
         "mood_after": result.mood_after.name,
         "heckles_received": rv.encounter.heckles_received,
@@ -546,9 +647,23 @@ async def redvelvet_request_song(body: SongRequestBody, request: Request):
     rv = _get_redvelvet(request)
     result = rv.request_song(body.song_type)
     _save_redvelvet(request, rv)
+
+    situation = (
+        f"Someone requested a {body.song_type.value} song from Firey RedVelvet. "
+        f"Her current mood is {result.mood.name}. "
+        f"Song types: MYSTERY=haunting/atmospheric, BATTLE=driving/fierce, BALLAD=slow/emotional, "
+        f"COMEDY=light/crowd-pleasing, EPIC=sweeping/legendary. "
+        f"She does not announce the song — she just begins it. Write the performance for this song type, "
+        f"colored by her current mood. Two to four sentences."
+    )
+    try:
+        perf_text = await narrate_npc("redvelvet", situation)
+    except Exception:
+        perf_text = result.performance_text
+
     return {
         "song_type": result.song_type,
-        "performance_text": result.performance_text,
+        "performance_text": perf_text,
         "mood": result.mood.name,
     }
 
@@ -576,7 +691,21 @@ async def kodrik_dispatch(request: Request, dispatch_type: DispatchType = Dispat
     kodrik = _get_kodrik(request)
     result = kodrik.get_dispatch(dispatch_type)
     _save_kodrik(request, kodrik)
-    return result
+
+    situation = (
+        f"Guildmaster Kodrik is assigning a {dispatch_type.value} dispatch to the party. "
+        f"Location: {result.location_name}. Breadcrumb: {result.breadcrumb}. "
+        f"Dispatch #{kodrik.encounter.dispatches_given}. "
+        f"Kodrik is direct, professional, no wasted words. He probably does not look up from the map. "
+        f"Write his delivery of this dispatch — one or two sentences. No pleasantries."
+    )
+    try:
+        flavor = await narrate_npc("kodrik", situation)
+    except Exception:
+        flavor = result.flavor
+
+    return {**dataclasses.asdict(result), "flavor": flavor}
+
 
 @router.post("/kodrik/repair")
 async def kodrik_repair(request: Request, body: RepairRequest):
@@ -584,7 +713,19 @@ async def kodrik_repair(request: Request, body: RepairRequest):
     kodrik = _get_kodrik(request)
     result = kodrik.repair_gear(body.item_name, body.silver_available)
     _save_kodrik(request, kodrik)
-    return result
+
+    situation = (
+        f"Kodrik is {'repairing' if result.success else 'declining to repair'} {body.item_name}. "
+        f"{'Cost: ' + str(result.cost) + ' silver. Work is done.' if result.success else 'Not enough silver — he does not touch it.'} "
+        f"He speaks in the language of craft and coin. Brief. No sentiment. "
+        f"Write his response in one sentence."
+    )
+    try:
+        flavor = await narrate_npc("kodrik", situation)
+    except Exception:
+        flavor = result.flavor
+
+    return {**dataclasses.asdict(result), "flavor": flavor}
 
 # ═══════════════════════════════════════════════════════════════════
 # BRYNE endpoints
@@ -596,14 +737,41 @@ async def bryne_observation(request: Request):
     bryne = _get_bryne(request)
     result = bryne.get_observation()
     _save_bryne(request, bryne)
-    return result
+
+    situation = (
+        f"Bryne has noticed something the party missed: \"{result.text}\". "
+        f"He points at it without explanation. He does not wait for acknowledgment. "
+        f"He and Nathis are always together — Nathis is nearby. "
+        f"Write the behavioral flavor: how Bryne gestures, what the silence feels like, "
+        f"what it is like to receive information from someone who considers speaking a last resort. "
+        f"One or two sentences. No dialogue from Bryne."
+    )
+    try:
+        flavor = await narrate_npc("bryne", situation)
+    except Exception:
+        flavor = result.flavor
+
+    return {**dataclasses.asdict(result), "flavor": flavor}
+
 
 @router.post("/bryne/cole-lean")
 async def bryne_cole_lean(request: Request):
     """Trigger Cole's lean effect."""
     bryne = _get_bryne(request)
-    flavor = bryne.trigger_cole_lean()
+    pool_flavor = bryne.trigger_cole_lean()
     _save_bryne(request, bryne)
+
+    situation = (
+        "Cole (Bryne's massive black dog, not yet in the realm) is doing The Lean — "
+        "the passive effect where he settles his full weight against someone and the room's tension "
+        "becomes a distant problem. Write one sentence describing the lean. "
+        "Weight. Warmth. Inexplicable safety."
+    )
+    try:
+        flavor = await narrate_npc("bryne", situation)
+    except Exception:
+        flavor = pool_flavor
+
     return {"flavor": flavor}
 
 
@@ -617,12 +785,41 @@ async def nathis_report(request: Request):
     nathis = _get_nathis(request)
     result = nathis.get_report()
     _save_nathis(request, nathis)
-    return result
+
+    situation = (
+        f"Nathis is delivering an intelligence report at speed. "
+        f"Intel: \"{result.intel}\". Urgency: {result.urgency}. "
+        f"Report #{nathis.encounter.reports_given}. "
+        f"He speaks in volleys — no filter between thought and mouth, "
+        f"already half-out the door before he finishes the sentence. "
+        f"Tyty may be nearby, already announcing the situation to the surrounding half mile. "
+        f"Write the flavor of how Nathis delivers this. One or two sentences. Fast."
+    )
+    try:
+        flavor = await narrate_npc("nathis", situation)
+    except Exception:
+        flavor = result.flavor
+
+    return {**dataclasses.asdict(result), "flavor": flavor}
+
 
 @router.post("/nathis/tyty-bark")
 async def nathis_tyty_bark(request: Request):
     """Trigger Tyty's barking."""
     nathis = _get_nathis(request)
-    flavor = nathis.trigger_tyty_bark()
+    pool_flavor = nathis.trigger_tyty_bark()
     _save_nathis(request, nathis)
+
+    situation = (
+        "Tyty (Nathis's dog, The Wandering Herald) has detected a threat and begun his announcement. "
+        "Full volume. The element of surprise is over for everyone within half a mile. "
+        "He has relocated to a better position to continue heraldry — this is not fleeing, "
+        "this is operational repositioning. "
+        "Write one sentence: the announcement, its range, and Tyty's strategic relocation."
+    )
+    try:
+        flavor = await narrate_npc("nathis", situation)
+    except Exception:
+        flavor = pool_flavor
+
     return {"flavor": flavor}
