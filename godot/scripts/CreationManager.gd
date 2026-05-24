@@ -13,7 +13,7 @@ const ABILITY_KEYS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 
 @onready var step_label       = $MarginContainer/VBoxContainer/StepLabel
-@onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
+@onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceScroll/RaceList
 @onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
 @onready var portrait_rect    = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitRect
 @onready var next_btn         = $MarginContainer/VBoxContainer/Footer/NextBtn

@@ -85,9 +85,14 @@ layout_mode = 2
 text = "Choose Your Ancestry:"
 theme_override_colors/font_color = Color(0.1, 0.08, 0.1, 1)
 
-[node name="RaceList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="RaceScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
 layout_mode = 2
-size_hint_vertical = 3
+size_hint_vertical = 1
+horizontal_scroll_mode = 0
+
+[node name="RaceList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceScroll"]
+layout_mode = 2
+size_hint_horizontal = 1
 
 [node name="RightPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
 layout_mode = 2
