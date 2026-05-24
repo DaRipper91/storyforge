@@ -61,10 +61,23 @@ var _paradox_scene:     PackedScene = null
 var _magic_burst_scene: PackedScene = null
 
 
+# ─── UI Overlay ─────────────────────────────────────────────────────
+var _ui_layer:      CanvasLayer    = null
+var _room_label:    Label          = null
+var _narrative_box: RichTextLabel  = null
+var _stat_panel:    PanelContainer = null
+var _stat_label:    RichTextLabel  = null
+
+# ─── Selection ───────────────────────────────────────────────────────
+var _selected_cid:   String = ""
+var _character_data: Dictionary = {}  # cid → full char dict from last state
+
+
 # ─── Lifecycle ──────────────────────────────────────────────────────
 
 func _ready():
 	_build_materials()
+	_setup_ui()
 
 	_dungeon_root = Node3D.new()
 	_dungeon_root.name = "DungeonRoot"
@@ -91,6 +104,62 @@ func _ready():
 	AudioManager.play_ambient("res://assets/audio/ambient_keep.wav")
 
 
+func _setup_ui():
+	_ui_layer = CanvasLayer.new()
+	add_child(_ui_layer)
+
+	# Room Name (top-center)
+	var margin = MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	margin.add_theme_constant_override("margin_top", 20)
+	_ui_layer.add_child(margin)
+
+	_room_label = Label.new()
+	_room_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_room_label.add_theme_font_size_override("font_size", 28)
+	_room_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	_room_label.add_theme_constant_override("shadow_offset_x", 2)
+	_room_label.add_theme_constant_override("shadow_offset_y", 2)
+	margin.add_child(_room_label)
+
+	# Narrative Box (bottom-left)
+	var log_margin = MarginContainer.new()
+	log_margin.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	log_margin.add_theme_constant_override("margin_left", 20)
+	log_margin.add_theme_constant_override("margin_bottom", 20)
+	log_margin.add_theme_constant_override("margin_right", 400) # Keep it on the left half
+	_ui_layer.add_child(log_margin)
+
+	var panel = PanelContainer.new()
+	log_margin.add_child(panel)
+
+	_narrative_box = RichTextLabel.new()
+	_narrative_box.bbcode_enabled = true
+	_narrative_box.scroll_following = true
+	_narrative_box.custom_minimum_size = Vector2(0, 120)
+	_narrative_box.fit_content = true
+	_narrative_box.add_theme_font_size_override("normal_font_size", 18)
+	panel.add_child(_narrative_box)
+
+	# Stat panel (bottom-right, hidden until a mini is selected)
+	var stat_margin := MarginContainer.new()
+	stat_margin.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	stat_margin.add_theme_constant_override("margin_right",  20)
+	stat_margin.add_theme_constant_override("margin_bottom", 20)
+	_ui_layer.add_child(stat_margin)
+
+	_stat_panel = PanelContainer.new()
+	_stat_panel.custom_minimum_size = Vector2(260, 0)
+	_stat_panel.visible = false
+	stat_margin.add_child(_stat_panel)
+
+	_stat_label = RichTextLabel.new()
+	_stat_label.bbcode_enabled = true
+	_stat_label.fit_content = true
+	_stat_label.add_theme_font_size_override("normal_font_size", 15)
+	_stat_panel.add_child(_stat_label)
+
+
 func _build_materials():
 	_mat_wall = StandardMaterial3D.new()
 	_mat_wall.albedo_color = Color(0.28, 0.25, 0.22)
@@ -98,25 +167,24 @@ func _build_materials():
 	_mat_wall.metallic = 0.0
 
 	_mat_floor = StandardMaterial3D.new()
-	_mat_floor.albedo_color = Color(0.55, 0.50, 0.44)
+	_mat_floor.albedo_color = Color(0.22, 0.20, 0.18)
 	_mat_floor.roughness = 0.85
+	_mat_floor.metallic = 0.0
 
 	_mat_door = StandardMaterial3D.new()
-	_mat_door.albedo_color = Color(0.45, 0.28, 0.12)
-	_mat_door.roughness = 0.75
-	_mat_door.emission_enabled = true
-	_mat_door.emission = Color(0.5, 0.3, 0.0)
-	_mat_door.emission_energy_multiplier = 0.6
+	_mat_door.albedo_color = Color(0.35, 0.25, 0.15)
+	_mat_door.roughness = 0.7
+	_mat_door.metallic = 0.1
 
 	_mat_hazard = StandardMaterial3D.new()
-	_mat_hazard.albedo_color = Color(0.6, 0.1, 0.0)
-	_mat_hazard.roughness = 0.8
+	_mat_hazard.albedo_color = Color(0.4, 0.1, 0.05)
+	_mat_hazard.roughness = 0.5
+	_mat_hazard.metallic = 0.0
 	_mat_hazard.emission_enabled = true
-	_mat_hazard.emission = Color(1.0, 0.1, 0.0)
-	_mat_hazard.emission_energy_multiplier = 0.8
+	_mat_hazard.emission = Color(0.4, 0.1, 0.0)
 
 
-func _process(delta: float):
+func _process(delta):
 	_flicker_t += delta
 	var flicker = sin(_flicker_t * 7.3) * 0.09 + sin(_flicker_t * 13.7) * 0.05
 	table_lantern.light_energy = _LANTERN_BASE + flicker
@@ -170,6 +238,14 @@ func _update_camera():
 
 func _rebuild_room(state: Dictionary):
 	var room_id: String = state.get("current_room_id", "")
+	
+	# Update room name UI
+	var rooms = state.get("rooms", {})
+	if room_id in rooms:
+		_room_label.text = rooms[room_id].get("name", room_id).to_upper()
+	else:
+		_room_label.text = ""
+
 	if room_id == _current_room_id:
 		return
 	_current_room_id = room_id
@@ -178,7 +254,6 @@ func _rebuild_room(state: Dictionary):
 	for child in _dungeon_root.get_children():
 		child.queue_free()
 
-	var rooms = state.get("rooms", {})
 	if not room_id in rooms:
 		ground_mesh.visible = true
 		return
@@ -248,58 +323,55 @@ func _rebuild_room(state: Dictionary):
 
 func _on_state_updated(new_state: Dictionary):
 	_rebuild_room(new_state)
+	_update_narrative(new_state)
 
-	var characters = new_state.get("characters", [])
-	for char_data in characters:
-		var cid:     String = char_data.get("id", "")
-		var pos             = char_data.get("position", {"x": 0, "y": 0})
-		var race_id: String = char_data.get("race", "ashenborn")
+	# characters is dict[str, CharacterSheet] — iterate over key→value pairs
+	var characters = new_state.get("characters", {})
+	var char_items: Array = characters.values() if characters is Dictionary else characters
+	for char_data in char_items:
+		if char_data is String:
+			continue
+		var cid:       String = char_data.get("id", "")
+		var pos               = char_data.get("position", {"x": 0, "y": 0})
+		var race_id:   String = char_data.get("race", "ashenborn")
+		var char_name: String = char_data.get("name", cid)
 
+		if cid.is_empty():
+			continue
+		_character_data[cid] = char_data  # store for stat panel
 		if cid in _miniatures:
 			_move_miniature(cid, Vector2(pos.x, pos.y))
 		else:
-			spawn_miniature(cid, Vector2(pos.x, pos.y), race_id)
+			spawn_miniature(cid, Vector2(pos.x, pos.y), race_id, char_name)
 
 
-func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String) -> Node3D:
-	var root = Node3D.new()
-	root.name = "Mini_" + character_id
+func _update_narrative(state: Dictionary):
+	var log_entries = state.get("narrative_log", [])
+	if log_entries.is_empty():
+		return
+	
+	var text = ""
+	# Show last 3 entries
+	var start = max(0, log_entries.size() - 3)
+	for i in range(start, log_entries.size()):
+		var entry = log_entries[i]
+		var entry_text = entry.get("text", "")
+		if entry.get("kind") == "narration":
+			text += "[i]%s[/i]\n\n" % entry_text
+		else:
+			text += "%s\n\n" % entry_text
+	
+	_narrative_box.text = text.strip_edges()
 
-	# Body — capsule
-	var body_inst = MeshInstance3D.new()
-	var body_mesh = CapsuleMesh.new()
-	body_mesh.radius = 0.18
-	body_mesh.height = 0.55
-	body_inst.mesh = body_mesh
-	body_inst.position = Vector3(0.0, 0.38, 0.0)
 
-	# Head — sphere
-	var head_inst = MeshInstance3D.new()
-	var head_mesh = SphereMesh.new()
-	head_mesh.radius = 0.15
-	head_mesh.height = 0.30
-	head_inst.mesh = head_mesh
-	head_inst.position = Vector3(0.0, 0.82, 0.0)
+const RaceMiniScene = preload("res://scenes/RaceMini.tscn")
 
-	# Material — race-group color with emissive glow
-	var group: String = RACE_GROUP.get(race_id, "Humanoid")
-	var glow_color: Color = RACE_COLORS.get(group, Color(1.0, 0.85, 0.6))
-
-	var mat = StandardMaterial3D.new()
-	mat.albedo_color = glow_color.darkened(0.35)
-	mat.roughness = 0.6
-	mat.metallic = 0.15
-	mat.emission_enabled = true
-	mat.emission = glow_color
-	mat.emission_energy_multiplier = 0.9
-
-	body_inst.material_override = mat
-	head_inst.material_override = mat
-
-	root.add_child(body_inst)
-	root.add_child(head_inst)
+func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, char_name: String = "") -> Node3D:
+	var root = RaceMiniScene.instantiate()
+	root.name     = "Mini_" + character_id
 	root.position = _grid_to_world(grid_pos)
-	add_child(root)
+	add_child(root)          # add first so @onready vars resolve before setup()
+	root.setup(race_id, char_name)
 	_miniatures[character_id] = root
 	return root
 
@@ -317,67 +389,116 @@ func _grid_to_world(grid_pos: Vector2) -> Vector3:
 	return Vector3(grid_pos.x * CELL_SIZE, MINI_Y, grid_pos.y * CELL_SIZE)
 
 
+# ─── Click-to-select ────────────────────────────────────────────────
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_try_select_mini(event.position)
+
+
+func _try_select_mini(screen_pos: Vector2) -> void:
+	var ray_origin    := camera.project_ray_origin(screen_pos)
+	var ray_dir       := camera.project_ray_normal(screen_pos)
+	var ray_end       := ray_origin + ray_dir * 100.0
+
+	var closest_cid   := ""
+	var closest_dist  := INF
+
+	for cid in _miniatures:
+		var mini: Node3D = _miniatures[cid]
+		var to_ray := mini.global_position - ray_origin
+		var proj   := to_ray.dot(ray_dir)
+		if proj < 0:
+			continue
+		var closest_pt := ray_origin + ray_dir * proj
+		var dist       := mini.global_position.distance_to(closest_pt)
+		if dist < 0.55 and proj < closest_dist:  # 0.55 = pick radius
+			closest_dist = proj
+			closest_cid  = cid
+
+	if closest_cid != "":
+		_select_mini(closest_cid)
+	else:
+		_deselect_mini()
+
+
+func _select_mini(cid: String) -> void:
+	if _selected_cid != "" and _selected_cid in _miniatures:
+		_miniatures[_selected_cid].deselect()
+	_selected_cid = cid
+	_miniatures[cid].select()
+	_show_stat_panel(cid)
+
+
+func _deselect_mini() -> void:
+	if _selected_cid != "" and _selected_cid in _miniatures:
+		_miniatures[_selected_cid].deselect()
+	_selected_cid = ""
+	if _stat_panel:
+		_stat_panel.visible = false
+
+
+func _show_stat_panel(cid: String) -> void:
+	if not _stat_panel or not _stat_label:
+		return
+	var d: Dictionary = _character_data.get(cid, {})
+	if d.is_empty():
+		return
+
+	var ab: Dictionary = d.get("abilities", {})
+	var inv: Array     = d.get("inventory", [])
+
+	var txt := ""
+	txt += "[b]%s[/b]\n" % d.get("name", cid)
+	txt += "[color=#888888]%s — %s — %s[/color]\n\n" % [
+		str(d.get("race", "?")).replace("_", " ").capitalize(),
+		str(d.get("evolution_state", "?")).replace("_", " ").capitalize(),
+		str(d.get("predator_role",  "?")).replace("_", " ").capitalize(),
+	]
+	txt += "[b]HP[/b]  %d / %d    [b]AC[/b]  %d    [b]Spd[/b]  %dft\n\n" % [
+		d.get("hp_current", 0), d.get("hp_max", 0),
+		d.get("armor_class", 10), d.get("speed", 30),
+	]
+	txt += "[b]STR[/b] %2d   [b]DEX[/b] %2d   [b]CON[/b] %2d\n" % [
+		ab.get("STR", 10), ab.get("DEX", 10), ab.get("CON", 10),
+	]
+	txt += "[b]INT[/b] %2d   [b]WIS[/b] %2d   [b]CHA[/b] %2d\n\n" % [
+		ab.get("INT", 10), ab.get("WIS", 10), ab.get("CHA", 10),
+	]
+	if inv.size() > 0:
+		txt += "[b]Inventory:[/b]\n"
+		for item in inv.slice(0, 6):
+			txt += "  • %s\n" % str(item.get("name", item) if item is Dictionary else item)
+
+	_stat_label.text = txt
+	_stat_panel.visible = true
+
+
 # ─── Particles ──────────────────────────────────────────────────────
 
-func spawn_paradox_glitch(world_pos: Vector3):
-	_spawn_particles(_paradox_scene, world_pos)
-	AudioManager.play_sfx("res://assets/audio/sfx_paradox_glitch.wav")
+func _on_paradox_triggered():
+	if _paradox_scene:
+		var inst = _paradox_scene.instantiate()
+		particles_root.add_child(inst)
+		inst.position = _cam_target
+		AudioManager.play_sfx("res://assets/audio/sfx_paradox.wav")
 
+func _on_phase_changed(new_phase: String):
+	print("[Tabletop] Phase changed to: ", new_phase)
+
+func _on_npc_event(event: Dictionary):
+	print("[Tabletop] NPC event: ", event)
+
+func _on_particle_event(event: Dictionary):
+	var type = event.get("type", "magic_burst")
+	var pos  = event.get("position", {"x":0, "y":0})
+	var world_pos = _grid_to_world(Vector2(pos.x, pos.y))
+	
+	if type == "magic_burst":
+		spawn_magic_burst(world_pos)
 
 func spawn_magic_burst(world_pos: Vector3):
-	_spawn_particles(_magic_burst_scene, world_pos)
-
-
-func _spawn_particles(scene: PackedScene, world_pos: Vector3):
-	if scene == null:
-		return
-	var inst: GPUParticles3D = scene.instantiate()
-	particles_root.add_child(inst)
-	inst.global_position = world_pos
-	inst.emitting = true
-	var timer = get_tree().create_timer(inst.lifetime + 0.2)
-	timer.timeout.connect(inst.queue_free)
-
-
-# ─── Event handlers ─────────────────────────────────────────────────
-
-func _on_paradox_triggered(_transformed_ids: Array):
-	for cid in _miniatures:
-		spawn_paradox_glitch(_miniatures[cid].global_position)
-	AudioManager.play_sfx("res://assets/audio/sfx_paradox_glitch.wav")
-	AudioManager.play_ambient("res://assets/audio/ambient_paradox.wav")
-
-
-func _on_phase_changed(phase: String):
-	match phase:
-		"LOBBY":       AudioManager.play_ambient("res://assets/audio/ambient_inn.wav")
-		"CREATION":    AudioManager.play_ambient("res://assets/audio/ambient_keep.wav")
-		"EXPLORATION": AudioManager.play_ambient("res://assets/audio/ambient_wilderness.wav")
-
-
-func _on_npc_event(ev: Dictionary):
-	var npc    = ev.get("npc", "")
-	var action = ev.get("action", "")
-	match npc + "/" + action:
-		"haylie/entrance":
-			spawn_magic_burst(Vector3.ZERO)
-			AudioManager.play_sfx("res://assets/audio/sfx_haylie_entrance.wav")
-		"danna/boon_granted", "redvelvet/boon_granted":
-			spawn_magic_burst(Vector3.ZERO)
-			AudioManager.play_sfx("res://assets/audio/sfx_boon_granted.wav")
-		"redvelvet/tip":
-			AudioManager.play_sfx("res://assets/audio/sfx_tip_silver.wav")
-		"redvelvet/heckle":
-			AudioManager.play_sfx("res://assets/audio/sfx_heckle.wav")
-		"jon/cactus":
-			AudioManager.play_sfx("res://assets/audio/sfx_cactus.wav")
-		"kodrik/dispatch":
-			spawn_magic_burst(Vector3(3.0, 0.5, 3.0))
-
-
-func _on_particle_event(ev: Dictionary):
-	var pos  = ev.get("position", {"x": 0, "y": 0})
-	var wpos = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
-	match ev.get("effect", "magic_burst"):
-		"magic_burst":    spawn_magic_burst(wpos)
-		"paradox_glitch": spawn_paradox_glitch(wpos)
+	if _magic_burst_scene:
+		var inst = _magic_burst_scene.instantiate()
+		particles_root.add_child(inst)
+		inst.position = world_pos + Vector3(0, 0.5, 0)

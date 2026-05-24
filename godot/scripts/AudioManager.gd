@@ -78,7 +78,7 @@ func play_ambient(path: String, fade_in: float = 1.5):
 	if not ResourceLoader.exists(path):
 		return
 	_ambient_player.stream = load(path)
-	_ambient_player.volume_db = linear_to_db(0.0)
+	_ambient_player.volume_db = -80.0  # finite silence — linear_to_db(0) = -INF which breaks tween
 	_ambient_player.play()
 	var tween = create_tween()
 	tween.tween_property(
