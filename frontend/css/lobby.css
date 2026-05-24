@@ -453,6 +453,93 @@ body[data-phase="saves"] #game-view { display: none; }
   border-top: 1px solid rgba(0,0,0,0.08);
 }
 
+/* ── Era selection ───────────────────────────────────────────────── */
+.era-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.era-card {
+  padding: var(--space-4);
+  text-align: center;
+  gap: 0.5rem;
+  min-height: 240px;
+  justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+}
+
+/* Before — warm civilized gold */
+.era-card--before {
+  border-color: #c9a84c;
+  background: rgba(255, 248, 210, 0.85);
+}
+.era-card--before .era-glyph { color: #b8860b; }
+.era-card--before h3          { color: #5c3d00; }
+.era-card--before .era-subtitle { color: #7a5200; }
+.era-card--before .era-detail   { color: #8b6914; }
+
+.era-card--before:hover,
+.era-card--before.focused {
+  border-color: #e0b030;
+  box-shadow: 0 0 18px rgba(220, 170, 30, 0.55);
+  background: rgba(255, 248, 200, 0.95);
+}
+.era-card--before.selected {
+  border-color: #e0b030;
+  background: rgba(255, 248, 200, 0.95);
+  box-shadow: 0 0 24px rgba(220, 170, 30, 0.7);
+}
+
+/* After — dark feral crimson */
+.era-card--after {
+  border-color: #7a1a1a;
+  background: rgba(30, 10, 10, 0.82);
+  color: #e8d5c4;
+}
+.era-card--after .era-glyph     { color: #c0392b; }
+.era-card--after h3              { color: #f0c0a0; }
+.era-card--after .era-subtitle   { color: #c87060; }
+.era-card--after .flavor         { color: #c8b0a0; opacity: 1; }
+.era-card--after .era-detail     { color: #a07060; }
+
+.era-card--after:hover,
+.era-card--after.focused {
+  border-color: #c0392b;
+  box-shadow: 0 0 18px rgba(180, 40, 20, 0.6);
+  background: rgba(40, 8, 8, 0.92);
+}
+.era-card--after.selected {
+  border-color: #c0392b;
+  background: rgba(40, 8, 8, 0.92);
+  box-shadow: 0 0 24px rgba(180, 40, 20, 0.75);
+}
+
+.era-glyph {
+  font-size: 2.4rem;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.era-subtitle {
+  font-size: var(--fs-sm);
+  font-style: italic;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.era-detail {
+  font-size: var(--fs-xs);
+  font-family: "JetBrains Mono", monospace;
+  margin: 0;
+  margin-top: auto;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  opacity: 0.8;
+}
+
 /* Ability assignment */
 .ability-grid {
   display: grid;

@@ -1085,14 +1085,35 @@ export class Lobby {
 
   _renderEraStep(draft) {
     const eras = [
-      { id: "before", name: "Before (Civilized)", flavor: "Start as the race you were before the Paradox. Your 'Feral' transformation will hit mid-game." },
-      { id: "after", name: "After (Feral)", flavor: "The Paradox has already taken you. You start in your evolved Feral Successor form." }
+      {
+        id: "before", glyph: "☀",
+        name: "Before — The Civilized World",
+        subtitle: "You are what you were",
+        flavor: "Start as the race you were before the Paradox. Your Feral transformation will hit mid-game.",
+        detail: "Human · Elf · Dwarf · the old names still hold"
+      },
+      {
+        id: "after", glyph: "🜏",
+        name: "After — The Feral World",
+        subtitle: "The Paradox already found you",
+        flavor: "You start in your evolved Feral Successor form. The Civilized World is a memory.",
+        detail: "Voidwraith · Ashenborn · Ironveil · what you became"
+      },
     ];
     const grid = document.createElement("div");
-    grid.className = "option-grid";
+    grid.className = "option-grid era-grid";
     eras.forEach((era, idx) => {
-      const card = this._optionCard(era.name, era.flavor, "",
-        draft.startingEra === era.id, idx === this._focusIndex);
+      const selected = draft.startingEra === era.id;
+      const focused  = idx === this._focusIndex;
+      const card = document.createElement("div");
+      card.className = `option-card era-card era-card--${era.id}${selected ? " selected" : ""}${focused ? " focused" : ""}`;
+      card.innerHTML = `
+        <div class="era-glyph">${era.glyph}</div>
+        <h3>${this._escape(era.name)}</h3>
+        <p class="era-subtitle">${this._escape(era.subtitle)}</p>
+        <p class="flavor">${this._escape(era.flavor)}</p>
+        <p class="era-detail">${this._escape(era.detail)}</p>
+      `;
       card.addEventListener("click",      () => { draft.startingEra = era.id; this._renderCreation(); this.audio?.playCursor(); });
       card.addEventListener("mouseenter", () => { this._focusIndex = idx; this._renderCreation(); });
       grid.appendChild(card);
