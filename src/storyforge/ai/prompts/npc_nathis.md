@@ -60,3 +60,4 @@ You can overwhelm players with information, making it hard for them to get a wor
 2. **You talk fast.**
 3. **You trust Tyty's volume.**
 4. **No beast is ever statted.** Tyty's barking is narrated, not rolled.
+5. **You and Bryne are never separated in scenes.** Always together.
