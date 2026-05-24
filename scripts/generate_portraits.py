@@ -7,397 +7,948 @@ Run from the project root:
 
 Output: godot/assets/characters/<race_id>.png
 """
-from PIL import Image, ImageDraw, ImageFont
-import os, math
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import numpy as np
+import os, math, random
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "godot", "assets", "characters")
+W, H = 800, 1120
 
-SCALE = 4
-W, H = 200 * SCALE, 280 * SCALE   # 800 × 1120
-
-def s(n): return int(n * SCALE)
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# ── Color helpers ──────────────────────────────────────────────────────────────
 
 def _rgb(h):
     h = h.lstrip("#")
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
-def _glow(d, cx, cy, r, col, a=60, layers=3):
-    for i in range(layers):
-        ri, ai = r + i * s(6), max(0, a - i * 18)
-        d.ellipse([cx-ri, cy-ri, cx+ri, cy+ri], fill=(*col, ai))
+def _lighten(c, amt=60):
+    return tuple(min(255, v + amt) for v in c)
 
-def _vignette(img):
-    v = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(v, "RGBA")
-    for i in range(s(40)):
-        a = int(i * 3.5 / SCALE)
-        d.rectangle([i, i, W-i, H-i], outline=(0, 0, 0, a), width=1)
-    img.alpha_composite(v)
+def _darken(c, amt=60):
+    return tuple(max(0, v - amt) for v in c)
 
-def _frame(d, accent):
-    d.rectangle([s(1), s(1), W-s(2), H-s(2)], outline=(*accent, 110), width=s(2))
-    d.rectangle([s(4), s(4), W-s(5), H-s(5)], outline=(*accent, 40), width=s(1))
+def _blend(c1, c2, t):
+    return tuple(int(c1[i] * (1 - t) + c2[i] * t) for i in range(3))
 
-def _labels(d, name, group, accent):
+
+# ── Low-level layer helpers ────────────────────────────────────────────────────
+
+def _radial_alpha(cx, cy, r_inner, r_outer, W=W, H=H):
+    """Return an (H, W) float32 array: 1.0 inside r_inner, 0.0 outside r_outer."""
+    yy, xx = np.mgrid[0:H, 0:W]
+    dist = np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2).astype(np.float32)
+    mask = np.clip((r_outer - dist) / max(r_outer - r_inner, 1), 0.0, 1.0)
+    return mask
+
+
+def _solid_rgba(color_rgb, alpha_map):
+    """Build RGBA array from solid RGB + float alpha map."""
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    arr[:, :, 0] = color_rgb[0]
+    arr[:, :, 1] = color_rgb[1]
+    arr[:, :, 2] = color_rgb[2]
+    arr[:, :, 3] = (alpha_map * 255).astype(np.uint8)
+    return Image.fromarray(arr, "RGBA")
+
+
+def _noise_layer(seed, scale=4, low=0, high=60):
+    """Create a grayscale noise RGBA layer using simple sum-of-sin waves."""
+    rng = np.random.default_rng(seed)
+    freqs = rng.uniform(0.5, 3.0, (8, 2))
+    phases = rng.uniform(0, 2 * math.pi, 8)
+    yy, xx = np.mgrid[0:H, 0:W]
+    field = np.zeros((H, W), dtype=np.float32)
+    for (fx, fy), ph in zip(freqs, phases):
+        field += np.sin(xx * fx / (W / scale) + yy * fy / (H / scale) + ph)
+    field = (field - field.min()) / (field.max() - field.min() + 1e-9)
+    v = (field * (high - low) + low).astype(np.uint8)
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    arr[:, :, 3] = v
+    return Image.fromarray(arr, "RGBA")
+
+
+def _glow_blob(cx, cy, radius, color, alpha=180, blur=40):
+    """Return an RGBA image with a single soft-glowing blob."""
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer, "RGBA")
+    d.ellipse([cx - radius, cy - radius, cx + radius, cy + radius],
+              fill=(*color, alpha))
+    return layer.filter(ImageFilter.GaussianBlur(blur))
+
+
+def _scatter_particles(rng, color, count=80, alpha_max=140):
+    """Scatter small glowing particles across the canvas."""
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer, "RGBA")
+    for _ in range(count):
+        x = int(rng.uniform(20, W - 20))
+        y = int(rng.uniform(20, H - 180))
+        r = int(rng.uniform(1, 4))
+        a = int(rng.uniform(30, alpha_max))
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(*color, a))
+    blur_r = 2
+    return layer.filter(ImageFilter.GaussianBlur(blur_r))
+
+
+# ── Group-themed backgrounds ───────────────────────────────────────────────────
+
+def _bg_cosmic(accent, seed):
+    rng = np.random.default_rng(seed)
+    # Deep space base
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    arr[:, :, 2] = 18
+    arr[:, :, 3] = 255
+    img = Image.fromarray(arr, "RGBA")
+
+    # Nebula wash
+    nebula = _glow_blob(W // 2, H // 2 - 100, 380, accent, alpha=55, blur=90)
+    img.alpha_composite(nebula)
+    nebula2 = _glow_blob(W // 2 - 120, H // 3, 200, _lighten(accent, 30), alpha=28, blur=70)
+    img.alpha_composite(nebula2)
+
+    # Star field
+    d = ImageDraw.Draw(img, "RGBA")
+    for _ in range(600):
+        x = int(rng.integers(0, W))
+        y = int(rng.integers(0, H))
+        b = float(rng.random())
+        r = max(1, int(b * 2.5))
+        a = int(b * 160 + 60)
+        brightness = int(b * 200 + 55)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(brightness, brightness, brightness, a))
+
+    # Subtle noise
+    noise = _noise_layer(seed + 1, scale=6, low=0, high=25)
+    arr2 = np.array(noise)
+    arr2[:, :, 0] = arr2[:, :, 3] // 4
+    arr2[:, :, 2] = arr2[:, :, 3]
+    img.alpha_composite(Image.fromarray(arr2, "RGBA"))
+    return img
+
+
+def _bg_primal(accent, seed):
+    rng = np.random.default_rng(seed)
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    # Dark forest base — dark green-black
+    arr[:, :, 1] = 14
+    arr[:, :, 3] = 255
+    img = Image.fromarray(arr, "RGBA")
+
+    # Organic mid-glow
+    glow = _glow_blob(W // 2, H // 2, 320, accent, alpha=40, blur=80)
+    img.alpha_composite(glow)
+
+    # Vine / root network using random lines
+    d = ImageDraw.Draw(img, "RGBA")
+    vine_color = _darken(accent, 40)
+    for _ in range(30):
+        x0 = int(rng.integers(-50, W + 50))
+        y0 = int(rng.integers(H // 3, H + 50))
+        for seg in range(int(rng.integers(3, 8))):
+            dx = int(rng.integers(-80, 80))
+            dy = int(rng.integers(-120, -20))
+            x1, y1 = x0 + dx, y0 + dy
+            d.line([x0, y0, x1, y1], fill=(*vine_color, 35), width=int(rng.integers(1, 3)))
+            x0, y0 = x1, y1
+
+    # Organic noise
+    noise = _noise_layer(seed, scale=5, low=0, high=30)
+    arr2 = np.array(noise)
+    arr2[:, :, 1] = arr2[:, :, 3]
+    arr2[:, :, 3] = arr2[:, :, 3] // 2
+    img.alpha_composite(Image.fromarray(arr2, "RGBA"))
+    return img
+
+
+def _bg_eldritch(accent, seed):
+    rng = np.random.default_rng(seed)
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    arr[:, :, 0] = 12
+    arr[:, :, 3] = 255
+    img = Image.fromarray(arr, "RGBA")
+
+    # Corruption glow
+    glow = _glow_blob(W // 2, H // 2 + 50, 340, accent, alpha=45, blur=85)
+    img.alpha_composite(glow)
+    glow2 = _glow_blob(int(rng.integers(100, 700)), int(rng.integers(100, 600)),
+                       180, _lighten(accent, 20), alpha=22, blur=60)
+    img.alpha_composite(glow2)
+
+    # Eldritch rune circles
+    d = ImageDraw.Draw(img, "RGBA")
+    for r in [280, 220, 160, 90]:
+        d.ellipse([W // 2 - r, H // 2 - r, W // 2 + r, H // 2 + r],
+                  outline=(*accent, 18), width=1)
+    # Corruption tendrils
+    for _ in range(20):
+        angle = float(rng.uniform(0, 2 * math.pi))
+        for seg in range(int(rng.integers(4, 10))):
+            x0 = int(W // 2 + math.cos(angle) * seg * 40 + rng.integers(-20, 20))
+            y0 = int(H // 2 + math.sin(angle) * seg * 40 + rng.integers(-20, 20))
+            x1 = int(W // 2 + math.cos(angle) * (seg + 1) * 40 + rng.integers(-25, 25))
+            y1 = int(H // 2 + math.sin(angle) * (seg + 1) * 40 + rng.integers(-25, 25))
+            d.line([x0, y0, x1, y1], fill=(*accent, 20), width=1)
+
+    noise = _noise_layer(seed, scale=4, low=0, high=30)
+    arr2 = np.array(noise)
+    arr2[:, :, 0] = arr2[:, :, 3]
+    arr2[:, :, 3] = arr2[:, :, 3] // 2
+    img.alpha_composite(Image.fromarray(arr2, "RGBA"))
+    return img
+
+
+def _bg_mechanical(accent, seed):
+    rng = np.random.default_rng(seed)
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    # Dark steel base
+    v = 16
+    arr[:, :, 0] = v
+    arr[:, :, 1] = v
+    arr[:, :, 2] = v + 8
+    arr[:, :, 3] = 255
+    img = Image.fromarray(arr, "RGBA")
+
+    # Core energy glow
+    glow = _glow_blob(W // 2, H // 2 + 80, 280, accent, alpha=50, blur=80)
+    img.alpha_composite(glow)
+
+    # Circuit / grid lines
+    d = ImageDraw.Draw(img, "RGBA")
+    grid_col = (*accent, 18)
+    for x in range(0, W, 40):
+        d.line([x, 0, x, H], fill=grid_col, width=1)
+    for y in range(0, H, 40):
+        d.line([0, y, W, y], fill=grid_col, width=1)
+
+    # Circuit trace decorations
+    for _ in range(25):
+        x0 = int(rng.choice(range(0, W, 40)))
+        y0 = int(rng.choice(range(0, H, 40)))
+        length = int(rng.integers(2, 6)) * 40
+        horiz = bool(rng.integers(0, 2))
+        x1 = x0 + (length if horiz else 0)
+        y1 = y0 + (0 if horiz else length)
+        d.line([x0, y0, x1, y1], fill=(*accent, 28), width=2)
+        d.ellipse([x1 - 4, y1 - 4, x1 + 4, y1 + 4], fill=(*accent, 45))
+
+    return img
+
+
+def _bg_humanoid(accent, seed):
+    rng = np.random.default_rng(seed)
+    arr = np.zeros((H, W, 4), dtype=np.uint8)
+    # Dark stone base
+    v = 20
+    arr[:, :, 0] = v
+    arr[:, :, 1] = int(v * 0.9)
+    arr[:, :, 2] = int(v * 0.8)
+    arr[:, :, 3] = 255
+    img = Image.fromarray(arr, "RGBA")
+
+    # Ambient glow behind character
+    glow = _glow_blob(W // 2, H // 2, 320, accent, alpha=38, blur=100)
+    img.alpha_composite(glow)
+
+    # Stone texture with noise
+    noise = _noise_layer(seed, scale=8, low=0, high=22)
+    arr2 = np.array(noise)
+    v2 = arr2[:, :, 3]
+    arr2[:, :, 0] = v2
+    arr2[:, :, 1] = (v2 * 0.9).astype(np.uint8)
+    arr2[:, :, 2] = (v2 * 0.8).astype(np.uint8)
+    arr2[:, :, 3] = (v2 * 0.6).astype(np.uint8)
+    img.alpha_composite(Image.fromarray(arr2, "RGBA"))
+
+    # Subtle heraldic diagonal lines
+    d = ImageDraw.Draw(img, "RGBA")
+    for i in range(-H, W + H, 60):
+        d.line([i, 0, i + H, H], fill=(*accent, 8), width=1)
+
+    return img
+
+
+BG_MAKERS = {
+    "Cosmic":     _bg_cosmic,
+    "Primal":     _bg_primal,
+    "Eldritch":   _bg_eldritch,
+    "Mechanical": _bg_mechanical,
+    "Humanoid":   _bg_humanoid,
+}
+
+
+# ── Character silhouette + glow compositing ────────────────────────────────────
+
+def _composite_character(bg, silhouette_fn, cx, cy, base, accent, extra):
+    """
+    Draw character with:
+      1. Large blurred aura behind character
+      2. Soft inner glow slightly expanding silhouette
+      3. Sharp silhouette on top
+    """
+    # 1. Aura — large blurred accent blob
+    aura_r = extra.get("aura_r", 180)
+    aura = _glow_blob(cx, cy, aura_r, accent, alpha=extra.get("aura_alpha", 60),
+                      blur=extra.get("aura_blur", 55))
+    bg.alpha_composite(aura)
+
+    # 2. Soft glow — same silhouette, slightly expanded, accent colored, blurred
+    glow_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow_layer, "RGBA")
+    silhouette_fn(gd, glow_layer, cx, cy, accent, accent, expand=10, **extra)
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(18))
+    bg.alpha_composite(glow_layer)
+
+    # 3. Sharp character on top
+    char_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(char_layer, "RGBA")
+    silhouette_fn(cd, char_layer, cx, cy, base, accent, expand=0, **extra)
+
+    # Rim light — draw a very thin highlight layer blurred lightly
+    rim_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    rd = ImageDraw.Draw(rim_layer, "RGBA")
+    rim_col = _lighten(accent, 80)
+    silhouette_fn(rd, rim_layer, cx - 12, cy - 8, rim_col, rim_col, expand=4, **extra)
+    rim_layer = rim_layer.filter(ImageFilter.GaussianBlur(5))
+    # Mask rim to only show where character is
+    bg.alpha_composite(rim_layer)
+    bg.alpha_composite(char_layer)
+
+
+# ── Body-type silhouette functions ────────────────────────────────────────────
+# Each function draws onto draw `d`, img `img`, centered at (cx, cy).
+# `expand` offsets all sizes outward by this many px (used for glow silhouette).
+
+def _ell(d, cx, cy, rx, ry, col, a=255, expand=0):
+    rx += expand; ry += expand
+    d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], fill=(*col, a))
+
+def _rect(d, x0, y0, x1, y1, col, a=255, expand=0):
+    d.rectangle([x0 - expand, y0 - expand, x1 + expand, y1 + expand], fill=(*col, a))
+
+def _poly(d, pts, col, a=255):
+    d.polygon(pts, fill=(*col, a))
+
+
+def draw_ethereal(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Wide misty body tapering to wisps
+    _ell(d, cx, cy - 40, 72 + e, 110 + e, base, 180)
+    _ell(d, cx, cy - 80, 48 + e, 60 + e, base, 200)
+    # Face void
+    _ell(d, cx, cy - 100, 36 + e, 42 + e, _lighten(base, 30), 215)
+    # Eyes
+    _ell(d, cx - 16, cy - 110, 9 + e, 9 + e, accent, 240)
+    _ell(d, cx + 16, cy - 110, 9 + e, 9 + e, accent, 240)
+    # Wisp tails
+    for ox, base_y in [(-50, cy + 60), (-20, cy + 80), (20, cy + 85), (50, cy + 65)]:
+        for j in range(6):
+            a_val = max(0, 170 - j * 28)
+            _ell(d, cx + ox, base_y + j * 30, max(1, 12 + e - j * 2), max(1, 14 + e - j * 2),
+                 base, a_val)
+    # Shoulder wisps
+    for ox in [-80, 80]:
+        for j in range(4):
+            _ell(d, cx + ox + (4 if ox > 0 else -4) * j, cy - 20 - j * 12,
+                 max(1, 18 + e - j * 4), max(1, 16 + e - j * 4), base, 130 - j * 25)
+
+
+def draw_insectoid(d, img, cx, cy, base, accent, legs=6, expand=0, **_):
+    e = expand
+    # Abdomen (bottom)
+    _ell(d, cx, cy + 70, 32 + e, 55 + e, base, 205)
+    # Thorax
+    _ell(d, cx, cy - 10, 30 + e, 38 + e, base, 220)
+    # Head
+    _ell(d, cx, cy - 72, 24 + e, 30 + e, base, 235)
+    # Mandibles
+    d.line([cx - 20, cy - 52, cx - 38, cy - 80], fill=(*accent, 210), width=3 + e // 2)
+    d.line([cx + 20, cy - 52, cx + 38, cy - 80], fill=(*accent, 210), width=3 + e // 2)
+    # Antenna
+    d.line([cx - 8, cy - 100, cx - 28, cy - 150], fill=(*accent, 200), width=2)
+    d.line([cx + 8, cy - 100, cx + 28, cy - 150], fill=(*accent, 200), width=2)
+    _ell(d, cx - 28, cy - 152, 6 + e, 6 + e, accent, 220)
+    _ell(d, cx + 28, cy - 152, 6 + e, 6 + e, accent, 220)
+    # Compound eyes
+    for ex, ey in [(-13, cy - 74), (13, cy - 74)]:
+        _ell(d, cx + ex, ey, 7 + e, 7 + e, accent, 245)
+    # Legs — 3 pairs
+    for i in range(legs // 2):
+        yl = cy - 5 + i * 22
+        for side in [-1, 1]:
+            sx = cx + side * 30
+            mx = cx + side * 80
+            ex2 = cx + side * (100 + i * 5)
+            ey2 = yl + 35
+            d.line([sx, yl, mx, yl + 12], fill=(*base, 195), width=3)
+            d.line([mx, yl + 12, ex2, ey2], fill=(*base, 165), width=2)
+
+
+def draw_hulking(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Legs
+    _ell(d, cx - 32, cy + 110, 22 + e, 45 + e, base, 195)
+    _ell(d, cx + 32, cy + 110, 22 + e, 45 + e, base, 195)
+    # Hips
+    _ell(d, cx, cy + 60, 70 + e, 40 + e, base, 210)
+    # Torso
+    _ell(d, cx, cy - 15, 78 + e, 70 + e, base, 218)
+    # Massive shoulders
+    _ell(d, cx - 95, cy - 40, 40 + e, 38 + e, base, 205)
+    _ell(d, cx + 95, cy - 40, 40 + e, 38 + e, base, 205)
+    # Upper arms
+    _ell(d, cx - 100, cy + 15, 28 + e, 45 + e, base, 198)
+    _ell(d, cx + 100, cy + 15, 28 + e, 45 + e, base, 198)
+    # Forearms / fists
+    _ell(d, cx - 105, cy + 78, 22 + e, 35 + e, base, 188)
+    _ell(d, cx + 105, cy + 78, 22 + e, 35 + e, base, 188)
+    # Neck
+    _ell(d, cx, cy - 82, 24 + e, 22 + e, base, 225)
+    # Head
+    _ell(d, cx, cy - 125, 36 + e, 38 + e, base, 232)
+    # Eyes
+    for ex in [-14, 14]:
+        _ell(d, cx + ex, cy - 132, 8 + e, 8 + e, accent, 245)
+    # Chest runes / energy nodes
+    for ox, oy in [(-22, cy - 30), (0, cy - 10), (22, cy - 30), (-14, cy + 20), (14, cy + 20)]:
+        _ell(d, cx + ox, oy, 8 + e, 8 + e, accent, 160)
+
+
+def draw_predator(d, img, cx, cy, base, accent, has_tail=True, expand=0, **_):
+    e = expand
+    # Legs
+    _rect(d, cx - 26, cy + 58, cx - 8, cy + 145, base, 195, e)
+    _rect(d, cx + 8, cy + 58, cx + 26, cy + 145, base, 195, e)
+    # Lower body
+    _ell(d, cx, cy + 35, 42 + e, 30 + e, base, 215)
+    # Arms
+    _ell(d, cx - 55, cy - 28, 22 + e, 55 + e, base, 192)
+    _ell(d, cx + 55, cy - 28, 22 + e, 55 + e, base, 192)
+    # Torso
+    _ell(d, cx, cy - 20, 50 + e, 65 + e, base, 225)
+    # Neck
+    _ell(d, cx, cy - 82, 20 + e, 22 + e, base, 228)
+    # Head — slightly angular
+    _ell(d, cx, cy - 118, 32 + e, 36 + e, base, 235)
+    # Muzzle hint
+    _ell(d, cx, cy - 112, 18 + e, 12 + e, _darken(base, 15), 220)
+    # Eyes
+    for ex in [-14, 14]:
+        _ell(d, cx + ex, cy - 126, 7 + e, 7 + e, accent, 248)
+    if has_tail:
+        pts = []
+        for i in range(8):
+            tx = cx + 30 + i * 15
+            ty = cy + 50 + i * 18
+            pts.append((tx, ty))
+        for i in range(len(pts) - 1):
+            w = max(1, 14 + e - i * 2)
+            d.line([pts[i], pts[i + 1]], fill=(*base, 200 - i * 18), width=w)
+
+
+def draw_avian(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Wing spans — large impressive
+    _poly(d, [cx, cy - 30,  cx - 160, cy - 60, cx - 140, cy + 45, cx - 25, cy + 20],
+          base, 170)
+    _poly(d, [cx, cy - 30,  cx + 160, cy - 60, cx + 140, cy + 45, cx + 25, cy + 20],
+          base, 170)
+    # Wing feather detail lines
+    for ox, sign in [(-1, -1), (1, 1)]:
+        for j in range(5):
+            fx0 = cx + sign * (30 + j * 25)
+            fy0 = cy - 22 + j * 8
+            fx1 = cx + sign * (80 + j * 20)
+            fy1 = cy + 32 + j * 4
+            d.line([fx0, fy0, fx1, fy1], fill=(*accent, 80), width=2)
+    # Body
+    _ell(d, cx, cy + 10, 32 + e, 52 + e, base, 228)
+    # Neck
+    _ell(d, cx, cy - 52, 20 + e, 28 + e, base, 232)
+    # Head
+    _ell(d, cx, cy - 100, 30 + e, 34 + e, base, 240)
+    # Crest feathers
+    for ox, h in [(-16, 40), (-7, 55), (0, 62), (7, 55), (16, 40)]:
+        _poly(d, [cx + ox - 5, cy - 130, cx + ox + 5, cy - 130, cx + ox, cy - 130 - h],
+              accent, 200)
+    # Eyes
+    for ex in [-12, 12]:
+        _ell(d, cx + ex, cy - 106, 7 + e, 7 + e, accent, 252)
+    # Legs / talons
+    for lx, side in [(-14, -1), (14, 1)]:
+        d.line([cx + lx, cy + 60, cx + lx + side * 6, cy + 130], fill=(*base, 185), width=5)
+        for j in range(3):
+            tx0 = cx + lx + side * 6
+            ty0 = cy + 130
+            d.line([tx0, ty0, tx0 + side * (10 + j * 5), ty0 + 15],
+                   fill=(*base, 160), width=2)
+
+
+def draw_horror(d, img, cx, cy, base, accent, has_cape=False, has_bones=False, expand=0, **_):
+    e = expand
+    if has_cape:
+        _poly(d, [cx, cy - 65,
+                  cx - 110, cy + 30, cx - 90, cy + 165,
+                  cx, cy + 130,
+                  cx + 90, cy + 165, cx + 110, cy + 30], base, 110)
+    # Thin elongated torso
+    _ell(d, cx - 32, cy - 28, 22 + e, 52 + e, base, 190)
+    _ell(d, cx + 32, cy - 28, 22 + e, 52 + e, base, 190)
+    _ell(d, cx, cy - 20, 36 + e, 68 + e, base, 220)
+    # Spindly neck
+    _ell(d, cx, cy - 88, 14 + e, 24 + e, base, 228)
+    # Elongated skull
+    _ell(d, cx, cy - 135, 28 + e, 46 + e, base, 235)
+    if has_bones:
+        # Bone spurs on torso
+        for ox, oy in [(-28, cy - 50), (-28, cy - 10), (28, cy - 50), (28, cy - 10),
+                       (0, cy - 75)]:
+            _poly(d, [cx + ox - 5, cy + oy, cx + ox + 5, cy + oy, cx + ox, cy + oy - 24],
+                  accent, 210)
+    # Glowing eyes
+    for ex, ey in [(-12, cy - 145), (12, cy - 145)]:
+        _ell(d, cx + ex, ey, 8 + e, 8 + e, accent, 255)
+    # Clawed hands
+    for sx, ey2 in [(-55, cy + 40), (55, cy + 40)]:
+        for j in range(4):
+            angle = math.pi * (0.2 + j * 0.2) * (-1 if sx < 0 else 1)
+            fx = cx + sx + int(math.cos(angle) * 22)
+            fy = ey2 + int(math.sin(angle) * 18)
+            d.line([cx + sx, ey2, fx, fy], fill=(*base, 175), width=3)
+    # Leg wisps
+    for ox in [-16, 16]:
+        _rect(d, cx + ox - 8, cy + 45, cx + ox + 8, cy + 140, base, 185, e)
+
+
+def draw_arachnid(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Large abdomen
+    _ell(d, cx, cy + 65, 45 + e, 62 + e, base, 215)
+    # Cephalothorax
+    _ell(d, cx, cy - 10, 42 + e, 45 + e, base, 230)
+    # Head with fang cluster
+    _ell(d, cx, cy - 68, 26 + e, 28 + e, base, 242)
+    # Chelicerae / fangs
+    for fx, fy in [(-12, cy - 80), (12, cy - 80)]:
+        d.line([cx + fx, cy - 58, cx + fx + (fx // abs(fx)) * 12, cy - 95],
+               fill=(*accent, 200), width=3)
+    # 8 eyes
+    eye_pts = [(-16, cy - 74), (-8, cy - 80), (8, cy - 80), (16, cy - 74),
+               (-12, cy - 68), (-4, cy - 72), (4, cy - 72), (12, cy - 68)]
+    for ex, ey in eye_pts:
+        _ell(d, cx + ex, ey, 4 + e, 4 + e, accent, 240)
+    # 8 legs — 2-segment each
+    leg_data = [
+        (-42, cy - 18, -110, cy - 60, -140, cy - 10),
+        (-42, cy,      -108, cy - 12, -138, cy + 40),
+        (-42, cy + 18, -100, cy + 30, -128, cy + 78),
+        (-42, cy + 36,  -85, cy + 60, -105, cy + 105),
+        ( 42, cy - 18,  110, cy - 60,  140, cy - 10),
+        ( 42, cy,       108, cy - 12,  138, cy + 40),
+        ( 42, cy + 18,  100, cy + 30,  128, cy + 78),
+        ( 42, cy + 36,   85, cy + 60,  105, cy + 105),
+    ]
+    for x0, y0, x1, y1, x2, y2 in leg_data:
+        d.line([cx + x0, y0, cx + x1, y1], fill=(*base, 205), width=3)
+        d.line([cx + x1, y1, cx + x2, y2], fill=(*base, 168), width=2)
+        _ell(d, cx + x2, y2, 4, 4, accent, 100)
+
+
+def draw_mechanical(d, img, cx, cy, base, accent, gear=False, wires=False, expand=0, **_):
+    e = expand
+    # Legs
+    _rect(d, cx - 38, cy + 62, cx - 12, cy + 150, base, 200, e)
+    _rect(d, cx + 12, cy + 62, cx + 38, cy + 150, base, 200, e)
+    # Feet
+    _rect(d, cx - 45, cy + 140, cx - 8, cy + 158, base, 185, e)
+    _rect(d, cx + 8, cy + 140, cx + 45, cy + 158, base, 185, e)
+    # Lower torso
+    _rect(d, cx - 40, cy + 20, cx + 40, cy + 65, base, 215, e)
+    # Chest plate
+    _rect(d, cx - 52, cy - 65, cx + 52, cy + 25, base, 228, e)
+    # Shoulder pauldrons
+    _rect(d, cx - 90, cy - 75, cx - 48, cy - 10, base, 210, e)
+    _rect(d, cx + 48, cy - 75, cx + 90, cy - 10, base, 210, e)
+    # Arms
+    _rect(d, cx - 85, cy - 8, cx - 50, cy + 58, base, 200, e)
+    _rect(d, cx + 50, cy - 8, cx + 85, cy + 58, base, 200, e)
+    # Panel lines on chest
+    if not expand:
+        d.line([cx - 50, cy - 22, cx + 50, cy - 22], fill=(*accent, 90), width=2)
+        d.line([cx - 50, cy + 5, cx + 50, cy + 5], fill=(*accent, 60), width=2)
+    # Neck
+    _rect(d, cx - 16, cy - 88, cx + 16, cy - 65, base, 225, e)
+    # Head
+    _rect(d, cx - 30, cy - 140, cx + 30, cy - 88, base, 235, e)
+    # Visor
+    _rect(d, cx - 26, cy - 128, cx + 26, cy - 102, accent, 190, e)
+    if gear:
+        for ang in range(0, 360, 45):
+            rad = math.radians(ang)
+            gx = int(cx + math.cos(rad) * 28)
+            gy = int(cy + 45 + math.sin(rad) * 28)
+            _ell(d, gx, gy, 6 + e, 6 + e, accent, 130)
+    if wires:
+        for x0, y0, x1, y1 in [(-52, cy - 30, -100, cy - 60),
+                                (52, cy - 30, 100, cy - 60),
+                                (-38, cy + 40, -70, cy + 85)]:
+            d.line([cx + x0, y0, cx + x1, y1], fill=(*accent, 160), width=3)
+
+
+def draw_plant(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Root-like legs
+    for ox, w in [(-28, 12), (0, 10), (28, 12)]:
+        ys = cy + 70
+        for seg in range(5):
+            curve = int(math.sin(seg * 0.8 + ox * 0.05) * 14)
+            d.line([cx + ox + curve, ys + seg * 18,
+                    cx + ox + curve + 4, ys + (seg + 1) * 18],
+                   fill=(*base, 190 - seg * 15), width=max(1, w - seg * 2))
+    # Torso
+    _ell(d, cx, cy, 42 + e, 72 + e, base, 215)
+    # Leaf-arms
+    for side in [-1, 1]:
+        _poly(d, [cx + side * 44, cy - 40,
+                  cx + side * 110, cy - 75,
+                  cx + side * 100, cy - 8,
+                  cx + side * 40, cy + 15], base, 178)
+        # Leaf veins
+        for j in range(3):
+            vx0 = cx + side * (50 + j * 15)
+            d.line([vx0, cy - 35 + j * 15, vx0 + side * 30, cy - 55 + j * 10],
+                   fill=(*accent, 60), width=1)
+    # Neck / stem
+    _ell(d, cx, cy - 95, 18 + e, 28 + e, base, 228)
+    # Head — blossom/bulb
+    _ell(d, cx, cy - 145, 38 + e, 44 + e, base, 235)
+    # Petal crown
+    for ang in range(0, 360, 72):
+        rad = math.radians(ang)
+        px = int(cx + math.cos(rad) * 52)
+        py = int(cy - 148 + math.sin(rad) * 42)
+        _ell(d, px, py, 14 + e, 20 + e, accent, 175)
+    # Eyes
+    for ex in [-12, 12]:
+        _ell(d, cx + ex, cy - 150, 7 + e, 7 + e, accent, 245)
+
+
+def draw_compact(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Short legs
+    _ell(d, cx - 22, cy + 85, 18 + e, 32 + e, base, 192)
+    _ell(d, cx + 22, cy + 85, 18 + e, 32 + e, base, 192)
+    # Stocky torso
+    _ell(d, cx, cy + 10, 58 + e, 60 + e, base, 222)
+    # Short arms
+    _ell(d, cx - 68, cy - 12, 22 + e, 42 + e, base, 200)
+    _ell(d, cx + 68, cy - 12, 22 + e, 42 + e, base, 200)
+    # Neck
+    _ell(d, cx, cy - 72, 24 + e, 20 + e, base, 228)
+    # Oversized head
+    _ell(d, cx, cy - 128, 50 + e, 54 + e, base, 238)
+    # Horns / spikes
+    for ox, h in [(-18, 52), (-8, 70), (8, 70), (18, 52)]:
+        _poly(d, [cx + ox - 6, cy - 178, cx + ox + 6, cy - 178, cx + ox, cy - 178 - h],
+              accent, 215)
+    # Big eyes
+    for ex in [-20, 20]:
+        _ell(d, cx + ex, cy - 138, 12 + e, 14 + e, accent, 252)
+        _ell(d, cx + ex, cy - 138, 6 + e, 7 + e, _darken(accent, 60), 255)
+    # Chest core
+    _ell(d, cx, cy - 20, 22 + e, 22 + e, accent, 190)
+
+
+def draw_cephalopod(d, img, cx, cy, base, accent, expand=0, **_):
+    e = expand
+    # Large mantle/head
+    _ell(d, cx, cy - 55, 88 + e, 80 + e, base, 215)
+    # Narrower body collar
+    _ell(d, cx, cy + 10, 55 + e, 35 + e, base, 228)
+    # 4 large eyes
+    eye_pts = [(-30, cy - 60), (-10, cy - 70), (10, cy - 70), (30, cy - 60)]
+    for ex, ey in eye_pts:
+        _ell(d, cx + ex, ey, 12 + e, 10 + e, accent, 235)
+        _ell(d, cx + ex, ey, 6 + e, 6 + e, _darken(accent, 40), 255)
+    # 8 tentacles
+    for i in range(8):
+        angle = math.pi * (i / 7.0)
+        x0 = int(cx + math.cos(angle) * 50)
+        y0 = cy + 35
+        for seg in range(7):
+            curve = int(math.sin(seg * 0.7 + i * 0.5) * 20)
+            dx = int(math.cos(angle) * 10 + curve * 0.3)
+            x1 = x0 + dx
+            y1 = y0 + 35 + seg * 30
+            d.line([x0, y0, x1, y1], fill=(*base, 200 - seg * 16), width=max(1, 10 - seg))
+            _ell(d, x1, y1 + 10, 4 + e, 4 + e, accent, 80 - seg * 8)
+            x0, y0 = x1, y1
+
+
+def draw_humanoid(d, img, cx, cy, base, accent, feature="default", expand=0, **_):
+    e = expand
+    if feature == "cloak":
+        _poly(d, [cx - 42, cy - 80,
+                  cx - 110, cy + 20, cx - 95, cy + 170,
+                  cx, cy + 140,
+                  cx + 95, cy + 170, cx + 110, cy + 20, cx + 42, cy - 80],
+              _darken(base, 20), 115)
+    # Legs
+    _rect(d, cx - 30, cy + 55, cx - 8, cy + 155, base, 195, e)
+    _rect(d, cx + 8, cy + 55, cx + 30, cy + 155, base, 195, e)
+    # Feet
+    _ell(d, cx - 22, cy + 155, 22 + e, 12 + e, base, 182)
+    _ell(d, cx + 22, cy + 155, 22 + e, 12 + e, base, 182)
+    # Hips
+    _ell(d, cx, cy + 45, 42 + e, 20 + e, base, 210)
+    # Torso
+    _ell(d, cx, cy - 18, 42 + e, 68 + e, base, 225)
+    # Shoulders
+    _ell(d, cx - 55, cy - 52, 22 + e, 22 + e, base, 208)
+    _ell(d, cx + 55, cy - 52, 22 + e, 22 + e, base, 208)
+    # Upper arms
+    _rect(d, cx - 72, cy - 52, cx - 42, cy + 22, base, 198, e)
+    _rect(d, cx + 42, cy - 52, cx + 72, cy + 22, base, 198, e)
+    # Forearms
+    _rect(d, cx - 70, cy + 20, cx - 44, cy + 82, base, 188, e)
+    _rect(d, cx + 44, cy + 20, cx + 70, cy + 82, base, 188, e)
+    # Neck
+    _ell(d, cx, cy - 85, 18 + e, 22 + e, base, 228)
+    # Head
+    _ell(d, cx, cy - 135, 34 + e, 40 + e, base, 238)
+    # Eyes
+    for ex in [-14, 14]:
+        _ell(d, cx + ex, cy - 142, 8 + e, 8 + e, accent, 245)
+
+    if feature == "crown":
+        for ox, h in [(-16, 22), (-7, 32), (0, 38), (7, 32), (16, 22)]:
+            _poly(d, [cx + ox - 5, cy - 172, cx + ox + 5, cy - 172, cx + ox, cy - 172 - h],
+                  accent, 228)
+    elif feature == "aura":
+        for r_a in [52, 38, 24]:
+            ring = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            rd = ImageDraw.Draw(ring, "RGBA")
+            rd.ellipse([cx - r_a, cy - 190 - r_a, cx + r_a, cy - 190 + r_a],
+                       outline=(*accent, 140), width=3)
+            ring = ring.filter(ImageFilter.GaussianBlur(4))
+            img.alpha_composite(ring)
+    elif feature == "scars":
+        for sx, sy, ex_c, ey_c in [(-12, cy - 55, -4, cy - 25),
+                                    (8, cy - 62, 16, cy - 32),
+                                    (-6, cy + 5, 2, cy + 32)]:
+            d.line([cx + sx, cy + sy, cx + ex_c, ey_c], fill=(*accent, 190), width=3)
+    elif feature == "thorns_sm":
+        for ox, oy in [(-44, cy - 58), (44, cy - 58), (-44, cy - 28), (44, cy - 28),
+                       (-44, cy + 2), (44, cy + 2)]:
+            _poly(d, [cx + ox - 4, cy + oy, cx + ox + 4, cy + oy, cx + ox, cy + oy - 18],
+                  accent, 210)
+    elif feature == "glow_body":
+        for oy in range(-60, 80, 18):
+            _ell(d, cx, cy + oy, 16 + e, 10 + e, accent, 100)
+    elif feature == "fire_crown":
+        for ox, h in [(-20, 30), (-10, 46), (0, 58), (10, 46), (20, 30)]:
+            _poly(d, [cx + ox - 5, cy - 172, cx + ox + 5, cy - 172, cx + ox, cy - 172 - h],
+                  accent, 210)
+    elif feature == "fracture":
+        for pts in [[(cx - 22, cy - 75), (cx - 8, cy + 12), (cx - 16, cy + 82)],
+                    [(cx + 10, cy - 68), (cx + 20, cy + 5), (cx + 8, cy + 75)]]:
+            d.line(pts, fill=(*accent, 130), width=2)
+    elif feature == "halo":
+        ring = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        rd = ImageDraw.Draw(ring, "RGBA")
+        rd.ellipse([cx - 42, cy - 200, cx + 42, cy - 158], outline=(*accent, 200), width=5)
+        ring = ring.filter(ImageFilter.GaussianBlur(6))
+        img.alpha_composite(ring)
+    elif feature == "split":
+        d.line([(cx, cy - 175), (cx, cy + 170)], fill=(*accent, 80), width=2)
+        _ell(d, cx - 12, cy - 148, 8 + e, 8 + e, _rgb("#e05030"), 240)
+    elif feature == "antenna":
+        for sign, ox in [(-1, -5), (1, 5)]:
+            d.line([cx + ox, cy - 174, cx + ox + sign * 22, cy - 215],
+                   fill=(*accent, 210), width=3)
+            _ell(d, cx + ox + sign * 22, cy - 217, 8 + e, 8 + e, accent, 238)
+    elif feature == "shadow_void":
+        pass  # aura handles this one
+    elif feature == "scales":
+        for row in range(6):
+            for col in range(4):
+                sx = cx - 30 + col * 20
+                sy = cy - 50 + row * 22
+                d.ellipse([sx, sy, sx + 16, sy + 14], outline=(*accent, 100), width=2)
+    elif feature == "wings_small":
+        _poly(d, [cx - 44, cy - 68, cx - 105, cy - 20, cx - 90, cy + 30, cx - 38, cy - 10],
+              base, 155)
+        _poly(d, [cx + 44, cy - 68, cx + 105, cy - 20, cx + 90, cy + 30, cx + 38, cy - 10],
+              base, 155)
+
+
+# ── Frame & labels ─────────────────────────────────────────────────────────────
+
+def _frame(img, accent):
+    d = ImageDraw.Draw(img, "RGBA")
+    # Outer border
+    d.rectangle([2, 2, W - 3, H - 3], outline=(*accent, 120), width=3)
+    # Inner border
+    d.rectangle([8, 8, W - 9, H - 9], outline=(*accent, 45), width=1)
+    # Corner diamonds
+    for cx2, cy2 in [(8, 8), (W - 9, 8), (8, H - 9), (W - 9, H - 9)]:
+        size = 12
+        d.polygon([cx2, cy2 - size, cx2 + size, cy2, cx2, cy2 + size, cx2 - size, cy2],
+                  fill=(*accent, 130))
+    # Mid-border decorative lines
+    mid_y = 16
+    d.line([24, mid_y, W - 24, mid_y], fill=(*accent, 35), width=1)
+    d.line([24, H - mid_y, W - 24, H - mid_y], fill=(*accent, 35), width=1)
+
+
+def _labels(img, name, group, accent):
+    d = ImageDraw.Draw(img, "RGBA")
+
     group_colors = {
-        "Cosmic": "#9ac8ff", "Primal": "#ffffc0", "Eldritch": "#d8b4ff",
-        "Mechanical": "#88ffcc", "Humanoid": "#ffaa66",
+        "Cosmic":     "#9ac8ff", "Primal":     "#a8e060",
+        "Eldritch":   "#d8b4ff", "Mechanical": "#88ffcc",
+        "Humanoid":   "#ffaa66",
     }
     badge_col = _rgb(group_colors.get(group, "#ffffff"))
 
     try:
-        small_font = ImageFont.load_default(size=s(9))
-        name_font  = ImageFont.load_default(size=s(14))
+        small_font = ImageFont.load_default(size=28)
+        name_font  = ImageFont.load_default(size=48)
     except Exception:
         small_font = name_font = None
 
-    # Group badge — top-left
-    d.rectangle([s(5), s(5), s(80), s(22)], fill=(0, 0, 0, 160))
+    # Group badge — top-left with accent backing
+    badge_w, badge_h = 175, 42
+    d.rectangle([12, 12, 12 + badge_w, 12 + badge_h], fill=(0, 0, 0, 175))
+    d.rectangle([12, 12, 12 + badge_w, 12 + badge_h], outline=(*badge_col, 80), width=1)
     kw = {"font": small_font} if small_font else {}
-    d.text((s(9), s(7)), group.upper(), fill=(*badge_col, 200), **kw)
+    d.text((22, 18), group.upper(), fill=(*badge_col, 220), **kw)
 
-    # Name bar — bottom
-    d.rectangle([0, H-s(38), W, H], fill=(0, 0, 0, 195))
-    d.line([0, H-s(38), W, H-s(38)], fill=(*accent, 100), width=s(1))
+    # Name bar — full-width gradient at bottom
+    bar_h = 140
+    bar_top = H - bar_h
+    # gradient bands
+    for i in range(bar_h):
+        t = i / bar_h
+        a = int(210 * (1 - t * 0.3))
+        d.line([0, bar_top + i, W, bar_top + i], fill=(0, 0, 0, a))
+    # Accent top-line of bar
+    d.line([0, bar_top, W, bar_top], fill=(*accent, 110), width=2)
+    d.line([0, bar_top + 3, W, bar_top + 3], fill=(*accent, 45), width=1)
+
+    # Decorative side flourishes
+    fw = 60
+    d.line([0, bar_top + 18, fw, bar_top + 18], fill=(*accent, 70), width=1)
+    d.line([W - fw, bar_top + 18, W, bar_top + 18], fill=(*accent, 70), width=1)
+    d.ellipse([fw - 4, bar_top + 15, fw + 4, bar_top + 21], fill=(*accent, 100))
+    d.ellipse([W - fw - 4, bar_top + 15, W - fw + 4, bar_top + 21], fill=(*accent, 100))
 
     kw2 = {"font": name_font} if name_font else {}
     if name_font:
         bbox = d.textbbox((0, 0), name.upper(), font=name_font)
         tw = bbox[2] - bbox[0]
-        d.text(((W - tw) // 2, H - s(26)), name.upper(), fill=(*accent, 220), font=name_font)
+        text_x = (W - tw) // 2
+        text_y = H - 95
+        # Shadow
+        d.text((text_x + 2, text_y + 2), name.upper(), fill=(0, 0, 0, 160), **kw2)
+        # Main text
+        d.text((text_x, text_y), name.upper(), fill=(*accent, 230), **kw2)
     else:
-        d.text((W // 2 - len(name) * s(3), H - s(24)), name.upper(), fill=(*accent, 220))
+        d.text((W // 2 - len(name) * 8, H - 90), name.upper(), fill=(*accent, 230))
 
 
-# ── Body-type draw functions ─────────────────────────────────────────────────
-
-def draw_ethereal(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy-s(18), s(60), accent, a=22, layers=5)
-    d.ellipse([cx-s(55), cy-s(68), cx+s(55), cy+s(28)], fill=(*base, 190))
-    _glow(d, cx, cy-s(22), s(28), accent, a=90, layers=2)
-    for ex, ey, er in [(-s(22), cy-s(32), s(9)), (s(22), cy-s(32), s(9))]:
-        _glow(d, cx+ex, ey, er, accent, a=140, layers=2)
-        d.ellipse([cx+ex-s(5), ey-s(5), cx+ex+s(5), ey+s(5)], fill=(*accent, 240))
-    for ox, ys in [(-s(28), cy+s(25)), (0, cy+s(30)), (s(28), cy+s(25))]:
-        for j in range(4):
-            a = 160 - j * 35
-            d.ellipse([cx+ox-s(5), ys+j*s(9)-s(5), cx+ox+s(5), ys+j*s(9)+s(5)], fill=(*accent, a))
-
-def draw_insectoid(d, img, cx, cy, base, accent, legs=6, **_):
-    d.ellipse([cx-s(18), cy+s(12), cx+s(18), cy+s(52)], fill=(*base, 200))
-    d.ellipse([cx-s(20), cy-s(18), cx+s(20), cy+s(18)], fill=(*base, 220))
-    d.ellipse([cx-s(14), cy-s(52), cx+s(14), cy-s(18)], fill=(*base, 235))
-    for ex, ey in [(-s(8), cy-s(40)), (s(8), cy-s(40))]:
-        d.ellipse([cx+ex-s(4), ey-s(4), cx+ex+s(4), ey+s(4)], fill=(*accent, 240))
-    d.line([cx-s(4), cy-s(52), cx-s(22), cy-s(78)], fill=(*accent, 200), width=s(2))
-    d.line([cx+s(4), cy-s(52), cx+s(22), cy-s(78)], fill=(*accent, 200), width=s(2))
-    d.ellipse([cx-s(25), cy-s(82), cx-s(18), cy-s(75)], fill=(*accent, 220))
-    d.ellipse([cx+s(18), cy-s(82), cx+s(25), cy-s(75)], fill=(*accent, 220))
-    for i in range(legs // 2):
-        yl = cy - s(8) + i * s(14)
-        d.line([cx-s(20), yl, cx-s(52), yl+s(8)],   fill=(*base, 185), width=s(2))
-        d.line([cx-s(52), yl+s(8), cx-s(62), yl+s(22)], fill=(*base, 155), width=s(2))
-        d.line([cx+s(20), yl, cx+s(52), yl+s(8)],   fill=(*base, 185), width=s(2))
-        d.line([cx+s(52), yl+s(8), cx+s(62), yl+s(22)], fill=(*base, 155), width=s(2))
-
-def draw_hulking(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy, s(70), accent, a=18, layers=4)
-    d.ellipse([cx-s(68), cy-s(18), cx+s(68), cy+s(58)], fill=(*base, 215))
-    d.ellipse([cx-s(62), cy-s(42), cx-s(22), cy+s(12)], fill=(*base, 200))
-    d.ellipse([cx+s(22), cy-s(42), cx+s(62), cy+s(12)], fill=(*base, 200))
-    d.ellipse([cx-s(26), cy-s(78), cx+s(26), cy-s(18)], fill=(*base, 232))
-    for ox, oy in [(-s(18), s(18)), (s(12), s(2)), (-s(4), s(38)), (s(24), s(24))]:
-        _glow(d, cx+ox, cy+oy, s(7), accent, a=150, layers=2)
-    for ex, ey in [(-s(11), cy-s(56)), (s(11), cy-s(56))]:
-        d.ellipse([cx+ex-s(5), ey-s(5), cx+ex+s(5), ey+s(5)], fill=(*accent, 245))
-    d.ellipse([cx-s(42), cy+s(48), cx-s(14), cy+s(80)], fill=(*base, 175))
-    d.ellipse([cx+s(14), cy+s(48), cx+s(42), cy+s(80)], fill=(*base, 175))
-
-def draw_predator(d, img, cx, cy, base, accent, has_tail=True, **_):
-    _glow(d, cx, cy, s(38), accent, a=22, layers=3)
-    d.ellipse([cx-s(38), cy-s(22), cx-s(12), cy+s(18)], fill=(*base, 195))
-    d.ellipse([cx+s(12), cy-s(22), cx+s(38), cy+s(18)], fill=(*base, 195))
-    d.ellipse([cx-s(20), cy-s(14), cx+s(20), cy+s(42)], fill=(*base, 222))
-    d.ellipse([cx-s(17), cy-s(62), cx+s(21), cy-s(10)], fill=(*base, 232))
-    for ex, ey in [(-s(9), cy-s(48)), (s(6), cy-s(48))]:
-        d.ellipse([cx+ex-s(5), ey-s(5), cx+ex+s(5), ey+s(5)], fill=(*accent, 242))
-    d.rectangle([cx-s(16), cy+s(36), cx-s(6), cy+s(75)], fill=(*base, 190))
-    d.rectangle([cx+s(6),  cy+s(36), cx+s(16), cy+s(75)], fill=(*base, 190))
-    if has_tail:
-        for i, (ox, oy) in enumerate([(s(24),s(28)), (s(36),s(42)), (s(44),s(58)), (s(46),s(74))]):
-            d.ellipse([cx+ox-s(6), cy+oy-s(6), cx+ox+s(6), cy+oy+s(6)], fill=(*base, 200-i*30))
-
-def draw_avian(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx-s(55), cy, s(30), accent, a=18, layers=3)
-    _glow(d, cx+s(55), cy, s(30), accent, a=18, layers=3)
-    d.polygon([cx, cy-s(8), cx-s(88), cy-s(28), cx-s(78), cy+s(28), cx-s(8), cy+s(18)], fill=(*base, 175))
-    d.polygon([cx, cy-s(8), cx+s(88), cy-s(28), cx+s(78), cy+s(28), cx+s(8), cy+s(18)], fill=(*base, 175))
-    for ox in [-s(80), -s(62), -s(44)]:
-        d.line([cx+ox//2, cy-s(2), cx+ox, cy+s(12)], fill=(*accent, 115), width=s(1))
-    for ox in [s(80), s(62), s(44)]:
-        d.line([cx+ox//2, cy-s(2), cx+ox, cy+s(12)], fill=(*accent, 115), width=s(1))
-    d.ellipse([cx-s(16), cy-s(8),  cx+s(16), cy+s(38)], fill=(*base, 232))
-    d.ellipse([cx-s(15), cy-s(58), cx+s(15), cy-s(8)],  fill=(*base, 242))
-    for ox, h in [(-s(6), s(18)), (0, s(26)), (s(6), s(20))]:
-        d.polygon([cx+ox-s(3), cy-s(58), cx+ox+s(3), cy-s(58), cx+ox, cy-s(58)-h], fill=(*accent, 205))
-    for ex, ey in [(-s(7), cy-s(43)), (s(7), cy-s(43))]:
-        d.ellipse([cx+ex-s(4), ey-s(4), cx+ex+s(4), ey+s(4)], fill=(*accent, 252))
-    d.ellipse([cx-s(12), cy+s(34), cx-s(3), cy+s(64)], fill=(*base, 178))
-    d.ellipse([cx+s(3),  cy+s(34), cx+s(12), cy+s(64)], fill=(*base, 178))
-
-def draw_horror(d, img, cx, cy, base, accent, has_cape=False, has_bones=False, **_):
-    _glow(d, cx, cy, s(28), accent, a=32, layers=4)
-    if has_cape:
-        d.polygon([cx, cy-s(28), cx-s(62), cy+s(38), cx-s(48), cy+s(78),
-                   cx, cy+s(58), cx+s(48), cy+s(78), cx+s(62), cy+s(38)], fill=(*base, 115))
-    d.ellipse([cx-s(35), cy-s(12), cx-s(12), cy+s(22)], fill=(*base, 185))
-    d.ellipse([cx+s(12), cy-s(12), cx+s(35), cy+s(22)], fill=(*base, 185))
-    d.ellipse([cx-s(14), cy-s(18), cx+s(14), cy+s(48)], fill=(*base, 222))
-    d.ellipse([cx-s(17), cy-s(68), cx+s(17), cy-s(12)], fill=(*base, 232))
-    if has_bones:
-        for ox, oy in [(-s(16), -s(10)), (-s(16), s(8)), (s(16), -s(10)), (s(16), s(8))]:
-            d.polygon([cx+ox-s(3), cy+oy, cx+ox+s(3), cy+oy, cx+ox, cy+oy-s(13)], fill=(*accent, 205))
-    for ex, ey in [(-s(8), cy-s(50)), (s(8), cy-s(50))]:
-        _glow(d, cx+ex, ey, s(5), accent, a=160, layers=2)
-        d.ellipse([cx+ex-s(4), ey-s(4), cx+ex+s(4), ey+s(4)], fill=(*accent, 255))
-    for i in range(3):
-        d.line([cx-s(35)+i*SCALE, cy+s(22), cx-s(38)+i*s(4), cy+s(42)], fill=(*base, 155), width=s(1))
-        d.line([cx+s(35)-i*SCALE, cy+s(22), cx+s(38)-i*s(4), cy+s(42)], fill=(*base, 155), width=s(1))
-    d.rectangle([cx-s(11), cy+s(44), cx-s(3), cy+s(82)], fill=(*base, 182))
-    d.rectangle([cx+s(3),  cy+s(44), cx+s(11), cy+s(82)], fill=(*base, 182))
-
-def draw_arachnid(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy, s(32), accent, a=22, layers=3)
-    d.ellipse([cx-s(26), cy+s(18), cx+s(26), cy+s(68)], fill=(*base, 210))
-    d.ellipse([cx-s(20), cy-s(22), cx+s(20), cy+s(28)], fill=(*base, 232))
-    d.ellipse([cx-s(14), cy-s(52), cx+s(14), cy-s(18)], fill=(*base, 242))
-    for ex, ey in [(-s(8), cy-s(42)), (-s(2), cy-s(47)), (s(4), cy-s(42)), (s(8), cy-s(47))]:
-        d.ellipse([cx+ex-s(3), ey-s(3), cx+ex+s(3), ey+s(3)], fill=(*accent, 242))
-    leg_data = [
-        (-s(20),-s(8), -s(68),-s(28), -s(78),s(2)),  (-s(20),s(2),  -s(70),s(6),  -s(80),s(26)),
-        (-s(20),s(12), -s(66),s(22),  -s(73),s(44)),  (-s(20),s(22), -s(58),s(36), -s(63),s(58)),
-        ( s(20),-s(8),  s(68),-s(28),  s(78),s(2)),   ( s(20),s(2),   s(70),s(6),   s(80),s(26)),
-        ( s(20),s(12),  s(66),s(22),   s(73),s(44)),  ( s(20),s(22),  s(58),s(36),  s(63),s(58)),
-    ]
-    for x1,y1,x2,y2,x3,y3 in leg_data:
-        d.line([cx+x1, cy+y1, cx+x2, cy+y2], fill=(*base, 200), width=s(2))
-        d.line([cx+x2, cy+y2, cx+x3, cy+y3], fill=(*base, 162), width=s(2))
-
-def draw_mechanical(d, img, cx, cy, base, accent, gear=False, wires=False, **_):
-    _glow(d, cx, cy, s(38), accent, a=28, layers=3)
-    d.rectangle([cx-s(24), cy-s(18), cx+s(24), cy+s(38)], fill=(*base, 222))
-    d.line([cx-s(24), cy+s(8),  cx+s(24), cy+s(8)],  fill=(*accent, 80), width=s(1))
-    d.line([cx-s(24), cy+s(24), cx+s(24), cy+s(24)], fill=(*accent, 55), width=s(1))
-    d.rectangle([cx-s(48), cy-s(24), cx-s(24), cy+s(10)], fill=(*base, 202))
-    d.rectangle([cx+s(24), cy-s(24), cx+s(48), cy+s(10)], fill=(*base, 202))
-    d.rectangle([cx-s(19), cy-s(66), cx+s(19), cy-s(18)], fill=(*base, 232))
-    d.rectangle([cx-s(15), cy-s(54), cx+s(15), cy-s(42)], fill=(*accent, 185))
-    _glow(d, cx, cy-s(48), s(13), accent, a=85, layers=2)
-    if gear:
-        for angle in range(0, 360, 45):
-            rad = math.radians(angle)
-            gx = cx + int(s(17) * math.cos(rad))
-            gy = cy + s(10) + int(s(17) * math.sin(rad))
-            d.ellipse([gx-s(4), gy-s(4), gx+s(4), gy+s(4)], fill=(*accent, 125))
-        d.ellipse([cx-s(7), cy+s(3), cx+s(7), cy+s(17)], fill=(*accent, 82))
-    if wires:
-        for sx,sy,ex,ey in [(-s(24),0,-s(52),-s(10)), (s(24),0,s(52),-s(10)), (-s(18),s(28),-s(48),s(44))]:
-            d.line([cx+sx, cy+sy, cx+ex, cy+ey], fill=(*accent, 155), width=s(2))
-    d.rectangle([cx-s(21), cy+s(36), cx-s(7),  cy+s(78)], fill=(*base, 192))
-    d.rectangle([cx+s(7),  cy+s(36), cx+s(21), cy+s(78)], fill=(*base, 192))
-    d.rectangle([cx-s(23), cy+s(70), cx-s(4),  cy+s(80)], fill=(*base, 180))
-    d.rectangle([cx+s(4),  cy+s(70), cx+s(23), cy+s(80)], fill=(*base, 180))
-
-def draw_plant(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy, s(32), accent, a=22, layers=3)
-    d.ellipse([cx-s(22), cy-s(18), cx+s(22), cy+s(44)], fill=(*base, 212))
-    for x1,y1,x2,y2,x3,y3 in [
-        (-s(26),-s(4),-s(40),-s(18),-s(33),-s(4)), (-s(30),s(10),-s(48),s(2),-s(38),s(18)),
-        ( s(26),-s(4), s(40),-s(18), s(33),-s(4)), ( s(30),s(10), s(48),s(2), s(38),s(18)),
-    ]:
-        d.polygon([cx+x1,cy+y1, cx+x2,cy+y2, cx+x3,cy+y3], fill=(*accent, 205))
-    d.ellipse([cx-s(17), cy-s(66), cx+s(17), cy-s(14)], fill=(*base, 232))
-    for i in range(4):
-        d.arc([cx-s(22), cy+i*s(12)-s(4), cx+s(22), cy+i*s(12)+s(4)], 200, 340, fill=(*accent, 58), width=s(1))
-    for ex, ey in [(-s(7), cy-s(48)), (s(7), cy-s(48))]:
-        d.ellipse([cx+ex-s(4), ey-s(4), cx+ex+s(4), ey+s(4)], fill=(*accent, 242))
-    d.rectangle([cx-s(17), cy+s(40), cx-s(5), cy+s(74)], fill=(*base, 182))
-    d.rectangle([cx+s(5),  cy+s(40), cx+s(17), cy+s(74)], fill=(*base, 182))
-
-def draw_compact(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy-s(20), s(30), accent, a=28, layers=4)
-    for ox, h in [(-s(10),s(18)), (-s(3),s(26)), (s(4),s(22))]:
-        d.polygon([cx+ox-s(3), cy-s(65), cx+ox+s(3), cy-s(65), cx+ox, cy-s(65)-h], fill=(*accent, 225))
-    d.ellipse([cx-s(28), cy-s(62), cx+s(28), cy+s(8)], fill=(*base, 232))
-    _glow(d, cx, cy-s(28), s(15), accent, a=85, layers=2)
-    for ex, ey in [(-s(11), cy-s(40)), (s(11), cy-s(40))]:
-        d.ellipse([cx+ex-s(5), ey-s(5), cx+ex+s(5), ey+s(5)], fill=(*accent, 252))
-    d.ellipse([cx-s(22), cy-s(3),  cx+s(22), cy+s(38)], fill=(*base, 222))
-    d.ellipse([cx-s(16), cy+s(32), cx-s(5),  cy+s(54)], fill=(*base, 182))
-    d.ellipse([cx+s(5),  cy+s(32), cx+s(16), cy+s(54)], fill=(*base, 182))
-
-def draw_cephalopod(d, img, cx, cy, base, accent, **_):
-    _glow(d, cx, cy-s(12), s(48), accent, a=18, layers=3)
-    d.ellipse([cx-s(48), cy-s(58), cx+s(48), cy+s(8)],  fill=(*base, 212))
-    d.ellipse([cx-s(28), cy-s(38), cx+s(28), cy+s(4)],  fill=(*base, 232))
-    for ox, oy in [(-s(17),cy-s(26)), (-s(6),cy-s(32)), (s(6),cy-s(32)), (s(17),cy-s(26))]:
-        _glow(d, cx+ox, oy, s(5), accent, a=125, layers=2)
-        d.ellipse([cx+ox-s(4), oy-s(4), cx+ox+s(4), oy+s(4)], fill=(*accent, 232))
-    for x1,y1,x2,y2,x3,y3 in [
-        (-s(38),s(5), -s(52),s(38), -s(42),s(72)), (-s(26),s(8), -s(36),s(44), -s(28),s(78)),
-        (-s(14),s(10),-s(16),s(48), -s(10),s(80)), (-s(2), s(10), 0,    s(50),  s(2), s(82)),
-        ( s(2), s(10), s(4), s(50),  s(6), s(82)), ( s(14),s(10), s(16),s(48),  s(14),s(80)),
-        ( s(26),s(8),  s(36),s(44),  s(32),s(78)), ( s(38),s(5),  s(52),s(38),  s(46),s(72)),
-    ]:
-        d.line([cx+x1,cy+y1, cx+x2,cy+y2], fill=(*base, 192), width=s(3))
-        d.line([cx+x2,cy+y2, cx+x3,cy+y3], fill=(*base, 162), width=s(2))
-        d.ellipse([cx+x3-s(3),cy+y3-s(3), cx+x3+s(3),cy+y3+s(3)], fill=(*accent, 105))
-
-def draw_humanoid(d, img, cx, cy, base, accent, feature="default", **_):
-    _glow(d, cx, cy, s(32), accent, a=18, layers=3)
-    if feature == "cloak":
-        d.polygon([cx-s(22),cy-s(14), cx-s(52),cy+s(18), cx-s(42),cy+s(78),
-                   cx,cy+s(58), cx+s(42),cy+s(78), cx+s(52),cy+s(18), cx+s(22),cy-s(14)], fill=(*base, 105))
-    d.ellipse([cx-s(36), cy-s(18), cx-s(12), cy+s(14)], fill=(*base, 200))
-    d.ellipse([cx+s(12), cy-s(18), cx+s(36), cy+s(14)], fill=(*base, 200))
-    d.rectangle([cx-s(34), cy+s(4),  cx-s(18), cy+s(48)], fill=(*base, 185))
-    d.rectangle([cx+s(18), cy+s(4),  cx+s(34), cy+s(48)], fill=(*base, 185))
-    d.ellipse([cx-s(20), cy-s(14), cx+s(20), cy+s(44)], fill=(*base, 222))
-    d.ellipse([cx-s(17), cy-s(68), cx+s(17), cy-s(10)], fill=(*base, 236))
-    for ex, ey in [(-s(8), cy-s(50)), (s(8), cy-s(50))]:
-        d.ellipse([cx+ex-s(4), ey-s(4), cx+ex+s(4), ey+s(4)], fill=(*accent, 242))
-    d.rectangle([cx-s(16), cy+s(38), cx-s(5), cy+s(78)], fill=(*base, 192))
-    d.rectangle([cx+s(5),  cy+s(38), cx+s(16), cy+s(78)], fill=(*base, 192))
-
-    if feature == "crown":
-        for ox, h in [(-s(10),s(14)), (-s(4),s(20)), (s(4),s(20)), (s(10),s(14))]:
-            d.polygon([cx+ox-s(3),cy-s(68), cx+ox+s(3),cy-s(68), cx+ox,cy-s(68)-h], fill=(*accent, 225))
-    elif feature == "aura":
-        _glow(d, cx, cy-s(38), s(30), accent, a=62, layers=3)
-    elif feature == "scars":
-        for sx,sy,ex,ey in [(-s(7),cy-s(28),-s(2),cy-s(13)), (s(5),cy-s(33),s(9),cy-s(18)), (-s(4),cy+s(2),s(1),cy+s(17))]:
-            d.line([cx+sx, ey, cx+ex, cy+sy], fill=(*accent, 185), width=s(2))
-    elif feature == "thorns_sm":
-        for ox, oy in [(-s(26),-s(8)), (s(26),-s(8)), (-s(26),s(10)), (s(26),s(10))]:
-            d.polygon([cx+ox-s(2),cy+oy, cx+ox+s(2),cy+oy, cx+ox,cy+oy-s(11)], fill=(*accent, 205))
-    elif feature == "glow_body":
-        for i in range(5):
-            _glow(d, cx, cy-s(8)+i*s(12), s(9), accent, a=82, layers=2)
-    elif feature == "fire_crown":
-        for ox, h in [(-s(12),s(18)), (-s(5),s(28)), (0,s(33)), (s(5),s(28)), (s(12),s(18))]:
-            d.polygon([cx+ox-s(3),cy-s(68), cx+ox+s(3),cy-s(68), cx+ox,cy-s(68)-h], fill=(*accent, 205))
-        _glow(d, cx, cy-s(82), s(19), accent, a=82, layers=2)
-    elif feature == "fracture":
-        for sx,sy,ex,ey in [(-s(14),cy-s(38),-s(5),cy+s(8)), (s(7),cy-s(46),s(14),cy+s(4)), (-s(9),cy-s(8),s(4),cy+s(38))]:
-            d.line([cx+sx, sy, cx+ex, ey], fill=(*accent, 125), width=s(1))
-    elif feature == "halo":
-        d.ellipse([cx-s(24),cy-s(86), cx+s(24),cy-s(66)], outline=(*accent, 185), width=s(3))
-        _glow(d, cx, cy-s(76), s(18), accent, a=52, layers=2)
-    elif feature == "split":
-        d.line([cx, cy-s(68), cx, cy+s(78)], fill=(*accent, 82), width=s(2))
-        d.ellipse([cx-s(8), cy-s(54), cx, cy-s(46)], fill=(*_rgb("#e05030"), 225))
-    elif feature == "antenna":
-        d.line([cx-s(3), cy-s(68), cx-s(14), cy-s(92)], fill=(*accent, 205), width=s(2))
-        d.line([cx+s(3), cy-s(68), cx+s(14), cy-s(92)], fill=(*accent, 205), width=s(2))
-        d.ellipse([cx-s(17), cy-s(96), cx-s(11), cy-s(90)], fill=(*accent, 232))
-        d.ellipse([cx+s(11), cy-s(96), cx+s(17), cy-s(90)], fill=(*accent, 232))
-    elif feature == "shadow_void":
-        _glow(d, cx, cy, s(52), accent, a=38, layers=4)
-    elif feature == "scales":
-        for row in range(4):
-            for col in range(3):
-                sx = cx - s(15) + col * s(13)
-                sy = cy - s(8)  + row * s(14)
-                d.ellipse([sx, sy, sx+s(11), sy+s(9)], outline=(*accent, 102), width=s(1))
-    elif feature == "wings_small":
-        d.ellipse([cx-s(52), cy-s(14), cx-s(18), cy+s(18)], fill=(*base, 148))
-        d.ellipse([cx+s(18), cy-s(14), cx+s(52), cy+s(18)], fill=(*base, 148))
+def _vignette(img):
+    d = ImageDraw.Draw(img, "RGBA")
+    for i in range(80):
+        a = int(i * 3.2)
+        d.rectangle([i, i, W - i, H - i], outline=(0, 0, 0, a), width=1)
 
 
-# ── Race table ───────────────────────────────────────────────────────────────
+# ── Race table ─────────────────────────────────────────────────────────────────
+# (race_id, display_name, group, body_fn, accent_hex, base_hex, extra_kwargs)
 
 RACES = {
     # COSMIC
-    "voidwraith":   ("Voidwraith",   "Cosmic",     "ethereal",   "#9ac8ff", "#0e1828", {}),
-    "nullshade":    ("Nullshade",    "Cosmic",     "ethereal",   "#8899aa", "#0e1018", {}),
-    "ironlocust":   ("Ironlocust",   "Cosmic",     "insectoid",  "#d4b820", "#1a140a", {"legs": 6}),
-    "embervein":    ("Embervein",    "Cosmic",     "hulking",    "#ff6600", "#2a0a00", {}),
-    "riftwalker":   ("Riftwalker",   "Cosmic",     "predator",   "#9ac8ff", "#061420", {"has_tail": True}),
+    "voidwraith":   ("Voidwraith",   "Cosmic",     draw_ethereal,   "#9ac8ff", "#070c1a", {"aura_r": 200, "aura_alpha": 65, "aura_blur": 60}),
+    "nullshade":    ("Nullshade",    "Cosmic",     draw_ethereal,   "#778899", "#06080e", {"aura_r": 180, "aura_alpha": 50, "aura_blur": 55}),
+    "ironlocust":   ("Ironlocust",   "Cosmic",     draw_insectoid,  "#d4b820", "#120e04", {"legs": 6, "aura_r": 160, "aura_alpha": 55}),
+    "embervein":    ("Embervein",    "Cosmic",     draw_hulking,    "#ff6600", "#1e0600", {"aura_r": 210, "aura_alpha": 70}),
+    "riftwalker":   ("Riftwalker",   "Cosmic",     draw_predator,   "#9ac8ff", "#04101a", {"has_tail": True, "aura_r": 170, "aura_alpha": 58}),
     # PRIMAL
-    "solarlord":    ("Solarlord",    "Primal",     "avian",      "#ffffc0", "#2a1c00", {}),
-    "thornmimic":   ("Thornmimic",   "Primal",     "plant",      "#66aa44", "#061006", {}),
-    "cinderkin":    ("Cinderkin",    "Primal",     "compact",    "#ff9900", "#200810", {}),
-    "deeptyrant":   ("Deeptyrant",   "Primal",     "cephalopod", "#00d4cc", "#001020", {}),
-    "grimcrow":     ("Grimcrow",     "Primal",     "avian",      "#9966cc", "#08000e", {}),
+    "solarlord":    ("Solarlord",    "Primal",     draw_avian,      "#ffe060", "#1a1200", {"aura_r": 220, "aura_alpha": 75}),
+    "thornmimic":   ("Thornmimic",   "Primal",     draw_plant,      "#66cc44", "#040a02", {"aura_r": 175, "aura_alpha": 55}),
+    "cinderkin":    ("Cinderkin",    "Primal",     draw_compact,    "#ff9900", "#160600", {"aura_r": 155, "aura_alpha": 65}),
+    "deeptyrant":   ("Deeptyrant",   "Primal",     draw_cephalopod, "#00d4cc", "#000e0c", {"aura_r": 200, "aura_alpha": 60}),
+    "grimcrow":     ("Grimcrow",     "Primal",     draw_avian,      "#9966cc", "#060008", {"aura_r": 175, "aura_alpha": 52}),
     # ELDRITCH
-    "bloodweaver":  ("Bloodweaver",  "Eldritch",   "horror",     "#ff2244", "#140006", {"has_cape": True}),
-    "dreamhusk":    ("Dreamhusk",    "Eldritch",   "ethereal",   "#d8b4ff", "#100820", {}),
-    "bonedrifter":  ("Bonedrifter",  "Eldritch",   "horror",     "#ddddd0", "#0e0e0c", {"has_bones": True}),
-    "mindspider":   ("Mindspider",   "Eldritch",   "arachnid",   "#aaffdd", "#000e0c", {}),
-    "chaosling":    ("Chaosling",    "Eldritch",   "ethereal",   "#ff88cc", "#12000e", {}),
+    "bloodweaver":  ("Bloodweaver",  "Eldritch",   draw_horror,     "#ff2244", "#0e0004", {"has_cape": True, "aura_r": 185, "aura_alpha": 62}),
+    "dreamhusk":    ("Dreamhusk",    "Eldritch",   draw_ethereal,   "#d8b4ff", "#0c0818", {"aura_r": 195, "aura_alpha": 58}),
+    "bonedrifter":  ("Bonedrifter",  "Eldritch",   draw_horror,     "#ddddd0", "#0a0a08", {"has_bones": True, "aura_r": 170, "aura_alpha": 50}),
+    "mindspider":   ("Mindspider",   "Eldritch",   draw_arachnid,   "#aaffdd", "#00080a", {"aura_r": 180, "aura_alpha": 55}),
+    "chaosling":    ("Chaosling",    "Eldritch",   draw_ethereal,   "#ff88cc", "#0e000c", {"aura_r": 200, "aura_alpha": 68}),
     # MECHANICAL
-    "ironveil":     ("Ironveil",     "Mechanical", "mechanical", "#c8e8ff", "#080e14", {}),
-    "forgespawn":   ("Forgespawn",   "Mechanical", "mechanical", "#ff8800", "#140800", {"gear": True}),
-    "cinderplate":  ("Cinderplate",  "Mechanical", "mechanical", "#ff4400", "#180600", {}),
-    "hexgear":      ("Hexgear",      "Mechanical", "mechanical", "#88ffcc", "#00100a", {"gear": True}),
-    "wirewraith":   ("Wirewraith",   "Mechanical", "mechanical", "#ffff44", "#141200", {"wires": True}),
+    "ironveil":     ("Ironveil",     "Mechanical", draw_mechanical, "#c8e8ff", "#060a10", {"aura_r": 165, "aura_alpha": 55}),
+    "forgespawn":   ("Forgespawn",   "Mechanical", draw_mechanical, "#ff8800", "#100600", {"gear": True, "aura_r": 175, "aura_alpha": 65}),
+    "cinderplate":  ("Cinderplate",  "Mechanical", draw_mechanical, "#ff4400", "#120400", {"aura_r": 168, "aura_alpha": 60}),
+    "hexgear":      ("Hexgear",      "Mechanical", draw_mechanical, "#88ffcc", "#000a06", {"gear": True, "aura_r": 162, "aura_alpha": 55}),
+    "wirewraith":   ("Wirewraith",   "Mechanical", draw_mechanical, "#ffff44", "#0e0e00", {"wires": True, "aura_r": 170, "aura_alpha": 60}),
     # HUMANOID
-    "ashenborn":    ("Ashenborn",    "Humanoid",   "humanoid",   "#ff6644", "#140800", {"feature": "scars"}),
-    "hollowsong":   ("Hollowsong",   "Humanoid",   "humanoid",   "#cc88ff", "#0c0012", {"feature": "aura"}),
-    "veilborn":     ("Veilborn",     "Humanoid",   "humanoid",   "#6677aa", "#06080e", {"feature": "cloak"}),
-    "thornweft":    ("Thornweft",    "Humanoid",   "humanoid",   "#66aa44", "#040a04", {"feature": "thorns_sm"}),
-    "ashcrown":     ("Ashcrown",     "Humanoid",   "humanoid",   "#eeeebb", "#0e0e0c", {"feature": "crown"}),
-    "ironfast":     ("Ironfast",     "Humanoid",   "humanoid",   "#999999", "#0a0a0a", {"feature": "glow_body"}),
-    "coreborn":     ("Coreborn",     "Humanoid",   "humanoid",   "#ff4422", "#140600", {"feature": "fire_crown"}),
-    "warpbred":     ("Warpbred",     "Humanoid",   "humanoid",   "#aa2200", "#120400", {"feature": "fracture"}),
-    "splitblood":   ("Splitblood",   "Humanoid",   "humanoid",   "#884422", "#0e0604", {"feature": "split"}),
-    "duskweft":     ("Duskweft",     "Humanoid",   "humanoid",   "#aaaaff", "#06060e", {"feature": "shadow_void"}),
-    "glitchkin":    ("Glitchkin",    "Humanoid",   "humanoid",   "#00ffaa", "#00100a", {"feature": "antenna"}),
-    "fractureline": ("Fractureline", "Humanoid",   "humanoid",   "#ffaa00", "#100c00", {"feature": "fracture"}),
-    "emberpact":    ("Emberpact",    "Humanoid",   "humanoid",   "#ff4444", "#140404", {"feature": "fire_crown"}),
-    "fallenlight":  ("Fallenlight",  "Humanoid",   "humanoid",   "#ffff99", "#0e0e08", {"feature": "halo"}),
-    "scaleworn":    ("Scaleworn",    "Humanoid",   "humanoid",   "#336633", "#040c04", {"feature": "scales"}),
-}
-
-DRAW_FNS = {
-    "ethereal": draw_ethereal, "insectoid": draw_insectoid, "hulking":    draw_hulking,
-    "predator": draw_predator, "avian":     draw_avian,     "horror":     draw_horror,
-    "arachnid": draw_arachnid, "mechanical":draw_mechanical,"plant":      draw_plant,
-    "compact":  draw_compact,  "cephalopod":draw_cephalopod,"humanoid":   draw_humanoid,
+    "ashenborn":    ("Ashenborn",    "Humanoid",   draw_humanoid,   "#ff6644", "#100400", {"feature": "scars"}),
+    "hollowsong":   ("Hollowsong",   "Humanoid",   draw_humanoid,   "#cc88ff", "#080010", {"feature": "aura"}),
+    "veilborn":     ("Veilborn",     "Humanoid",   draw_humanoid,   "#6677aa", "#04060c", {"feature": "cloak"}),
+    "thornweft":    ("Thornweft",    "Humanoid",   draw_humanoid,   "#66aa44", "#030802", {"feature": "thorns_sm"}),
+    "ashcrown":     ("Ashcrown",     "Humanoid",   draw_humanoid,   "#eeeebb", "#0c0c0a", {"feature": "crown"}),
+    "ironfast":     ("Ironfast",     "Humanoid",   draw_humanoid,   "#a0a0a0", "#080808", {"feature": "glow_body"}),
+    "coreborn":     ("Coreborn",     "Humanoid",   draw_humanoid,   "#ff4422", "#100200", {"feature": "fire_crown"}),
+    "warpbred":     ("Warpbred",     "Humanoid",   draw_humanoid,   "#cc4400", "#0e0200", {"feature": "fracture"}),
+    "splitblood":   ("Splitblood",   "Humanoid",   draw_humanoid,   "#884422", "#0c0400", {"feature": "split"}),
+    "duskweft":     ("Duskweft",     "Humanoid",   draw_humanoid,   "#aaaaff", "#04040e", {"feature": "shadow_void", "aura_r": 220, "aura_alpha": 70, "aura_blur": 65}),
+    "glitchkin":    ("Glitchkin",    "Humanoid",   draw_humanoid,   "#00ffaa", "#000c06", {"feature": "antenna"}),
+    "fractureline": ("Fractureline", "Humanoid",   draw_humanoid,   "#ffaa00", "#0c0800", {"feature": "fracture"}),
+    "emberpact":    ("Emberpact",    "Humanoid",   draw_humanoid,   "#ff4444", "#100000", {"feature": "fire_crown"}),
+    "fallenlight":  ("Fallenlight",  "Humanoid",   draw_humanoid,   "#ffff99", "#0c0c04", {"feature": "halo"}),
+    "scaleworn":    ("Scaleworn",    "Humanoid",   draw_humanoid,   "#336633", "#020802", {"feature": "scales"}),
 }
 
 
-# ── Main generator ────────────────────────────────────────────────────────────
+# ── Main generator ─────────────────────────────────────────────────────────────
 
-def make_portrait(race_id, name, group, body_type, accent_hex, base_hex, extra):
-    img = Image.new("RGBA", (W, H), (10, 10, 18, 255))
-    d = ImageDraw.Draw(img, "RGBA")
-
+def make_portrait(race_id, name, group, draw_fn, accent_hex, base_hex, extra):
+    rng = np.random.default_rng(abs(hash(race_id)) % (2**31))
     accent = _rgb(accent_hex)
     base   = _rgb(base_hex)
-    cx, cy = W // 2, H // 2 - s(20)
+    cx, cy = W // 2, H // 2 - 50  # character center slightly above mid
 
-    # Subtle accent radial haze
-    for i in range(s(30)):
-        a = max(0, int((i / SCALE) * 2.5) // 6)
-        d.rectangle([0, H - i - 1, W, H - i], fill=(*accent, a))
+    # 1. Atmospheric background
+    bg_fn = BG_MAKERS.get(group, _bg_humanoid)
+    img = bg_fn(accent, abs(hash(race_id)) % (2**31))
 
-    DRAW_FNS[body_type](d, img, cx, cy, base, accent, **extra)
+    # 2. Ground shadow beneath character
+    shadow = _glow_blob(cx, cy + 175, 110, (0, 0, 0), alpha=120, blur=35)
+    img.alpha_composite(shadow)
+
+    # 3. Ambient particles
+    particle_layer = _scatter_particles(rng, accent, count=55, alpha_max=110)
+    img.alpha_composite(particle_layer)
+
+    # 4. Character with aura + glow + silhouette
+    _composite_character(img, draw_fn, cx, cy, base, accent, extra)
+
+    # 5. Vignette
     _vignette(img)
 
-    d2 = ImageDraw.Draw(img, "RGBA")
-    _frame(d2, accent)
-    _labels(d2, name, group, accent)
+    # 6. Frame
+    _frame(img, accent)
+
+    # 7. Labels
+    _labels(img, name, group, accent)
 
     os.makedirs(OUT, exist_ok=True)
-    img.save(os.path.join(OUT, f"{race_id}.png"))
-    print(f"  ✓  {race_id}.png")
+    out_path = os.path.join(OUT, f"{race_id}.png")
+    img.convert("RGB").save(out_path, optimize=True)
+    print(f"  ✓  {race_id:16s}  {group}")
 
 
 if __name__ == "__main__":
-    print(f"Generating {len(RACES)} portraits at {W}×{H} → {OUT}\n")
+    print(f"Generating {len(RACES)} portraits at {W}x{H} -> {OUT}\n")
     for race_id, data in RACES.items():
         make_portrait(race_id, *data)
     print(f"\nDone.")
