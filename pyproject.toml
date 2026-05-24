@@ -1,6 +1,6 @@
 [project]
 name = "storyforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Hybrid VTT + AI Dungeon Master for family D&D 5e"
 requires-python = ">=3.12"
 dependencies = [

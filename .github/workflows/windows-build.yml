@@ -1,4 +1,7 @@
-name: Windows Build and Release
+name: Windows Quick Build
+
+# Lightweight per-push Windows build — produces StoryForge.exe artifact.
+# For the full release pipeline (Godot export + zip + itch.io), see build.yml.
 
 on:
   push:
@@ -14,13 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
           version: "latest"
@@ -28,33 +29,36 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev --python 3.12
 
-      - name: Create client_secret.json from Secret
+      - name: Write OAuth client secret
         shell: bash
-        run: echo '${{ secrets.OAUTH_CLIENT_SECRET }}' > client_secret.json
+        run: |
+          if [ -n "${{ secrets.OAUTH_CLIENT_SECRET }}" ]; then
+            echo '${{ secrets.OAUTH_CLIENT_SECRET }}' > client_secret.json
+          fi
 
-      - name: Build with PyInstaller
+      - name: Build StoryForge.exe
         run: uv run --python 3.12 python scripts/build.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StoryForge-Windows
+          name: StoryForge-Windows-Launcher
           path: dist/StoryForge.exe
 
-      - name: Create Release
+      - name: Create pre-release
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.1.1
-          name: StoryForge v0.1.1 (Windows)
+          tag_name: latest-dev
+          name: "StoryForge (latest dev build)"
+          prerelease: true
           body: |
-            ## StoryForge: Feral Successors Update
-            
-            This release introduces the **Google OAuth2 Desktop Flow** and pins the AI DM engine to **Gemini 3.5 Flash** for peak performance.
-            
-            ### Tester Instructions:
-            1. Download `StoryForge.exe` below.
-            2. Launch the application.
-            3. On first login, Google may show an "Unverified App" screen. 
-            4. **Action Required**: Click **"Advanced"** -> **"Go to StoryForge (unsafe)"** to proceed with authentication.
+            **Automated dev build** from the latest commit on `main`.
+
+            > This is the Python launcher only. The Godot client is not included.
+            > For a complete playable build, wait for a versioned release (`v*` tag).
+
+            ### Tester notes
+            - Requires Godot 4 installed and in PATH (or `GODOT_PATH` env var)
+            - Requires a `.env` file with `STORYFORGE_GEMINI_API_KEY`
           files: dist/StoryForge.exe

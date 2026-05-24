@@ -35,10 +35,21 @@ We are currently transitioning from a web-based (HTML/JS/Konva.js) frontend to a
 - [x] Synthesized placeholder audio assets — 27 .wav files (6 ambient, 5 RedVelvet performances, 16 SFX).
 - [x] Particle triggers wired to all game events (freeform actions, Paradox phase change, NPC entrances, 8 NPC event SFX).
 
-### 🚀 Milestone 4: Final Release - PLANNED
-- [ ] Unified Windows Release packaging (Godot + Python).
-- [ ] Steam/Itch.io distribution preparation.
+### 🚀 Milestone 4: Final Release - IN PROGRESS
+- [x] Unified Windows Release packaging (Godot + Python).
+  - `src/storyforge/launcher.py` — PyInstaller entry point (FastAPI thread + Godot subprocess).
+  - `StoryForge.spec` — updated spec (removed pywebview, targets launcher.py).
+  - `godot/export_presets.cfg` — Windows Desktop + Linux/X11 headless export presets.
+  - `scripts/build.py` + `scripts/package_release.py` — build and zip pipeline.
+- [x] Steam/Itch.io distribution preparation.
+  - `.github/workflows/build.yml` — Godot export + Python build + release zip + itch.io butler push.
+  - `.itch.toml` — itch.io manifest (entry point: StoryForge.exe).
+  - Required GitHub secrets: `BUTLER_API_KEY`, `OAUTH_CLIENT_SECRET`.
+  - Required GitHub vars: `ITCH_USER`, `ITCH_GAME`.
 - [ ] Final lorebook & asset optimization.
+  - [ ] Replace synthesized .wav placeholders with real audio assets.
+  - [ ] Sprite sheets for all 35 races.
+  - [ ] Final balance pass on ability score bonuses + NPC encounter state.
 
 ---
 
