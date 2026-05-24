@@ -10,12 +10,28 @@ extends Control
 
 const STEPS        = ["Era", "Race", "Evolutionary State", "Predator Role", "Abilities", "Name"]
 const ABILITY_KEYS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+const ABILITY_NAMES = {
+	"STR": "Strength",
+	"DEX": "Dexterity",
+	"CON": "Constitution",
+	"INT": "Intelligence",
+	"WIS": "Wisdom",
+	"CHA": "Charisma"
+}
+const ABILITY_HELP = {
+	"STR": "Power. Increases physical damage and carrying capacity.",
+	"DEX": "Agility. Increases accuracy, defense (AC), and initiative.",
+	"CON": "Fortitude. Increases total Health (HP) and stamina.",
+	"INT": "Logic. Power for cosmic/tech abilities and investigation.",
+	"WIS": "Instinct. Power for primal/eldritch abilities and perception.",
+	"CHA": "Presence. Power for social influence and leadership."
+}
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 
 @onready var step_label       = $MarginContainer/VBoxContainer/StepLabel
 @onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
 @onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
-@onready var portrait_rect    = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitRect
+@onready var race_mini       = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport/RaceMini
 @onready var next_btn         = $MarginContainer/VBoxContainer/Footer/NextBtn
 @onready var back_btn         = $MarginContainer/VBoxContainer/Footer/BackBtn
 
@@ -41,6 +57,9 @@ var _focused_ability: String = ""   # which ability row is selected for assignme
 
 func _ready():
 	next_btn.disabled = true
+
+	if race_mini:
+		race_mini.scale = Vector3(1.7, 1.7, 1.7)
 
 	# Wrap RaceList in a ScrollContainer at runtime.
 	# Doing this in code (not .tscn) so layout flags are set after the node
@@ -98,7 +117,8 @@ func _clear_list():
 	for child in race_list.get_children():
 		child.queue_free()
 	description_label.text = ""
-	portrait_rect.texture = null
+	if race_mini:
+		race_mini.visible = false
 
 # ── Step 0: Era ────────────────────────────────────────────────────
 
@@ -223,8 +243,9 @@ func _preview_race(data: Dictionary, is_before: bool):
 	description_label.text = "\n".join(lines)
 
 	var portrait_key = name_str.to_lower().replace(" ", "_").replace("-", "_")
-	var path = "res://assets/characters/%s.png" % portrait_key
-	portrait_rect.texture = load(path) if ResourceLoader.exists(path) else null
+	if race_mini:
+		race_mini.visible = true
+		race_mini.setup(portrait_key)
 
 # ── Step 2/3: Generic choice (state / role) ────────────────────────
 
@@ -261,9 +282,8 @@ func _preview_item(data: Dictionary):
 		text += "\n\n%s" % flavor
 	description_label.text = text
 
-	var portrait_key = name_str.to_lower().replace(" ", "_").replace("-", "_")
-	var path = "res://assets/characters/%s.png" % portrait_key
-	portrait_rect.texture = load(path) if ResourceLoader.exists(path) else null
+	if race_mini:
+		race_mini.visible = false
 
 # ── Step 4: Abilities ──────────────────────────────────────────────
 
@@ -288,6 +308,9 @@ func _render_abilities_step():
 		"Select an ability, then select a value to assign.\n\n" +
 		"Racial bonuses are applied automatically on character creation."
 	)
+	
+	if _focused_ability != "":
+		description_label.text += "\n\n[color=cyan][b]%s:[/b] %s[/color]" % [ABILITY_NAMES[_focused_ability], ABILITY_HELP[_focused_ability]]
 
 	# Pool of unassigned values at the top
 	var pool_label = Label.new()
@@ -295,15 +318,28 @@ func _render_abilities_step():
 	race_list.add_child(pool_label)
 
 	# One row per ability
+	var race_id = selection.get("race")
+	var race_data = catalog.get("races", {}).get(race_id, {})
+	var bonuses = race_data.get("ability_bonuses", {})
+
 	for ab in ABILITY_KEYS:
 		var current_val = selection["abilities"][ab]
+		var bonus = bonuses.get(ab, 0)
 		var row = HBoxContainer.new()
 		row.custom_minimum_size = Vector2(0, 32)
 
 		var ab_label = Label.new()
-		ab_label.text = ab
-		ab_label.custom_minimum_size = Vector2(44, 0)
+		ab_label.text = ABILITY_NAMES[ab]
+		ab_label.custom_minimum_size = Vector2(110, 0)
 		row.add_child(ab_label)
+
+		# Bonus indicator
+		var bonus_label = Label.new()
+		bonus_label.text = "+%d" % bonus if bonus > 0 else "  "
+		bonus_label.custom_minimum_size = Vector2(32, 0)
+		if bonus > 0:
+			bonus_label.modulate = Color.GREEN_YELLOW
+		row.add_child(bonus_label)
 
 		# Assigned value button (shows current or "—")
 		var val_btn = Button.new()
@@ -318,8 +354,13 @@ func _render_abilities_step():
 		)
 		row.add_child(val_btn)
 
-		# If a value is assigned, show a clear button
+		# Total
 		if current_val != null:
+			var total_label = Label.new()
+			total_label.text = "= %d" % (current_val + bonus)
+			total_label.custom_minimum_size = Vector2(44, 0)
+			row.add_child(total_label)
+
 			var clear_btn = Button.new()
 			clear_btn.text = "✕"
 			clear_btn.custom_minimum_size = Vector2(28, 0)
@@ -339,7 +380,7 @@ func _render_abilities_step():
 		race_list.add_child(spacer)
 
 		var assign_label = Label.new()
-		assign_label.text = "Assign to %s:" % _focused_ability
+		assign_label.text = "Assign to %s:" % ABILITY_NAMES[_focused_ability]
 		race_list.add_child(assign_label)
 
 		var pool_row = HBoxContainer.new()
