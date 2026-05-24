@@ -32,12 +32,12 @@ def _godot_cmd() -> list[str] | None:
         base = Path(sys.executable).parent
         name = "StoryForge_client.exe" if sys.platform == "win32" else "StoryForge_client"
         exe = base / name
-        return [str(exe)] if exe.exists() else None
+        return [str(exe), "--local-server"] if exe.exists() else None
 
     # Dev mode — use GODOT_PATH env var or assume 'godot' is in PATH
     godot = os.environ.get("GODOT_PATH", "godot")
     project = Path(__file__).resolve().parents[3] / "godot"
-    return [godot, "--path", str(project)]
+    return [godot, "--path", str(project), "--", "--local-server"]
 
 
 def main() -> None:

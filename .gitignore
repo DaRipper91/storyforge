@@ -7,6 +7,13 @@ build/
 dist/
 *.spec
 
+# Godot editor cache and import artifacts (regenerated from source assets)
+godot/.godot/
+godot/assets/**/*.import
+godot/assets/**/*.uid
+godot/scripts/*.gd.uid
+godot/**/*.gd.uid
+
 # Env
 .env
 .env.*

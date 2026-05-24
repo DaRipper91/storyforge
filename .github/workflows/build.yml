@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  GODOT_VERSION: "4.3"   # update to match project.godot config/features
+  GODOT_VERSION: "4.6.2"   # matches project.godot config/features
 
 # ──────────────────────────────────────────────────────────────────────────────
 jobs:
