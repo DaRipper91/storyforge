@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://t1a2b3c4d5e6"]
+[gd_scene load_steps=12 format=3 uid="uid://t1a2b3c4d5e6"]
 
 [ext_resource type="Script" path="res://scripts/Tabletop.gd" id="1_tabletop"]
 [ext_resource type="Shader" path="res://assets/shaders/parchment.gdshader" id="2_parchment"]
@@ -22,8 +22,50 @@ shader_parameter/ink_color = Color(0.14902, 0.121569, 0.14902, 1)
 shader_parameter/roughness = 0.95
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_noise")
 
+[sub_resource type="Environment" id="Environment_cinematic"]
+background_mode = 1
+background_color = Color(0.05, 0.04, 0.03, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.48, 0.36, 0.22, 1)
+ambient_light_energy = 0.45
+tonemap_mode = 2
+tonemap_exposure = 1.1
+tonemap_white = 1.0
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 0.5
+glow_bloom = 0.18
+glow_hdr_threshold = 0.82
+glow_hdr_scale = 2.0
+ssao_enabled = true
+ssao_radius = 0.9
+ssao_intensity = 1.6
+ssao_power = 1.5
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttr_dof"]
+dof_blur_far_enabled = true
+dof_blur_far_distance = 22.0
+dof_blur_far_transition = 7.0
+dof_blur_amount = 0.07
+dof_blur_near_enabled = false
+
+[sub_resource type="StandardMaterial3D" id="Mat_lantern_emit"]
+shading_mode = 0
+emission_enabled = true
+emission = Color(1.0, 0.82, 0.35, 1)
+emission_energy_multiplier = 6.0
+albedo_color = Color(1.0, 0.82, 0.35, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_lantern"]
+radius = 0.08
+height = 0.16
+material = SubResource("Mat_lantern_emit")
+
 [node name="Tabletop" type="Node3D"]
 script = ExtResource("1_tabletop")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_cinematic")
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_1")
@@ -33,9 +75,23 @@ surface_material_override/0 = SubResource("ShaderMaterial_parchment")
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 10)
 projection = 1
 size = 20.0
+attributes = SubResource("CameraAttr_dof")
+
+[node name="TableLantern" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+light_color = Color(1.0, 0.78, 0.42, 1)
+light_energy = 2.5
+omni_range = 18.0
+shadow_enabled = true
+shadow_bias = 0.04
+
+[node name="LanternGlobe" type="MeshInstance3D" parent="TableLantern"]
+mesh = SubResource("SphereMesh_lantern")
+cast_shadow = 0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 10, 0)
+light_energy = 0.65
 shadow_enabled = true
 shadow_bias = 0.05
 directional_shadow_mode = 0
@@ -43,3 +99,5 @@ directional_shadow_split_1 = 0.1
 directional_shadow_split_2 = 0.2
 directional_shadow_split_3 = 0.5
 directional_shadow_blend_splits = true
+
+[node name="ParticlesRoot" type="Node3D" parent="."]

@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://magic_burst_01"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_burst"]
+shading_mode = 0
+blend_mode = 1
+emission_enabled = true
+emission = Color(1.0, 0.88, 0.3, 1)
+emission_energy_multiplier = 4.5
+albedo_color = Color(1.0, 0.88, 0.3, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_burst"]
+radius = 0.04
+height = 0.08
+material = SubResource("Mat_burst")
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_burst"]
+emission_shape = 1
+emission_sphere_radius = 0.1
+direction = Vector3(0, 1, 0)
+spread = 120.0
+gravity = Vector3(0, 1.2, 0)
+initial_velocity_min = 0.8
+initial_velocity_max = 3.2
+angular_velocity_min = -90.0
+angular_velocity_max = 90.0
+damping_min = 1.5
+damping_max = 3.0
+scale_min = 0.5
+scale_max = 1.8
+color = Color(1.0, 0.85, 0.25, 1)
+
+[node name="MagicBurst" type="GPUParticles3D"]
+emitting = false
+amount = 35
+lifetime = 0.55
+explosiveness = 0.85
+randomness = 0.2
+one_shot = true
+process_material = SubResource("PPM_burst")
+draw_pass_1 = SubResource("SphereMesh_burst")

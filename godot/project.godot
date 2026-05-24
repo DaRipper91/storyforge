@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 PythonClient="*res://scripts/PythonClient.gd"
+AudioManager="*res://scripts/AudioManager.gd"
 
 [display]
 
