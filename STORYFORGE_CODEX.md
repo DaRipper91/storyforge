@@ -145,7 +145,7 @@ Never announce him. He simply shows up. No fanfare, no introduction. One moment 
 **Status:** Divine — not a character in scenes
 **Real animal:** Dee's dog (passed away)
 
-The entire game was built in her honor. Keeva's name means "Beloved" and "Protector" in Irish. She is not stationed anywhere. She is not a character who appears. She is the light, warmth, and protection that the world itself runs on. The realm holds together because she held it first. Do not place her in scenes. Let her presence be felt, not shown. Mate to Cyrus. Grandmother of Teddy.
+The entire game was built in her honor. Keeva's name means "Beloved" and "Protector" in Irish. She is not stationed anywhere. She is not a just character who appears shes a goddess. She is the light, warmth, and protection that the world itself runs on. The realm holds together because she held it first. Do not place her in scenes. Let her presence be felt, not shown. Mate to Cyrus. Grandmother of Teddy.
 
 ---
 
@@ -224,9 +224,7 @@ Where Teddy stands and holds, Tyty announces the threat to the surrounding half 
 ### COLE
 **Real animal:** Brayden's dog (big black fluffy dog)
 **Role:** Shadow Hound · Bryne's dog
-**STATUS: NOT YET IN THE REALM**
 
-Cole arrives when Bryne's story fully begins. Do not place him in scenes. Do not reference him as present. When he arrives: he will find a door and claim it. Primary interaction method: The Lean.
 
 ---
 
@@ -253,8 +251,140 @@ Teddy & Tyty           — Best friends. Teddy holds. Tyty announces.
 **The Guild** — Kodrik's operation. Central Dispatch. Where things get decided.
 **The Store** — Jon and Haylie's. Coco's territory. Samael loiters here.
 **The Crooked Tankard** — Where Firey RedVelvet plays.
+**Sunless Canyon** — A deep, iridescent rift where heat mirages distort reality. Habitat of the Shimmering Thresher.
+**The Iron Ledge** — The precipice of the world, where the gravity of the old world meets the chaos of the Feral.
 
 ---
 
-*End of Codex — Iron Ledge Era Canon v1.0*
+---
+
+## CHARACTER CREATION SYSTEM
+
+*The Feral Successor system. Not standard D&D races. Three orthogonal choices build every character.*
+
+---
+
+### THE PARADOX — THE ERA DIVIDE
+
+The world is split across two eras. Every race has a **Before** form (the civilized ancestor) and an **After** form (the Feral Successor that emerged through the Paradox). Players choose which era they inhabit.
+
+- **BEFORE** — The pre-Paradox world. Mortal forms, organized civilizations, understood rules. Warm, gold-lit, ordered.
+- **AFTER** — The Feral World. Transformed successors. The old species did not survive unchanged. Dangerous, alive, unknowable.
+
+---
+
+### RACE GROUPS (35 total)
+
+#### COSMIC — born between stars, beneath suns, inside the void
+| Feral Successor | Before Form | Ability Bonuses | Speed |
+|---|---|---|---|
+| Voidwraith | Astral Spirit | INT +2, STR +1 | 30 |
+| Nullshade | Shadow-Wisp | DEX +2, INT +1 | 40 |
+| Iron-Locust | Mining Drone | DEX +2, CON +1 | 35 |
+| Embervein | Magma Elemental | STR +2, CON +1 | 20 |
+| Riftwalker | Planar Voyager | DEX +1, WIS +2 | 30 |
+
+#### PRIMAL — ancient, elemental, rooted in myth and the living world
+| Feral Successor | Before Form | Ability Bonuses | Speed |
+|---|---|---|---|
+| Solar-Lord | High Seraph | CHA +2, WIS +1 | 40 |
+| Thornmimic | Wood Spirit | DEX +1, CHA +2 | 30 |
+| Cinderkin | Sun-Spark | INT +1, DEX +2 | 35 |
+| Deep-Tyrant | Abyssal Guard | STR +1, INT +2 | 30 |
+| Grimcrow | Fate-Watcher | WIS +2, INT +1 | 30 |
+
+#### ELDRITCH — things that should not be, things that persist anyway
+| Feral Successor | Before Form | Ability Bonuses | Speed |
+|---|---|---|---|
+| Bloodweaver | High Vampire | CHA +2, INT +1 | 30 |
+| Dreamhusk | Sleep-Walker | WIS +2, CHA +1 | 30 |
+| Bonedrifter | Bone-Construct | CON +2, STR +1 | 20 |
+| Mindspider | Telepath | INT +2, DEX +1 | 40 |
+| Chaosling | Wild Mage | DEX +2, WIS +1 | 35 |
+
+#### MECHANICAL — constructed, forged, refused to stop
+| Feral Successor | Before Form | Ability Bonuses | Speed |
+|---|---|---|---|
+| Ironveil | Security Automaton | DEX +2, INT +1 | 40 |
+| Forgespawn | Industrial Golem | STR +2, CON +1 | 35 |
+| Cinderplate | Furnace Guard | STR +2, WIS +1 | 20 |
+| Hexgear | Logic-Cube | INT +2, DEX +1 | 35 |
+| Wirewraith | Data-Ghost | DEX +2, WIS +1 | 45 |
+
+#### HUMANOID — what the civilized races became after the Paradox
+| Feral Successor | Before Form | Ability Bonuses | Speed |
+|---|---|---|---|
+| Ashenborn | Human | CON +2, STR +1 | 30 |
+| Hollowsong | Elf | WIS +2, INT +1 | 35 |
+| Veilborn | Dark Elf | DEX +2, CHA +1 | 40 |
+| Thornweft | Wood Elf | WIS +2, CON +1 | 30 |
+| Ashcrown | High Elf | INT +2, CHA +1 | 35 |
+| Ironfast | Dwarf | CON +2, STR +1 | 25 |
+| Coreborn | Deep Dwarf | CON +2, INT +1 | 25 |
+| Warpbred | Orc | STR +2, CON +1 | 35 |
+| Splitblood | Half-Orc | STR +1, CON +2 | 30 |
+| Duskweft | Halfling | DEX +2, WIS +1 | 40 |
+| Glitchkin | Gnome | INT +2, DEX +1 | 30 |
+| Fractureline | Half-Elf | INT +2, CHA +1 | 35 |
+| Emberpact | Tiefling | CHA +2, STR +1 | 30 |
+| Fallenlight | Aasimar | CHA +2, WIS +1 | 35 |
+| Scaleworn | Dragonborn | STR +2, DEX +1 | 30 |
+
+---
+
+### EVOLUTIONARY STATES (choose 1 — determines HP die and base AC)
+
+| State | Hit Die | Base AC | Style |
+|---|---|---|---|
+| **Behemoth** | d12 | 16 | A wall of muscle and chitin. High durability. |
+| **Phantom** | d6 | 12 | Incorporeal and ethereal. Hard to hit, but fragile. |
+| **Swarm-Host** | d8 | 14 | A colony intelligence in one body. Adaptable. |
+| **Mimic** | d10 | 14 | Adaptive form. Balanced offense and defense. |
+
+---
+
+### PREDATOR ROLES (choose 1 — determines starting gear)
+
+Each role grants a **primary item** (automatic) plus **one choice** from three secondary options.
+
+**Stalker** — Single-target elimination and ambushing.
+- *Primary:* Razor Claws (equipped)
+- *Choose one:* Smoke Pellets (blind pursuers 1 round) / Grappling Hook (reach elevated positions instantly) / Caltrops ×10 (scatter to slow pursuit)
+
+**Vanguard** — Zone control and intimidation.
+- *Primary:* Heavy Mandibles (equipped)
+- *Choose one:* Reinforced Plating (+1 AC while worn) / War Banner (allies within 10ft gain advantage on morale saves) / Battle Horn (demoralize enemies on Intimidation)
+
+**Catalyst** — Environmental manipulation and trapping.
+- *Primary:* Venom Sac (equipped)
+- *Choose one:* Web Strands ×5 (restrain a target on hit) / Explosive Spore ×3 (5ft burst on impact) / Paralytic Dust (DC 13 CON or target slowed)
+
+**Siphoner** — Resource theft and adaptation.
+- *Primary:* Energy Leech (equipped)
+- *Choose one:* Void Battery (store stolen energy for burst attack) / Essence Vial ×3 (distilled lifeforce; heals 1d6 HP) / Null Trap ×2 (suppresses magic in 10ft radius)
+
+---
+
+### BACKGROUNDS (choose 1 — grants bonus skills and a unique perk)
+
+| Background | Perk | Auto Skills |
+|---|---|---|
+| **Void Scavenger** | Salvage Sense — identify any object's value and origin at a glance | Survival, Sleight of Hand |
+| **Paradox Cultist** | Paradox Scar — sense when someone is about to transform | Arcana, Religion |
+| **Remnant Soldier** | Battle Hardened — cannot be frightened while at full HP | Athletics, Intimidation |
+| **Archive Scholar** | Living Catalogue — advantage on History/Nature for pre-Paradox civilizations | History, Arcana |
+| **Feral Wanderer** | Apex Instinct — advantage on all initiative rolls | Survival, Perception |
+| **Syndicate Broker** | Network Ghost — find a favor-ower in any settlement (DC 12 Persuasion) | Deception, Persuasion |
+| **Settlement Warden** | Guardian's Presence — allies within 10ft have advantage vs fear | Insight, Medicine |
+| **Void Oracle** | Fractured Sight — once per day, ask DM a yes/no about the near future | Insight, History |
+
+---
+
+### STANDARD ABILITY ARRAY
+
+All characters distribute `[15, 14, 13, 12, 10, 8]` across STR / DEX / CON / INT / WIS / CHA before racial bonuses.
+
+---
+
+*End of Codex — Iron Ledge Era Canon v2.0*
 *Built in honor of Keeva. Every session, every word.*

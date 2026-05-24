@@ -2,8 +2,8 @@
 
 This document tracks the high-level progress and future milestones of StoryForge.
 
-## 🏁 Current Status: The Great Godot Pivot
-We are currently transitioning from a web-based (HTML/JS/Konva.js) frontend to a high-fidelity **2.5D Godot Engine** client. The Python backend remains the authoritative "Brain."
+## 🏁 Current Status: Final Release Polish
+The Godot 4 3D tabletop client is complete. The Python backend remains the authoritative "Brain." Active work is on audio assets, balance validation, and CI distribution.
 
 ---
 
@@ -17,15 +17,19 @@ We are currently transitioning from a web-based (HTML/JS/Konva.js) frontend to a
 - [x] Persistence (Campaign Saves).
 - [x] Standalone Windows executable via PyInstaller.
 
-### 🏗️ Milestone 2: The Godot Overhaul - IN PROGRESS
+### ✅ Milestone 2: The Godot Overhaul - COMPLETE
 - [x] Formalized 2.5D "Living Lorebook" Design.
 - [x] Scaffolding Godot project structure.
 - [x] `PythonClient.gd` communication bridge (HTTP/WebSockets).
 - [x] Update `main.py` to orchestrate dual-process launch.
 - [x] Implement 3D Tabletop scene with parchment shader.
 - [x] Integrate 2.5D Billboard sprites (Foundations).
-- [ ] **Next Task**: Recreate Character Forge UI in Godot (Focus: 'Before' vs 'After' Transition).
 - [x] Implement Google OAuth2 login flow within Godot UI.
+- [x] Godot 4 3D dungeon geometry (BoxMesh walls/floors/doors/hazards).
+- [x] 3D character minis with race-group glow colors.
+- [x] Gimbal camera (orbit/zoom/R to reset).
+- [x] Full Character Forge UI (12-step creation: era, race, state, role, equipment, background, skills, feats, alignment, lore, keepsake, name).
+- [x] 35 Feral Successor portrait cards (atmospheric PIL generator).
 
 ### ✅ Milestone 3: Cinematic Polish - COMPLETE
 - [x] Dynamic 3D lighting — WorldEnvironment, candlelit OmniLight with flicker, bloom + SSAO.
@@ -46,10 +50,16 @@ We are currently transitioning from a web-based (HTML/JS/Konva.js) frontend to a
   - `.itch.toml` — itch.io manifest (entry point: StoryForge.exe).
   - Required GitHub secrets: `BUTLER_API_KEY`, `OAUTH_CLIENT_SECRET`.
   - Required GitHub vars: `ITCH_USER`, `ITCH_GAME`.
-- [ ] Final lorebook & asset optimization.
+- [x] Final lorebook & asset optimization (portraits done).
+  - [x] Sprite sheets for all 35 races (portrait cards done).
   - [ ] Replace synthesized .wav placeholders with real audio assets.
-  - [ ] Sprite sheets for all 35 races.
   - [ ] Final balance pass on ability score bonuses + NPC encounter state.
+
+### 🎵 Milestone 5: Audio & Polish - PENDING
+- [ ] Replace synthesized .wav placeholders with real audio assets.
+- [ ] Final balance pass on ability score bonuses.
+- [ ] Duplicate ability score server validation (`is_valid_standard_array` not yet called in creation route).
+- [ ] CI itch.io publishing (needs `BUTLER_API_KEY` + `ITCH_USER`/`ITCH_GAME` GitHub secrets).
 
 ---
 

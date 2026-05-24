@@ -8,10 +8,10 @@
   <img src="https://img.shields.io/badge/System-D%26D_5e-red?style=for-the-badge&logo=dungeons-and-dragons" alt="D&D 5e">
   <img src="https://img.shields.io/badge/Engine-Godot_4.6-blue?style=for-the-badge&logo=godotengine" alt="Godot 4.6">
   <img src="https://img.shields.io/badge/Backend-Python_3.12-blue?style=for-the-badge&logo=python" alt="Python">
-  <img src="https://img.shields.io/badge/AI-Gemini_3.5_Flash-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
+  <img src="https://img.shields.io/badge/AI-Gemini_2.5_Pro-orange?style=for-the-badge&logo=google-gemini" alt="Gemini">
 </p>
 
-**StoryForge** is a hybrid Virtual Tabletop (VTT) and AI-driven Dungeon Master built specifically for the *Weaver's Paradox* campaign setting. It combines a cinematic 2.5D client built in **Godot 4** with the creative power of a headless **Python/FastAPI** brain powered by **Gemini 3.5 Flash** to deliver a reactive, persistent, and voice-enabled D&D 5e experience.
+**StoryForge** is a hybrid Virtual Tabletop (VTT) and AI-driven Dungeon Master built specifically for the *Weaver's Paradox* campaign setting. It combines a cinematic **3D Godot 4 tabletop** client with the creative power of a headless **Python/FastAPI** brain powered by **Gemini 2.5 Pro** to deliver a reactive, persistent, and voice-enabled D&D 5e experience.
 
 ---
 
@@ -20,7 +20,7 @@
 The "Civilized World" is a memory. Reality was unraveled by the Weaver's Paradox—a cosmic glitch that rewrote the laws of magic and biology. 
 
 ### Core Lore Elements
-- **The Paradox**: A reality-shattering event that transformed the humanoid races into **Feral Successors**.
+- **The Paradox**: A reality-shattering event that transformed the humanoid races into **35 Feral Successor species** across five groups — Cosmic, Primal, Eldritch, Mechanical, and Humanoid.
 - **Ironhold Keep**: The last bastion of stability, ruled by **Queen D.Anna** and anchored by **Guildmaster Kodrik**.
 - **The Multiversal Bodega**: A shop that exists across all genres, managed by **Jon** (the talkative owner) and **Madame Haylie** (the actual manager).
 - **The Pantheon of the Mundane**: Beings like **Samael the Ascended**, who use omnipotence to perform household chores while offering cryptic lore.
@@ -39,7 +39,7 @@ StoryForge is a full-stack application divided into two decoupled layers:
 ### Lobby-to-Exploration Flow
 The game operates on a robust state machine:
 1. **Lobby Phase**: Players join, authenticate via Google, and claim controller slots.
-2. **Creation Phase (Character Forge)**: Players build their Feral Successors (Race, Evolutionary State, Predator Role).
+2. **Creation Phase (Character Forge)**: A 12-step creation flow where players build their Feral Successors — choosing starting era, race (35 options across 5 groups), evolutionary state (Behemoth/Phantom/Swarm-Host/Mimic), predator role (Stalker/Vanguard/Catalyst/Siphoner), equipment loadout, background, skills, feats (Apex Predator, Hive Mind, Regenerator, Phase Shift, Pack Tactics, Void Touched, Echo Memory), alignment, lore entry, keepsake, and character name.
 3. **Exploration Phase**: The AI DM narrates movements, handles freeform actions, and manages NPC encounters.
 
 ---

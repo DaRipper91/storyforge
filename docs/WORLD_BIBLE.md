@@ -30,7 +30,7 @@ This arrangement is stable because both understand their respective domains.
 
 #### KODRIK
 - **Role**: Guildmaster, Iron Ledge Company
-- **Race**: Human → Ironveil
+- **Race**: Human (Before) → Ironveil (Feral Successor)
 - **Class**: Fighter / Artificer
 - **PC**: Cody
 - **Functions**: Meta-Guide, Mechanic, Arbitrator, Keeper of Lore (grounded/plot hints).
@@ -41,7 +41,7 @@ This arrangement is stable because both understand their respective domains.
 
 #### QUEEN D.ANNA
 - **Role**: Head of State, The Feral World
-- **Race**: Human → High-Tier Feral Successor
+- **Race**: Human (Before) → High-Tier Feral Successor
 - **Class**: Sovereign
 - **Functions**: Political authority. Grants boons (Blessings, Intelligence, Mercy).
 - **Personality**: Commands every room without effort. Zero patience for bad manners. Everything about how she holds a room traces back to Keeva.
@@ -136,6 +136,127 @@ This arrangement is stable because both understand their respective domains.
 
 ### The Field
 - **TYTY (Wandering Herald)**: Nathis's dog. Long ears, long hair, goofy face assembled with great enthusiasm. When danger arrives, Tyty informs the surrounding half-mile at maximum volume, then relocates to continue the briefing from a safer position. This is not cowardice — a herald who gets eliminated cannot continue heraldry. Best friend: Teddy. Together: one holds the line, one tells the forest there is a line.
+
+---
+
+## ⚔️ Section 5 — The Character System
+
+### The Paradox and the Era Divide
+
+The **Weaver's Paradox** was a cosmic glitch that rewrote the laws of magic and biology simultaneously. It split recorded history into two eras:
+
+- **The Before Era**: The age of recognizable humanoid civilizations. Humans, familiar creatures, standard biology.
+- **The After Era (Iron Ledge Era)**: The present. Survivors of the Paradox either perished, adapted, or ascended. Those who ascended are the **Feral Successors** — 35 distinct species organized into five groups, each shaped by the specific forces that rewrote them.
+
+A character's **Before form** is their ancestral identity. Their **After form** is the Feral Successor they became. Some NPCs, like Kodrik (Human → Ironveil) and D.Anna (Human → High-Tier Feral Successor), carry both as part of their history.
+
+---
+
+### The 35 Feral Successor Races
+
+#### Cosmic Group
+| Race | Before Form | Flavor |
+|------|-------------|--------|
+| Voidwraith | Drifting astral specter | A predator assembled from collapsed starlight; feeds on entropy. |
+| Nullshade | Void-touched shade | Erases its own reflection; exists most fully where light cannot reach. |
+| Iron-Locust | Swarm entity | A billion micro-minds sharing one hunger, moving as one storm. |
+| Embervein | Living stellar remnant | Supernovae compressed into a body; veins glow with contained plasma. |
+| Riftwalker | Dimensional exile | Steps between folds in space as a reflex, not a decision. |
+
+#### Primal Group
+| Race | Before Form | Flavor |
+|------|-------------|--------|
+| Solar-Lord | Apex predator of the old sun-plains | Commands raw radiant force; even shadows obey. |
+| Thornmimic | Flora-fused hunter | Grew thorns outward until biology and weapon became one structure. |
+| Cinderkin | Ash-born survivor | Born from the char left after the Paradox swept through old forests. |
+| Deep-Tyrant | Abyssal leviathan remnant | Surfaced from depths so far down they have their own physics. |
+| Grimcrow | Murder-intelligence corvid | Too smart to be only a bird; too bird to be trusted. |
+
+#### Eldritch Group
+| Race | Before Form | Flavor |
+|------|-------------|--------|
+| Bloodweaver | Hemomantic practitioner | Weaves living tissue the way others weave cloth. |
+| Dreamhusk | Sleep-parasite entity | Inhabits the space between a mind and its nightmares. |
+| Bonedrifter | Ossified spirit | Became the skeleton after the flesh decided it was unnecessary. |
+| Mindspider | Psychic arachnid | Spins webs inside thoughts; the prey never knows until the web is set. |
+| Chaosling | Paradox-born singularity | Arrived after the Paradox broke probability; has not fully resolved into a fixed form. |
+
+#### Mechanical Group
+| Race | Before Form | Flavor |
+|------|-------------|--------|
+| Ironveil | Artificer-class humanoid | Integrated the machine until the boundary between tool and body dissolved. |
+| Forgespawn | Forge-elemental construct | Was built in a furnace and never fully cooled. |
+| Cinderplate | Armored war-chassis | Plating grew over wounds until the wounds stopped coming. |
+| Hexgear | Rune-mechanical hybrid | Runs on equations that should be impossible; doesn't care. |
+| Wirewraith | Signal-entity | Travels through conductive material; the body is optional. |
+
+#### Humanoid Group (15)
+| Race | Before Form | Flavor |
+|------|-------------|--------|
+| Ashenborn | Fire-scarred human | Carries the memory of every flame that touched them. |
+| Hollowsong | Vocal-resonance mutant | The voice became a separate entity that lives inside the body. |
+| Veilborn | Shadow-touched human | Was touched by the Paradox's edge; never fully returned from the periphery. |
+| Thornweft | Briar-fused humanoid | Grew defensive, then kept growing. |
+| Ashcrown | Burned noble lineage | Titles outlasted the civilizations that granted them. |
+| Ironfast | Hardened laborer caste | Worked iron until the iron worked back. |
+| Coreborn | Energy-core symbiont | Bonded with a power source that has no off switch. |
+| Warpbred | Phase-splice survivor | Hit by competing Paradox waves; the result is not entirely one thing. |
+| Splitblood | Dual-heritage remnant | Two Before bloodlines that the Paradox fused into a third thing entirely. |
+| Duskweft | Twilight-boundary entity | Lives in the hour the Paradox suspended permanently. |
+| Glitchkin | Paradox-glitch personified | Flickered during the rewrite and didn't fully render. |
+| Fractureline | Shatter-pattern survivor | Broke during the Paradox and reassembled in the wrong order — it works, somehow. |
+| Emberpact | Compact-bound flame-caller | Made a deal with fire before the Paradox. Fire kept its end. |
+| Fallenlight | Collapsed luminary | Was a source of light; the light went out and left the structure behind. |
+| Scaleworn | Armored hide remnant | Grew scales as a stress response; the stress never ended. |
+
+---
+
+### Evolutionary States
+
+The Paradox did not transform all survivors the same way. A character's **Evolutionary State** reflects *how* their body adapted — the survival strategy the Paradox locked them into.
+
+| State | Hit Die | Base AC | Survival Strategy |
+|-------|---------|---------|-------------------|
+| Behemoth | d12 | 16 | Mass and endurance — become impossible to put down. |
+| Phantom | d6 | 12 | Evasion and intangibility — become impossible to hit. |
+| Swarm-Host | d8 | 14 | Distributed form — no single point of failure. |
+| Mimic | d10 | 14 | Adaptive response — become whatever the situation requires. |
+
+---
+
+### Predator Roles
+
+A character's **Predator Role** defines their instinctive combat function and determines their starting equipment. These are not classes — they are biological imperatives the Paradox hard-wired in.
+
+| Role | Primary Equipment | Choice Equipment |
+|------|------------------|-----------------|
+| Stalker | Razor Claws | Smoke Pellets / Grappling Hook / Caltrops |
+| Vanguard | Heavy Mandibles | Reinforced Plating / War Banner / Battle Horn |
+| Catalyst | Venom Sac | Web Strands / Explosive Spore / Paralytic Dust |
+| Siphoner | Energy Leech | Void Battery / Essence Vial / Null Trap |
+
+---
+
+### Backgrounds
+
+A character's **Background** defines where they survived between the Paradox and the present. Each grants a signature perk and two auto-assigned skills.
+
+| Background | Perk |
+|------------|------|
+| Void Scavenger | Proficiency with improvised weapons; advantage on checks to identify extraplanar materials. |
+| Paradox Cultist | Can sense active Paradox residue within 60 ft; once per rest, reroll any failed Arcana check. |
+| Remnant Soldier | Advantage on initiative; proficiency with medium armor if not granted by Evolutionary State. |
+| Archive Scholar | Advantage on History and Investigation checks; can read Before-era scripts without a check. |
+| Feral Wanderer | Advantage on Survival checks; always know true north and current weather for the next 4 hours. |
+| Syndicate Broker | Advantage on Persuasion in trade contexts; begin each session with 1d6 x 5 gold from network contacts. |
+| Settlement Warden | Advantage on Perception; advantage on saving throws against fear while allies are within 10 ft. |
+| Void Oracle | Once per long rest, ask the DM one yes/no question about the current situation; answer is always truthful. |
+
+---
+
+### Ability Scores
+
+Character creation uses the standard D&D 5e array — **[15, 14, 13, 12, 10, 8]** — distributed across STR, DEX, CON, INT, WIS, and CHA. Racial bonuses from the chosen Feral Successor race are applied on top of the assigned values. No ability scores are rolled; the array is fixed.
 
 ---
 
