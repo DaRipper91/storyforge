@@ -47,7 +47,7 @@ def main():
     launcher = DIST / ("StoryForge.exe" if platform.system() == "Windows" else "StoryForge")
     if launcher.exists():
         size_mb = launcher.stat().st_size / (1024 * 1024)
-        print(f"\n[build] OK  →  {launcher}  ({size_mb:.1f} MB)")
+        print(f"\n[build] OK  ->  {launcher}  ({size_mb:.1f} MB)")
         print()
         print("Next step: export the Godot client")
         print("  godot --headless --export-release \"Windows Desktop\" dist/StoryForge_client.exe")

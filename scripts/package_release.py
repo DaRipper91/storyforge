@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 
-# Read version from pyproject.toml — no TOML parser needed
+# Read version from pyproject.toml (no TOML parser needed)
 def _version() -> str:
     for line in (ROOT / "pyproject.toml").read_text().splitlines():
         if line.strip().startswith("version"):
@@ -26,7 +26,7 @@ def _version() -> str:
 
 
 README_TXT = """\
-StoryForge: The Feral World — D&D 5e AI Dungeon Master
+StoryForge: The Feral World - D&D 5e AI Dungeon Master
 =======================================================
 
 SETUP
@@ -88,7 +88,7 @@ def main() -> None:
         zf.writestr(base + "README.txt", README_TXT)
 
     size_mb = zip_path.stat().st_size / (1024 * 1024)
-    print(f"[package] OK  →  {zip_path}  ({size_mb:.1f} MB)")
+    print(f"[package] OK  ->  {zip_path}  ({size_mb:.1f} MB)")
     print()
     print("itch.io:  butler push dist/StoryForge_v{version}_Windows.zip <user>/<game>:windows")
     print("Steam:    steamcmd +login ... +run_app_build ...")
