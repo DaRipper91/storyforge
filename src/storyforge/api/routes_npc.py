@@ -17,6 +17,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
+from storyforge.ai.npc_narrator import narrate_npc
 from storyforge.api.deps import get_state_manager
 from storyforge.core.state_manager import StateManager
 from storyforge.encounters.shopkeeper_jon import (
@@ -292,21 +293,40 @@ class ConsultRequest(BaseModel):
 async def samael_consult(body: ConsultRequest, request: Request):
     """
     Ask Samael for a lore hint.
-    Returns cryptic but valid guidance + what mundane thing he's doing right now.
+    Calls Gemini with npc_samael.md as the system instruction for a unique
+    cryptic response. Falls back to the Python pool hint if Gemini fails.
     """
     samael = _get_samael(request)
     result = samael.consult(body.category)
+    ctx = samael.get_llm_context(body.category)
     _save_samael(request, samael)
+
+    category_label = body.category.value.replace("_", " ")
+    again_prefix = "Again. " if ctx["consultation_number"] > 1 else ""
+    situation = (
+        f"{again_prefix}The party has approached Samael for guidance. "
+        f"He is currently: {ctx['mundane_description']} "
+        f"They are asking about: {category_label}. "
+        f"This is consultation #{ctx['consultation_number']}. "
+        f"Apathy level: {ctx['apathy_level']} out of 5 — let this shape how theatrical your sighing is. "
+        f"Respond in character. Use the Cryptic Delivery Format from your prompt. "
+        f"Return the full interaction: atmospheric intro, acknowledgment, cryptic hint, mundane return."
+    )
+
+    try:
+        cryptic_hint = await narrate_npc("samael", situation)
+    except Exception:
+        cryptic_hint = result.cryptic_hint  # pool fallback
+
     return {
         "category": result.category,
-        "cryptic_hint": result.cryptic_hint,
+        "cryptic_hint": cryptic_hint,
         "mundane_activity": result.mundane_activity,
         "mundane_description": result.mundane_description,
         "apathy_intro": result.apathy_intro,
         "apathy_outro": result.apathy_outro,
         "apathy_level": result.apathy_level,
         "consultation_number": result.consultation_number,
-        "llm_context": samael.get_llm_context(body.category),
     }
 
 
