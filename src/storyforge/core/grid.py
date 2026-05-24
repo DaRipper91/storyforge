@@ -53,7 +53,7 @@ def feet_between(a: Coord, b: Coord) -> int:
 
 def is_traversable(cell: Cell) -> bool:
     """A cell a character can stand in (or pass through)."""
-    if cell.terrain in (TerrainKind.WALL,):
+    if cell.terrain in (TerrainKind.WALL, TerrainKind.PILLAR, TerrainKind.TABLE):
         return False
     if cell.occupant_id is not None:
         return False

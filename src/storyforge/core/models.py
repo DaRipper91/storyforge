@@ -94,8 +94,10 @@ class TerrainKind(StrEnum):
     FLOOR = "floor"
     WALL = "wall"
     DOOR = "door"
-    DIFFICULT = "difficult"          # half-speed
+    DIFFICULT = "difficult"          # half-speed (rugs, rubble, water)
     HAZARD = "hazard"
+    PILLAR = "pillar"                # impassable column
+    TABLE = "table"                  # impassable furniture / counter
 
 
 class Cell(BaseModel):

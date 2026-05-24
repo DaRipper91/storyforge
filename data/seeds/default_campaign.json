@@ -305,7 +305,7 @@
           "occupant_id": "npc_coco"
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -313,7 +313,7 @@
           "occupant_id": "npc_haylie"
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -321,11 +321,51 @@
           "occupant_id": "npc_mykael"
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
           "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -377,7 +417,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "pillar",
           "occupant_id": null
         },
         {
@@ -385,19 +425,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -409,35 +437,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -469,7 +469,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "pillar",
           "occupant_id": null
         },
         {
@@ -501,7 +501,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -517,7 +517,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -573,7 +573,7 @@
           "occupant_id": null
         }
       ],
-      "description": "A standard room."
+      "description": "The Store \u2014 Jon and Haylie's shop. A counter separates the staff from the customer floor. Display shelves line the walls."
     },
     "tavern_01": {
       "id": "tavern_01",
@@ -650,15 +650,11 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "difficult",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
+          "terrain": "difficult",
           "occupant_id": null
         },
         {
@@ -666,7 +662,15 @@
           "occupant_id": null
         },
         {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
           "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -686,11 +690,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
+          "terrain": "difficult",
           "occupant_id": null
         },
         {
@@ -710,7 +710,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -718,47 +718,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
+          "terrain": "pillar",
           "occupant_id": null
         },
         {
@@ -802,7 +762,47 @@
           "occupant_id": null
         },
         {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
           "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "pillar",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -830,27 +830,27 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -902,7 +902,7 @@
           "occupant_id": null
         }
       ],
-      "description": "A standard room."
+      "description": "The Crooked Tankard \u2014 a warm tavern with scattered tables, a performance stage, and a long bar counter."
     },
     "ironhold_keep": {
       "id": "ironhold_keep",
@@ -967,7 +967,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "pillar",
           "occupant_id": null
         },
         {
@@ -1075,7 +1075,43 @@
           "occupant_id": null
         },
         {
+          "terrain": "pillar",
+          "occupant_id": null
+        },
+        {
           "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "pillar",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
           "occupant_id": null
         },
         {
@@ -1091,7 +1127,11 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
           "occupant_id": null
         },
         {
@@ -1119,7 +1159,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -1139,47 +1179,7 @@
           "occupant_id": null
         },
         {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "wall",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
-          "occupant_id": null
-        },
-        {
-          "terrain": "floor",
+          "terrain": "table",
           "occupant_id": null
         },
         {
@@ -1231,7 +1231,7 @@
           "occupant_id": null
         }
       ],
-      "description": "A standard room."
+      "description": "Ironhold Keep \u2014 the Guild's hall of operations. Stone pillars flank a ceremonial carpet leading to the throne seats at the far end."
     }
   },
   "narrative_log": [

@@ -15,10 +15,13 @@ var _dungeon_root: Node3D = null
 var _current_room_id: String = ""
 
 # Shared materials (created once, reused)
-var _mat_wall:    StandardMaterial3D = null
-var _mat_floor:   StandardMaterial3D = null
-var _mat_door:    StandardMaterial3D = null
-var _mat_hazard:  StandardMaterial3D = null
+var _mat_wall:      StandardMaterial3D = null
+var _mat_floor:     StandardMaterial3D = null
+var _mat_door:      StandardMaterial3D = null
+var _mat_hazard:    StandardMaterial3D = null
+var _mat_pillar:    StandardMaterial3D = null
+var _mat_table:     StandardMaterial3D = null
+var _mat_difficult: StandardMaterial3D = null
 
 # Race group → emissive color for miniature glow
 const RACE_COLORS: Dictionary = {
@@ -183,6 +186,21 @@ func _build_materials():
 	_mat_hazard.emission_enabled = true
 	_mat_hazard.emission = Color(0.4, 0.1, 0.0)
 
+	_mat_pillar = StandardMaterial3D.new()
+	_mat_pillar.albedo_color = Color(0.52, 0.48, 0.42)
+	_mat_pillar.roughness = 0.78
+	_mat_pillar.metallic = 0.04
+
+	_mat_table = StandardMaterial3D.new()
+	_mat_table.albedo_color = Color(0.32, 0.20, 0.11)
+	_mat_table.roughness = 0.88
+	_mat_table.metallic = 0.0
+
+	_mat_difficult = StandardMaterial3D.new()
+	_mat_difficult.albedo_color = Color(0.30, 0.24, 0.18)
+	_mat_difficult.roughness = 0.92
+	_mat_difficult.metallic = 0.0
+
 
 func _process(delta):
 	_flicker_t += delta
@@ -277,6 +295,21 @@ func _rebuild_room(state: Dictionary):
 	var hazard_mesh = BoxMesh.new()
 	hazard_mesh.size = Vector3(CELL_SIZE, 0.12, CELL_SIZE)
 
+	var pillar_mesh = CylinderMesh.new()
+	pillar_mesh.top_radius    = CELL_SIZE * 0.18
+	pillar_mesh.bottom_radius = CELL_SIZE * 0.22
+	pillar_mesh.height        = 2.0
+	pillar_mesh.radial_segments = 8
+
+	var table_top_mesh = BoxMesh.new()
+	table_top_mesh.size = Vector3(CELL_SIZE * 0.88, 0.09, CELL_SIZE * 0.88)
+
+	var table_leg_mesh = CylinderMesh.new()
+	table_leg_mesh.top_radius    = CELL_SIZE * 0.04
+	table_leg_mesh.bottom_radius = CELL_SIZE * 0.04
+	table_leg_mesh.height        = 0.56
+	table_leg_mesh.radial_segments = 6
+
 	for y in range(h):
 		for x in range(w):
 			var idx = y * w + x
@@ -291,21 +324,72 @@ func _rebuild_room(state: Dictionary):
 					inst.mesh = wall_mesh
 					inst.material_override = _mat_wall
 					inst.position = Vector3(wx, 1.25, wz)
+
 				"door":
-					# Floor tile under the door
 					var floor_inst = MeshInstance3D.new()
 					floor_inst.mesh = floor_mesh
 					floor_inst.material_override = _mat_floor
 					floor_inst.position = Vector3(wx, -0.06, wz)
 					_dungeon_root.add_child(floor_inst)
-					# Door frame
 					inst.mesh = door_mesh
 					inst.material_override = _mat_door
 					inst.position = Vector3(wx, 1.1, wz)
+
 				"hazard":
 					inst.mesh = hazard_mesh
 					inst.material_override = _mat_hazard
 					inst.position = Vector3(wx, -0.06, wz)
+
+				"difficult":
+					inst.mesh = floor_mesh
+					inst.material_override = _mat_difficult
+					inst.position = Vector3(wx, -0.06, wz)
+
+				"pillar":
+					# Floor slab beneath
+					var floor_inst = MeshInstance3D.new()
+					floor_inst.mesh = floor_mesh
+					floor_inst.material_override = _mat_floor
+					floor_inst.position = Vector3(wx, -0.06, wz)
+					_dungeon_root.add_child(floor_inst)
+					# Base cap
+					var base_mesh = BoxMesh.new()
+					base_mesh.size = Vector3(CELL_SIZE * 0.5, 0.12, CELL_SIZE * 0.5)
+					var base_inst = MeshInstance3D.new()
+					base_inst.mesh = base_mesh
+					base_inst.material_override = _mat_pillar
+					base_inst.position = Vector3(wx, 0.06, wz)
+					_dungeon_root.add_child(base_inst)
+					# Shaft
+					inst.mesh = pillar_mesh
+					inst.material_override = _mat_pillar
+					inst.position = Vector3(wx, 1.0, wz)
+
+				"table":
+					# Floor slab beneath
+					var floor_inst = MeshInstance3D.new()
+					floor_inst.mesh = floor_mesh
+					floor_inst.material_override = _mat_floor
+					floor_inst.position = Vector3(wx, -0.06, wz)
+					_dungeon_root.add_child(floor_inst)
+					# Four legs
+					var leg_offsets = [
+						Vector3( CELL_SIZE * 0.32, 0.28,  CELL_SIZE * 0.32),
+						Vector3(-CELL_SIZE * 0.32, 0.28,  CELL_SIZE * 0.32),
+						Vector3( CELL_SIZE * 0.32, 0.28, -CELL_SIZE * 0.32),
+						Vector3(-CELL_SIZE * 0.32, 0.28, -CELL_SIZE * 0.32),
+					]
+					for lo in leg_offsets:
+						var leg_inst = MeshInstance3D.new()
+						leg_inst.mesh = table_leg_mesh
+						leg_inst.material_override = _mat_table
+						leg_inst.position = Vector3(wx, 0, wz) + lo
+						_dungeon_root.add_child(leg_inst)
+					# Tabletop
+					inst.mesh = table_top_mesh
+					inst.material_override = _mat_table
+					inst.position = Vector3(wx, 0.60, wz)
+
 				_:
 					inst.mesh = floor_mesh
 					inst.material_override = _mat_floor
