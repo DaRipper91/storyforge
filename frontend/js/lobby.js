@@ -1155,33 +1155,33 @@ export class Lobby {
         let card;
         
         const isBeforeEra = draft.startingEra === "before";
-        const primaryName = (isBeforeEra && def.before) ? def.before : def.name;
-        const secondaryName = (isBeforeEra && def.before) ? def.name : (def.before || "");
-        
-        if (def.before || isBeforeEra) {
+
+        if (def.before) {
+          // Humanoid race — has a civilized "before" form and a feral "after" form
           card = document.createElement("div");
           card.className = "option-card humanoid-card";
           if (draft.race === key) card.classList.add("selected");
           if (idx === this._focusIndex) card.classList.add("focused");
-          
-          if (isBeforeEra && def.before) {
+
+          if (isBeforeEra) {
             card.innerHTML = `
               <div class="humanoid-before-label">Start as: <span>${this._escape(def.before)}</span></div>
-              <div class="humanoid-arrow">↓</div>
-              <h3>${this._escape(def.name)} (Feral)</h3>
+              <div class="humanoid-arrow">↓ Paradox</div>
+              <h3>${this._escape(def.name)}</h3>
               <p class="flavor">${this._escape(def.flavor)}</p>
               <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
             `;
           } else {
             card.innerHTML = `
-              <div class="humanoid-before-label">Before: <span>${this._escape(def.before || "Unknown")}</span></div>
-              <div class="humanoid-arrow">↓</div>
+              <div class="humanoid-before-label">Before: <span>${this._escape(def.before)}</span></div>
+              <div class="humanoid-arrow">↓ Paradox</div>
               <h3>${this._escape(def.name)}</h3>
               <p class="flavor">${this._escape(def.flavor)}</p>
               <div class="stats">Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}</div>
             `;
           }
         } else {
+          // Non-humanoid race (Cosmic / Primal / Eldritch / Mechanical) — no before form
           card = this._optionCard(def.name, def.flavor,
             `Speed: ${def.speed}ft · ${Object.entries(def.ability_bonuses).map(([a, b]) => `${a} +${b}`).join(", ")}`,
             draft.race === key, idx === this._focusIndex);
