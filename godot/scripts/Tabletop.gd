@@ -70,10 +70,34 @@ var _room_label:    Label          = null
 var _narrative_box: RichTextLabel  = null
 var _stat_panel:    PanelContainer = null
 var _stat_label:    RichTextLabel  = null
+var _world_map:     Control        = null
+var _world_map_visible: bool       = false
+
+# World map layout: room_id → {label, pos (pixels), connections}
+const WORLD_MAP_NODES: Dictionary = {
+    "crossroads":       {"label": "The Crossroads",    "pos": Vector2(340, 280)},
+    "ironhold_keep":    {"label": "Ironhold Keep",     "pos": Vector2(340, 100)},
+    "keep_courtyard":   {"label": "Keep Courtyard",    "pos": Vector2(340, 180)},
+    "keep_barracks":    {"label": "Keep Barracks",     "pos": Vector2(220, 100)},
+    "market_square":    {"label": "Market Square",     "pos": Vector2(530, 200)},
+    "store_01":         {"label": "The Store",         "pos": Vector2(530, 100)},
+    "back_alley":       {"label": "Back Alley",        "pos": Vector2(650, 200)},
+    "nightside_square": {"label": "Nightside Square",  "pos": Vector2(340, 380)},
+    "tavern_01":        {"label": "Crooked Tankard",   "pos": Vector2(530, 380)},
+    "cellar_depths":    {"label": "Cellar Depths",     "pos": Vector2(180, 380)},
+    "forest_edge":      {"label": "The Wild Reaches",  "pos": Vector2(140, 280)},
+    "ancient_ruins":    {"label": "Ancient Ruins",     "pos": Vector2(30,  280)},
+}
 
 # ─── Selection ───────────────────────────────────────────────────────
 var _selected_cid:   String = ""
 var _character_data: Dictionary = {}  # cid → full char dict from last state
+
+# ─── Room state cache (for click-to-move) ────────────────────────────
+var _room_width:  int = 10
+var _room_height: int = 8
+var _room_cells:  Array = []   # flat cell dicts, row-major
+var _room_exits:  Dictionary = {}  # "x,y" → room_id
 
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
@@ -162,6 +186,121 @@ func _setup_ui():
 	_stat_label.add_theme_font_size_override("normal_font_size", 15)
 	_stat_panel.add_child(_stat_label)
 
+	# M-key hint (top-right)
+	var hint_label := Label.new()
+	hint_label.text = "[M] Map"
+	hint_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	hint_label.offset_left   = -90
+	hint_label.offset_top    = 20
+	hint_label.offset_right  = -20
+	hint_label.offset_bottom = 50
+	hint_label.add_theme_font_size_override("font_size", 16)
+	hint_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 0.7))
+	_ui_layer.add_child(hint_label)
+
+	_setup_world_map()
+
+
+func _setup_world_map() -> void:
+	# Full-screen darkened overlay
+	_world_map = Control.new()
+	_world_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_world_map.visible = false
+	_ui_layer.add_child(_world_map)
+
+	# Dark backdrop
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.04, 0.03, 0.06, 0.88)
+	_world_map.add_child(backdrop)
+
+	# Title
+	var title := Label.new()
+	title.text = "THE FERAL WORLD — Fast Travel"
+	title.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	title.offset_top = 30
+	title.offset_bottom = 70
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_color_override("font_color", Color(0.9, 0.82, 0.6))
+	_world_map.add_child(title)
+
+	var hint := Label.new()
+	hint.text = "Click a location to travel there  •  [M] or [Esc] to close"
+	hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	hint.offset_top    = -50
+	hint.offset_bottom = -16
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.add_theme_font_size_override("font_size", 16)
+	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6, 0.8))
+	_world_map.add_child(hint)
+
+	# Map canvas centered in screen
+	var map_container := Control.new()
+	map_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	map_container.custom_minimum_size = Vector2(720, 500)
+	map_container.offset_left   = -360
+	map_container.offset_top    = -210
+	map_container.offset_right  =  360
+	map_container.offset_bottom =  290
+	_world_map.add_child(map_container)
+
+	# Draw connection lines as ColorRects
+	const CONNECTIONS: Array = [
+		["crossroads", "keep_courtyard"], ["keep_courtyard", "ironhold_keep"],
+		["ironhold_keep", "keep_barracks"],
+		["crossroads", "market_square"], ["market_square", "store_01"],
+		["market_square", "back_alley"],
+		["crossroads", "nightside_square"], ["nightside_square", "tavern_01"],
+		["nightside_square", "cellar_depths"],
+		["crossroads", "forest_edge"], ["forest_edge", "ancient_ruins"],
+	]
+	for conn in CONNECTIONS:
+		var a_pos: Vector2 = WORLD_MAP_NODES[conn[0]]["pos"]
+		var b_pos: Vector2 = WORLD_MAP_NODES[conn[1]]["pos"]
+		var line := ColorRect.new()
+		var mid  := (a_pos + b_pos) * 0.5
+		var diff := b_pos - a_pos
+		var length := diff.length()
+		line.size = Vector2(length, 2)
+		line.position = mid - Vector2(length * 0.5, 1)
+		line.rotation = diff.angle()
+		line.pivot_offset = Vector2(length * 0.5, 1)
+		line.color = Color(0.5, 0.45, 0.35, 0.55)
+		map_container.add_child(line)
+
+	# Room buttons
+	for room_id in WORLD_MAP_NODES:
+		var data: Dictionary = WORLD_MAP_NODES[room_id]
+		var btn := Button.new()
+		btn.text = data["label"]
+		btn.custom_minimum_size = Vector2(130, 36)
+		btn.position = data["pos"] - Vector2(65, 18)
+		btn.add_theme_font_size_override("font_size", 13)
+		var rid_copy := room_id
+		btn.pressed.connect(func():
+			_travel_to(rid_copy)
+		)
+		map_container.add_child(btn)
+
+
+func _travel_to(room_id: String) -> void:
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	_world_map.visible = false
+	_world_map_visible = false
+	var http = pc.post_request("/action/travel", {"room_id": room_id})
+	http.request_completed.connect(func(_r, _c, _h, _b):
+		pc.fetch_full_state()
+		http.queue_free()
+	)
+
+
+func _toggle_world_map() -> void:
+	_world_map_visible = not _world_map_visible
+	_world_map.visible = _world_map_visible
+
 
 func _build_materials():
 	_mat_wall = StandardMaterial3D.new()
@@ -231,12 +370,19 @@ func _input(event: InputEvent):
 		_last_mouse = event.position
 		_update_camera()
 
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		_cam_yaw      = 0.0
-		_cam_pitch    = -45.0
-		_cam_distance = 14.14
-		_cam_target   = Vector3.ZERO
-		_update_camera()
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_R:
+				_cam_yaw      = 0.0
+				_cam_pitch    = -45.0
+				_cam_distance = 14.14
+				_cam_target   = Vector3.ZERO
+				_update_camera()
+			KEY_M:
+				_toggle_world_map()
+			KEY_ESCAPE:
+				if _world_map_visible:
+					_toggle_world_map()
 
 
 func _update_camera():
@@ -256,13 +402,21 @@ func _update_camera():
 
 func _rebuild_room(state: Dictionary):
 	var room_id: String = state.get("current_room_id", "")
-	
+
 	# Update room name UI
 	var rooms = state.get("rooms", {})
 	if room_id in rooms:
 		_room_label.text = rooms[room_id].get("name", room_id).to_upper()
 	else:
 		_room_label.text = ""
+
+	# Cache room data for click-to-move
+	if room_id in rooms:
+		var room_dict: Dictionary = rooms[room_id]
+		_room_width  = room_dict.get("width",  10)
+		_room_height = room_dict.get("height", 8)
+		_room_cells  = room_dict.get("cells",  [])
+		_room_exits  = room_dict.get("exits",  {})
 
 	if room_id == _current_room_id:
 		return
@@ -406,7 +560,14 @@ func _rebuild_room(state: Dictionary):
 # ─── State / miniatures ─────────────────────────────────────────────
 
 func _on_state_updated(new_state: Dictionary):
+	var old_room := _current_room_id
 	_rebuild_room(new_state)
+	# On room transition, clear all minis so they respawn at new positions
+	if _current_room_id != old_room and old_room != "":
+		for mini in _miniatures.values():
+			mini.queue_free()
+		_miniatures.clear()
+		_selected_cid = ""
 	_update_narrative(new_state)
 
 	# characters is dict[str, CharacterSheet] — iterate over key→value pairs
@@ -481,13 +642,12 @@ func _input(event: InputEvent) -> void:
 
 
 func _try_select_mini(screen_pos: Vector2) -> void:
-	var ray_origin    := camera.project_ray_origin(screen_pos)
-	var ray_dir       := camera.project_ray_normal(screen_pos)
-	var ray_end       := ray_origin + ray_dir * 100.0
+	var ray_origin := camera.project_ray_origin(screen_pos)
+	var ray_dir    := camera.project_ray_normal(screen_pos)
 
-	var closest_cid   := ""
-	var closest_dist  := INF
-
+	# ── 1. Try to hit a miniature ─────────────────────────────────────
+	var closest_cid  := ""
+	var closest_dist := INF
 	for cid in _miniatures:
 		var mini: Node3D = _miniatures[cid]
 		var to_ray := mini.global_position - ray_origin
@@ -495,15 +655,71 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 		if proj < 0:
 			continue
 		var closest_pt := ray_origin + ray_dir * proj
-		var dist       := mini.global_position.distance_to(closest_pt)
-		if dist < 0.55 and proj < closest_dist:  # 0.55 = pick radius
+		if mini.global_position.distance_to(closest_pt) < 0.55 and proj < closest_dist:
 			closest_dist = proj
 			closest_cid  = cid
 
 	if closest_cid != "":
 		_select_mini(closest_cid)
-	else:
+		return
+
+	# ── 2. No mini hit — ray-cast onto the floor plane (y = 0) ────────
+	if ray_dir.y >= 0.0:
 		_deselect_mini()
+		return
+	var t := -ray_origin.y / ray_dir.y
+	var world_x := ray_origin.x + t * ray_dir.x
+	var world_z := ray_origin.z + t * ray_dir.z
+	var gx := int(round(world_x / CELL_SIZE))
+	var gy := int(round(world_z / CELL_SIZE))
+
+	if gx < 0 or gy < 0 or gx >= _room_width or gy >= _room_height:
+		_deselect_mini()
+		return
+
+	var cell_idx := gy * _room_width + gx
+	var cell: Dictionary = _room_cells[cell_idx] if cell_idx < _room_cells.size() else {}
+	var terrain := cell.get("terrain", "floor")
+
+	# ── 3. Door cell — interact (room transition) ─────────────────────
+	if terrain == "door":
+		var actor_id := _get_any_player_id()
+		if actor_id.is_empty():
+			return
+		var pc = get_node_or_null("/root/PythonClient")
+		if pc:
+			var http = pc.post_request("/action/grid", {
+				"actor_id": actor_id, "type": "interact",
+				"target": {"x": gx, "y": gy}
+			})
+			http.request_completed.connect(func(_r, _c, _h, body):
+				var resp = JSON.parse_string(body.get_string_from_utf8())
+				if resp and resp.has("room_transition"):
+					pc.fetch_full_state()
+				http.queue_free()
+			)
+		return
+
+	# ── 4. Floor/difficult cell — move selected character ─────────────
+	if (terrain == "floor" or terrain == "difficult") and _selected_cid != "":
+		var pc = get_node_or_null("/root/PythonClient")
+		if pc:
+			var http = pc.post_request("/action/grid", {
+				"actor_id": _selected_cid, "type": "move",
+				"target": {"x": gx, "y": gy}
+			})
+			http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
+		return
+
+	_deselect_mini()
+
+
+func _get_any_player_id() -> String:
+	if _selected_cid != "":
+		return _selected_cid
+	if not _character_data.is_empty():
+		return _character_data.keys()[0]
+	return ""
 
 
 func _select_mini(cid: String) -> void:

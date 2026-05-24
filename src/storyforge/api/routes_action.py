@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from storyforge.core.models import (
     GridAction, FreeformAction, TurnPhase,
 )
@@ -100,3 +101,24 @@ async def handle_freeform(
     })
 
     return {"narrative": response.narrative, "revision": state.current.revision}
+
+
+class TravelRequest(BaseModel):
+    room_id: str
+
+
+@router.post("/travel")
+async def fast_travel(
+    req: TravelRequest,
+    state: StateManager = Depends(get_state_manager),
+) -> dict:
+    """World-map fast travel: teleport the party to any known room."""
+    if req.room_id not in state.current.rooms:
+        raise HTTPException(status_code=404, detail=f"unknown room: {req.room_id}")
+    diff = await state.fast_travel(req.room_id)
+    room_name = state.current.rooms[req.room_id].name
+    await state.append_narration(
+        actor_id=None, kind="narration",
+        text=f"The party arrives at {room_name}."
+    )
+    return {"room_transition": diff, "revision": state.current.revision}

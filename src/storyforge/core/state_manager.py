@@ -73,6 +73,13 @@ class StateManager:
             return summary
 
 
+    async def fast_travel(self, room_id: str) -> dict:
+        """World-map teleport: move the party to any known room."""
+        async with self._lock:
+            diff = self._do_transition_room(room_id)
+            await self._commit(diff)
+        return diff
+
     async def apply_grid_action(
         self,
         char: CharacterSheet,
