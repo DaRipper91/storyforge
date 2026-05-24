@@ -13,7 +13,7 @@ const ABILITY_KEYS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 
 @onready var step_label       = $MarginContainer/VBoxContainer/StepLabel
-@onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceScroll/RaceList
+@onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
 @onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
 @onready var portrait_rect    = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitRect
 @onready var next_btn         = $MarginContainer/VBoxContainer/Footer/NextBtn
@@ -41,6 +41,18 @@ var _focused_ability: String = ""   # which ability row is selected for assignme
 
 func _ready():
 	next_btn.disabled = true
+
+	# Wrap RaceList in a ScrollContainer at runtime.
+	# Doing this in code (not .tscn) so layout flags are set after the node
+	# tree is fully initialised — the .tscn approach collapsed the VBox to 0.
+	var left_panel = race_list.get_parent()
+	var scroll = ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left_panel.add_child(scroll)
+	left_panel.move_child(scroll, race_list.get_index())
+	race_list.reparent(scroll)
+	race_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	var pc = get_node_or_null("/root/PythonClient")
 	if pc:
