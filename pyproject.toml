@@ -28,6 +28,7 @@ dev = [
     "ruff>=0.7",
     "pyinstaller>=6.10",
     "pillow>=10.0",
+    "numpy>=2.4.6",
 ]
 
 [project.scripts]

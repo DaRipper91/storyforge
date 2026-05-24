@@ -91,6 +91,17 @@ func _handle_ws_message(json_str: String):
 				fetch_full_state()
 			"narration":
 				narration_received.emit(json["text"])
+			"npc_event":
+				_handle_npc_event(json)
+
+
+func _handle_npc_event(ev: Dictionary):
+	var npc    = ev.get("npc", "")
+	var action = ev.get("action", "")
+	var mood   = ev.get("mood", "warm")
+	if npc == "redvelvet" and action == "perform":
+		var path = "res://assets/audio/performance_%s.wav" % mood
+		AudioManager.play_npc_performance(path, mood)
 
 # ─── REST helpers ──────────────────────────────────────────────────
 

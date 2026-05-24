@@ -22,6 +22,7 @@ from pydantic import BaseModel
 from storyforge.ai.npc_narrator import narrate_npc
 from storyforge.api.deps import get_state_manager
 from storyforge.core.state_manager import StateManager
+from storyforge.events.bus import event_bus
 from storyforge.encounters.shopkeeper_jon import (
     EscapeMethod,
     JonEncounterState,
@@ -563,6 +564,14 @@ async def redvelvet_perform(request: Request):
         perf_text = await narrate_npc("redvelvet", situation)
     except Exception:
         perf_text = result.performance_text
+
+    mood_name = result.mood.name.lower()
+    await event_bus.publish({
+        "type": "npc_event",
+        "npc": "redvelvet",
+        "action": "perform",
+        "mood": mood_name,
+    })
 
     return {
         "performance_text": perf_text,

@@ -40,6 +40,8 @@ func _ready():
 	if ResourceLoader.exists("res://scenes/MagicBurst.tscn"):
 		_magic_burst_scene = load("res://scenes/MagicBurst.tscn")
 
+	AudioManager.play_ambient("res://assets/audio/ambient_keep.wav")
+
 
 func _process(delta: float):
 	_flicker_t += delta
@@ -130,6 +132,7 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	var tween  = create_tween()
 	tween.tween_property(sprite, "position", target, 0.3).set_trans(Tween.TRANS_SINE)
 	spawn_magic_burst(target)
+	AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
 
 
 func _grid_to_world(grid_pos: Vector2) -> Vector3:
@@ -140,6 +143,7 @@ func _grid_to_world(grid_pos: Vector2) -> Vector3:
 
 func spawn_paradox_glitch(world_pos: Vector3):
 	_spawn_particles(_paradox_scene, world_pos)
+	AudioManager.play_sfx("res://assets/audio/sfx_paradox_glitch.wav")
 
 
 func spawn_magic_burst(world_pos: Vector3):

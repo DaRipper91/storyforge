@@ -391,6 +391,7 @@ func _render_name_step():
 func _on_next_btn_pressed():
 	if _submitting:
 		return
+	AudioManager.play_sfx("res://assets/audio/sfx_ui_confirm.wav")
 	if current_step < STEPS.size() - 1:
 		current_step += 1
 		_render_step()
@@ -398,6 +399,7 @@ func _on_next_btn_pressed():
 		_submit_creation()
 
 func _on_back_btn_pressed():
+	AudioManager.play_sfx("res://assets/audio/sfx_ui_back.wav")
 	if current_step > 0:
 		current_step -= 1
 		_render_step()
@@ -422,6 +424,7 @@ func _submit_creation():
 	})
 
 func _on_character_created(_result: Dictionary):
+	AudioManager.play_sfx("res://assets/audio/sfx_character_created.wav")
 	get_node("/root/PythonClient").game_start_failed.connect(_on_game_start_failed, CONNECT_ONE_SHOT)
 	get_node("/root/PythonClient").start_game()
 
