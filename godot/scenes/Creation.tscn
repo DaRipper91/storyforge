@@ -92,7 +92,8 @@ horizontal_scroll_mode = 0
 
 [node name="RaceList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceScroll"]
 layout_mode = 2
-size_hint_horizontal = 1
+size_hint_horizontal = 3
+size_hint_vertical = 0
 
 [node name="RightPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
 layout_mode = 2
@@ -139,3 +140,4 @@ disabled = true
 text = "Continue"
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/Footer/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Footer/NextBtn" to="." method="_on_next_btn_pressed"]

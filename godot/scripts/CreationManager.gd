@@ -40,8 +40,6 @@ var _focused_ability: String = ""   # which ability row is selected for assignme
 # ─── Lifecycle ─────────────────────────────────────────────────────
 
 func _ready():
-	back_btn.pressed.connect(_on_back_btn_pressed)
-	next_btn.pressed.connect(_on_next_btn_pressed)
 	next_btn.disabled = true
 
 	var pc = get_node_or_null("/root/PythonClient")
