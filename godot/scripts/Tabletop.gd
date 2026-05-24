@@ -29,19 +29,19 @@ const RACE_COLORS: Dictionary = {
 	"Humanoid":  Color(1.0, 0.85, 0.6),
 }
 const RACE_GROUP: Dictionary = {
-	"voidwraith": "Cosmic",  "nullshade": "Cosmic",  "iron_locust": "Cosmic",
-	"embervein":  "Cosmic",  "riftwalker":"Cosmic",
-	"solar_lord": "Primal",  "thornmimic":"Primal",  "cinderkin":  "Primal",
-	"deep_tyrant":"Primal",  "grimcrow":  "Primal",
-	"bloodweaver":"Eldritch","dreamhusk": "Eldritch","bonedrifter":"Eldritch",
-	"mindspider": "Eldritch","chaosling":  "Eldritch",
-	"ironveil":   "Mechanical","forgespawn":"Mechanical","cinderplate":"Mechanical",
-	"hexgear":    "Mechanical","wirewraith":"Mechanical",
-	"ashenborn":  "Humanoid","hollowsong":"Humanoid","stonehide":  "Humanoid",
-	"thornback":  "Humanoid","frostkin":  "Humanoid","embercrest": "Humanoid",
-	"duskmantle": "Humanoid","tidecaller":"Humanoid","ashwarden":  "Humanoid",
-	"ironblood":  "Humanoid","verdant":   "Humanoid","stormborn":  "Humanoid",
-	"cinderfall": "Humanoid","rootbound":  "Humanoid","veilborn":  "Humanoid",
+	"voidwraith":   "Cosmic",    "nullshade":    "Cosmic",    "ironlocust":   "Cosmic",
+	"embervein":    "Cosmic",    "riftwalker":   "Cosmic",
+	"solarlord":    "Primal",    "thornmimic":   "Primal",    "cinderkin":    "Primal",
+	"deeptyrant":   "Primal",    "grimcrow":     "Primal",
+	"bloodweaver":  "Eldritch",  "dreamhusk":    "Eldritch",  "bonedrifter":  "Eldritch",
+	"mindspider":   "Eldritch",  "chaosling":    "Eldritch",
+	"ironveil":     "Mechanical","forgespawn":   "Mechanical","cinderplate":  "Mechanical",
+	"hexgear":      "Mechanical","wirewraith":   "Mechanical",
+	"ashenborn":    "Humanoid",  "hollowsong":   "Humanoid",  "veilborn":     "Humanoid",
+	"thornweft":    "Humanoid",  "ashcrown":     "Humanoid",  "ironfast":     "Humanoid",
+	"coreborn":     "Humanoid",  "warpbred":     "Humanoid",  "splitblood":   "Humanoid",
+	"duskweft":     "Humanoid",  "glitchkin":    "Humanoid",  "fractureline": "Humanoid",
+	"emberpact":    "Humanoid",  "fallenlight":  "Humanoid",  "scaleworn":    "Humanoid",
 }
 
 # ─── Camera gimbal ──────────────────────────────────────────────────

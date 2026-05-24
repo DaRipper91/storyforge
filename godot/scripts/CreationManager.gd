@@ -212,6 +212,10 @@ func _preview_race(data: Dictionary, is_before: bool):
 
 	description_label.text = "\n".join(lines)
 
+	var portrait_key = name_str.to_lower().replace(" ", "_").replace("-", "_")
+	var path = "res://assets/characters/%s.png" % portrait_key
+	portrait_rect.texture = load(path) if ResourceLoader.exists(path) else null
+
 # ── Step 2/3: Generic choice (state / role) ────────────────────────
 
 func _render_choice_step(options: Dictionary, field: String, placeholder: String):
@@ -225,6 +229,7 @@ func _render_choice_step(options: Dictionary, field: String, placeholder: String
 		btn.text = data.get("name", key)
 		btn.toggle_mode = true
 		btn.button_group = group
+		btn.custom_minimum_size = Vector2(0, 48)
 		if selection[field] == key:
 			btn.set_pressed_no_signal(true)
 			next_btn.disabled = false
@@ -380,7 +385,10 @@ func _render_name_step():
 		selection["name"] = val.strip_edges()
 		next_btn.disabled = selection["name"].is_empty()
 	)
-	name_input.text_submitted.connect(func(_v): _on_next_btn_pressed())
+	name_input.text_submitted.connect(func(_v):
+		if not next_btn.disabled:
+			_on_next_btn_pressed()
+	)
 	race_list.add_child(name_input)
 	name_input.grab_focus()
 
