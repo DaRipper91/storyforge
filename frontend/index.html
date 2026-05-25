@@ -681,9 +681,10 @@
   <!-- ─────── FREEFORM MODAL (unchanged) ─────── -->
   <div id="freeform-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card parchment-surface">
-      <h2 class="ink-crimson">Speak Your Action</h2>
-      <p class="hint-small">Press <kbd>Esc</kbd> or <kbd>B</kbd> to cancel · <kbd>Enter</kbd> to commit</p>
+      <h2 id="freeform-title" class="ink-crimson">Speak Your Action</h2>
+      <p id="freeform-hint" class="hint-small">Press <kbd>Esc</kbd> or <kbd>B</kbd> to cancel · <kbd>Enter</kbd> to commit</p>
       <textarea id="freeform-input" rows="4" maxlength="500"
+                aria-labelledby="freeform-title" aria-describedby="freeform-hint"
                 placeholder="I creep along the shadowed wall toward the bard..."></textarea>
       <div class="modal-actions">
         <button id="freeform-cancel" class="btn">Cancel</button>
@@ -698,23 +699,23 @@
       <h2 class="ink-crimson">Settings</h2>
 
       <div class="settings-section">
-        <div class="settings-label">
+        <label class="settings-label" for="ui-scale-slider">
           <span>UI Scale</span>
           <span id="ui-scale-value" class="settings-value ink-gilded">100%</span>
-        </div>
+        </label>
         <input type="range" id="ui-scale-slider" class="settings-slider"
-               min="60" max="140" step="5" value="100">
-        <p class="hint-small">Scales all menus, text, and panels.</p>
+               min="60" max="140" step="5" value="100" aria-describedby="ui-scale-hint">
+        <p id="ui-scale-hint" class="hint-small">Scales all menus, text, and panels.</p>
       </div>
 
       <div class="settings-section">
-        <div class="settings-label">
+        <label class="settings-label" for="game-zoom-slider">
           <span>Game Zoom</span>
           <span id="game-zoom-value" class="settings-value ink-gilded">70%</span>
-        </div>
+        </label>
         <input type="range" id="game-zoom-slider" class="settings-slider"
-               min="40" max="150" step="5" value="70">
-        <p class="hint-small">Scales the grid and tokens on the map.</p>
+               min="40" max="150" step="5" value="70" aria-describedby="game-zoom-hint">
+        <p id="game-zoom-hint" class="hint-small">Scales the grid and tokens on the map.</p>
       </div>
 
       <div class="modal-actions">
