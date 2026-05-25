@@ -105,11 +105,7 @@ def export_blend(blend_path: str, out_glb: str):
 
     print(f"[CONVERT] {os.path.basename(blend_path)} → {os.path.relpath(out_glb, PROJECT_MODELS)}")
 
-    # Load the file fresh
     bpy.ops.wm.open_mainfile(filepath=blend_path)
-
-    # Select everything
-    bpy.ops.object.select_all(action='SELECT')
 
     bpy.ops.export_scene.gltf(
         filepath=out_glb,
