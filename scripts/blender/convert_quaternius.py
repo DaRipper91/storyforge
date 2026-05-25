@@ -13,7 +13,13 @@ CHAR_BLEND_DIR = os.path.expanduser(
     "~/Downloads/quaternius_characters/Humanoid Rig/Individual Characters/Blend"
 )
 ANIMAL_BLEND_DIR = os.path.expanduser(
-    "~/Downloads/quaternius_animals_blends"
+    "~/Downloads/quaternius_animals/Blends"
+)
+MONSTER_BLEND_DIR = os.path.expanduser(
+    "~/Downloads/quaternius_monsters/Blends"
+)
+WEAPON_BLEND_DIR = os.path.expanduser(
+    "~/Downloads/quaternius_weapons/Blends"
 )
 
 PROJECT_MODELS = os.path.expanduser(
@@ -36,10 +42,56 @@ CHARACTER_MAP = {
 }
 
 ANIMAL_MAP = {
-    "Husky.blend":    "animals/dog.glb",
-    "Wolf.blend":     "animals/wolf.glb",
-    "ShibaInu.blend": "animals/cat.glb",    # close enough for placeholder
-    "Fox.blend":      "animals/bear.glb",   # placeholder until real bear found
+    # NOTE: pre-animated glTF exports are already in assets/models/animals/ —
+    # only run this if you need GLB from blend (e.g. to add custom animations).
+    "Husky.blend":      "animals/dog.glb",
+    "Wolf.blend":       "animals/wolf.glb",
+    "ShibaInu.blend":   "animals/cat.glb",
+    "Fox.blend":        "animals/fox.glb",
+    "Horse.blend":      "animals/horse.glb",
+    "Horse_White.blend":"animals/horse_white.glb",
+    "Bull.blend":       "animals/bull.glb",
+    "Deer.blend":       "animals/deer.glb",
+    "Stag.blend":       "animals/stag.glb",
+    "Cow.blend":        "animals/cow.glb",
+    "Donkey.blend":     "animals/donkey.glb",
+    "Alpaca.blend":     "animals/alpaca.glb",
+}
+
+# quaternius_monsters/Blends — download from animatedmonster pack first
+MONSTER_MAP = {
+    "Dragon.blend":   "monsters/dragon.glb",
+    "Bat.blend":      "monsters/bat.glb",
+    "Skeleton.blend": "monsters/skeleton_animated.glb",
+    "Slime.blend":    "monsters/slime.glb",
+}
+
+# quaternius_weapons/Blends — download from medievalweapons pack first
+WEAPON_MAP = {
+    "Sword.blend":              "weapons/sword.glb",
+    "Sword_2.blend":            "weapons/sword_2.glb",
+    "Sword_Big.blend":          "weapons/sword_big.glb",
+    "Sword_Golden.blend":       "weapons/sword_golden.glb",
+    "Claymore.blend":           "weapons/claymore.glb",
+    "Axe.blend":                "weapons/axe.glb",
+    "Axe_Double.blend":         "weapons/axe_double.glb",
+    "Axe_Small.blend":          "weapons/axe_small.glb",
+    "Dagger.blend":             "weapons/dagger.glb",
+    "Dagger_2.blend":           "weapons/dagger_2.glb",
+    "Hammer_Double.blend":      "weapons/hammer.glb",
+    "Hammer_Small.blend":       "weapons/hammer_small.glb",
+    "Scythe.blend":             "weapons/scythe.glb",
+    "Spear.blend":              "weapons/spear.glb",
+    "Bow_Wooden.blend":         "weapons/bow.glb",
+    "Bow_Wooden2.blend":        "weapons/bow_2.glb",
+    "Bow_Evil.blend":           "weapons/bow_evil.glb",
+    "Bow_Golden.blend":         "weapons/bow_golden.glb",
+    "Arrow.blend":              "weapons/arrow.glb",
+    "Shield_Heater.blend":      "weapons/shield_heater.glb",
+    "Shield_Heater_2.blend":    "weapons/shield_heater_2.glb",
+    "Shield_Round.blend":       "weapons/shield_round.glb",
+    "Shield_Round_2.blend":     "weapons/shield_round_2.glb",
+    "Shield_Celtic_Golden.blend":"weapons/shield_celtic.glb",
 }
 
 
@@ -82,21 +134,21 @@ def run():
     ok = 0
     fail = 0
 
-    for src_name, dest_rel in CHARACTER_MAP.items():
-        src = os.path.join(CHAR_BLEND_DIR, src_name)
-        dst = os.path.join(PROJECT_MODELS, dest_rel)
-        if export_blend(src, dst):
-            ok += 1
-        else:
-            fail += 1
+    maps = [
+        (CHARACTER_MAP, CHAR_BLEND_DIR),
+        (ANIMAL_MAP,    ANIMAL_BLEND_DIR),
+        (MONSTER_MAP,   MONSTER_BLEND_DIR),
+        (WEAPON_MAP,    WEAPON_BLEND_DIR),
+    ]
 
-    for src_name, dest_rel in ANIMAL_MAP.items():
-        src = os.path.join(ANIMAL_BLEND_DIR, src_name)
-        dst = os.path.join(PROJECT_MODELS, dest_rel)
-        if export_blend(src, dst):
-            ok += 1
-        else:
-            fail += 1
+    for asset_map, blend_dir in maps:
+        for src_name, dest_rel in asset_map.items():
+            src = os.path.join(blend_dir, src_name)
+            dst = os.path.join(PROJECT_MODELS, dest_rel)
+            if export_blend(src, dst):
+                ok += 1
+            else:
+                fail += 1
 
     print(f"\n=== Done: {ok} exported, {fail} skipped ===")
 
