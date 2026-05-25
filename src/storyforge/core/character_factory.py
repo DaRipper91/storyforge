@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from storyforge.core import grid
 from storyforge.core.models import (
-    AbilityScores, CharacterSheet, Coord, GameState,
+    AbilityScores, CharacterSheet, Coord, EnemySheet, GameState,
     InventoryItem, Race, EvolutionaryState, PredatorRole
 )
 
@@ -29,153 +29,304 @@ class RaceDef:
     ability_bonuses: dict[str, int]
     flavor: str
     group: str = "Cosmic"
-    before: str | None = None  # Humanoid only: the "Before" race name
+    before: str | None = None      # Humanoid only: the "Before" race name
+    race_weapon: InventoryItem | None = None
+    race_armor: InventoryItem | None = None
+
+def _weapon(item_id: str, name: str, dice: str, notes: str) -> InventoryItem:
+    return InventoryItem(id=item_id, name=name, equipped=True,
+                         damage_dice=dice, notes=notes)
+
+def _armor(item_id: str, name: str, ac_bonus: int, notes: str) -> InventoryItem:
+    return InventoryItem(id=item_id, name=name, equipped=True,
+                         armor_ac_bonus=ac_bonus, notes=notes)
+
 
 RACES: dict[Race, RaceDef] = {
-    # Cosmic — born between stars, beneath suns, inside the void
+    # ── Cosmic ──────────────────────────────────────────────────────────────
     Race.VOIDWRAITH: RaceDef(
         name="Voidwraith", speed=30, ability_bonuses={"INT": 2, "STR": 1}, group="Cosmic", before="Astral Spirit",
-        flavor="Stellar scavengers that feast on dying magic and the bones of dead worlds."
+        flavor="Stellar scavengers that feast on dying magic and the bones of dead worlds.",
+        race_weapon=_weapon("void_shard_blade", "Void-Shard Blade", "1d8",
+            "Crystallized null-space; ignores magical wards on the first strike each combat."),
+        race_armor=_armor("null_field_wrap", "Null-Field Wrap", 1,
+            "Absorbs the first 2 points of energy damage each round."),
     ),
     Race.NULLSHADE: RaceDef(
         name="Nullshade", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Cosmic", before="Shadow-Wisp",
-        flavor="Formless hunters that stalk prey from the dark spaces between worlds."
+        flavor="Formless hunters that stalk prey from the dark spaces between worlds.",
+        race_weapon=_weapon("umbra_stiletto", "Umbra Stiletto", "1d4",
+            "Shadow-forged; +2 to hit in dim light or darkness."),
+        race_armor=_armor("dusk_veil", "Dusk Veil", 0,
+            "Grants advantage on Stealth checks; near-invisible in shadow."),
     ),
     Race.IRONLOCUST: RaceDef(
         name="Iron-Locust", speed=35, ability_bonuses={"DEX": 2, "CON": 1}, group="Cosmic", before="Mining Drone",
-        flavor="Chitinous swarms that strip metal, stone, and bone with equal hunger."
+        flavor="Chitinous swarms that strip metal, stone, and bone with equal hunger.",
+        race_weapon=_weapon("mandible_shears", "Mandible Shears", "1d6",
+            "Serrated chitinous pincers; can cut through rope, thin metal, and leather as a bonus action."),
+        race_armor=_armor("chitin_plating", "Chitin Plating", 2,
+            "Harvested shell reinforcement; bludgeoning damage reduced by 1."),
     ),
     Race.EMBERVEIN: RaceDef(
         name="Embervein", speed=20, ability_bonuses={"STR": 2, "CON": 1}, group="Cosmic", before="Magma Elemental",
-        flavor="Molten-blooded leviathans born in the cores of burning worlds."
+        flavor="Molten-blooded leviathans born in the cores of burning worlds.",
+        race_weapon=_weapon("magma_fist", "Magma Fist", "1d8",
+            "Molten-core impact; deals an extra 1 fire damage on hit. Melts ice and wax on contact."),
+        race_armor=_armor("volcanic_carapace", "Volcanic Carapace", 2,
+            "Ignores the first 3 points of fire damage each round."),
     ),
     Race.RIFTWALKER: RaceDef(
         name="Riftwalker", speed=30, ability_bonuses={"DEX": 1, "WIS": 2}, group="Cosmic", before="Planar Voyager",
-        flavor="Phase-hunters that slip between realms leaving no shadow and no sound."
+        flavor="Phase-hunters that slip between realms leaving no shadow and no sound.",
+        race_weapon=_weapon("phase_blade", "Phase Blade", "1d6",
+            "Partially phased; ignores the AC bonus from light armor on the first hit each combat."),
+        race_armor=_armor("rift_fold_cloak", "Rift-Fold Cloak", 1,
+            "Phase-displacement layer; once per combat, the first melee hit against you is re-rolled."),
     ),
-    # Primal — ancient, elemental, rooted in myth and living world
+    # ── Primal ──────────────────────────────────────────────────────────────
     Race.SOLARLORD: RaceDef(
         name="Solar-Lord", speed=40, ability_bonuses={"CHA": 2, "WIS": 1}, group="Primal", before="High Seraph",
-        flavor="Celestial avians who ride light-paths between suns and speak in stellar fire."
+        flavor="Celestial avians who ride light-paths between suns and speak in stellar fire.",
+        race_weapon=_weapon("sunlance", "Sunlance", "1d8",
+            "Radiant piercing weapon; ignites flammable targets. Undead take +2 damage per strike."),
+        race_armor=_armor("feathermail_aegis", "Feathermail Aegis", 1,
+            "Celestial pinions woven into mail; resistance to falling damage."),
     ),
     Race.THORNMIMIC: RaceDef(
         name="Thornmimic", speed=30, ability_bonuses={"DEX": 1, "CHA": 2}, group="Primal", before="Wood Spirit",
-        flavor="Bark-skinned shapeshifters who replace their prey in the oldest forests."
+        flavor="Bark-skinned shapeshifters who replace their prey in the oldest forests.",
+        race_weapon=_weapon("thorn_whip", "Thorn-Whip", "1d6",
+            "Reach weapon (10 ft); on a critical hit, target is entangled until end of its next turn."),
+        race_armor=_armor("bark_veil", "Bark-Veil", 1,
+            "Regenerates 1 HP per hour when in a natural environment (forest, grassland, etc.)."),
     ),
     Race.CINDERKIN: RaceDef(
         name="Cinderkin", speed=35, ability_bonuses={"INT": 1, "DEX": 2}, group="Primal", before="Sun-Spark",
-        flavor="Crystalline fire-sprites forged in the hearts of volcanoes."
+        flavor="Crystalline fire-sprites forged in the hearts of volcanoes.",
+        race_weapon=_weapon("ember_dart", "Ember Dart", "1d4",
+            "Thrown 20/60 ft; ignites targets on hit. Carries 3 darts per rest."),
+        race_armor=_armor("crystal_shard_shell", "Crystal-Shard Shell", 1,
+            "Razor-edged crystal; attackers who grapple you take 1d4 piercing damage."),
     ),
     Race.DEEPTYRANT: RaceDef(
         name="Deep-Tyrant", speed=30, ability_bonuses={"STR": 1, "INT": 2}, group="Primal", before="Abyssal Guard",
-        flavor="Ancient cephalopodic minds who rule kingdoms from the lightless abyss."
+        flavor="Ancient cephalopodic minds who rule kingdoms from the lightless abyss.",
+        race_weapon=_weapon("crushing_tentacle", "Crushing Tentacle", "1d8",
+            "Reach 10 ft; on hit, target must make DC 13 STR save or be grappled."),
+        race_armor=_armor("abyssal_shell", "Abyssal Shell", 2,
+            "Pressure-hardened plate; resistance to cold damage and crushing pressure."),
     ),
     Race.GRIMCROW: RaceDef(
         name="Grimcrow", speed=30, ability_bonuses={"WIS": 2, "INT": 1}, group="Primal", before="Fate-Watcher",
-        flavor="Obsidian-feathered oracles who steal living magic and bind it to bone."
+        flavor="Obsidian-feathered oracles who steal living magic and bind it to bone.",
+        race_weapon=_weapon("fate_talon", "Fate-Talon", "1d4",
+            "Siphons luck; target subtracts 1 from its next attack roll or saving throw on a hit."),
+        race_armor=_armor("bone_woven_shroud", "Bone-Woven Shroud", 1,
+            "Woven from prophesied bones; advantage on saving throws against divination effects."),
     ),
-    # Eldritch — things that should not be, things that persist anyway
+    # ── Eldritch ─────────────────────────────────────────────────────────────
     Race.BLOODWEAVER: RaceDef(
         name="Bloodweaver", speed=30, ability_bonuses={"CHA": 2, "INT": 1}, group="Eldritch", before="High Vampire",
-        flavor="Regal horrors who conquer entire bloodlines from the inside out."
+        flavor="Regal horrors who conquer entire bloodlines from the inside out.",
+        race_weapon=_weapon("blood_spike_lash", "Blood-Spike Lash", "1d6",
+            "Necrotic barbs; heals you for 2 HP on each successful hit."),
+        race_armor=_armor("crimson_veil", "Crimson Veil", 1,
+            "Blood-thickened carapace; grants an extra +1 AC when your HP is below half maximum."),
     ),
     Race.DREAMHUSK: RaceDef(
         name="Dreamhusk", speed=30, ability_bonuses={"WIS": 2, "CHA": 1}, group="Eldritch", before="Sleep-Walker",
-        flavor="Spore-borne entities that project the faces of the beloved dead."
+        flavor="Spore-borne entities that project the faces of the beloved dead.",
+        race_weapon=_weapon("spore_burst", "Spore-Burst", "1d4",
+            "5-ft radius on throw; DC 12 CON save or target is poisoned for 1 minute. 3 charges per rest."),
+        race_armor=_armor("husk_skin", "Husk-Skin", 1,
+            "Spore-secreting outer layer; creatures that strike you in melee must make DC 11 CON or be sickened."),
     ),
     Race.BONEDRIFTER: RaceDef(
         name="Bonedrifter", speed=20, ability_bonuses={"CON": 2, "STR": 1}, group="Eldritch", before="Bone-Construct",
-        flavor="Parasitic beings that rewrite their hosts skeleton-first into living prisons."
+        flavor="Parasitic beings that rewrite their hosts skeleton-first into living prisons.",
+        race_weapon=_weapon("ossified_club", "Ossified Club", "1d6",
+            "Dense bone-mass impact; advantage on Shove attempts. Counts as bludgeoning."),
+        race_armor=_armor("bone_lattice_carapace", "Bone-Lattice Carapace", 2,
+            "Reinforced skeleton; you cannot be knocked prone by effects that move less than 10 ft."),
     ),
     Race.MINDSPIDER: RaceDef(
         name="Mindspider", speed=40, ability_bonuses={"INT": 2, "DEX": 1}, group="Eldritch", before="Telepath",
-        flavor="Translucent arachnids that harvest plans and secrets from sleeping prey."
+        flavor="Translucent arachnids that harvest plans and secrets from sleeping prey.",
+        race_weapon=_weapon("psychic_web", "Psychic-Web", "1d4",
+            "Ranged 30 ft; on hit, target is restrained (DC 12 STR to escape as action). 3 charges per rest."),
+        race_armor=_armor("silk_steel_exoskeleton", "Silk-Steel Exoskeleton", 1,
+            "Web-reinforced chitin; resistance to psychic damage."),
     ),
     Race.CHAOSLING: RaceDef(
         name="Chaosling", speed=35, ability_bonuses={"DEX": 2, "WIS": 1}, group="Eldritch", before="Wild Mage",
-        flavor="Twitching fragments of unraveled reality stitched into borrowed flesh."
+        flavor="Twitching fragments of unraveled reality stitched into borrowed flesh.",
+        race_weapon=_weapon("entropy_bolt", "Entropy Bolt", "1d6",
+            "Damage type changes each round (fire → cold → lightning → thunder → repeat). 20/60 ft ranged."),
+        race_armor=_armor("chaos_weave", "Chaos-Weave", 1,
+            "Unpredictable energy deflection; attackers cannot gain advantage against you from flanking."),
     ),
-    # Mechanical — constructed, forged, refused to stop
+    # ── Mechanical ───────────────────────────────────────────────────────────
     Race.IRONVEIL: RaceDef(
         name="Ironveil", speed=40, ability_bonuses={"DEX": 2, "INT": 1}, group="Mechanical", before="Security Automaton",
-        flavor="Gossamer-thin war constructs that fold themselves flat to slip through walls and armor plating. Deceptively fragile looking, catastrophically sharp."
+        flavor="Gossamer-thin war constructs that fold themselves flat to slip through walls and armor plating. Deceptively fragile looking, catastrophically sharp.",
+        race_weapon=_weapon("razor_wire_whip", "Razor-Wire Whip", "1d6",
+            "Reach 10 ft; deals 1 ongoing slashing damage per turn until target uses action to remove."),
+        race_armor=_armor("folded_steel_plates", "Folded-Steel Plates", 1,
+            "Paper-thin but razor-edged; attackers using bludgeoning weapons have -1 to hit against you."),
     ),
     Race.FORGESPAWN: RaceDef(
         name="Forgespawn", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Mechanical", before="Industrial Golem",
-        flavor="Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire."
+        flavor="Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire.",
+        race_weapon=_weapon("molten_fist", "Molten Fist", "1d8",
+            "Fire damage on hit; softens metal armor — targets in metal armor have -1 AC until their next turn."),
+        race_armor=_armor("liquid_metal_skin", "Liquid-Metal Skin", 2,
+            "Auto-seals wounds when heated; you regain 1 HP when you take fire damage instead of being harmed."),
     ),
     Race.CINDERPLATE: RaceDef(
         name="Cinderplate", speed=20, ability_bonuses={"STR": 2, "WIS": 1}, group="Mechanical", before="Furnace Guard",
-        flavor="Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch."
+        flavor="Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch.",
+        race_weapon=_weapon("forge_hammer", "Forge-Hammer", "1d10",
+            "Two-handed bludgeoning; ignores DR from nonmagical armor. Leaves scorched craters on stone."),
+        race_armor=_armor("furnace_plate", "Furnace Plate", 2,
+            "Built-in heat sink; immune to being set on fire. Glows red after sustained combat."),
     ),
     Race.HEXGEAR: RaceDef(
         name="Hexgear", speed=35, ability_bonuses={"INT": 2, "DEX": 1}, group="Mechanical", before="Logic-Cube",
-        flavor="Six-sided modular beings that reconfigure their body layout mid-combat. No consistent face, no consistent silhouette."
+        flavor="Six-sided modular beings that reconfigure their body layout mid-combat. No consistent face, no consistent silhouette.",
+        race_weapon=_weapon("reconfigured_blade", "Reconfigured Blade", "1d6",
+            "Damage type rotates each round (slashing → piercing → bludgeoning). Enemies can't predict its form."),
+        race_armor=_armor("modular_shielding", "Modular Shielding", 1,
+            "Reconfigures to match incoming attack type; reduces the first hit of each damage type per combat by 1."),
     ),
     Race.WIREWRAITH: RaceDef(
         name="Wirewraith", speed=45, ability_bonuses={"DEX": 2, "WIS": 1}, group="Mechanical", before="Data-Ghost",
-        flavor="Exposed-nerve constructs that transmit pain and data at the same speed. They feel everything, process it, and don't stop moving."
+        flavor="Exposed-nerve constructs that transmit pain and data at the same speed. They feel everything, process it, and don't stop moving.",
+        race_weapon=_weapon("neural_lash", "Neural-Lash", "1d6",
+            "Lightning damage; on a critical hit, target is paralyzed until end of its next turn."),
+        race_armor=_armor("exposed_wire_mesh", "Exposed-Wire Mesh", 1,
+            "Conducts electricity; metal-weapon attackers take 1 lightning damage on each hit against you."),
     ),
-    # Humanoid — what the civilized races became after the Paradox
+    # ── Humanoid ─────────────────────────────────────────────────────────────
     Race.ASHENBORN: RaceDef(
         name="Ashenborn", speed=30, ability_bonuses={"CON": 2, "STR": 1}, group="Humanoid", before="Human",
-        flavor="Humans who burned through the Paradox and came out the other side charred, fireproof, and furious."
+        flavor="Humans who burned through the Paradox and came out the other side charred, fireproof, and furious.",
+        race_weapon=_weapon("emberstone_axe", "Emberstone Axe", "1d6",
+            "Fire-infused blade; deals 1 extra fire damage per strike. The edge never dulls."),
+        race_armor=_armor("charred_bone_mail", "Charred-Bone Mail", 1,
+            "Fire-resistant; immunity to being ignited by nonmagical flames."),
     ),
     Race.HOLLOWSONG: RaceDef(
         name="Hollowsong", speed=35, ability_bonuses={"WIS": 2, "INT": 1}, group="Humanoid", before="Elf",
-        flavor="Elves whose magic inverted; they no longer cast, they absorb, and it's starting to show."
+        flavor="Elves whose magic inverted; they no longer cast, they absorb, and it's starting to show.",
+        race_weapon=_weapon("silence_staff", "Silence-Staff", "1d6",
+            "Absorbs a magical effect on hit; DC 13 CON or target cannot cast spells until end of next turn."),
+        race_armor=_armor("absorption_mantle", "Absorption Mantle", 1,
+            "Absorbs the first 2 damage from any magical hit each round."),
     ),
     Race.VEILBORN: RaceDef(
         name="Veilborn", speed=40, ability_bonuses={"DEX": 2, "CHA": 1}, group="Humanoid", before="Dark Elf",
-        flavor="Dark elves who were already living in the dark when the Paradox hit; they adapted faster than anyone and trust no one."
+        flavor="Dark elves who were already living in the dark when the Paradox hit; they adapted faster than anyone and trust no one.",
+        race_weapon=_weapon("shadow_blade", "Shadow-Blade", "1d6",
+            "+2 to hit in dim light or darkness. Deals necrotic damage in darkness."),
+        race_armor=_armor("drow_silk_harness", "Drow-Silk Harness", 1,
+            "Near-invisible in shadow; advantage on Stealth checks in dim light or darkness."),
     ),
     Race.THORNWEFT: RaceDef(
         name="Thornweft", speed=30, ability_bonuses={"WIS": 2, "CON": 1}, group="Humanoid", before="Wood Elf",
-        flavor="Wood elves who merged with the forests during the silence; bark grows where skin used to be."
+        flavor="Wood elves who merged with the forests during the silence; bark grows where skin used to be.",
+        race_weapon=_weapon("briar_spear", "Briar Spear", "1d8",
+            "Reach 10 ft; plants thorns on hit — target takes 1 piercing damage per turn until removed (DC 11 Medicine)."),
+        race_armor=_armor("living_bark_armor", "Living Bark Armor", 1,
+            "Regenerates 1 HP per hour when exposed to sunlight or rain."),
     ),
     Race.ASHCROWN: RaceDef(
         name="Ashcrown", speed=35, ability_bonuses={"INT": 2, "CHA": 1}, group="Humanoid", before="High Elf",
-        flavor="High elves who refused to change and paid for it; regal, brittle, and slowly going translucent."
+        flavor="High elves who refused to change and paid for it; regal, brittle, and slowly going translucent.",
+        race_weapon=_weapon("crystalline_rapier", "Crystalline Rapier", "1d6",
+            "Precision blade; advantage on attack rolls against unarmored or lightly armored targets."),
+        race_armor=_armor("translucent_shield", "Translucent Shield", 1,
+            "Faded high-elf ward; reduces psychic damage by 2."),
     ),
     Race.IRONFAST: RaceDef(
         name="Ironfast", speed=25, ability_bonuses={"CON": 2, "STR": 1}, group="Humanoid", before="Dwarf",
-        flavor="Dwarves whose bones calcified past stone; they are slower, denser, and nearly impossible to put down."
+        flavor="Dwarves whose bones calcified past stone; they are slower, denser, and nearly impossible to put down.",
+        race_weapon=_weapon("stone_crusher_maul", "Stone-Crusher Maul", "1d10",
+            "Two-handed; -1 to hit but +2 bonus damage. Breaks through fortifications and stone walls."),
+        race_armor=_armor("calcite_plate", "Calcite Plate", 3,
+            "Calcified bone reinforcement; you are immune to being moved involuntarily unless you fail a DC 14 STR save."),
     ),
     Race.COREBORN: RaceDef(
         name="Coreborn", speed=25, ability_bonuses={"CON": 2, "INT": 1}, group="Humanoid", before="Deep Dwarf",
-        flavor="Deep dwarves who pulled something up from below during the Paradox; it came with them."
+        flavor="Deep dwarves who pulled something up from below during the Paradox; it came with them.",
+        race_weapon=_weapon("deep_iron_pick", "Deep-Iron Pick", "1d6",
+            "Ignores natural AC from thick hides and scales. What came up from below sharpens it still."),
+        race_armor=_armor("abyssal_crust_armor", "Abyssal Crust Armor", 2,
+            "Void-forged deep-earth plate; resistance to poison damage."),
     ),
     Race.WARPBRED: RaceDef(
         name="Warpbred", speed=35, ability_bonuses={"STR": 2, "CON": 1}, group="Humanoid", before="Orc",
-        flavor="Orcs who leaned into the Paradox and asked it for more; nobody is sure what they traded."
+        flavor="Orcs who leaned into the Paradox and asked it for more; nobody is sure what they traded.",
+        race_weapon=_weapon("paradox_cleaver", "Paradox Cleaver", "1d8",
+            "Variable damage type each hit (slashing/necrotic/psychic — enemy cannot predict or resist). +1 to hit."),
+        race_armor=_armor("mutated_hide", "Mutated Hide", 2,
+            "Grotesque paradox-flesh; reduces critical hits to normal hits once per combat."),
     ),
     Race.SPLITBLOOD: RaceDef(
         name="Splitblood", speed=30, ability_bonuses={"STR": 1, "CON": 2}, group="Humanoid", before="Half-Orc",
-        flavor="Half-orcs whose two halves stopped agreeing during the silence; they are in a constant negotiation with themselves."
+        flavor="Half-orcs whose two halves stopped agreeing during the silence; they are in a constant negotiation with themselves.",
+        race_weapon=_weapon("half_blood_axe", "Half-Blood Axe", "1d6",
+            "One side slashing, one bludgeoning; choose damage type per attack. Enemies resistant to one are hit by the other."),
+        race_armor=_armor("contested_plate", "Contested Plate", 1,
+            "Cobbled from both heritages; +1 STR saving throws and +1 CON saving throws."),
     ),
     Race.DUSKWEFT: RaceDef(
         name="Duskweft", speed=40, ability_bonuses={"DEX": 2, "WIS": 1}, group="Humanoid", before="Halfling",
-        flavor="Halflings who slipped sideways during the silence and haven't fully come back; they flicker."
+        flavor="Halflings who slipped sideways during the silence and haven't fully come back; they flicker.",
+        race_weapon=_weapon("flicker_dagger", "Flicker Dagger", "1d4",
+            "Melee or thrown 20/60 ft; advantage on attacks made immediately after teleporting or repositioning."),
+        race_armor=_armor("phase_cloth", "Phase-Cloth", 1,
+            "Flickering displacement; critical hits against you are re-rolled once — attacker takes the lower result."),
     ),
     Race.GLITCHKIN: RaceDef(
         name="Glitchkin", speed=30, ability_bonuses={"INT": 2, "DEX": 1}, group="Humanoid", before="Gnome",
-        flavor="Gnomes whose tinkering instinct turned inward; they've been modifying themselves ever since."
+        flavor="Gnomes whose tinkering instinct turned inward; they've been modifying themselves ever since.",
+        race_weapon=_weapon("modified_crossbow", "Modified Crossbow", "1d6",
+            "Self-upgraded bolts; +1 to hit from precision modifications. Reloads as bonus action."),
+        race_armor=_armor("self_repair_chassis", "Self-Repair Chassis", 1,
+            "Auto-repairs 1 HP at the start of any turn in which you took no damage the previous round."),
     ),
     Race.FRACTURELINE: RaceDef(
         name="Fractureline", speed=35, ability_bonuses={"INT": 2, "CHA": 1}, group="Humanoid", before="Half-Elf",
-        flavor="Half-elves split cleanly down the middle during the Paradox; one half remembers the old world, the other doesn't."
+        flavor="Half-elves split cleanly down the middle during the Paradox; one half remembers the old world, the other doesn't.",
+        race_weapon=_weapon("split_edge_sword", "Split-Edge Sword", "1d6",
+            "On a critical hit, make a second damage roll and add it — two halves, two cuts."),
+        race_armor=_armor("paradox_split_shield", "Paradox-Split Shield", 1,
+            "One side absorbs magic, one absorbs physical; reduce the first instance of each per combat by 1."),
     ),
     Race.EMBERPACT: RaceDef(
         name="Emberpact", speed=30, ability_bonuses={"CHA": 2, "STR": 1}, group="Humanoid", before="Tiefling",
-        flavor="Tieflings whose infernal contracts dissolved in the Paradox; they kept the features and lost the leash."
+        flavor="Tieflings whose infernal contracts dissolved in the Paradox; they kept the features and lost the leash.",
+        race_weapon=_weapon("hellfire_scourge", "Hellfire Scourge", "1d6",
+            "Fire + necrotic hybrid; deals 1 extra fire damage per strike. Smells of brimstone."),
+        race_armor=_armor("infernal_remnant_plate", "Infernal Remnant Plate", 2,
+            "Contract fragments stitched into metal; resistance to fire damage."),
     ),
     Race.FALLENLIGHT: RaceDef(
         name="Fallenlight", speed=35, ability_bonuses={"CHA": 2, "WIS": 1}, group="Humanoid", before="Aasimar",
-        flavor="Aasimars whose divine connection severed; they still glow, but nothing answers when they call."
+        flavor="Aasimars whose divine connection severed; they still glow, but nothing answers when they call.",
+        race_weapon=_weapon("severed_halo_blade", "Severed-Halo Blade", "1d6",
+            "Radiant damage; weakened divine energy still burns undead (+2 vs undead) and fiends (+2 vs fiends)."),
+        race_armor=_armor("diminished_radiance", "Diminished Radiance", 1,
+            "Faded divine light as a deflective field; reduces necrotic damage by 2."),
     ),
     Race.SCALEWORN: RaceDef(
         name="Scaleworn", speed=30, ability_bonuses={"STR": 2, "DEX": 1}, group="Humanoid", before="Dragonborn",
-        flavor="Dragonborn whose draconic heritage collapsed inward; the fire is still there, the bloodline is not."
+        flavor="Dragonborn whose draconic heritage collapsed inward; the fire is still there, the bloodline is not.",
+        race_weapon=_weapon("collapsed_fang_spear", "Collapsed-Fang Spear", "1d8",
+            "Reach 10 ft; dragon heritage made weapon instead of bite. Deals +1 fire damage — the lineage bleeds through."),
+        race_armor=_armor("inverted_scale_mail", "Inverted-Scale Mail", 1,
+            "Scales turned inward for self-reinforcement; resistance to the original draconic damage type."),
     ),
 }
 
@@ -484,7 +635,18 @@ def build_character(
     hp_max = s_def.hit_die + _ability_modifier(final_scores.CON)
     ac = s_def.base_armor_class + _ability_modifier(final_scores.DEX)
 
-    # Build inventory: primary item + one chosen secondary (default to first)
+    # Race armor contributes a flat AC bonus
+    if r_def.race_armor:
+        ac += r_def.race_armor.armor_ac_bonus
+
+    # Build inventory: race gear first, then role gear
+    inventory: list[InventoryItem] = []
+    if r_def.race_weapon:
+        inventory.append(r_def.race_weapon)
+    if r_def.race_armor:
+        inventory.append(r_def.race_armor)
+    inventory.append(p_def.primary_item)
+
     chosen_secondary: InventoryItem | None = None
     if equipment_choice_id and p_def.equipment_choices:
         for item in p_def.equipment_choices:
@@ -493,7 +655,6 @@ def build_character(
                 break
     if chosen_secondary is None and p_def.equipment_choices:
         chosen_secondary = p_def.equipment_choices[0]
-    inventory: list[InventoryItem] = [p_def.primary_item]
     if chosen_secondary is not None:
         inventory.append(chosen_secondary)
 
@@ -587,3 +748,112 @@ def generate_char_id(name: str, existing: set[str]) -> str:
         return slug
     suffix = secrets.token_hex(2)
     return f"{slug}_{suffix}"
+
+
+# ─────────────────────── Race enemy builder ───────────────────────
+
+# Canonical ability priorities per race group — used when building NPC enemies.
+# Values are standard-array assignments biased toward the race's primary stats.
+_RACE_ENEMY_BASES: dict[Race, tuple[int, int, int, int, int, int]] = {
+    # STR, DEX, CON, INT, WIS, CHA
+    Race.VOIDWRAITH:   (13, 10, 12, 15, 10,  8),
+    Race.NULLSHADE:    ( 8, 15, 12, 13, 10, 10),
+    Race.IRONLOCUST:   (12, 14, 13,  8, 10,  8),
+    Race.EMBERVEIN:    (15, 8,  14, 10, 10,  8),
+    Race.RIFTWALKER:   (10, 13, 10, 12, 14,  8),
+    Race.SOLARLORD:    (10, 13, 10, 10, 14, 15),
+    Race.THORNMIMIC:   (10, 13, 12, 10, 10, 14),
+    Race.CINDERKIN:    ( 8, 14, 10, 13, 10, 10),
+    Race.DEEPTYRANT:   (13,  8, 12, 15, 10, 10),
+    Race.GRIMCROW:     ( 8, 12, 10, 13, 15, 10),
+    Race.BLOODWEAVER:  (10, 12, 10, 13, 10, 15),
+    Race.DREAMHUSK:    ( 8, 10, 12, 10, 15, 13),
+    Race.BONEDRIFTER:  (13,  8, 15, 10, 10, 10),
+    Race.MINDSPIDER:   ( 8, 13, 10, 15, 10, 10),
+    Race.CHAOSLING:    (10, 14, 10, 10, 13,  8),
+    Race.IRONVEIL:     ( 8, 15, 10, 13, 10, 10),
+    Race.FORGESPAWN:   (15, 10, 14,  8, 10,  8),
+    Race.CINDERPLATE:  (15,  8, 14, 10, 13, 8),
+    Race.HEXGEAR:      (10, 13, 10, 15, 10,  8),
+    Race.WIREWRAITH:   ( 8, 15, 10, 10, 13, 10),
+    Race.ASHENBORN:    (13, 10, 15,  8, 10,  8),
+    Race.HOLLOWSONG:   ( 8, 13, 10, 13, 15, 10),
+    Race.VEILBORN:     ( 8, 15, 12, 10, 10, 13),
+    Race.THORNWEFT:    (10, 12, 14,  8, 15, 10),
+    Race.ASHCROWN:     ( 8, 13, 10, 15, 10, 13),
+    Race.IRONFAST:     (13,  8, 15, 10, 10, 10),
+    Race.COREBORN:     (12,  8, 15, 13, 10, 10),
+    Race.WARPBRED:     (15, 10, 14,  8, 10,  8),
+    Race.SPLITBLOOD:   (13, 10, 14,  8, 10, 10),
+    Race.DUSKWEFT:     ( 8, 15, 10, 10, 13, 10),
+    Race.GLITCHKIN:    ( 8, 13, 10, 15, 10, 10),
+    Race.FRACTURELINE: ( 8, 13, 10, 14, 10, 13),
+    Race.EMBERPACT:    (13, 10, 12, 10, 10, 15),
+    Race.FALLENLIGHT:  (10, 13, 10, 10, 14, 15),
+    Race.SCALEWORN:    (15, 13, 12,  8, 10, 10),
+}
+
+
+def build_race_enemy(
+    enemy_id: str,
+    race: Race,
+    ev_state: EvolutionaryState,
+    room_id: str,
+    position: Coord,
+    name_override: str | None = None,
+    xp_reward: int | None = None,
+) -> EnemySheet:
+    """
+    Build an EnemySheet for a hostile NPC using the race's weapon/armor and
+    derived combat stats. Stats are scaled to NPC level — no standard-array
+    constraint, but the same formulas as PCs.
+    """
+    r_def = RACES[race]
+    s_def = STATES[ev_state]
+
+    base = _RACE_ENEMY_BASES[race]
+    str_, dex_, con_, int_, wis_, cha_ = base
+    # Apply racial ability bonuses
+    totals = {"STR": str_, "DEX": dex_, "CON": con_, "INT": int_, "WIS": wis_, "CHA": cha_}
+    for abi, bonus in r_def.ability_bonuses.items():
+        totals[abi] = totals.get(abi, 10) + bonus
+    str_, dex_, con_ = totals["STR"], totals["DEX"], totals["CON"]
+
+    con_mod = _ability_modifier(con_)
+    dex_mod = _ability_modifier(dex_)
+    str_mod = _ability_modifier(str_)
+    best_mod = max(str_mod, dex_mod)
+
+    hp_max = max(1, s_def.hit_die + con_mod)
+    ac = s_def.base_armor_class + dex_mod
+    if r_def.race_armor:
+        ac += r_def.race_armor.armor_ac_bonus
+    attack_bonus = best_mod + 2   # +2 proficiency
+
+    weapon_dice = "1d6"
+    if r_def.race_weapon and r_def.race_weapon.damage_dice:
+        weapon_dice = r_def.race_weapon.damage_dice
+
+    default_xp = max(25, hp_max * 6 + ac * 4)
+    enemy_name = name_override or r_def.name
+    weapon_name = r_def.race_weapon.name if r_def.race_weapon else "Natural Weapon"
+    description = (
+        f"A hostile {enemy_name}. "
+        f"Wields {weapon_name}. {r_def.flavor}"
+    )
+
+    return EnemySheet(
+        id=enemy_id,
+        name=enemy_name,
+        room_id=room_id,
+        position=position,
+        hp_current=hp_max,
+        hp_max=hp_max,
+        armor_class=ac,
+        attack_bonus=attack_bonus,
+        damage_dice=weapon_dice,
+        xp_reward=xp_reward or default_xp,
+        alive=True,
+        sprite_key="enemy_race",
+        description=description,
+    )

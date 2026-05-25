@@ -1,7 +1,7 @@
 extends Node3D
 
 @onready var ground_mesh     = $Ground
-@onready var camera          = $Camera3D
+@onready var camera: Camera3D = $Camera3D
 @onready var table_lantern   = $TableLantern
 @onready var particles_root  = $ParticlesRoot
 
@@ -99,6 +99,17 @@ var _room_height: int = 8
 var _room_cells:  Array = []   # flat cell dicts, row-major
 var _room_exits:  Dictionary = {}  # "x,y" → room_id
 
+# ─── Enemy tokens ────────────────────────────────────────────────────
+var _enemy_data:   Dictionary = {}  # enemy_id → data dict
+var _enemy_tokens: Dictionary = {}  # enemy_id → Node3D
+var _enemy_cells:  Dictionary = {}  # "x,y" → enemy_id (current room)
+
+# ─── Combat overlay ──────────────────────────────────────────────────
+var _combat_overlay: Control = null
+var _combat_label: RichTextLabel = null
+var _combat_timer: float = 0.0
+const COMBAT_OVERLAY_DURATION := 4.0
+
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
 
@@ -120,6 +131,7 @@ func _ready():
 		pc.phase_changed.connect(_on_phase_changed)
 		pc.npc_event_received.connect(_on_npc_event)
 		pc.particle_event_received.connect(_on_particle_event)
+		pc.fetch_full_state()
 
 	_update_camera()
 
@@ -198,7 +210,26 @@ func _setup_ui():
 	hint_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 0.7))
 	_ui_layer.add_child(hint_label)
 
+	_setup_combat_overlay()
 	_setup_world_map()
+
+
+func _setup_combat_overlay() -> void:
+	_combat_overlay = PanelContainer.new()
+	_combat_overlay.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_combat_overlay.custom_minimum_size = Vector2(480, 0)
+	_combat_overlay.offset_left  = -240
+	_combat_overlay.offset_right =  240
+	_combat_overlay.offset_top   = -120
+	_combat_overlay.offset_bottom = 120
+	_combat_overlay.visible = false
+	_ui_layer.add_child(_combat_overlay)
+
+	_combat_label = RichTextLabel.new()
+	_combat_label.bbcode_enabled = true
+	_combat_label.fit_content = true
+	_combat_label.add_theme_font_size_override("normal_font_size", 17)
+	_combat_overlay.add_child(_combat_label)
 
 
 func _setup_world_map() -> void:
@@ -277,7 +308,7 @@ func _setup_world_map() -> void:
 		btn.custom_minimum_size = Vector2(130, 36)
 		btn.position = data["pos"] - Vector2(65, 18)
 		btn.add_theme_font_size_override("font_size", 13)
-		var rid_copy := room_id
+		var rid_copy: String = room_id
 		btn.pressed.connect(func():
 			_travel_to(rid_copy)
 		)
@@ -345,6 +376,10 @@ func _process(delta):
 	_flicker_t += delta
 	var flicker = sin(_flicker_t * 7.3) * 0.09 + sin(_flicker_t * 13.7) * 0.05
 	table_lantern.light_energy = _LANTERN_BASE + flicker
+	if _combat_overlay and _combat_overlay.visible:
+		_combat_timer -= delta
+		if _combat_timer <= 0.0:
+			_combat_overlay.visible = false
 
 
 # ─── Camera input ───────────────────────────────────────────────────
@@ -352,6 +387,12 @@ func _process(delta):
 func _input(event: InputEvent):
 	if event is InputEventMouseButton:
 		match event.button_index:
+			MOUSE_BUTTON_LEFT:
+				if event.pressed:
+					if _combat_overlay and _combat_overlay.visible:
+						_combat_overlay.visible = false
+					elif not _world_map_visible:
+						_try_select_mini(event.position)
 			MOUSE_BUTTON_RIGHT:
 				_is_orbiting = event.pressed
 				if event.pressed:
@@ -381,7 +422,9 @@ func _input(event: InputEvent):
 			KEY_M:
 				_toggle_world_map()
 			KEY_ESCAPE:
-				if _world_map_visible:
+				if _combat_overlay and _combat_overlay.visible:
+					_combat_overlay.visible = false
+				elif _world_map_visible:
 					_toggle_world_map()
 
 
@@ -562,11 +605,15 @@ func _rebuild_room(state: Dictionary):
 func _on_state_updated(new_state: Dictionary):
 	var old_room := _current_room_id
 	_rebuild_room(new_state)
-	# On room transition, clear all minis so they respawn at new positions
+	# On room transition, clear minis and enemy tokens so they respawn
 	if _current_room_id != old_room and old_room != "":
 		for mini in _miniatures.values():
 			mini.queue_free()
 		_miniatures.clear()
+		for tok in _enemy_tokens.values():
+			tok.queue_free()
+		_enemy_tokens.clear()
+		_enemy_cells.clear()
 		_selected_cid = ""
 	_update_narrative(new_state)
 
@@ -588,6 +635,80 @@ func _on_state_updated(new_state: Dictionary):
 			_move_miniature(cid, Vector2(pos.x, pos.y))
 		else:
 			spawn_miniature(cid, Vector2(pos.x, pos.y), race_id, char_name)
+
+	_update_enemy_tokens(new_state)
+
+
+func _update_enemy_tokens(state: Dictionary) -> void:
+	_enemy_data.clear()
+	_enemy_cells.clear()
+	var current_room: String = state.get("current_room_id", "")
+	var all_enemies = state.get("enemies", {})
+	if not all_enemies is Dictionary:
+		return
+
+	for eid in all_enemies:
+		var e = all_enemies[eid]
+		if not e is Dictionary:
+			continue
+		if e.get("room_id", "") != current_room:
+			continue
+		_enemy_data[eid] = e
+		var pos = e.get("position", {"x": 0, "y": 0})
+		var cell_key := "%d,%d" % [int(pos.get("x", 0)), int(pos.get("y", 0))]
+		if e.get("alive", true):
+			_enemy_cells[cell_key] = eid
+		# Spawn or remove token
+		if e.get("alive", true):
+			if not eid in _enemy_tokens:
+				_spawn_enemy_token(eid, e)
+		else:
+			if eid in _enemy_tokens:
+				_enemy_tokens[eid].queue_free()
+				_enemy_tokens.erase(eid)
+
+
+func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
+	var pos = data.get("position", {"x": 0, "y": 0})
+	var root := Node3D.new()
+	root.name = "Enemy_" + enemy_id
+	root.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
+
+	# Body — dark red tapered cylinder
+	var body_mesh := CylinderMesh.new()
+	body_mesh.top_radius    = CELL_SIZE * 0.19
+	body_mesh.bottom_radius = CELL_SIZE * 0.24
+	body_mesh.height        = 0.60
+	body_mesh.radial_segments = 12
+	var body_mat := StandardMaterial3D.new()
+	body_mat.albedo_color = Color(0.65, 0.07, 0.07)
+	body_mat.roughness = 0.55
+	body_mat.metallic  = 0.15
+	var body_inst := MeshInstance3D.new()
+	body_inst.mesh = body_mesh
+	body_inst.material_override = body_mat
+	body_inst.position = Vector3(0, 0.30, 0)
+	root.add_child(body_inst)
+
+	# Glow ring on the floor
+	var ring_mesh := CylinderMesh.new()
+	ring_mesh.top_radius    = CELL_SIZE * 0.30
+	ring_mesh.bottom_radius = CELL_SIZE * 0.30
+	ring_mesh.height        = 0.04
+	ring_mesh.radial_segments = 16
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.albedo_color      = Color(1.0, 0.15, 0.15, 0.7)
+	ring_mat.emission_enabled  = true
+	ring_mat.emission          = Color(1.2, 0.0, 0.0)
+	ring_mat.transparency      = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var ring_inst := MeshInstance3D.new()
+	ring_inst.mesh = ring_mesh
+	ring_inst.material_override = ring_mat
+	ring_inst.position = Vector3(0, 0.02, 0)
+	root.add_child(ring_inst)
+
+	add_child(root)
+	_enemy_tokens[enemy_id] = root
 
 
 func _update_narrative(state: Dictionary):
@@ -636,11 +757,6 @@ func _grid_to_world(grid_pos: Vector2) -> Vector3:
 
 # ─── Click-to-select ────────────────────────────────────────────────
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_try_select_mini(event.position)
-
-
 func _try_select_mini(screen_pos: Vector2) -> void:
 	var ray_origin := camera.project_ray_origin(screen_pos)
 	var ray_dir    := camera.project_ray_normal(screen_pos)
@@ -679,9 +795,19 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 
 	var cell_idx := gy * _room_width + gx
 	var cell: Dictionary = _room_cells[cell_idx] if cell_idx < _room_cells.size() else {}
-	var terrain := cell.get("terrain", "floor")
+	var terrain: String = cell.get("terrain", "floor")
 
-	# ── 3. Door cell — interact (room transition) ─────────────────────
+	# ── 3. Enemy cell — attack ───────────────────────────────────────
+	var cell_key := "%d,%d" % [gx, gy]
+	if cell_key in _enemy_cells:
+		var eid: String = _enemy_cells[cell_key]
+		if _enemy_data.get(eid, {}).get("alive", false):
+			var actor_id := _get_any_player_id()
+			if not actor_id.is_empty():
+				_do_attack_enemy(eid, actor_id)
+			return
+
+	# ── 4. Door cell — interact (room transition) ─────────────────────
 	if terrain == "door":
 		var actor_id := _get_any_player_id()
 		if actor_id.is_empty():
@@ -700,7 +826,7 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 			)
 		return
 
-	# ── 4. Floor/difficult cell — move selected character ─────────────
+	# ── 5. Floor/difficult cell — move selected character ─────────────
 	if (terrain == "floor" or terrain == "difficult") and _selected_cid != "":
 		var pc = get_node_or_null("/root/PythonClient")
 		if pc:
@@ -712,6 +838,49 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 		return
 
 	_deselect_mini()
+
+
+func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	var http = pc.post_request("/enemy/" + enemy_id + "/attack", {"actor_id": actor_id})
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code >= 200 and code < 300:
+			var resp = JSON.parse_string(body.get_string_from_utf8())
+			if resp is Dictionary:
+				_show_combat_result(resp)
+				pc.fetch_full_state()
+		http.queue_free()
+	)
+
+
+func _show_combat_result(data: Dictionary) -> void:
+	if not _combat_overlay or not _combat_label:
+		return
+
+	var txt := "[center][b]⚔  COMBAT  ⚔[/b][/center]\n\n"
+
+	var pa: Dictionary = data.get("player_attack", {})
+	if not pa.is_empty():
+		var color := "#ff9966" if pa.get("hit", false) else "#888888"
+		txt += "[color=%s]%s[/color]\n" % [color, pa.get("hint", "")]
+
+	if data.get("enemy_died", false):
+		txt += "\n[color=#ffdd44][b]Enemy defeated! +%d XP[/b][/color]\n" % data.get("xp_reward", 0)
+	else:
+		var ea: Dictionary = data.get("enemy_attack", {})
+		if not ea.is_empty():
+			var color := "#ff5555" if ea.get("hit", false) else "#888888"
+			txt += "[color=%s]%s[/color]\n" % [color, ea.get("hint", "")]
+		var enemy_hp: int = data.get("enemy_hp", 0)
+		txt += "\n[color=#888888]Enemy HP remaining: %d[/color]" % enemy_hp
+
+	txt += "\n\n[color=#555555][i]Click or wait to dismiss[/i][/color]"
+
+	_combat_label.text = txt
+	_combat_overlay.visible = true
+	_combat_timer = COMBAT_OVERLAY_DURATION
 
 
 func _get_any_player_id() -> String:

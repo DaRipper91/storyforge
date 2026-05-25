@@ -2668,7 +2668,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "ironfast_sentry"
         },
         {
           "terrain": "floor",
@@ -2752,7 +2752,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "warpbred_berserker"
         },
         {
           "terrain": "floor",
@@ -3866,7 +3866,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "bandit_01"
         },
         {
           "terrain": "floor",
@@ -4018,7 +4018,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "thug_01"
         },
         {
           "terrain": "floor",
@@ -4390,7 +4390,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "veilborn_cutpurse"
         },
         {
           "terrain": "floor",
@@ -4462,7 +4462,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "splitblood_enforcer"
         },
         {
           "terrain": "floor",
@@ -4877,7 +4877,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "ghoul_01"
         },
         {
           "terrain": "difficult",
@@ -4949,7 +4949,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "shadow_01"
         },
         {
           "terrain": "floor",
@@ -5353,7 +5353,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "thornweft_warden"
         },
         {
           "terrain": "floor",
@@ -5381,7 +5381,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "grimcrow_oracle"
         },
         {
           "terrain": "floor",
@@ -6175,7 +6175,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "skeleton_01"
         },
         {
           "terrain": "floor",
@@ -6375,7 +6375,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "animated_armor_01"
         },
         {
           "terrain": "floor",
@@ -6724,7 +6724,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "forgespawn_soldier"
         },
         {
           "terrain": "floor",
@@ -6744,7 +6744,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "cinderplate_juggernaut"
         },
         {
           "terrain": "floor",
@@ -7063,5 +7063,273 @@
       "timestamp": "2026-05-21T00:00:00+00:00"
     }
   ],
-  "revision": 1
+  "revision": 1,
+  "enemies": {
+    "bandit_01": {
+      "id": "bandit_01",
+      "name": "Bandit",
+      "room_id": "back_alley",
+      "position": {
+        "x": 5,
+        "y": 2
+      },
+      "hp_current": 11,
+      "hp_max": 11,
+      "armor_class": 12,
+      "attack_bonus": 3,
+      "damage_dice": "1d6+1",
+      "xp_reward": 25,
+      "alive": true,
+      "sprite_key": "enemy_humanoid",
+      "description": "A leather-clad cutpurse with a scimitar and hungry eyes.",
+      "loot": []
+    },
+    "thug_01": {
+      "id": "thug_01",
+      "name": "Thug",
+      "room_id": "back_alley",
+      "position": {
+        "x": 7,
+        "y": 5
+      },
+      "hp_current": 32,
+      "hp_max": 32,
+      "armor_class": 11,
+      "attack_bonus": 4,
+      "damage_dice": "1d6+2",
+      "xp_reward": 100,
+      "alive": true,
+      "sprite_key": "enemy_humanoid",
+      "description": "A brute with a mace and a neck full of old scars.",
+      "loot": []
+    },
+    "ghoul_01": {
+      "id": "ghoul_01",
+      "name": "Ghoul",
+      "room_id": "cellar_depths",
+      "position": {
+        "x": 3,
+        "y": 3
+      },
+      "hp_current": 22,
+      "hp_max": 22,
+      "armor_class": 12,
+      "attack_bonus": 4,
+      "damage_dice": "2d4+2",
+      "xp_reward": 200,
+      "alive": true,
+      "sprite_key": "enemy_undead",
+      "description": "A hunched, rotting thing. Its claws can paralyze the living.",
+      "loot": []
+    },
+    "shadow_01": {
+      "id": "shadow_01",
+      "name": "Shadow",
+      "room_id": "cellar_depths",
+      "position": {
+        "x": 9,
+        "y": 4
+      },
+      "hp_current": 16,
+      "hp_max": 16,
+      "armor_class": 12,
+      "attack_bonus": 4,
+      "damage_dice": "2d6+2",
+      "xp_reward": 100,
+      "alive": true,
+      "sprite_key": "enemy_undead",
+      "description": "A living shadow that drains strength with every touch.",
+      "loot": []
+    },
+    "skeleton_01": {
+      "id": "skeleton_01",
+      "name": "Skeleton",
+      "room_id": "ancient_ruins",
+      "position": {
+        "x": 3,
+        "y": 3
+      },
+      "hp_current": 13,
+      "hp_max": 13,
+      "armor_class": 13,
+      "attack_bonus": 4,
+      "damage_dice": "1d6+2",
+      "xp_reward": 50,
+      "alive": true,
+      "sprite_key": "enemy_undead",
+      "description": "Reanimated by ancient ruin magic. Its empty sockets glow faint blue.",
+      "loot": []
+    },
+    "animated_armor_01": {
+      "id": "animated_armor_01",
+      "name": "Animated Armor",
+      "room_id": "ancient_ruins",
+      "position": {
+        "x": 11,
+        "y": 6
+      },
+      "hp_current": 33,
+      "hp_max": 33,
+      "armor_class": 18,
+      "attack_bonus": 4,
+      "damage_dice": "1d6+2",
+      "xp_reward": 200,
+      "alive": true,
+      "sprite_key": "enemy_construct",
+      "description": "A suit of plate that still walks its eternal post, attacking all who enter.",
+      "loot": []
+    },
+    "veilborn_cutpurse": {
+      "id": "veilborn_cutpurse",
+      "name": "Veilborn Cutpurse",
+      "room_id": "nightside_square",
+      "position": {
+        "x": 5,
+        "y": 4
+      },
+      "hp_current": 7,
+      "hp_max": 7,
+      "armor_class": 16,
+      "attack_bonus": 5,
+      "damage_dice": "1d6",
+      "xp_reward": 106,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Veilborn Cutpurse. Wields Shadow-Blade. Dark elves who were already living in the dark when the Paradox hit; they adapted faster than anyone and trust no one.",
+      "loot": []
+    },
+    "splitblood_enforcer": {
+      "id": "splitblood_enforcer",
+      "name": "Splitblood Enforcer",
+      "room_id": "nightside_square",
+      "position": {
+        "x": 9,
+        "y": 5
+      },
+      "hp_current": 15,
+      "hp_max": 15,
+      "armor_class": 17,
+      "attack_bonus": 4,
+      "damage_dice": "1d6",
+      "xp_reward": 158,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Splitblood Enforcer. Wields Half-Blood Axe. Half-orcs whose two halves stopped agreeing during the silence; they are in a constant negotiation with themselves.",
+      "loot": []
+    },
+    "thornweft_warden": {
+      "id": "thornweft_warden",
+      "name": "Thornweft Warden",
+      "room_id": "forest_edge",
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "hp_current": 12,
+      "hp_max": 12,
+      "armor_class": 16,
+      "attack_bonus": 3,
+      "damage_dice": "1d8",
+      "xp_reward": 136,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Thornweft Warden. Wields Briar Spear. Wood elves who merged with the forests during the silence; bark grows where skin used to be.",
+      "loot": []
+    },
+    "grimcrow_oracle": {
+      "id": "grimcrow_oracle",
+      "name": "Grimcrow Oracle",
+      "room_id": "forest_edge",
+      "position": {
+        "x": 12,
+        "y": 3
+      },
+      "hp_current": 6,
+      "hp_max": 6,
+      "armor_class": 14,
+      "attack_bonus": 3,
+      "damage_dice": "1d4",
+      "xp_reward": 92,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Grimcrow Oracle. Wields Fate-Talon. Obsidian-feathered oracles who steal living magic and bind it to bone.",
+      "loot": []
+    },
+    "ironfast_sentry": {
+      "id": "ironfast_sentry",
+      "name": "Ironfast Sentry",
+      "room_id": "keep_courtyard",
+      "position": {
+        "x": 5,
+        "y": 4
+      },
+      "hp_current": 15,
+      "hp_max": 15,
+      "armor_class": 18,
+      "attack_bonus": 4,
+      "damage_dice": "1d10",
+      "xp_reward": 162,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Ironfast Sentry. Wields Stone-Crusher Maul. Dwarves whose bones calcified past stone; they are slower, denser, and nearly impossible to put down.",
+      "loot": []
+    },
+    "warpbred_berserker": {
+      "id": "warpbred_berserker",
+      "name": "Warpbred Berserker",
+      "room_id": "keep_courtyard",
+      "position": {
+        "x": 10,
+        "y": 5
+      },
+      "hp_current": 14,
+      "hp_max": 14,
+      "armor_class": 18,
+      "attack_bonus": 5,
+      "damage_dice": "1d8",
+      "xp_reward": 156,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Warpbred Berserker. Wields Paradox Cleaver. Orcs who leaned into the Paradox and asked it for more; nobody is sure what they traded.",
+      "loot": []
+    },
+    "forgespawn_soldier": {
+      "id": "forgespawn_soldier",
+      "name": "Forgespawn Soldier",
+      "room_id": "keep_barracks",
+      "position": {
+        "x": 3,
+        "y": 3
+      },
+      "hp_current": 14,
+      "hp_max": 14,
+      "armor_class": 18,
+      "attack_bonus": 5,
+      "damage_dice": "1d8",
+      "xp_reward": 156,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Forgespawn Soldier. Wields Molten Fist. Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire.",
+      "loot": []
+    },
+    "cinderplate_juggernaut": {
+      "id": "cinderplate_juggernaut",
+      "name": "Cinderplate Juggernaut",
+      "room_id": "keep_barracks",
+      "position": {
+        "x": 8,
+        "y": 3
+      },
+      "hp_current": 14,
+      "hp_max": 14,
+      "armor_class": 17,
+      "attack_bonus": 5,
+      "damage_dice": "1d10",
+      "xp_reward": 152,
+      "alive": true,
+      "sprite_key": "enemy_race",
+      "description": "A hostile Cinderplate Juggernaut. Wields Forge-Hammer. Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch.",
+      "loot": []
+    }
+  }
 }

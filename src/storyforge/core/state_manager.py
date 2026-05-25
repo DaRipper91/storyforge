@@ -26,6 +26,7 @@ from storyforge.core.models import (
     NarrativeEntry, StateDiff, TurnPhase, Era,
     CharacterCreationRequest, SlotStatus,
 )
+from storyforge.encounters.enemies import resolve_player_attack, resolve_enemy_attack
 from storyforge.events.bus import event_bus
 from storyforge.persistence import snapshot
 
@@ -72,6 +73,61 @@ class StateManager:
             await self._commit(summary)
             return summary
 
+
+    async def attack_enemy(self, attacker_id: str, enemy_id: str) -> dict:
+        """Resolve one round: player attacks, enemy counterattacks if still alive."""
+        async with self._lock:
+            char = self._state.characters.get(attacker_id)
+            if char is None:
+                raise StateError(f"unknown character: {attacker_id}")
+            enemy = self._state.enemies.get(enemy_id)
+            if enemy is None or not enemy.alive:
+                raise StateError(f"enemy not found or already dead: {enemy_id}")
+
+            player_result = resolve_player_attack(char, enemy)
+            if player_result.hit:
+                enemy.hp_current = max(0, enemy.hp_current - player_result.damage)
+
+            result: dict = {
+                "type": "combat_round",
+                "player_attack": {
+                    "hit": player_result.hit,
+                    "roll": player_result.roll,
+                    "total": player_result.total,
+                    "damage": player_result.damage,
+                    "hint": player_result.hint,
+                },
+                "enemy_hp": enemy.hp_current,
+            }
+
+            if enemy.hp_current <= 0:
+                enemy.alive = False
+                room = self._state.rooms.get(self._state.current_room_id)
+                if room:
+                    try:
+                        cell = grid.get_cell(room, enemy.position)
+                        if cell.occupant_id == enemy_id:
+                            cell.occupant_id = None
+                    except Exception:
+                        pass
+                char.evolution_points += enemy.xp_reward
+                result["enemy_died"] = True
+                result["xp_reward"] = enemy.xp_reward
+            else:
+                counter = resolve_enemy_attack(enemy, char)
+                if counter.hit:
+                    char.hp_current = max(0, char.hp_current - counter.damage)
+                result["enemy_attack"] = {
+                    "hit": counter.hit,
+                    "roll": counter.roll,
+                    "total": counter.total,
+                    "damage": counter.damage,
+                    "hint": counter.hint,
+                }
+                result["player_hp"] = char.hp_current
+
+            await self._commit(result)
+            return result
 
     async def fast_travel(self, room_id: str) -> dict:
         """World-map teleport: move the party to any known room."""
@@ -487,7 +543,18 @@ class StateManager:
         room = self._state.rooms[self._state.current_room_id]
         cell = grid.get_cell(room, target)
 
-        # 1. NPC encounter
+        # 1. Enemy → signal for attack flow
+        if cell.occupant_id and cell.occupant_id in self._state.enemies:
+            enemy = self._state.enemies[cell.occupant_id]
+            if enemy.alive:
+                return {
+                    "type": "enemy_encounter",
+                    "enemy_id": enemy.id,
+                    "enemy_name": enemy.name,
+                    "position": target.model_dump(),
+                }
+
+        # 2. NPC encounter
         if cell.occupant_id and cell.occupant_id in self._state.npcs:
             npc = self._state.npcs[cell.occupant_id]
             return {
@@ -498,12 +565,12 @@ class StateManager:
                 "position": target.model_dump(),
             }
 
-        # 2. Door exit
+        # 4. Door exit
         exit_key = f"{target.x},{target.y}"
         if cell.terrain.value == "door" and exit_key in room.exits:
             return self._do_transition_room(room.exits[exit_key])
 
-        # 3. Generic
+        # 5. Generic
         return {"type": "interact", "target": target.model_dump()}
 
     def _do_transition_room(self, target_room_id: str) -> dict:

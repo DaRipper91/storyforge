@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/CreationManager.gd" id="1_creation"]
 [ext_resource type="Shader" path="res://assets/shaders/parchment.gdshader" id="2_parchment"]
+[ext_resource type="PackedScene" uid="uid://b2n3i4m5i6n7" path="res://scenes/RaceMini.tscn" id="3_racemini"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("2_parchment")
@@ -104,13 +105,25 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="PortraitRect" type="TextureRect" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
+[node name="PortraitViewport" type="SubViewportContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 320)
-size_hint_horizontal = 4
 size_hint_vertical = 4
-expand_mode = 1
-stretch_mode = 5
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.2, 2.5)
+
+[node name="RaceMini" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport" instance=ExtResource("3_racemini")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport"]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 5, 0)
 
 [node name="DescriptionLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2

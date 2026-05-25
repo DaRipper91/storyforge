@@ -40,8 +40,10 @@ class InventoryItem(BaseModel):
     name: str
     quantity: int = Field(ge=0, default=1)
     equipped: bool = False
-    value: int = Field(ge=0, default=0) # Value in silver
+    value: int = Field(ge=0, default=0)  # value in silver
     notes: str | None = None
+    damage_dice: str | None = None       # e.g. "1d8" — None means use default (1d6)
+    armor_ac_bonus: int = 0              # flat AC bonus when equipped
 
 
 class CharacterSheet(BaseModel):
@@ -116,6 +118,24 @@ class NpcSheet(BaseModel):
     encounter_id: str | None = None     # e.g. "john_shop" — links to encounter handler
     blocks_movement: bool = True        # if True the grid cell has occupant_id set
     description: str = ""
+
+
+class EnemySheet(BaseModel):
+    """A hostile entity on the grid with combat stats."""
+    id: str
+    name: str
+    room_id: str
+    position: Coord
+    hp_current: int = Field(ge=0)
+    hp_max: int = Field(ge=1)
+    armor_class: int = Field(ge=1, default=12)
+    attack_bonus: int = 3
+    damage_dice: str = "1d6"
+    xp_reward: int = 50
+    alive: bool = True
+    sprite_key: str = "enemy_default"
+    description: str = ""
+    loot: list[InventoryItem] = Field(default_factory=list)
 
 
 class Room(BaseModel):
@@ -296,9 +316,10 @@ class GameState(BaseModel):
     current_room_id: str
     phase: TurnPhase = TurnPhase.LOBBY
     era: Era = Era.AFTER
-    
+
     characters: dict[str, CharacterSheet] = Field(default_factory=dict)
     npcs: dict[str, NpcSheet] = Field(default_factory=dict)
+    enemies: dict[str, EnemySheet] = Field(default_factory=dict)
     rooms: dict[str, Room]
     combat: CombatState | None = None
     
