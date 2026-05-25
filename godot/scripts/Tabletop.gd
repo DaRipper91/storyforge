@@ -153,8 +153,8 @@ func _ready():
 	_dungeon_root.name = "DungeonRoot"
 	add_child(_dungeon_root)
 
-	# Hide flat ground until we have room data; show it as fallback
-	ground_mesh.visible = true
+	# Keep ground hidden — _render_room shows it only when room_id not found
+	ground_mesh.visible = false
 
 	var pc = get_node_or_null("/root/PythonClient")
 	if pc:
@@ -1459,11 +1459,11 @@ func _setup_environment() -> void:
 	_env.fog_light_energy       = 1.0
 	_env.fog_density            = 0.040
 
-	# Bloom — lets emissive glows on tokens and rings pulse visibly
+	# Bloom — only emissive surfaces glow; threshold kept high to avoid blowout
 	_env.glow_enabled           = true
-	_env.glow_intensity         = 0.55
-	_env.glow_bloom             = 0.12
-	_env.glow_hdr_threshold     = 0.70
+	_env.glow_intensity         = 0.45
+	_env.glow_bloom             = 0.05
+	_env.glow_hdr_threshold     = 1.0
 	_env.glow_hdr_scale         = 2.0
 
 	# SSAO — adds depth to wall/floor crevices
