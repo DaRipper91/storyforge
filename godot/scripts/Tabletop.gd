@@ -85,6 +85,7 @@ var _ui_layer:      CanvasLayer    = null
 var _room_label:    Label          = null
 var _time_label:    Label          = null
 var _narrative_box: RichTextLabel  = null
+var _keyhint_label: Label          = null
 var _stat_panel:    PanelContainer = null
 var _stat_label:    RichTextLabel  = null
 var _controller_label: Label = null
@@ -310,9 +311,9 @@ func _load_level(level_name: String):
 	_waiting_screen.add_child(center)
 
 	_controller_label = Label.new()
-	_controller_label.text = "WAITING FOR XBOX CONTROLLER...\n(PLEASE CONNECT VIA BLUETOOTH OR USB)"
+	_controller_label.text = "PLEASE CONNECT AN XBOX CONTROLLER\n(BLUETOOTH OR USB)"
 	_controller_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_controller_label.add_theme_font_size_override("font_size", 24)
+	_controller_label.add_theme_font_size_override("font_size", 28)
 	center.add_child(_controller_label)
 
 
@@ -323,6 +324,13 @@ func _update_controller_status():
 	var connected = Input.get_connected_joypads().size() > 0
 	if _waiting_screen:
 		_waiting_screen.visible = not connected
+	
+	if _keyhint_label:
+		if connected:
+			_keyhint_label.text = "L-Stick: Move   R-Stick: Camera   A: Interact   LT: Lock-On   RT: Freeform   D-Pad: Character   Back: Map   Start: Menu"
+		else:
+			_keyhint_label.text = "WASD: Move   Mouse: Camera   E: Interact   Q: Lock-On   F: Freeform action   1-4: Select   Tab: Cycle   M: Map"
+	
 	print("[Tabletop] Controller connected: ", connected)
 
 func _setup_combat_overlay() -> void:
@@ -628,29 +636,31 @@ func _input(event: InputEvent):
 				_toggle_world_map()
 			return
 
-		# Block all other shortcuts while freeform input is open
-		if _freeform_bar and _freeform_bar.visible:
-			return
+	# Unified InputMap actions (Supports Keyboard & Xbox)
+	if (_freeform_bar and _freeform_bar.visible):
+		return
 
+	if Input.is_action_just_pressed("reset_cam"):
+		_cam_yaw      = 0.0
+		_cam_pitch    = -45.0
+		_cam_distance = 14.14
+		_update_camera()
+	elif Input.is_action_just_pressed("map"):
+		_toggle_world_map()
+	elif Input.is_action_just_pressed("cycle_next"):
+		_cycle_character(true)
+	elif Input.is_action_just_pressed("cycle_prev"):
+		_cycle_character(false)
+	elif Input.is_action_just_pressed("freeform"):
+		_open_freeform()
+	
+	# Number keys still work for keyboard selection
+	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_R:
-				_cam_yaw      = 0.0
-				_cam_pitch    = -45.0
-				_cam_distance = 14.14
-				_cam_target   = Vector3.ZERO
-				_update_camera()
-			KEY_M:
-				_toggle_world_map()
-			KEY_TAB:
-				_cycle_character(not event.shift_pressed)
 			KEY_1: _select_character_by_slot(0)
 			KEY_2: _select_character_by_slot(1)
 			KEY_3: _select_character_by_slot(2)
 			KEY_4: _select_character_by_slot(3)
-			KEY_E:
-				_interact_adjacent()
-			KEY_F:
-				_open_freeform()
 			KEY_I:
 				if _stat_panel:
 					if not _stat_panel.visible and not _selected_cid.is_empty():
@@ -669,7 +679,7 @@ func _physics_process(delta: float) -> void:
 
 	# 1. Camera Control (Right Stick / Bluetooth Xbox)
 	var look_vec = Input.get_vector("look_left", "look_right", "look_up", "look_down")
-	if look_vec.length() > 0.05 and not Input.is_action_pressed("z_target"):
+	if look_vec.length() > 0.05 and not Input.is_action_pressed("lock_on"):
 		_cam_yaw -= look_vec.x * 2.5
 		_cam_pitch = clamp(_cam_pitch - look_vec.y * 2.0, -82.0, -8.0)
 		_update_camera()
@@ -677,8 +687,8 @@ func _physics_process(delta: float) -> void:
 	# 2. Leader Movement (Left Stick / WASD)
 	var leader = _miniatures[_selected_cid]
 	
-	# Z-Targeting Logic
-	var is_targeting = Input.is_action_pressed("z_target")
+	# Lock-On Logic
+	var is_targeting = Input.is_action_pressed("lock_on")
 	var target_pos = Vector3.ZERO
 	var closest_target = null
 	
@@ -2043,15 +2053,15 @@ func _setup_freeform_bar() -> void:
 
 
 func _setup_keyhints() -> void:
-	var strip := Label.new()
-	strip.text = "Arrows: Move   E: Interact   F: Freeform action   Tab: Next character   1-4: Select   I: Stats   M: Map   R: Reset camera"
-	strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	strip.offset_top    = -28
-	strip.offset_bottom = -6
-	strip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	strip.add_theme_font_size_override("font_size", 13)
-	strip.add_theme_color_override("font_color", Color(0.7, 0.65, 0.55, 0.60))
-	_ui_layer.add_child(strip)
+	_keyhint_label = Label.new()
+	_keyhint_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_keyhint_label.offset_top    = -28
+	_keyhint_label.offset_bottom = -6
+	_keyhint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_keyhint_label.add_theme_font_size_override("font_size", 13)
+	_keyhint_label.add_theme_color_override("font_color", Color(0.7, 0.65, 0.55, 0.60))
+	_ui_layer.add_child(_keyhint_label)
+	_update_controller_status()
 
 
 func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
