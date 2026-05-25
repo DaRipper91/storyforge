@@ -15,13 +15,29 @@ var _dungeon_root: Node3D = null
 var _current_room_id: String = ""
 
 # Shared materials (created once, reused)
-var _mat_wall:      StandardMaterial3D = null
-var _mat_floor:     StandardMaterial3D = null
+var _mat_wall:      Material = null   # ShaderMaterial — stone blocks
+var _mat_floor:     Material = null   # ShaderMaterial — stone flags
 var _mat_door:      StandardMaterial3D = null
 var _mat_hazard:    StandardMaterial3D = null
 var _mat_pillar:    StandardMaterial3D = null
 var _mat_table:     StandardMaterial3D = null
 var _mat_difficult: StandardMaterial3D = null
+
+# ─── Environment / lighting ─────────────────────────────────────────
+var _world_env: WorldEnvironment  = null
+var _env:       Environment       = null
+var _key_light: DirectionalLight3D = null
+
+# Per-room atmosphere (fog color, density, ambient, key light)
+const ROOM_ATMOSPHERE: Dictionary = {
+	"tavern_01":        {"fog": Color(0.10, 0.07, 0.03), "fog_d": 0.020, "ambient": Color(0.15, 0.10, 0.05), "key": Color(1.00, 0.78, 0.50), "key_e": 1.4},
+	"cellar_depths":    {"fog": Color(0.02, 0.02, 0.05), "fog_d": 0.060, "ambient": Color(0.04, 0.04, 0.08), "key": Color(0.50, 0.60, 1.00), "key_e": 0.6},
+	"forest_edge":      {"fog": Color(0.04, 0.08, 0.03), "fog_d": 0.018, "ambient": Color(0.08, 0.14, 0.06), "key": Color(0.90, 1.00, 0.80), "key_e": 1.6},
+	"ancient_ruins":    {"fog": Color(0.04, 0.03, 0.06), "fog_d": 0.050, "ambient": Color(0.06, 0.05, 0.08), "key": Color(0.70, 0.65, 1.00), "key_e": 0.85},
+	"market_square":    {"fog": Color(0.08, 0.07, 0.06), "fog_d": 0.015, "ambient": Color(0.12, 0.11, 0.10), "key": Color(1.00, 0.95, 0.85), "key_e": 1.3},
+	"nightside_square": {"fog": Color(0.02, 0.02, 0.04), "fog_d": 0.055, "ambient": Color(0.05, 0.05, 0.10), "key": Color(0.60, 0.65, 1.00), "key_e": 0.7},
+}
+const _ATMO_DEFAULT: Dictionary = {"fog": Color(0.04, 0.04, 0.06), "fog_d": 0.040, "ambient": Color(0.08, 0.09, 0.12), "key": Color(1.00, 0.88, 0.70), "key_e": 1.1}
 
 # Race group → emissive color for miniature glow
 const RACE_COLORS: Dictionary = {
@@ -131,6 +147,7 @@ var _npc_active_data:  Dictionary    = {}  # encounter data from server
 func _ready():
 	_build_materials()
 	_setup_ui()
+	_setup_environment()
 
 	_dungeon_root = Node3D.new()
 	_dungeon_root.name = "DungeonRoot"
@@ -407,15 +424,51 @@ func _toggle_world_map() -> void:
 
 
 func _build_materials():
-	_mat_wall = StandardMaterial3D.new()
-	_mat_wall.albedo_color = Color(0.28, 0.25, 0.22)
-	_mat_wall.roughness = 0.9
-	_mat_wall.metallic = 0.0
+	# Stone-block wall: hash-varied tiles with grout lines
+	var wall_sm := ShaderMaterial.new()
+	wall_sm.shader = Shader.new()
+	wall_sm.shader.code = """
+shader_type spatial;
+void fragment() {
+	vec2 uv = UV * 2.5;
+	vec2 tile = floor(uv);
+	vec2 frc  = fract(uv);
+	float n   = fract(sin(dot(tile, vec2(127.1, 311.7))) * 43758.5453);
+	float grout = step(0.93, max(frc.x, frc.y));
+	vec3 base = vec3(0.27, 0.24, 0.21) * (0.78 + n * 0.44);
+	ALBEDO    = mix(base, vec3(0.11, 0.10, 0.09), grout);
+	ROUGHNESS = 0.93 - n * 0.08;
+	METALLIC  = 0.0;
+	float ex  = (frc.x - 0.5) * grout * 0.5;
+	float ey  = (frc.y - 0.5) * grout * 0.5;
+	NORMAL_MAP       = normalize(vec3(ex, ey, 1.0));
+	NORMAL_MAP_DEPTH = 1.1;
+}
+"""
+	_mat_wall = wall_sm
 
-	_mat_floor = StandardMaterial3D.new()
-	_mat_floor.albedo_color = Color(0.22, 0.20, 0.18)
-	_mat_floor.roughness = 0.85
-	_mat_floor.metallic = 0.0
+	# Stone-flag floor: larger slabs with grout and wear variation
+	var floor_sm := ShaderMaterial.new()
+	floor_sm.shader = Shader.new()
+	floor_sm.shader.code = """
+shader_type spatial;
+void fragment() {
+	vec2 uv   = UV * 3.0;
+	vec2 tile = floor(uv);
+	vec2 frc  = fract(uv);
+	float n   = fract(sin(dot(tile, vec2(311.7, 127.1))) * 43758.5453);
+	float grout = step(0.94, max(frc.x, frc.y));
+	vec3 base = vec3(0.21, 0.19, 0.17) * (0.80 + n * 0.40);
+	ALBEDO    = mix(base, vec3(0.09, 0.08, 0.07), grout);
+	ROUGHNESS = 0.88 - n * 0.10;
+	METALLIC  = 0.0;
+	float ex  = (frc.x - 0.5) * grout * 0.35;
+	float ey  = (frc.y - 0.5) * grout * 0.35;
+	NORMAL_MAP       = normalize(vec3(ex, ey, 1.0));
+	NORMAL_MAP_DEPTH = 0.85;
+}
+"""
+	_mat_floor = floor_sm
 
 	_mat_door = StandardMaterial3D.new()
 	_mat_door.albedo_color = Color(0.35, 0.25, 0.15)
@@ -674,6 +727,10 @@ func _rebuild_room(state: Dictionary):
 	_cam_distance = max(w, h) * 0.9 + 4.0
 	_update_camera()
 
+	_build_void_floor(w, h)
+	_add_room_torches(cells, w, h)
+	_set_room_atmosphere(room_id)
+
 
 # ─── State / miniatures ─────────────────────────────────────────────
 
@@ -831,6 +888,9 @@ func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 	ring_inst.material_override = ring_mat
 	ring_inst.position = Vector3(0, 0.02, 0)
 	root.add_child(ring_inst)
+
+	# HP bar floating above token
+	_add_enemy_hp_bar(root, data.get("hp_current", 1), data.get("hp_max", 1))
 
 	add_child(root)
 	_enemy_tokens[enemy_id] = root
@@ -1075,15 +1135,30 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 			var resp = JSON.parse_string(body.get_string_from_utf8())
 			if resp is Dictionary:
 				_show_combat_result(resp)
-				# Play death animation on the enemy token if it died
-				if resp.get("enemy_died", false) and enemy_id in _enemy_tokens:
+				if enemy_id in _enemy_tokens:
 					var etok: Node3D = _enemy_tokens[enemy_id]
-					var ap := _find_anim_player_in(etok)
-					if ap:
-						for n in ["Death", "Die", "Fall", "death"]:
-							if ap.has_animation(n):
-								ap.play(n)
-								break
+					# Sparks on any hit
+					var pa: Dictionary = resp.get("player_attack", {})
+					if pa.get("hit", false):
+						_spawn_hit_sparks(etok.position)
+					# Death animation + bar hide on kill
+					if resp.get("enemy_died", false):
+						var ap := _find_anim_player_in(etok)
+						if ap:
+							for n in ["Death", "Die", "Fall", "death"]:
+								if ap.has_animation(n):
+									ap.play(n)
+									break
+						var bar := etok.get_node_or_null("HPBar")
+						if bar:
+							bar.visible = false
+					else:
+						# Refresh HP bar to show new HP
+						var bar := etok.get_node_or_null("HPBar")
+						if bar:
+							bar.queue_free()
+						_add_enemy_hp_bar(etok, resp.get("enemy_hp", 1),
+							_enemy_data.get(enemy_id, {}).get("hp_max", 1))
 				pc.fetch_full_state()
 		http.queue_free()
 	)
@@ -1366,3 +1441,285 @@ func spawn_magic_burst(world_pos: Vector3):
 		var inst = _magic_burst_scene.instantiate()
 		particles_root.add_child(inst)
 		inst.position = world_pos + Vector3(0, 0.5, 0)
+
+
+# ─── Environment setup ──────────────────────────────────────────────
+
+func _setup_environment() -> void:
+	_env = Environment.new()
+	_env.background_mode        = Environment.BG_COLOR
+	_env.background_color       = Color(0.02, 0.02, 0.03)
+	_env.ambient_light_source   = Environment.AMBIENT_SOURCE_COLOR
+	_env.ambient_light_color    = Color(0.08, 0.09, 0.12)
+	_env.ambient_light_energy   = 0.8
+
+	# Distance fog — makes the void outside rooms fade to near-black
+	_env.fog_enabled            = true
+	_env.fog_light_color        = Color(0.04, 0.04, 0.06)
+	_env.fog_light_energy       = 1.0
+	_env.fog_density            = 0.040
+
+	# Bloom — lets emissive glows on tokens and rings pulse visibly
+	_env.glow_enabled           = true
+	_env.glow_intensity         = 0.55
+	_env.glow_bloom             = 0.12
+	_env.glow_hdr_threshold     = 0.70
+	_env.glow_hdr_scale         = 2.0
+
+	# SSAO — adds depth to wall/floor crevices
+	_env.ssao_enabled           = true
+	_env.ssao_radius            = 1.0
+	_env.ssao_intensity         = 1.8
+	_env.ssao_power             = 1.5
+
+	# Filmic tone mapping — prevents over-bright washed-out look
+	_env.tonemap_mode           = Environment.TONE_MAPPER_FILMIC
+	_env.tonemap_exposure       = 0.9
+
+	_world_env = WorldEnvironment.new()
+	_world_env.name = "WorldEnvironment"
+	_world_env.environment = _env
+	add_child(_world_env)
+
+	# Key light — warm directional from upper-front-right, casts shadows
+	_key_light = DirectionalLight3D.new()
+	_key_light.name = "KeyLight"
+	_key_light.rotation_degrees = Vector3(-55.0, 30.0, 0.0)
+	_key_light.light_color      = Color(1.0, 0.88, 0.70)
+	_key_light.light_energy     = 1.1
+	_key_light.shadow_enabled   = true
+	add_child(_key_light)
+
+	# Fill light — cool bounce from below-back, no shadow
+	var fill := DirectionalLight3D.new()
+	fill.name = "FillLight"
+	fill.rotation_degrees = Vector3(25.0, -160.0, 0.0)
+	fill.light_color      = Color(0.40, 0.50, 0.80)
+	fill.light_energy     = 0.20
+	fill.shadow_enabled   = false
+	add_child(fill)
+
+
+func _set_room_atmosphere(room_id: String) -> void:
+	if not _env or not _key_light:
+		return
+	var atmo: Dictionary = ROOM_ATMOSPHERE.get(room_id, _ATMO_DEFAULT)
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(_env,       "fog_light_color",    atmo["fog"],     1.5)
+	tw.tween_property(_env,       "fog_density",        atmo["fog_d"],   1.5)
+	tw.tween_property(_env,       "ambient_light_color", atmo["ambient"], 1.5)
+	tw.tween_property(_key_light, "light_color",        atmo["key"],     1.5)
+	tw.tween_property(_key_light, "light_energy",       atmo["key_e"],   1.5)
+
+
+# ─── Cave void outside rooms ─────────────────────────────────────────
+
+func _build_void_floor(w: int, h: int) -> void:
+	var cx := (w - 1) * CELL_SIZE * 0.5
+	var cz := (h - 1) * CELL_SIZE * 0.5
+	var size := max(w, h) * CELL_SIZE * 6.0
+
+	# Large dark cavern floor extending beyond room bounds
+	var void_sm := ShaderMaterial.new()
+	void_sm.shader = Shader.new()
+	void_sm.shader.code = """
+shader_type spatial;
+void fragment() {
+	vec2 uv   = UV * 10.0;
+	vec2 tile = floor(uv);
+	float n   = fract(sin(dot(tile, vec2(127.1, 311.7))) * 43758.5453);
+	ALBEDO    = vec3(0.06, 0.055, 0.05) * (0.65 + n * 0.35);
+	ROUGHNESS = 0.96;
+	METALLIC  = 0.0;
+}
+"""
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(size, size)
+	var void_inst := MeshInstance3D.new()
+	void_inst.mesh = plane
+	void_inst.material_override = void_sm
+	void_inst.position = Vector3(cx, -0.14, cz)
+	_dungeon_root.add_child(void_inst)
+
+	# Scatter cave boulders and rubble around the perimeter
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(w * 1000 + h)
+	var min_d := max(w, h) * 0.55 * CELL_SIZE
+	var max_d := max(w, h) * 1.8 * CELL_SIZE
+
+	for _i in range(45):
+		var angle := rng.randf() * TAU
+		var dist  := rng.randf_range(min_d, max_d)
+		var rx := cx + cos(angle) * dist
+		var rz2 := cz + sin(angle) * dist
+		var rh   := rng.randf_range(0.2, 2.4)
+		var rw2  := rng.randf_range(0.3, 1.6)
+		var rd   := rng.randf_range(0.3, 1.6)
+		var rock_mesh := BoxMesh.new()
+		rock_mesh.size = Vector3(rw2, rh, rd)
+		var sv := rng.randf_range(0.07, 0.19)
+		var rock_mat := StandardMaterial3D.new()
+		rock_mat.albedo_color = Color(sv, sv * 0.94, sv * 0.86)
+		rock_mat.roughness    = rng.randf_range(0.85, 0.97)
+		var rock_inst := MeshInstance3D.new()
+		rock_inst.mesh = rock_mesh
+		rock_inst.material_override = rock_mat
+		rock_inst.position = Vector3(rx, rh * 0.5 - 0.13, rz2)
+		rock_inst.rotation_euler.y = rng.randf() * TAU
+		_dungeon_root.add_child(rock_inst)
+
+	# Stalactites hanging from ceiling
+	for _j in range(22):
+		var angle := rng.randf() * TAU
+		var dist  := rng.randf_range(min_d * 0.65, max_d)
+		var sx := cx + cos(angle) * dist
+		var sz2 := cz + sin(angle) * dist
+		var sh   := rng.randf_range(0.25, 1.6)
+		var sr   := rng.randf_range(0.05, 0.20)
+		var stala := CylinderMesh.new()
+		stala.top_radius    = 0.0
+		stala.bottom_radius = sr
+		stala.height        = sh
+		stala.radial_segments = 5
+		var sv2 := rng.randf_range(0.10, 0.24)
+		var sm2 := StandardMaterial3D.new()
+		sm2.albedo_color = Color(sv2, sv2 * 0.92, sv2 * 0.84)
+		sm2.roughness    = 0.90
+		var si := MeshInstance3D.new()
+		si.mesh = stala
+		si.material_override = sm2
+		si.position = Vector3(sx, 2.5 - sh * 0.5, sz2)
+		_dungeon_root.add_child(si)
+
+
+# ─── Wall torches ────────────────────────────────────────────────────
+
+func _add_room_torches(cells: Array, w: int, h: int) -> void:
+	var torch_pos: Array[Vector3] = []
+
+	# Room corners (if floor)
+	for corner in [[1, 1], [w - 2, 1], [1, h - 2], [w - 2, h - 2]]:
+		var tx: int = corner[0]
+		var ty: int = corner[1]
+		var idx := ty * w + tx
+		if idx < cells.size():
+			var t: String = cells[idx].get("terrain", "floor")
+			if t in ["floor", "difficult", "table"]:
+				torch_pos.append(Vector3(tx * CELL_SIZE, 1.5, ty * CELL_SIZE))
+
+	# Wall cells adjacent to floor — thin-out to avoid saturation
+	for y in range(h):
+		for x in range(w):
+			if torch_pos.size() >= 14:
+				break
+			var idx := y * w + x
+			if idx >= cells.size():
+				continue
+			if cells[idx].get("terrain", "floor") != "wall":
+				continue
+			if (x + y) % 5 != 0:
+				continue
+			for off in [[0,1],[0,-1],[1,0],[-1,0]]:
+				var nx2 := x + off[0]
+				var ny2 := y + off[1]
+				var ni  := ny2 * w + nx2
+				if nx2 >= 0 and nx2 < w and ny2 >= 0 and ny2 < h and ni < cells.size():
+					if cells[ni].get("terrain", "floor") in ["floor", "door"]:
+						torch_pos.append(Vector3(x * CELL_SIZE, 1.4, y * CELL_SIZE))
+						break
+
+	for tp in torch_pos:
+		# Warm flickering OmniLight
+		var light := OmniLight3D.new()
+		light.light_color  = Color(1.0, 0.60, 0.20)
+		light.light_energy = 1.6
+		light.omni_range   = 3.8
+		light.shadow_enabled = false
+		light.position = tp
+		_dungeon_root.add_child(light)
+
+		# Small CPU flame particle — no scene file needed
+		var flame := CPUParticles3D.new()
+		flame.emitting           = true
+		flame.amount             = 14
+		flame.lifetime           = 0.45
+		flame.explosiveness      = 0.0
+		flame.randomness         = 0.65
+		flame.direction          = Vector3(0, 1, 0)
+		flame.spread             = 22.0
+		flame.gravity            = Vector3(0, 0.4, 0)
+		flame.initial_velocity_min = 0.4
+		flame.initial_velocity_max = 1.0
+		flame.scale_amount_min   = 0.04
+		flame.scale_amount_max   = 0.09
+		flame.color              = Color(1.0, 0.50, 0.10, 0.85)
+		flame.position           = tp + Vector3(0, 0.12, 0)
+		_dungeon_root.add_child(flame)
+
+
+# ─── Hit sparks ──────────────────────────────────────────────────────
+
+func _spawn_hit_sparks(world_pos: Vector3) -> void:
+	var sparks := CPUParticles3D.new()
+	sparks.position          = world_pos + Vector3(0, 0.55, 0)
+	sparks.emitting          = true
+	sparks.one_shot          = true
+	sparks.amount            = 22
+	sparks.lifetime          = 0.55
+	sparks.explosiveness     = 0.88
+	sparks.direction         = Vector3(0, 1, 0)
+	sparks.spread            = 75.0
+	sparks.gravity           = Vector3(0, -9.8, 0)
+	sparks.initial_velocity_min = 2.5
+	sparks.initial_velocity_max = 5.5
+	sparks.scale_amount_min  = 0.03
+	sparks.scale_amount_max  = 0.07
+	sparks.color             = Color(1.0, 0.70, 0.15)
+	add_child(sparks)
+	get_tree().create_timer(1.5).timeout.connect(sparks.queue_free)
+
+
+# ─── Enemy HP bar ────────────────────────────────────────────────────
+
+func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
+	var bar := Node3D.new()
+	bar.name = "HPBar"
+	bar.position = Vector3(0.0, 1.35, 0.0)
+
+	var frac := clamp(float(hp) / float(max(1, hp_max)), 0.0, 1.0)
+	var bar_w := 0.62
+
+	# Background (dark maroon)
+	var bg := MeshInstance3D.new()
+	var bg_mesh := QuadMesh.new()
+	bg_mesh.size = Vector2(bar_w + 0.04, 0.085)
+	bg.mesh = bg_mesh
+	var bg_mat := StandardMaterial3D.new()
+	bg_mat.albedo_color  = Color(0.22, 0.02, 0.02, 0.92)
+	bg_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	bg_mat.no_depth_test  = true
+	bg_mat.shading_mode   = BaseMaterial3D.SHADING_MODE_UNSHADED
+	bg_mat.transparency   = BaseMaterial3D.TRANSPARENCY_ALPHA
+	bg.material_override  = bg_mat
+	bar.add_child(bg)
+
+	# Foreground fill (green → red by remaining HP)
+	if frac > 0.0:
+		var fg := MeshInstance3D.new()
+		var fg_mesh := QuadMesh.new()
+		fg_mesh.size = Vector2(bar_w * frac, 0.075)
+		fg.mesh = fg_mesh
+		var c := Color(1.0 - frac, frac * 0.85, 0.05, 1.0)
+		var fg_mat := StandardMaterial3D.new()
+		fg_mat.albedo_color   = c
+		fg_mat.emission_enabled = true
+		fg_mat.emission        = c * 0.5
+		fg_mat.billboard_mode  = BaseMaterial3D.BILLBOARD_ENABLED
+		fg_mat.no_depth_test   = true
+		fg_mat.shading_mode    = BaseMaterial3D.SHADING_MODE_UNSHADED
+		fg.material_override   = fg_mat
+		# Offset so it fills from the left edge
+		fg.position.x = -(bar_w * (1.0 - frac)) * 0.5
+		bar.add_child(fg)
+
+	root.add_child(bar)
