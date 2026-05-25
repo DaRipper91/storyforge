@@ -1517,7 +1517,7 @@ func _set_room_atmosphere(room_id: String) -> void:
 func _build_void_floor(w: int, h: int) -> void:
 	var cx := (w - 1) * CELL_SIZE * 0.5
 	var cz := (h - 1) * CELL_SIZE * 0.5
-	var size := max(w, h) * CELL_SIZE * 6.0
+	var size: float = float(maxi(w, h)) * CELL_SIZE * 6.0
 
 	# Large dark cavern floor extending beyond room bounds
 	var void_sm := ShaderMaterial.new()
@@ -1544,8 +1544,8 @@ void fragment() {
 	# Scatter cave boulders and rubble around the perimeter
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(w * 1000 + h)
-	var min_d := max(w, h) * 0.55 * CELL_SIZE
-	var max_d := max(w, h) * 1.8 * CELL_SIZE
+	var min_d: float = float(maxi(w, h)) * 0.55 * CELL_SIZE
+	var max_d: float = float(maxi(w, h)) * 1.8 * CELL_SIZE
 
 	for _i in range(45):
 		var angle := rng.randf() * TAU
@@ -1620,9 +1620,9 @@ func _add_room_torches(cells: Array, w: int, h: int) -> void:
 			if (x + y) % 5 != 0:
 				continue
 			for off in [[0,1],[0,-1],[1,0],[-1,0]]:
-				var nx2 := x + off[0]
-				var ny2 := y + off[1]
-				var ni  := ny2 * w + nx2
+				var nx2: int = x + int(off[0])
+				var ny2: int = y + int(off[1])
+				var ni: int  = ny2 * w + nx2
 				if nx2 >= 0 and nx2 < w and ny2 >= 0 and ny2 < h and ni < cells.size():
 					if cells[ni].get("terrain", "floor") in ["floor", "door"]:
 						torch_pos.append(Vector3(x * CELL_SIZE, 1.4, y * CELL_SIZE))
@@ -1686,7 +1686,7 @@ func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
 	bar.name = "HPBar"
 	bar.position = Vector3(0.0, 1.35, 0.0)
 
-	var frac := clamp(float(hp) / float(max(1, hp_max)), 0.0, 1.0)
+	var frac: float = clamp(float(hp) / float(maxi(1, hp_max)), 0.0, 1.0)
 	var bar_w := 0.62
 
 	# Background (dark maroon)
