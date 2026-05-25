@@ -554,6 +554,8 @@ func _input(event: InputEvent):
 					_npc_dialog.visible = false
 				elif _world_map_visible:
 					_toggle_world_map()
+			KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT:
+				_arrow_move(event.keycode)
 
 
 func _update_camera():
@@ -1021,6 +1023,78 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	)
 	spawn_magic_burst(target)
 	AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
+
+
+func _arrow_move(keycode: int) -> void:
+	if _selected_cid.is_empty() or not _selected_cid in _miniatures:
+		# Auto-select first character if none chosen
+		if _character_data.is_empty():
+			return
+		_select_mini(_character_data.keys()[0])
+
+	var cid := _selected_cid
+	var char_data: Dictionary = _character_data.get(cid, {})
+	var pos = char_data.get("position", null)
+	if pos == null:
+		return
+
+	var gx: int = int(pos.get("x", 0))
+	var gy: int = int(pos.get("y", 0))
+
+	# Raw arrow direction in screen space
+	var raw_dir := Vector2.ZERO
+	match keycode:
+		KEY_UP:    raw_dir = Vector2( 0, -1)
+		KEY_DOWN:  raw_dir = Vector2( 0,  1)
+		KEY_LEFT:  raw_dir = Vector2(-1,  0)
+		KEY_RIGHT: raw_dir = Vector2( 1,  0)
+
+	# Rotate by camera yaw so arrows feel relative to the view
+	var yaw := deg_to_rad(_cam_yaw)
+	var dx: int = roundi(raw_dir.x * cos(yaw) - raw_dir.y * sin(yaw))
+	var dy: int = roundi(raw_dir.x * sin(yaw) + raw_dir.y * cos(yaw))
+
+	var tx: int = gx + dx
+	var ty: int = gy + dy
+
+	if tx < 0 or ty < 0 or tx >= _room_width or ty >= _room_height:
+		return
+
+	var cell_idx: int = ty * _room_width + tx
+	var cell: Dictionary = _room_cells[cell_idx] if cell_idx < _room_cells.size() else {}
+	var terrain: String = cell.get("terrain", "floor")
+
+	# Interact with door, attack enemy, or move to floor
+	var cell_key := "%d,%d" % [tx, ty]
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+
+	if cell_key in _enemy_cells:
+		var eid: String = _enemy_cells[cell_key]
+		if _enemy_data.get(eid, {}).get("alive", false):
+			_do_attack_enemy(eid, cid)
+		return
+
+	if cell_key in _npc_cells:
+		_do_interact_npc(_npc_cells[cell_key], tx, ty, cid)
+		return
+
+	if terrain in ["floor", "difficult", "door"]:
+		var action_type := "interact" if terrain == "door" else "move"
+		var http := pc.post_request("/action/grid", {
+			"actor_id": cid, "type": action_type,
+			"target": {"x": tx, "y": ty}
+		})
+		if terrain == "door":
+			http.request_completed.connect(func(_r, _c, _h, body):
+				var resp = JSON.parse_string(body.get_string_from_utf8())
+				if resp and resp.has("room_transition"):
+					pc.fetch_full_state()
+				http.queue_free()
+			)
+		else:
+			http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
 
 
 func _grid_to_world(grid_pos: Vector2) -> Vector3:
