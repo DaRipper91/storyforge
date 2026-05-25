@@ -1,3 +1,3 @@
-## 2024-05-23 - Minimize Button Accessibility
-**Learning:** Added `aria-label="Minimize Window"` to the app menu minimize button. Found that adding `aria-label` to buttons that already have clear descriptive text (e.g. "Settings", "Quit") is an accessibility anti-pattern because it's redundant. `aria-label` should only be used when visible text is missing or insufficient (like the "—" button).
-**Action:** Only use `aria-label` on buttons that are icon-only or have text that doesn't fully explain their action.
+## 2024-11-20 - Ensure Semantic Form Relationships
+**Learning:** Found several instances where pseudo-labels (using `<span>` or `<p>` tags) were used next to inputs without proper semantic `<label>` grouping or `id` mapping. Also, dynamic inputs (e.g., custom pronoun or title inputs) lacked ARIA labels, which degrades screen reader accessibility.
+**Action:** When working on form inputs, always use semantic `<label>` tags linked via `for`/`htmlFor` and `id`, or use `aria-label` for inputs that inherently do not have visible labels to maintain full accessibility.
