@@ -702,6 +702,8 @@ export function getRaceFrames(raceId) {
 
 export const SPRITE_DIM = 8;
 
+const _spriteCache = new Map();
+
 /**
  * Render a sprite frame to an HTMLCanvasElement.
  *
@@ -712,6 +714,11 @@ export const SPRITE_DIM = 8;
  * @returns {HTMLCanvasElement}
  */
 export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
+  const cacheKey = `${frame.join(',')}_${charColor}_${scale}_${accent}`;
+  if (_spriteCache.has(cacheKey)) {
+    return _spriteCache.get(cacheKey);
+  }
+
   const size = SPRITE_DIM * scale;
   const canvas = document.createElement('canvas');
   canvas.width  = size;
@@ -729,6 +736,8 @@ export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
       ctx.fillRect(px * scale, py * scale, scale, scale);
     }
   }
+
+  _spriteCache.set(cacheKey, canvas);
   return canvas;
 }
 
