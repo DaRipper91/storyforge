@@ -20,7 +20,7 @@ from typing import Literal
 from storyforge.core import grid, rules
 from storyforge.core.models import (
     CharacterSheet, Coord, GameState, GridAction,
-    NarrativeEntry, StateDiff, TurnPhase,
+    NarrativeEntry, StateDiff,
 )
 from storyforge.events.bus import event_bus
 from storyforge.persistence import snapshot

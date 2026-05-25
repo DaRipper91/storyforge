@@ -112,12 +112,15 @@ class NpcSheet(BaseModel):
     id: str
     name: str
     position: Coord
+    target_position: Coord | None = None
     room_id: str | None = None          # which room this NPC belongs to (None = any)
     sprite_key: str = "npc_default"     # frontend canvas uses this to style the token
     interactable: bool = True
     encounter_id: str | None = None     # e.g. "john_shop" — links to encounter handler
     blocks_movement: bool = True        # if True the grid cell has occupant_id set
     description: str = ""
+    dialog_history: list[dict[str, str]] = Field(default_factory=list)
+    schedule: dict[str, dict[str, float]] = Field(default_factory=dict) # e.g. "8": {"x": 10, "z": 5}
 
 
 class EnemySheet(BaseModel):

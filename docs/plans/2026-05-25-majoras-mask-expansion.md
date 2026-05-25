@@ -38,12 +38,12 @@
 
 ## Phase 2: The Global Clock & Dynamic Lighting
 
-**Goal:** Implement the defining feature of Majora's Mask: Time.
+**Goal:** Implement the defining feature of Majora's Mask: Time, and replace the abstract void with a rich, atmospheric world.
 
 ### Task 2.1: The Time Manager (Godot UI & Sync)
 - **Files:** `godot/scripts/TimeManager.gd` (New Autoload)
 - **Action:** Create a UI element at the bottom center of the screen displaying the "Current Day" and a clock face.
-- **Action:** Tick time forward continuously (e.g., 1 real minute = 1 in-game hour).
+- **Action:** Tick time forward continuously (e.g., 1 real minute = 12 in-game minutes).
 
 ### Task 2.2: Day/Night Cycle
 - **Files:** `godot/scenes/Tabletop.tscn`
@@ -53,19 +53,20 @@
 
 ---
 
-## Phase 3: Persistent Hub World & Scheduled NPCs
+## Phase 3: Persistent Hand-Crafted World Map
 
-**Goal:** Build a central town where NPCs live out their lives based on the clock.
+**Goal:** Replace the procedural "dungeon boxes in a void" with a hand-crafted, persistent level scene that feels like a real location.
 
-### Task 3.1: The Hub Level Scene
+### Task 3.1: The Central Hub Level (Clock Town Style)
 - **Files:** Create `godot/scenes/levels/CentralHub.tscn`
-- **Action:** Build a static town square level with terrain, buildings, and a clear center point. Ensure the floor is baked into a `NavigationRegion3D`.
+- **Action:** Build a static town square level with terrain, paths, houses, and landmarks (e.g., a central fountain). Ensure the entire floor is baked into a `NavigationRegion3D`.
+- **Action:** Add `Marker3D` nodes for party spawn points and NPC spawn points.
 
-### Task 3.2: AI Scheduled NPCs
-- **Files:** `Python Backend` (API) & `godot/scripts/NpcManager.gd`
-- **Action:** Update the backend to assign "schedules" to NPCs (e.g., 8AM - Market, 6PM - Inn).
-- **Action:** The Godot client polls the backend (or receives WebSocket events) for NPC locations.
-- **Action:** NPCs use their `NavigationAgent3D` to physically walk to their scheduled locations as time passes.
+### Task 3.2: Level Loading & Spawning
+- **Files:** `godot/scripts/Tabletop.gd`, Python Backend
+- **Action:** Update `Tabletop.gd` to load and instantiate the `CentralHub.tscn` level.
+- **Action:** Ensure player characters spawn at the designated `Marker3D` in the map rather than grid [0,0].
+- **Action:** Deprecate the `_rebuild_room` procedural logic when a persistent level is active.
 
 ---
 

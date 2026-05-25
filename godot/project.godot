@@ -24,6 +24,7 @@ config/icon="res://icon.svg"
 PythonClient="*res://scripts/PythonClient.gd"
 AudioManager="*res://scripts/AudioManager.gd"
 TimeManager="*res://scripts/TimeManager.gd"
+NpcManager="*res://scripts/NpcManager.gd"
 
 [display]
 

@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://cx6y8l8"]
+[gd_scene load_steps=4 format=3 uid="uid://cx6y8l8"]
 
 [ext_resource type="Script" path="res://scripts/RaceMini.gd" id="1_x8q2l"]
+[ext_resource type="PackedScene" uid="uid://d2w3x4y5z6a7" path="res://scenes/Interactable.tscn" id="2_int"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_root"]
 radius = 0.35
@@ -22,3 +23,5 @@ target_desired_distance = 0.5
 path_max_distance = 2.0
 avoidance_enabled = true
 radius = 0.5
+
+[node name="Interactable" parent="." instance=ExtResource("2_int")]

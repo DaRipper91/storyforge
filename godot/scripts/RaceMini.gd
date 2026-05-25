@@ -148,15 +148,32 @@ func _build_large_beast_mesh() -> void:
 	head.size = Vector3(0.6, 0.6, 0.8)
 	_add_part(head, Vector3(0, 1.0, 0.8))
 
-func move_with_input(input_dir: Vector3, delta: float) -> void:
+func move_with_input(input_dir: Vector3, delta: float, look_at_pos: Vector3 = Vector3.ZERO) -> void:
 	if input_dir.length() > 0.1:
 		velocity = input_dir * move_speed
 		# Smooth rotation
-		var target_quat = Quaternion(Basis.looking_at(input_dir))
+		var target_quat: Quaternion
+		if look_at_pos != Vector3.ZERO:
+			var dir_to_target = global_position.direction_to(look_at_pos)
+			dir_to_target.y = 0
+			if dir_to_target.length_squared() > 0.01:
+				target_quat = Quaternion(Basis.looking_at(dir_to_target))
+			else:
+				target_quat = Quaternion(Basis.looking_at(input_dir))
+		else:
+			target_quat = Quaternion(Basis.looking_at(input_dir))
+			
 		quaternion = quaternion.slerp(target_quat, rotation_speed * delta)
 		play_walk()
 	else:
 		velocity = velocity.move_toward(Vector3.ZERO, move_speed * 10.0 * delta)
+		# Even if not moving, we should rotate to face target if Z-Targeting
+		if look_at_pos != Vector3.ZERO:
+			var dir_to_target = global_position.direction_to(look_at_pos)
+			dir_to_target.y = 0
+			if dir_to_target.length_squared() > 0.01:
+				var target_quat = Quaternion(Basis.looking_at(dir_to_target))
+				quaternion = quaternion.slerp(target_quat, rotation_speed * delta)
 	
 	move_and_slide()
 

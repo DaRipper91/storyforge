@@ -9,7 +9,8 @@ Output: godot/assets/characters/<race_id>.png
 """
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import numpy as np
-import os, math, random
+import os
+import math
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "godot", "assets", "characters")
 W, H = 800, 1120
@@ -1129,4 +1130,4 @@ if __name__ == "__main__":
     print(f"Generating {len(RACES)} portraits at {W}x{H} -> {OUT}\n")
     for race_id, data in RACES.items():
         make_portrait(race_id, *data)
-    print(f"\nDone.")
+    print("\nDone.")

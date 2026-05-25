@@ -669,27 +669,58 @@ func _physics_process(delta: float) -> void:
 
 	# 1. Camera Control (Right Stick / Bluetooth Xbox)
 	var look_vec = Input.get_vector("look_left", "look_right", "look_up", "look_down")
-	if look_vec.length() > 0.05:
+	if look_vec.length() > 0.05 and not Input.is_action_pressed("z_target"):
 		_cam_yaw -= look_vec.x * 2.5
 		_cam_pitch = clamp(_cam_pitch - look_vec.y * 2.0, -82.0, -8.0)
 		_update_camera()
 
 	# 2. Leader Movement (Left Stick / WASD)
 	var leader = _miniatures[_selected_cid]
+	
+	# Z-Targeting Logic
+	var is_targeting = Input.is_action_pressed("z_target")
+	var target_pos = Vector3.ZERO
+	var closest_target = null
+	
+	if is_targeting:
+		var closest_dist = INF
+		# Check NPCs and Enemies
+		var candidates = _npc_tokens.values() + _enemy_tokens.values()
+		for c in candidates:
+			if not is_instance_valid(c): continue
+			var dist = leader.global_position.distance_to(c.global_position)
+			if dist < 15.0 and dist < closest_dist:
+				closest_dist = dist
+				closest_target = c
+		
+		if closest_target:
+			target_pos = closest_target.global_position
+			# Lock camera looking at target
+			var dir_to_target = leader.global_position.direction_to(target_pos)
+			_cam_yaw = rad_to_deg(atan2(-dir_to_target.x, -dir_to_target.z))
+	
 	var input_vec = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
-	if input_vec.length() > 0.05:
+	if input_vec.length() > 0.05 or is_targeting:
 		var yaw := deg_to_rad(_cam_yaw)
 		var forward = Vector3(-sin(yaw), 0, -cos(yaw))
 		var right   = Vector3(cos(yaw), 0, -sin(yaw))
 		
 		# In Godot get_vector, Y is positive for down, so -input_vec.y is forward
 		var move_dir = (right * input_vec.x + forward * (-input_vec.y)).normalized()
-		
+		if input_vec.length() < 0.05:
+			move_dir = Vector3.ZERO
+			
 		if leader.has_method("move_with_input"):
-			leader.move_with_input(move_dir, delta)
-			_cam_target = leader.position
-			_update_camera()
+			leader.move_with_input(move_dir, delta, target_pos)
+	
+	# Camera Follow
+	if closest_target:
+		# Midpoint camera
+		_cam_target = leader.position.lerp(closest_target.position, 0.3)
+	else:
+		_cam_target = leader.position
+	_update_camera()
 	
 	# 3. Party Follower Logic
 	for cid in _miniatures:
@@ -729,7 +760,7 @@ func _rebuild_room(state: Dictionary):
 	if room_id in rooms:
 		_room_label.text = rooms[room_id].get("name", room_id).to_upper()
 	else:
-		_room_label.text = ""
+		_room_label.text = room_id.capitalize()
 
 	# Cache room data for click-to-move
 	if room_id in rooms:
@@ -747,6 +778,26 @@ func _rebuild_room(state: Dictionary):
 	for child in _dungeon_root.get_children():
 		child.queue_free()
 
+	# 1. Check for a persistent hand-crafted level first
+	# Map room_id to a scene name (e.g. "central_hub" -> "CentralHub")
+	var parts = room_id.split("_")
+	var scene_name = ""
+	for part in parts:
+		scene_name += part.capitalize()
+	
+	var path = "res://scenes/levels/%s.tscn" % scene_name
+	if ResourceLoader.exists(path):
+		ground_mesh.visible = false
+		var scene = load(path) as PackedScene
+		var inst = scene.instantiate()
+		_dungeon_root.add_child(inst)
+		
+		_set_room_atmosphere(room_id)
+		if _dungeon_root:
+			_dungeon_root.bake_navigation_mesh()
+		return
+
+	# 2. Fallback to Procedural Generation
 	if not room_id in rooms:
 		ground_mesh.visible = true
 		return
@@ -904,6 +955,7 @@ func _on_state_updated(new_state: Dictionary):
 			tok.queue_free()
 		_npc_tokens.clear()
 		_npc_cells.clear()
+		NpcManager.clear_npcs()
 		_selected_cid = ""
 		_npc_dialog.visible = false
 	_update_narrative(new_state)
@@ -1119,6 +1171,12 @@ func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
 	add_child(mini)
 	mini.setup(sprite_key, display_name, false)
 	_npc_tokens[npc_id] = mini
+	NpcManager.register_npc(npc_id, mini)
+	
+	var interactable = mini.get_node_or_null("Interactable")
+	if interactable:
+		interactable.entity_id = npc_id
+		interactable.interacted.connect(_on_npc_interacted)
 
 
 func _update_narrative(state: Dictionary):
@@ -1316,6 +1374,30 @@ func _do_interact_npc(npc_id: String, gx: int, gy: int, actor_id: String) -> voi
 	var http = pc.post_request("/action/grid", {
 		"actor_id": actor_id, "type": "interact",
 		"target": {"x": gx, "y": gy}
+	})
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code >= 200 and code < 300:
+			var resp = JSON.parse_string(body.get_string_from_utf8())
+			if resp is Dictionary and resp.has("encounter"):
+				var enc: Dictionary = resp["encounter"]
+				if enc.get("type", "") == "npc_encounter":
+					_show_npc_dialog(enc)
+		http.queue_free()
+	)
+
+func _on_npc_interacted(interactable: Area3D, player_mini: Node3D) -> void:
+	if _selected_cid.is_empty():
+		return
+	
+	# Fallback to the old grid logic by finding their grid positions
+	# Or, since we're replacing the grid, we can just send the target ID
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	var npc_id = interactable.entity_id
+	var http = pc.post_request("/action/interact_entity", {
+		"actor_id": _selected_cid, 
+		"target_id": npc_id
 	})
 	http.request_completed.connect(func(_r, code, _h, body):
 		if code >= 200 and code < 300:

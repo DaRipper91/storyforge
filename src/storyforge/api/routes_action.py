@@ -103,6 +103,40 @@ async def handle_freeform(
     return {"narrative": response.narrative, "revision": state.current.revision}
 
 
+class EntityAction(BaseModel):
+    actor_id: str
+    target_id: str
+
+@router.post("/interact_entity")
+async def interact_entity(
+    action: EntityAction,
+    state: StateManager = Depends(get_state_manager),
+) -> dict:
+    """Directly interact with an entity (NPC, chest, etc.) by ID."""
+    if state.current.phase != TurnPhase.EXPLORATION:
+        raise HTTPException(
+            status_code=409,
+            detail=f"actions require EXPLORATION phase, currently {state.current.phase.value}",
+        )
+    
+    char = state.get_character(action.actor_id)
+    target_id = action.target_id
+    
+    # Check if target is an NPC
+    if target_id in state.current.npcs:
+        npc = state.current.npcs[target_id]
+        diff = {
+            "type": "npc_encounter",
+            "npc_id": npc.id,
+            "npc_name": npc.name,
+            "encounter_id": npc.encounter_id,
+            "history": npc.dialog_history,
+        }
+        return {"encounter": diff, "revision": state.current.revision}
+    
+    raise HTTPException(status_code=404, detail="Target not found or not interactable")
+
+
 class TravelRequest(BaseModel):
     room_id: str
 

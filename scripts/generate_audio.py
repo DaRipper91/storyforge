@@ -6,9 +6,7 @@ All files are real, playable audio — swap in final assets by replacing the fil
 Run:  uv run python scripts/generate_audio.py
 """
 import wave
-import struct
 import os
-import math
 import numpy as np
 from pathlib import Path
 

@@ -1,52 +1,29 @@
 {
   "campaign_id": "family_campaign_01",
-  "current_room_id": "crossroads",
+  "current_room_id": "central_hub",
   "phase": "lobby",
   "era": "after",
   "world_name": "The Feral World",
   "characters": {},
   "npcs": {
-    "bink_bink": {
-      "id": "bink_bink",
-      "name": "Bink Bink",
-      "position": {
-        "x": 4,
-        "y": 2
-      },
-      "room_id": "ironhold_keep",
-      "sprite_key": "npc_cat",
-      "interactable": true,
-      "encounter_id": "pet_bink_bink",
-      "blocks_movement": false,
-      "description": "Queen D.Anna's cat. Quality control authority over the shelves. Every 8-12 minutes, something falls. She is an unshakeable fixture of Ironhold Keep."
-    },
-    "cole": {
-      "id": "cole",
-      "name": "Cole",
-      "position": {
-        "x": 3,
-        "y": 3
-      },
-      "room_id": "ironhold_keep",
-      "sprite_key": "npc_dog_black",
-      "interactable": true,
-      "encounter_id": "pet_cole",
-      "blocks_movement": false,
-      "description": "Bryne's companion. A massive black fluffy dog. He 'Leans' with the weight of a heavy blanket."
-    },
     "jon": {
       "id": "jon",
       "name": "Jon",
       "position": {
-        "x": 1,
-        "y": 1
+        "x": 10,
+        "y": -8
       },
-      "room_id": "store_01",
+      "room_id": "central_hub",
       "sprite_key": "npc_jon",
       "interactable": true,
       "encounter_id": "jon_shop",
       "blocks_movement": true,
-      "description": "The proprietor of The Store. Lover and husband to Madame Haylie. Father of four (forthcoming). Shares Coco with Haylie. Genuinely warm and conversational."
+      "description": "The proprietor of The Store.",
+      "schedule": {
+        "8": {"x": 10, "y": -8},
+        "12": {"x": 0, "y": 0},
+        "18": {"x": 10, "y": -8}
+      }
     },
     "samael": {
       "id": "samael",

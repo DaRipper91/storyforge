@@ -5,7 +5,9 @@ Run: blender --background --python make_enemies.py
 Outputs to godot/assets/models/enemies/
 Each model includes Idle, Attack, and Death NLA actions.
 """
-import bpy, bmesh, math, os, sys
+import bpy
+import math
+import os
 
 OUT = os.path.join(os.path.dirname(__file__),
                    "../../godot/assets/models/enemies")

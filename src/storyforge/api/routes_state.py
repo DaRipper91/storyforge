@@ -5,11 +5,42 @@ from pydantic import BaseModel
 
 from storyforge.config import settings
 from storyforge.core.state_manager import StateManager
+from storyforge.core.models import Coord
 from storyforge.api.deps import get_state_manager
 from storyforge.persistence import snapshot
+from storyforge.events.bus import event_bus
 
 router = APIRouter(prefix="/api", tags=["state"])
 
+class TimeSyncRequest(BaseModel):
+    day: int
+    hour: int
+    minute: int
+
+@router.post("/time/sync")
+async def sync_time(req: TimeSyncRequest, state: StateManager = Depends(get_state_manager)):
+    """Godot sends the current time. Update NPC schedules if hour changes."""
+    # We can store the global time in state if we want, but for now just use it to evaluate schedules
+    current_hour_str = str(req.hour)
+    
+    dirty = False
+    for npc_id, npc in state.current.npcs.items():
+        if npc.schedule and current_hour_str in npc.schedule:
+            sched_pos = npc.schedule[current_hour_str]
+            # Convert dictionary back to Coord
+            new_target = Coord(x=int(sched_pos.get("x", 0)), y=int(sched_pos.get("y", 0)))
+            
+            if npc.target_position != new_target:
+                npc.target_position = new_target
+                dirty = True
+                
+    if dirty:
+        state.current.revision += 1
+        await event_bus.publish({
+            "type": "state_updated",
+            "revision": state.current.revision
+        })
+    return {"status": "ok"}
 
 @router.get("/state")
 async def get_state(state: StateManager = Depends(get_state_manager)):

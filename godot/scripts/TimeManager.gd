@@ -33,6 +33,18 @@ func _increment_hour():
 	is_day = (hour >= 6 and hour < 20)
 	if was_day != is_day:
 		period_changed.emit(is_day)
+	
+	_sync_with_backend()
+
+func _sync_with_backend() -> void:
+	var pc = get_node_or_null("/root/PythonClient")
+	if pc:
+		var http = pc.post_request("/time/sync", {
+			"day": day,
+			"hour": hour,
+			"minute": minute
+		})
+		http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
 
 func get_time_string() -> String:
 	var ampm = "AM" if hour < 12 else "PM"

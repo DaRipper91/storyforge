@@ -22,8 +22,7 @@ import bpy
 import bmesh
 import math
 import os
-import sys
-from mathutils import Vector, Euler
+from mathutils import Euler
 
 OUT_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
