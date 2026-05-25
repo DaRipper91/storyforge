@@ -702,6 +702,9 @@ export function getRaceFrames(raceId) {
 
 export const SPRITE_DIM = 8;
 
+const _spriteCache = new Map();
+const _flipCache = new Map();
+
 /**
  * Render a sprite frame to an HTMLCanvasElement.
  *
@@ -712,6 +715,15 @@ export const SPRITE_DIM = 8;
  * @returns {HTMLCanvasElement}
  */
 export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
+  const cacheKey = `${charColor}:${scale}:${accent}`;
+  if (!_spriteCache.has(frame)) {
+    _spriteCache.set(frame, new Map());
+  }
+  const frameCache = _spriteCache.get(frame);
+  if (frameCache.has(cacheKey)) {
+    return frameCache.get(cacheKey);
+  }
+
   const size = SPRITE_DIM * scale;
   const canvas = document.createElement('canvas');
   canvas.width  = size;
@@ -729,17 +741,25 @@ export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
       ctx.fillRect(px * scale, py * scale, scale, scale);
     }
   }
+
+  frameCache.set(cacheKey, canvas);
   return canvas;
 }
 
 /** Mirror a frame horizontally — used when the character is walking left. */
 export function flipH(frame) {
+  if (_flipCache.has(frame)) {
+    return _flipCache.get(frame);
+  }
+
   const out = new Array(SPRITE_DIM * SPRITE_DIM);
   for (let y = 0; y < SPRITE_DIM; y++) {
     for (let x = 0; x < SPRITE_DIM; x++) {
       out[y * SPRITE_DIM + (SPRITE_DIM - 1 - x)] = frame[y * SPRITE_DIM + x];
     }
   }
+
+  _flipCache.set(frame, out);
   return out;
 }
 
