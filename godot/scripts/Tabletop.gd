@@ -127,6 +127,10 @@ var _npc_cells:  Dictionary = {}  # "x,y" → npc_id (current room)
 
 const NpcMiniScene := preload("res://scenes/NpcMini.tscn")
 
+# ─── Freeform text input ─────────────────────────────────────────────
+var _freeform_bar:   PanelContainer = null
+var _freeform_input: LineEdit       = null
+
 # ─── Combat overlay ──────────────────────────────────────────────────
 var _combat_overlay: Control = null
 var _combat_label: RichTextLabel = null
@@ -230,21 +234,11 @@ func _setup_ui():
 	_stat_label.add_theme_font_size_override("normal_font_size", 15)
 	_stat_panel.add_child(_stat_label)
 
-	# M-key hint (top-right)
-	var hint_label := Label.new()
-	hint_label.text = "[M] Map"
-	hint_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	hint_label.offset_left   = -90
-	hint_label.offset_top    = 20
-	hint_label.offset_right  = -20
-	hint_label.offset_bottom = 50
-	hint_label.add_theme_font_size_override("font_size", 16)
-	hint_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 0.7))
-	_ui_layer.add_child(hint_label)
-
 	_setup_combat_overlay()
 	_setup_npc_dialog()
 	_setup_world_map()
+	_setup_freeform_bar()
+	_setup_keyhints()
 
 
 func _setup_combat_overlay() -> void:
@@ -538,6 +532,22 @@ func _input(event: InputEvent):
 		_update_camera()
 
 	if event is InputEventKey and event.pressed:
+		# Escape always closes overlays/freeform regardless of focus
+		if event.keycode == KEY_ESCAPE:
+			if _freeform_bar and _freeform_bar.visible:
+				_freeform_bar.visible = false
+			elif _combat_overlay and _combat_overlay.visible:
+				_combat_overlay.visible = false
+			elif _npc_dialog and _npc_dialog.visible:
+				_npc_dialog.visible = false
+			elif _world_map_visible:
+				_toggle_world_map()
+			return
+
+		# Block all other shortcuts while freeform input is open
+		if _freeform_bar and _freeform_bar.visible:
+			return
+
 		match event.keycode:
 			KEY_R:
 				_cam_yaw      = 0.0
@@ -547,15 +557,24 @@ func _input(event: InputEvent):
 				_update_camera()
 			KEY_M:
 				_toggle_world_map()
-			KEY_ESCAPE:
-				if _combat_overlay and _combat_overlay.visible:
-					_combat_overlay.visible = false
-				elif _npc_dialog and _npc_dialog.visible:
-					_npc_dialog.visible = false
-				elif _world_map_visible:
-					_toggle_world_map()
 			KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT:
 				_arrow_move(event.keycode)
+			KEY_TAB:
+				_cycle_character(not event.shift_pressed)
+			KEY_1: _select_character_by_slot(0)
+			KEY_2: _select_character_by_slot(1)
+			KEY_3: _select_character_by_slot(2)
+			KEY_4: _select_character_by_slot(3)
+			KEY_E:
+				_interact_adjacent()
+			KEY_F:
+				_open_freeform()
+			KEY_I:
+				if _stat_panel:
+					if not _stat_panel.visible and not _selected_cid.is_empty():
+						_show_stat_panel(_selected_cid)
+					else:
+						_stat_panel.visible = not _stat_panel.visible
 
 
 func _update_camera():
@@ -1754,6 +1773,152 @@ func _spawn_hit_sparks(world_pos: Vector3) -> void:
 
 
 # ─── Enemy HP bar ────────────────────────────────────────────────────
+
+# ─── Key binding helpers ─────────────────────────────────────────────
+
+func _cycle_character(forward: bool) -> void:
+	if _character_data.is_empty():
+		return
+	var keys := _character_data.keys()
+	if _selected_cid.is_empty():
+		_select_mini(keys[0])
+		return
+	var idx: int = keys.find(_selected_cid)
+	if idx == -1:
+		_select_mini(keys[0])
+		return
+	idx = (idx + (1 if forward else keys.size() - 1)) % keys.size()
+	_select_mini(keys[idx])
+
+
+func _select_character_by_slot(slot: int) -> void:
+	var keys := _character_data.keys()
+	if slot < keys.size():
+		_select_mini(keys[slot])
+
+
+func _interact_adjacent() -> void:
+	if _selected_cid.is_empty():
+		return
+	var cdata: Dictionary = _character_data.get(_selected_cid, {})
+	var pos = cdata.get("position", null)
+	if pos == null:
+		return
+	var cx: int = int(pos.get("x", 0))
+	var cy: int = int(pos.get("y", 0))
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+
+	for off in [[0, -1], [0, 1], [-1, 0], [1, 0]]:
+		var nx: int = cx + int(off[0])
+		var ny: int = cy + int(off[1])
+		if nx < 0 or ny < 0 or nx >= _room_width or ny >= _room_height:
+			continue
+		var cell_key := "%d,%d" % [nx, ny]
+
+		if cell_key in _npc_cells:
+			_do_interact_npc(_npc_cells[cell_key], nx, ny, _selected_cid)
+			return
+
+		var tidx: int = ny * _room_width + nx
+		if tidx < _room_cells.size():
+			var t: String = _room_cells[tidx].get("terrain", "floor")
+			if t == "door":
+				var http := pc.post_request("/action/grid", {
+					"actor_id": _selected_cid, "type": "interact",
+					"target": {"x": nx, "y": ny}
+				})
+				http.request_completed.connect(func(_r, _c, _h, body):
+					var resp = JSON.parse_string(body.get_string_from_utf8())
+					if resp and resp.has("room_transition"):
+						pc.fetch_full_state()
+					http.queue_free()
+				)
+				return
+
+
+func _open_freeform() -> void:
+	if _selected_cid.is_empty():
+		if not _character_data.is_empty():
+			_select_mini(_character_data.keys()[0])
+		else:
+			return
+	if _freeform_bar:
+		_freeform_bar.visible = true
+		_freeform_input.clear()
+		_freeform_input.grab_focus()
+
+
+func _on_freeform_submitted(text: String) -> void:
+	_freeform_bar.visible = false
+	if text.strip_edges().is_empty() or _selected_cid.is_empty():
+		return
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	_freeform_input.editable = false
+	var http := pc.post_request("/action/freeform", {
+		"actor_id": _selected_cid, "text": text.strip_edges()
+	})
+	http.request_completed.connect(func(_r, code, _h, body):
+		_freeform_input.editable = true
+		if code >= 200 and code < 300:
+			var resp = JSON.parse_string(body.get_string_from_utf8())
+			if resp is Dictionary and _narrative_box:
+				var nar: String = resp.get("narrative", "")
+				if not nar.is_empty():
+					_narrative_box.append_text("\n[color=#e8d9b0]%s[/color]" % nar)
+		http.queue_free()
+	)
+
+
+func _setup_freeform_bar() -> void:
+	_freeform_bar = PanelContainer.new()
+	_freeform_bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_freeform_bar.offset_top    = -58
+	_freeform_bar.offset_bottom = -8
+	_freeform_bar.offset_left   = 80
+	_freeform_bar.offset_right  = -80
+	_freeform_bar.visible = false
+
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.08, 0.07, 0.06, 0.92)
+	bg.border_color = Color(0.5, 0.4, 0.25)
+	bg.set_border_width_all(1)
+	bg.set_corner_radius_all(4)
+	_freeform_bar.add_theme_stylebox_override("panel", bg)
+
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 10)
+	var lbl := Label.new()
+	lbl.text = "Action:"
+	lbl.add_theme_font_size_override("font_size", 18)
+	lbl.add_theme_color_override("font_color", Color(0.9, 0.75, 0.4))
+	hbox.add_child(lbl)
+
+	_freeform_input = LineEdit.new()
+	_freeform_input.placeholder_text = "Describe what you do…  (Enter to send, Esc to cancel)"
+	_freeform_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_freeform_input.add_theme_font_size_override("font_size", 18)
+	_freeform_input.text_submitted.connect(_on_freeform_submitted)
+	hbox.add_child(_freeform_input)
+
+	_freeform_bar.add_child(hbox)
+	_ui_layer.add_child(_freeform_bar)
+
+
+func _setup_keyhints() -> void:
+	var strip := Label.new()
+	strip.text = "Arrows: Move   E: Interact   F: Freeform action   Tab: Next character   1-4: Select   I: Stats   M: Map   R: Reset camera"
+	strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	strip.offset_top    = -28
+	strip.offset_bottom = -6
+	strip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	strip.add_theme_font_size_override("font_size", 13)
+	strip.add_theme_color_override("font_color", Color(0.7, 0.65, 0.55, 0.60))
+	_ui_layer.add_child(strip)
+
 
 func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
 	var bar := Node3D.new()
