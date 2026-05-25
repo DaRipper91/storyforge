@@ -135,6 +135,12 @@ func post_request(endpoint: String, data: Dictionary) -> HTTPRequest:
 	http.request(_base_url + endpoint, headers, HTTPClient.METHOD_POST, json_data)
 	return http
 
+func get_request(endpoint: String) -> HTTPRequest:
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request(_base_url + endpoint)
+	return http
+
 # ─── Auth ──────────────────────────────────────────────────────────
 
 signal auth_completed(success: bool, user_info: Dictionary)

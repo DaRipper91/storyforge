@@ -554,9 +554,11 @@ class StateManager:
                     "position": target.model_dump(),
                 }
 
-        # 2. NPC encounter
-        if cell.occupant_id and cell.occupant_id in self._state.npcs:
-            npc = self._state.npcs[cell.occupant_id]
+        # 2. NPC encounter — occupant_id may carry an "npc_" prefix in old saves
+        _occ = cell.occupant_id or ""
+        _npc_key = _occ[4:] if _occ.startswith("npc_") else _occ
+        if _npc_key and _npc_key in self._state.npcs:
+            npc = self._state.npcs[_npc_key]
             return {
                 "type": "npc_encounter",
                 "npc_id": npc.id,

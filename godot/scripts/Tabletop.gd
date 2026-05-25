@@ -104,11 +104,24 @@ var _enemy_data:   Dictionary = {}  # enemy_id → data dict
 var _enemy_tokens: Dictionary = {}  # enemy_id → Node3D
 var _enemy_cells:  Dictionary = {}  # "x,y" → enemy_id (current room)
 
+# ─── NPC tokens ──────────────────────────────────────────────────────
+var _npc_data:   Dictionary = {}  # npc_id → data dict
+var _npc_tokens: Dictionary = {}  # npc_id → Node3D
+var _npc_cells:  Dictionary = {}  # "x,y" → npc_id (current room)
+
 # ─── Combat overlay ──────────────────────────────────────────────────
 var _combat_overlay: Control = null
 var _combat_label: RichTextLabel = null
 var _combat_timer: float = 0.0
 const COMBAT_OVERLAY_DURATION := 4.0
+
+# ─── NPC dialog ──────────────────────────────────────────────────────
+var _npc_dialog:       Control       = null
+var _npc_dialog_title: Label         = null
+var _npc_dialog_desc:  RichTextLabel = null
+var _npc_dialog_resp:  RichTextLabel = null
+var _npc_dialog_btns:  HBoxContainer = null
+var _npc_active_data:  Dictionary    = {}  # encounter data from server
 
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
@@ -211,6 +224,7 @@ func _setup_ui():
 	_ui_layer.add_child(hint_label)
 
 	_setup_combat_overlay()
+	_setup_npc_dialog()
 	_setup_world_map()
 
 
@@ -230,6 +244,63 @@ func _setup_combat_overlay() -> void:
 	_combat_label.fit_content = true
 	_combat_label.add_theme_font_size_override("normal_font_size", 17)
 	_combat_overlay.add_child(_combat_label)
+
+
+func _setup_npc_dialog() -> void:
+	_npc_dialog = PanelContainer.new()
+	_npc_dialog.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_npc_dialog.custom_minimum_size = Vector2(520, 0)
+	_npc_dialog.offset_left   = -260
+	_npc_dialog.offset_right  =  260
+	_npc_dialog.offset_top    = -200
+	_npc_dialog.offset_bottom =  200
+	_npc_dialog.visible = false
+	_ui_layer.add_child(_npc_dialog)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	_npc_dialog.add_child(vbox)
+
+	# Header row: name + close button
+	var header := HBoxContainer.new()
+	vbox.add_child(header)
+
+	_npc_dialog_title = Label.new()
+	_npc_dialog_title.add_theme_font_size_override("font_size", 22)
+	_npc_dialog_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(_npc_dialog_title)
+
+	var close_btn := Button.new()
+	close_btn.text = "✕"
+	close_btn.flat = true
+	close_btn.pressed.connect(func(): _npc_dialog.visible = false)
+	header.add_child(close_btn)
+
+	# Separator
+	var sep := HSeparator.new()
+	vbox.add_child(sep)
+
+	# Description
+	_npc_dialog_desc = RichTextLabel.new()
+	_npc_dialog_desc.bbcode_enabled = true
+	_npc_dialog_desc.fit_content = true
+	_npc_dialog_desc.custom_minimum_size = Vector2(0, 50)
+	_npc_dialog_desc.add_theme_font_size_override("normal_font_size", 15)
+	vbox.add_child(_npc_dialog_desc)
+
+	# Response area
+	_npc_dialog_resp = RichTextLabel.new()
+	_npc_dialog_resp.bbcode_enabled = true
+	_npc_dialog_resp.fit_content = true
+	_npc_dialog_resp.scroll_following = true
+	_npc_dialog_resp.custom_minimum_size = Vector2(0, 60)
+	_npc_dialog_resp.add_theme_font_size_override("normal_font_size", 14)
+	vbox.add_child(_npc_dialog_resp)
+
+	# Action buttons
+	_npc_dialog_btns = HBoxContainer.new()
+	_npc_dialog_btns.add_theme_constant_override("separation", 8)
+	vbox.add_child(_npc_dialog_btns)
 
 
 func _setup_world_map() -> void:
@@ -424,6 +495,8 @@ func _input(event: InputEvent):
 			KEY_ESCAPE:
 				if _combat_overlay and _combat_overlay.visible:
 					_combat_overlay.visible = false
+				elif _npc_dialog and _npc_dialog.visible:
+					_npc_dialog.visible = false
 				elif _world_map_visible:
 					_toggle_world_map()
 
@@ -614,7 +687,12 @@ func _on_state_updated(new_state: Dictionary):
 			tok.queue_free()
 		_enemy_tokens.clear()
 		_enemy_cells.clear()
+		for tok in _npc_tokens.values():
+			tok.queue_free()
+		_npc_tokens.clear()
+		_npc_cells.clear()
 		_selected_cid = ""
+		_npc_dialog.visible = false
 	_update_narrative(new_state)
 
 	# characters is dict[str, CharacterSheet] — iterate over key→value pairs
@@ -637,6 +715,7 @@ func _on_state_updated(new_state: Dictionary):
 			spawn_miniature(cid, Vector2(pos.x, pos.y), race_id, char_name)
 
 	_update_enemy_tokens(new_state)
+	_update_npc_tokens(new_state)
 
 
 func _update_enemy_tokens(state: Dictionary) -> void:
@@ -709,6 +788,115 @@ func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 
 	add_child(root)
 	_enemy_tokens[enemy_id] = root
+
+
+func _update_npc_tokens(state: Dictionary) -> void:
+	var current_room: String = state.get("current_room_id", "")
+	var all_npcs = state.get("npcs", {})
+	if not all_npcs is Dictionary:
+		return
+
+	var seen_ids: Dictionary = {}
+	for nid in all_npcs:
+		var n = all_npcs[nid]
+		if not n is Dictionary:
+			continue
+		if n.get("room_id", "") != current_room:
+			continue
+		_npc_data[nid] = n
+		seen_ids[nid] = true
+		var pos = n.get("position", {"x": 0, "y": 0})
+		var cell_key := "%d,%d" % [int(pos.get("x", 0)), int(pos.get("y", 0))]
+		if n.get("interactable", false):
+			_npc_cells[cell_key] = nid
+		if not nid in _npc_tokens:
+			_spawn_npc_token(nid, n)
+
+	# Remove tokens for NPCs no longer in this room
+	for nid in _npc_tokens.keys():
+		if not nid in seen_ids:
+			_npc_tokens[nid].queue_free()
+			_npc_tokens.erase(nid)
+	for k in _npc_cells.keys():
+		if not _npc_cells[k] in seen_ids:
+			_npc_cells.erase(k)
+
+
+# NPC token color palette keyed by sprite_key prefix
+const NPC_COLORS: Dictionary = {
+	"npc_jon":      Color(1.0,  0.82, 0.35),   # warm gold — shopkeeper
+	"npc_samael":   Color(0.55, 0.20, 0.90),   # deep violet — demigod
+	"npc_haylie":   Color(0.85, 0.45, 0.75),   # rose pink — innkeeper
+	"npc_danna":    Color(0.90, 0.85, 0.30),   # royal gold — queen
+	"npc_redvelvet":Color(0.95, 0.20, 0.30),   # red — performer
+	"npc_kodrik":   Color(0.30, 0.65, 0.95),   # steel blue — guildmaster
+	"npc_bryne":    Color(0.45, 0.75, 0.55),   # muted green — warden
+	"npc_nathis":   Color(0.85, 0.55, 0.20),   # amber — front man
+	"npc_keeva":    Color(1.0,  1.0,  1.0),    # white — divine
+	"npc_bear":     Color(0.70, 0.45, 0.20),   # brown — bear
+	"npc_wolf":     Color(0.75, 0.75, 0.80),   # silver — wolf
+	"npc_cat":      Color(0.85, 0.65, 0.40),   # tan — cat
+	"npc_cat_white":Color(0.95, 0.95, 1.0),    # white — cat
+	"npc_dog":      Color(0.70, 0.55, 0.35),   # brown — dog
+	"npc_dog_black":Color(0.20, 0.18, 0.22),   # dark — black dog
+}
+
+func _npc_color(sprite_key: String) -> Color:
+	if sprite_key in NPC_COLORS:
+		return NPC_COLORS[sprite_key]
+	return Color(0.7, 0.9, 0.7)  # default soft green
+
+func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
+	var pos = data.get("position", {"x": 0, "y": 0})
+	var sprite_key: String = data.get("sprite_key", "npc_default")
+	var is_animal := sprite_key in ["npc_cat", "npc_cat_white", "npc_dog", "npc_dog_black",
+									"npc_wolf", "npc_bear"]
+	var col := _npc_color(sprite_key)
+
+	var root := Node3D.new()
+	root.name = "NPC_" + npc_id
+	root.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
+
+	# Body cylinder — shorter/wider for animals
+	var body_mesh := CylinderMesh.new()
+	if is_animal:
+		body_mesh.top_radius    = CELL_SIZE * 0.20
+		body_mesh.bottom_radius = CELL_SIZE * 0.26
+		body_mesh.height        = 0.30
+	else:
+		body_mesh.top_radius    = CELL_SIZE * 0.17
+		body_mesh.bottom_radius = CELL_SIZE * 0.22
+		body_mesh.height        = 0.65
+	body_mesh.radial_segments = 12
+	var body_mat := StandardMaterial3D.new()
+	body_mat.albedo_color = col
+	body_mat.roughness = 0.6
+	body_mat.metallic  = 0.05
+	var body_inst := MeshInstance3D.new()
+	body_inst.mesh = body_mesh
+	body_inst.material_override = body_mat
+	body_inst.position = Vector3(0, body_mesh.height * 0.5, 0)
+	root.add_child(body_inst)
+
+	# Soft glow ring
+	var ring_mesh := CylinderMesh.new()
+	ring_mesh.top_radius    = CELL_SIZE * 0.28
+	ring_mesh.bottom_radius = CELL_SIZE * 0.28
+	ring_mesh.height        = 0.03
+	ring_mesh.radial_segments = 16
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.albedo_color      = Color(col.r, col.g, col.b, 0.55)
+	ring_mat.emission_enabled  = true
+	ring_mat.emission          = col * 0.7
+	ring_mat.transparency      = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var ring_inst := MeshInstance3D.new()
+	ring_inst.mesh = ring_mesh
+	ring_inst.material_override = ring_mat
+	ring_inst.position = Vector3(0, 0.015, 0)
+	root.add_child(ring_inst)
+
+	add_child(root)
+	_npc_tokens[npc_id] = root
 
 
 func _update_narrative(state: Dictionary):
@@ -807,6 +995,14 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 				_do_attack_enemy(eid, actor_id)
 			return
 
+	# ── 3b. NPC cell — open dialog ───────────────────────────────────
+	if cell_key in _npc_cells:
+		var nid: String = _npc_cells[cell_key]
+		var actor_id := _get_any_player_id()
+		if not actor_id.is_empty():
+			_do_interact_npc(nid, gx, gy, actor_id)
+		return
+
 	# ── 4. Door cell — interact (room transition) ─────────────────────
 	if terrain == "door":
 		var actor_id := _get_any_player_id()
@@ -851,6 +1047,144 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 			if resp is Dictionary:
 				_show_combat_result(resp)
 				pc.fetch_full_state()
+		http.queue_free()
+	)
+
+
+func _do_interact_npc(npc_id: String, gx: int, gy: int, actor_id: String) -> void:
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	var http = pc.post_request("/action/grid", {
+		"actor_id": actor_id, "type": "interact",
+		"target": {"x": gx, "y": gy}
+	})
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code >= 200 and code < 300:
+			var resp = JSON.parse_string(body.get_string_from_utf8())
+			if resp is Dictionary and resp.has("encounter"):
+				var enc: Dictionary = resp["encounter"]
+				if enc.get("type", "") == "npc_encounter":
+					_show_npc_dialog(enc)
+		http.queue_free()
+	)
+
+
+func _show_npc_dialog(enc: Dictionary) -> void:
+	_npc_active_data = enc
+	var npc_id: String = enc.get("npc_id", "")
+	var npc_name: String = enc.get("npc_name", "Unknown")
+	var encounter_id: String = enc.get("encounter_id", "")
+
+	# Get description from cached npc_data
+	var desc: String = ""
+	if npc_id in _npc_data:
+		desc = _npc_data[npc_id].get("description", "")
+
+	_npc_dialog_title.text = npc_name
+	_npc_dialog_desc.text = "[color=#cccccc]%s[/color]" % desc
+	_npc_dialog_resp.text = ""
+
+	# Rebuild action buttons
+	for child in _npc_dialog_btns.get_children():
+		child.queue_free()
+
+	var actions := _npc_actions_for(encounter_id)
+	for act in actions:
+		var btn := Button.new()
+		btn.text = act["label"]
+		var act_copy: Dictionary = act
+		btn.pressed.connect(func(): _npc_do_action(act_copy))
+		_npc_dialog_btns.add_child(btn)
+
+	var leave_btn := Button.new()
+	leave_btn.text = "Leave"
+	leave_btn.pressed.connect(func(): _npc_dialog.visible = false)
+	_npc_dialog_btns.add_child(leave_btn)
+
+	_npc_dialog.visible = true
+
+
+func _npc_actions_for(encounter_id: String) -> Array:
+	match encounter_id:
+		"jon_shop":
+			return [
+				{"label": "Browse Shop",  "method": "GET",  "path": "/npc/jon/inventory"},
+				{"label": "Buy Cactus",   "method": "POST", "path": "/npc/jon/cactus",  "body": {"item": "cactus"}},
+			]
+		"samael_lore":
+			return [
+				{"label": "Consult Oracle", "method": "POST", "path": "/npc/samael/consult", "body": {"category": "general", "question": "What should we know?"}},
+			]
+		"haylie_inn":
+			return [
+				{"label": "Visit Inn", "method": "GET", "path": "/npc/haylie/inn"},
+			]
+		"danna_audience":
+			return [
+				{"label": "Address Queen",  "method": "POST", "path": "/npc/danna/address",  "body": {"form": "formal"}},
+				{"label": "File Petition",  "method": "POST", "path": "/npc/danna/petition", "body": {"type": "request"}},
+			]
+		"redvelvet_performance":
+			return [
+				{"label": "Watch Performance", "method": "POST", "path": "/npc/redvelvet/perform"},
+				{"label": "Tip RedVelvet",      "method": "POST", "path": "/npc/redvelvet/tip", "body": {"amount": 5}},
+				{"label": "Request Song",       "method": "POST", "path": "/npc/redvelvet/request-song", "body": {"song": "something haunting"}},
+			]
+		"kodrik_guild":
+			return [
+				{"label": "Guild Dispatch", "method": "POST", "path": "/npc/kodrik/dispatch"},
+				{"label": "Request Repair", "method": "POST", "path": "/npc/kodrik/repair", "body": {"item": "armor"}},
+			]
+		"bryne_warden":
+			return [
+				{"label": "Seek Report",  "method": "GET",  "path": "/npc/bryne/observation"},
+				{"label": "Call Cole",    "method": "POST", "path": "/npc/bryne/cole-lean"},
+			]
+		"nathis_frontman":
+			return [
+				{"label": "Get Report",  "method": "GET",  "path": "/npc/nathis/report"},
+				{"label": "Tyty Speaks", "method": "POST", "path": "/npc/nathis/tyty-bark"},
+			]
+		_:
+			return []
+
+
+func _npc_do_action(act: Dictionary) -> void:
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	_npc_dialog_resp.text = "[color=#888888][i]...[/i][/color]"
+
+	var http: HTTPRequest
+	if act.get("method", "GET") == "GET":
+		http = pc.get_request(act["path"])
+	else:
+		http = pc.post_request(act["path"], act.get("body", {}))
+
+	http.request_completed.connect(func(_r, code, _h, body):
+		var resp = JSON.parse_string(body.get_string_from_utf8())
+		if resp is Dictionary:
+			var narrative: String = (
+				resp.get("narrative", "") or
+				resp.get("flavor", "") or
+				resp.get("result", "") or
+				resp.get("observation", "") or
+				resp.get("report", "") or
+				resp.get("address", "") or
+				resp.get("performance", "") or
+				""
+			)
+			if narrative.is_empty():
+				# Flatten any string value from the response
+				for v in resp.values():
+					if v is String and not v.is_empty():
+						narrative = v
+						break
+			if not narrative.is_empty():
+				_npc_dialog_resp.text = "[color=#e8d9b0]%s[/color]" % narrative
+			else:
+				_npc_dialog_resp.text = "[color=#888888]...[/color]"
 		http.queue_free()
 	)
 
