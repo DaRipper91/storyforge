@@ -11,7 +11,7 @@
       "name": "Jon",
       "position": {
         "x": 10,
-        "y": -8
+        "y": 8
       },
       "room_id": "central_hub",
       "sprite_key": "npc_jon",
@@ -20,9 +20,9 @@
       "blocks_movement": true,
       "description": "The proprietor of The Store.",
       "schedule": {
-        "8": {"x": 10, "y": -8},
+        "8": {"x": 10, "y": 8},
         "12": {"x": 0, "y": 0},
-        "18": {"x": 10, "y": -8}
+        "18": {"x": 10, "y": 8}
       }
     },
     "samael": {

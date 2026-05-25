@@ -346,6 +346,7 @@ class StateManager:
                     slot.bonds = ""
                     slot.ideals = ""
                     slot.keepsake_name = None
+                    slot.starting_era = None
                     slot.creation_step = "era"
                     
                     # If nobody is in any slot, revert to LOBBY phase.

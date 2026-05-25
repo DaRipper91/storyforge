@@ -48,8 +48,8 @@ func _setup_input_map() -> void:
 		"move_left":  [KEY_A, KEY_LEFT, [JOY_AXIS_LEFT_X, -1.0]],
 		"move_right": [KEY_D, KEY_RIGHT, [JOY_AXIS_LEFT_X, 1.0]],
 		"action":     [KEY_E, KEY_ENTER, JOY_BUTTON_A],
-		"lock_on":    [KEY_Q, [JOY_AXIS_LEFT_TRIGGER, 1.0]],
-		"freeform":   [KEY_F, [JOY_AXIS_RIGHT_TRIGGER, 1.0]],
+		"lock_on":    [KEY_Q, [JOY_AXIS_TRIGGER_LEFT, 1.0]],
+		"freeform":   [KEY_F, [JOY_AXIS_TRIGGER_RIGHT, 1.0]],
 		"map":        [KEY_M, JOY_BUTTON_BACK],
 		"reset_cam":  [KEY_R, JOY_BUTTON_START],
 		"cycle_prev": [JOY_BUTTON_DPAD_LEFT],
@@ -311,3 +311,31 @@ func _on_game_started(_result, response_code, _headers, body):
 		var json = JSON.parse_string(body.get_string_from_utf8())
 		var msg = json.get("detail", "Unknown error") if json else "Unknown error"
 		game_start_failed.emit(msg)
+
+# ─── Jon shop ──────────────────────────────────────────────────────
+
+signal jon_inventory_received(items: Array)
+signal jon_buy_result(success: bool, message: String)
+
+func fetch_jon_inventory(genre: String = "fantasy") -> void:
+	var http = get_request("/npc/jon/inventory?genre=" + genre)
+	http.request_completed.connect(_on_jon_inventory)
+
+func _on_jon_inventory(_result, response_code, _headers, body):
+	if response_code != 200:
+		jon_inventory_received.emit([])
+		return
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	jon_inventory_received.emit(json.get("items", []) if json else [])
+
+func buy_jon_item(actor_id: String, item_id: String, genre: String = "fantasy") -> void:
+	var http = post_request("/npc/jon/buy", {"actor_id": actor_id, "item_id": item_id, "genre": genre})
+	http.request_completed.connect(_on_jon_buy)
+
+func _on_jon_buy(_result, response_code, _headers, body):
+	var json = JSON.parse_string(body.get_string_from_utf8())
+	if response_code == 200:
+		jon_buy_result.emit(true, json.get("message", "Purchased!") if json else "Purchased!")
+	else:
+		var msg = json.get("detail", "Purchase failed.") if json else "Purchase failed."
+		jon_buy_result.emit(false, msg)

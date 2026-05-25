@@ -1,0 +1,4 @@
+*
+!.gitignore
+!godam.toml
+.godam

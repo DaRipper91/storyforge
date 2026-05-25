@@ -148,6 +148,10 @@ var _npc_dialog_resp:  RichTextLabel = null
 var _npc_dialog_btns:  HBoxContainer = null
 var _npc_active_data:  Dictionary    = {}  # encounter data from server
 
+# ─── Jon shop ────────────────────────────────────────────────────────
+const JON_SHOP_SCENE := preload("res://scenes/JonShopPanel.tscn")
+var _jon_shop: Control = null
+
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
 
@@ -1211,8 +1215,6 @@ func _update_narrative(state: Dictionary):
 	_narrative_box.text = text.strip_edges()
 
 
-const RaceMiniScene = preload("res://scenes/RaceMini.tscn")
-
 func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, char_name: String = "") -> Node3D:
 	var root = RaceMiniScene.instantiate()
 	root.name     = "Mini_" + character_id
@@ -1468,8 +1470,8 @@ func _npc_actions_for(encounter_id: String) -> Array:
 	match encounter_id:
 		"jon_shop":
 			return [
-				{"label": "Browse Shop",  "method": "GET",  "path": "/npc/jon/inventory"},
-				{"label": "Buy Cactus",   "method": "POST", "path": "/npc/jon/cactus",  "body": {"item": "cactus"}},
+				{"label": "Browse Shop",  "method": "SHOP", "path": "jon"},
+				{"label": "Pet Cactus",   "method": "POST", "path": "/npc/jon/cactus",  "body": {"is_lewd_or_mocking": false}},
 			]
 		"samael_lore":
 			return [
@@ -1527,6 +1529,10 @@ func _npc_actions_for(encounter_id: String) -> Array:
 
 
 func _npc_do_action(act: Dictionary) -> void:
+	if act.get("method", "GET") == "SHOP":
+		_open_jon_shop()
+		return
+
 	var pc = get_node_or_null("/root/PythonClient")
 	if not pc:
 		return
@@ -1667,6 +1673,36 @@ func _on_phase_changed(new_phase: String):
 
 func _on_npc_event(event: Dictionary):
 	print("[Tabletop] NPC event: ", event)
+	if event.get("npc") == "jon" and event.get("action") == "open_shop":
+		_open_jon_shop()
+
+func _open_jon_shop() -> void:
+	if not _jon_shop:
+		_jon_shop = JON_SHOP_SCENE.instantiate()
+		_ui_layer.add_child(_jon_shop)
+		_jon_shop.shop_closed.connect(func(): _npc_dialog.visible = false)
+
+	# Determine genre from current room
+	var genre := "fantasy"
+	if _game_state.has("current_room"):
+		var room_id: String = str(_game_state["current_room"])
+		if "sci" in room_id or "space" in room_id:
+			genre = "sci_fi"
+		elif "western" in room_id or "frontier" in room_id:
+			genre = "western"
+
+	# Get selected character's gold from inventory
+	var gold := 0
+	if _selected_cid != "":
+		for ch in _game_state.get("characters", []):
+			if ch.get("id", "") == _selected_cid:
+				for it in ch.get("inventory", []):
+					var iname: String = it.get("id", "") + it.get("name", "")
+					if "gold" in iname.to_lower():
+						gold += it.get("quantity", 1) * it.get("value", 1)
+				break
+
+	_jon_shop.open(_selected_cid, genre, gold)
 
 func _on_particle_event(event: Dictionary):
 	var type = event.get("type", "magic_burst")
@@ -1686,6 +1722,11 @@ func spawn_magic_burst(world_pos: Vector3):
 # ─── Environment setup ──────────────────────────────────────────────
 
 func _setup_environment() -> void:
+	# Add PhantomCameraHost to Camera3D
+	if camera:
+		var host = Node.new()
+		host.set_script(load("res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd"))
+		camera.add_child(host)
 	_env = Environment.new()
 	_env.background_mode        = Environment.BG_COLOR
 	_env.background_color       = Color(0.02, 0.02, 0.03)

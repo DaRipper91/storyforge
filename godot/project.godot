@@ -25,12 +25,18 @@ PythonClient="*res://scripts/PythonClient.gd"
 AudioManager="*res://scripts/AudioManager.gd"
 TimeManager="*res://scripts/TimeManager.gd"
 NpcManager="*res://scripts/NpcManager.gd"
+InventorySystem="*res://scenes/ui/inventory_system.tscn"
+ItemTooltip="*res://scenes/ui/item_tooltip.tscn"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/multimesh_scatter/plugin.cfg", "res://addons/PushDownAutomata/plugin.cfg")
 
 [rendering]
 
