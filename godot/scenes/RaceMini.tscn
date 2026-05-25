@@ -1,9 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://b2n3i4m5i6n7"]
+[gd_scene load_steps=2 format=3 uid="uid://cx6y8l8"]
 
-[ext_resource type="Script" path="res://scripts/RaceMini.gd" id="1_racemini"]
+[ext_resource type="Script" path="res://scripts/RaceMini.gd" id="1_x8q2l"]
 
 [node name="RaceMini" type="Node3D"]
-script = ExtResource("1_racemini")
+script = ExtResource("1_x8q2l")
 
-[node name="Body" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]

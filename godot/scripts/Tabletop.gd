@@ -122,10 +122,8 @@ var _enemy_cells:  Dictionary = {}  # "x,y" → enemy_id (current room)
 
 # ─── NPC tokens ──────────────────────────────────────────────────────
 var _npc_data:   Dictionary = {}  # npc_id → data dict
-var _npc_tokens: Dictionary = {}  # npc_id → NpcMini instance
+var _npc_tokens: Dictionary = {}  # npc_id → RaceMini instance
 var _npc_cells:  Dictionary = {}  # "x,y" → npc_id (current room)
-
-const NpcMiniScene := preload("res://scenes/NpcMini.tscn")
 
 # ─── Freeform text input ─────────────────────────────────────────────
 var _freeform_bar:   PanelContainer = null
@@ -877,21 +875,13 @@ func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 				model_loaded = true
 
 	if not model_loaded:
-		# Procedural fallback — dark red tapered cylinder
-		var body_mesh := CylinderMesh.new()
-		body_mesh.top_radius    = CELL_SIZE * 0.19
-		body_mesh.bottom_radius = CELL_SIZE * 0.24
-		body_mesh.height        = 0.60
-		body_mesh.radial_segments = 12
-		var body_mat := StandardMaterial3D.new()
-		body_mat.albedo_color = Color(0.65, 0.07, 0.07)
-		body_mat.roughness = 0.55
-		body_mat.metallic  = 0.15
-		var body_inst := MeshInstance3D.new()
-		body_inst.mesh = body_mesh
-		body_inst.material_override = body_mat
-		body_inst.position = Vector3(0, 0.30, 0)
-		root.add_child(body_inst)
+		# Use RaceMini for dynamic 3D shapes based on enemy type
+		var mini = RaceMiniScene.instantiate()
+		mini.name = "RaceMini"
+		root.add_child(mini)
+		var kind: String = data.get("kind", sprite_key)
+		if kind.is_empty(): kind = "goblin"
+		mini.setup(kind, data.get("name", "Enemy"), true)
 
 	# Red glow ring regardless of model
 	var ring_mesh := CylinderMesh.new()
@@ -987,13 +977,12 @@ func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
 	var pos = data.get("position", {"x": 0, "y": 0})
 	var sprite_key: String = data.get("sprite_key", "npc_default")
 	var display_name: String = data.get("name", npc_id)
-	var col := _npc_color(sprite_key)
 
-	var mini = NpcMiniScene.instantiate()
+	var mini = RaceMiniScene.instantiate()
 	mini.name = "NPC_" + npc_id
 	mini.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
 	add_child(mini)
-	mini.setup(npc_id, display_name, col)
+	mini.setup(sprite_key, display_name, false)
 	_npc_tokens[npc_id] = mini
 
 
@@ -1101,7 +1090,7 @@ func _arrow_move(keycode: int) -> void:
 
 	if terrain in ["floor", "difficult", "door"]:
 		var action_type := "interact" if terrain == "door" else "move"
-		var http := pc.post_request("/action/grid", {
+		var http = pc.post_request("/action/grid", {
 			"actor_id": cid, "type": action_type,
 			"target": {"x": tx, "y": ty}
 		})
@@ -1825,7 +1814,7 @@ func _interact_adjacent() -> void:
 		if tidx < _room_cells.size():
 			var t: String = _room_cells[tidx].get("terrain", "floor")
 			if t == "door":
-				var http := pc.post_request("/action/grid", {
+				var http = pc.post_request("/action/grid", {
 					"actor_id": _selected_cid, "type": "interact",
 					"target": {"x": nx, "y": ny}
 				})
@@ -1858,7 +1847,7 @@ func _on_freeform_submitted(text: String) -> void:
 	if not pc:
 		return
 	_freeform_input.editable = false
-	var http := pc.post_request("/action/freeform", {
+	var http = pc.post_request("/action/freeform", {
 		"actor_id": _selected_cid, "text": text.strip_edges()
 	})
 	http.request_completed.connect(func(_r, code, _h, body):

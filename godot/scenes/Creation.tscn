@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/CreationManager.gd" id="1_creation"]
 [ext_resource type="Shader" path="res://assets/shaders/parchment.gdshader" id="2_parchment"]
-[ext_resource type="PackedScene" uid="uid://b2n3i4m5i6n7" path="res://scenes/RaceMini.tscn" id="3_racemini"]
+[ext_resource type="PackedScene" uid="uid://cx6y8l8" path="res://scenes/RaceMini.tscn" id="3_racemini"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("2_parchment")
