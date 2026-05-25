@@ -38,6 +38,44 @@ var is_connected: bool = false
 
 # ─── Called by BootManager once the URL is confirmed ───────────────
 
+func _ready() -> void:
+	_setup_input_map()
+
+func _setup_input_map() -> void:
+	var actions = {
+		"move_up":    [KEY_W, KEY_UP, [JOY_AXIS_LEFT_Y, -1.0]],
+		"move_down":  [KEY_S, KEY_DOWN, [JOY_AXIS_LEFT_Y, 1.0]],
+		"move_left":  [KEY_A, KEY_LEFT, [JOY_AXIS_LEFT_X, -1.0]],
+		"move_right": [KEY_D, KEY_RIGHT, [JOY_AXIS_LEFT_X, 1.0]],
+		"action":     [KEY_E, KEY_ENTER, JOY_BUTTON_A],
+		"z_target":   [KEY_Q, [JOY_AXIS_LEFT_TRIGGER, 1.0]],
+		"look_up":    [[JOY_AXIS_RIGHT_Y, -1.0]],
+		"look_down":  [[JOY_AXIS_RIGHT_Y, 1.0]],
+		"look_left":  [[JOY_AXIS_RIGHT_X, -1.0]],
+		"look_right": [[JOY_AXIS_RIGHT_X, 1.0]]
+	}
+
+	for action in actions:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		
+		for event_data in actions[action]:
+			var event: InputEvent
+			if event_data is int: # KeyCode or JoyButton
+				if event_data < 500: # Simple heuristic for JoyButton vs KeyCode
+					event = InputEventJoypadButton.new()
+					event.button_index = event_data
+				else:
+					event = InputEventKey.new()
+					event.physical_keycode = event_data
+			elif event_data is Array: # JoyAxis [axis, value]
+				event = InputEventJoypadMotion.new()
+				event.axis = event_data[0]
+				event.axis_value = event_data[1]
+			
+			if event:
+				InputMap.action_add_event(action, event)
+
 func start_connection(url: String) -> void:
 	server_url = url.rstrip("/")
 	_save_url(server_url)

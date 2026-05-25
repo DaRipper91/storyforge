@@ -86,6 +86,8 @@ var _room_label:    Label          = null
 var _narrative_box: RichTextLabel  = null
 var _stat_panel:    PanelContainer = null
 var _stat_label:    RichTextLabel  = null
+var _controller_label: Label = null
+var _waiting_screen: ColorRect = null
 var _world_map:     Control        = null
 var _world_map_visible: bool       = false
 
@@ -151,8 +153,14 @@ func _ready():
 	_setup_ui()
 	_setup_environment()
 
-	_dungeon_root = Node3D.new()
+	Input.joy_connection_changed.connect(_on_joy_connection_changed)
+	_update_controller_status()
+
+	_dungeon_root = NavigationRegion3D.new()
 	_dungeon_root.name = "DungeonRoot"
+	_dungeon_root.navigation_mesh = NavigationMesh.new()
+	_dungeon_root.navigation_mesh.agent_radius = 0.35
+	_dungeon_root.navigation_mesh.agent_height = 1.6
 	add_child(_dungeon_root)
 
 	# Keep ground hidden — _render_room shows it only when room_id not found
@@ -238,6 +246,31 @@ func _setup_ui():
 	_setup_freeform_bar()
 	_setup_keyhints()
 
+	# Waiting for Controller Screen
+	_waiting_screen = ColorRect.new()
+	_waiting_screen.color = Color(0, 0, 0, 0.85)
+	_waiting_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_ui_layer.add_child(_waiting_screen)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_waiting_screen.add_child(center)
+
+	_controller_label = Label.new()
+	_controller_label.text = "WAITING FOR XBOX CONTROLLER...\n(PLEASE CONNECT VIA BLUETOOTH OR USB)"
+	_controller_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_controller_label.add_theme_font_size_override("font_size", 24)
+	center.add_child(_controller_label)
+
+
+func _on_joy_connection_changed(_device: int, _connected: bool):
+	_update_controller_status()
+
+func _update_controller_status():
+	var connected = Input.get_connected_joypads().size() > 0
+	if _waiting_screen:
+		_waiting_screen.visible = not connected
+	print("[Tabletop] Controller connected: ", connected)
 
 func _setup_combat_overlay() -> void:
 	_combat_overlay = PanelContainer.new()
@@ -555,8 +588,6 @@ func _input(event: InputEvent):
 				_update_camera()
 			KEY_M:
 				_toggle_world_map()
-			KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT:
-				_arrow_move(event.keycode)
 			KEY_TAB:
 				_cycle_character(not event.shift_pressed)
 			KEY_1: _select_character_by_slot(0)
@@ -574,6 +605,53 @@ func _input(event: InputEvent):
 					else:
 						_stat_panel.visible = not _stat_panel.visible
 
+
+func _physics_process(delta: float) -> void:
+	if _selected_cid.is_empty() or not _selected_cid in _miniatures:
+		return
+	
+	# Block movement while typing or in dialog
+	if (_freeform_bar and _freeform_bar.visible) or (_npc_dialog and _npc_dialog.visible):
+		return
+
+	# 1. Camera Control (Right Stick / Bluetooth Xbox)
+	var look_vec = Input.get_vector("look_left", "look_right", "look_up", "look_down")
+	if look_vec.length() > 0.05:
+		_cam_yaw -= look_vec.x * 2.5
+		_cam_pitch = clamp(_cam_pitch - look_vec.y * 2.0, -82.0, -8.0)
+		_update_camera()
+
+	# 2. Leader Movement (Left Stick / WASD)
+	var leader = _miniatures[_selected_cid]
+	var input_vec = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	
+	if input_vec.length() > 0.05:
+		var yaw := deg_to_rad(_cam_yaw)
+		var forward = Vector3(-sin(yaw), 0, -cos(yaw))
+		var right   = Vector3(cos(yaw), 0, -sin(yaw))
+		
+		# In Godot get_vector, Y is positive for down, so -input_vec.y is forward
+		var move_dir = (right * input_vec.x + forward * (-input_vec.y)).normalized()
+		
+		if leader.has_method("move_with_input"):
+			leader.move_with_input(move_dir, delta)
+			_cam_target = leader.position
+			_update_camera()
+	
+	# 3. Party Follower Logic
+	for cid in _miniatures:
+		if cid == _selected_cid:
+			continue
+		
+		var mini = _miniatures[cid]
+		# Only move player characters (mini name starts with "Mini_")
+		if not mini.name.begins_with("Mini_"):
+			continue
+			
+		if mini.has_method("move_towards_target"):
+			# Followers target the leader
+			mini.nav_agent.target_position = leader.position
+			mini.move_towards_target(delta)
 
 func _update_camera():
 	var yaw   = deg_to_rad(_cam_yaw)
@@ -749,6 +827,10 @@ func _rebuild_room(state: Dictionary):
 	_build_void_floor(w, h)
 	_add_room_torches(cells, w, h)
 	_set_room_atmosphere(room_id)
+	
+	# Bake navigation mesh so party followers can pathfind
+	if _dungeon_root:
+		_dungeon_root.bake_navigation_mesh()
 
 
 # ─── State / miniatures ─────────────────────────────────────────────
@@ -1031,78 +1113,6 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	)
 	spawn_magic_burst(target)
 	AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
-
-
-func _arrow_move(keycode: int) -> void:
-	if _selected_cid.is_empty() or not _selected_cid in _miniatures:
-		# Auto-select first character if none chosen
-		if _character_data.is_empty():
-			return
-		_select_mini(_character_data.keys()[0])
-
-	var cid := _selected_cid
-	var char_data: Dictionary = _character_data.get(cid, {})
-	var pos = char_data.get("position", null)
-	if pos == null:
-		return
-
-	var gx: int = int(pos.get("x", 0))
-	var gy: int = int(pos.get("y", 0))
-
-	# Raw arrow direction in screen space
-	var raw_dir := Vector2.ZERO
-	match keycode:
-		KEY_UP:    raw_dir = Vector2( 0, -1)
-		KEY_DOWN:  raw_dir = Vector2( 0,  1)
-		KEY_LEFT:  raw_dir = Vector2(-1,  0)
-		KEY_RIGHT: raw_dir = Vector2( 1,  0)
-
-	# Rotate by camera yaw so arrows feel relative to the view
-	var yaw := deg_to_rad(_cam_yaw)
-	var dx: int = roundi(raw_dir.x * cos(yaw) - raw_dir.y * sin(yaw))
-	var dy: int = roundi(raw_dir.x * sin(yaw) + raw_dir.y * cos(yaw))
-
-	var tx: int = gx + dx
-	var ty: int = gy + dy
-
-	if tx < 0 or ty < 0 or tx >= _room_width or ty >= _room_height:
-		return
-
-	var cell_idx: int = ty * _room_width + tx
-	var cell: Dictionary = _room_cells[cell_idx] if cell_idx < _room_cells.size() else {}
-	var terrain: String = cell.get("terrain", "floor")
-
-	# Interact with door, attack enemy, or move to floor
-	var cell_key := "%d,%d" % [tx, ty]
-	var pc = get_node_or_null("/root/PythonClient")
-	if not pc:
-		return
-
-	if cell_key in _enemy_cells:
-		var eid: String = _enemy_cells[cell_key]
-		if _enemy_data.get(eid, {}).get("alive", false):
-			_do_attack_enemy(eid, cid)
-		return
-
-	if cell_key in _npc_cells:
-		_do_interact_npc(_npc_cells[cell_key], tx, ty, cid)
-		return
-
-	if terrain in ["floor", "difficult", "door"]:
-		var action_type := "interact" if terrain == "door" else "move"
-		var http = pc.post_request("/action/grid", {
-			"actor_id": cid, "type": action_type,
-			"target": {"x": tx, "y": ty}
-		})
-		if terrain == "door":
-			http.request_completed.connect(func(_r, _c, _h, body):
-				var resp = JSON.parse_string(body.get_string_from_utf8())
-				if resp and resp.has("room_transition"):
-					pc.fetch_full_state()
-				http.queue_free()
-			)
-		else:
-			http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
 
 
 func _grid_to_world(grid_pos: Vector2) -> Vector3:

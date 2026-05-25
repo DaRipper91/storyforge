@@ -1,8 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://cx6y8l8"]
+[gd_scene load_steps=3 format=3 uid="uid://cx6y8l8"]
 
 [ext_resource type="Script" path="res://scripts/RaceMini.gd" id="1_x8q2l"]
 
-[node name="RaceMini" type="Node3D"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_root"]
+radius = 0.35
+height = 1.6
+
+[node name="RaceMini" type="CharacterBody3D"]
+collision_layer = 2
 script = ExtResource("1_x8q2l")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("CapsuleShape3D_root")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.5
+path_max_distance = 2.0
+avoidance_enabled = true
+radius = 0.5
