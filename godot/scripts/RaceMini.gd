@@ -3,11 +3,16 @@ class_name RaceMini
 
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 
-var _material: StandardMaterial3D
+const MiniatureGlowShader = preload("res://assets/shaders/miniature_glow.gdshader")
+
+var _material: ShaderMaterial
 
 func _ready() -> void:
-	_material = StandardMaterial3D.new()
-	_material.albedo_color = Color(1.0, 1.0, 1.0) # Default to white
+	_material = ShaderMaterial.new()
+	_material.shader = MiniatureGlowShader
+	_material.set_shader_parameter("albedo", Color(1.0, 1.0, 1.0))
+	_material.set_shader_parameter("rim_color", Color(1.0, 1.0, 1.0))
+	_material.set_shader_parameter("rim_intensity", 1.5)
 	mesh_instance.material_override = _material
 
 func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) -> void:
@@ -56,8 +61,9 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 			color = Color(0.3, 0.5, 0.8) # Default hero color
 			_build_humanoid_mesh()
 			
-	_material.albedo_color = color
-
+	_material.set_shader_parameter("albedo", color)
+	_material.set_shader_parameter("rim_color", color * 1.5) # slightly brighter rim
+	
 func _add_part(mesh: Mesh, pos: Vector3, rot: Vector3 = Vector3.ZERO) -> void:
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
