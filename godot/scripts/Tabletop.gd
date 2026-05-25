@@ -749,29 +749,73 @@ func _update_enemy_tokens(state: Dictionary) -> void:
 				_enemy_tokens.erase(eid)
 
 
+const _ENEMY_MODEL_DIR := "res://assets/models/enemies/"
+const _DRAGON_MODEL_DIR := "res://assets/models/dragons/"
+
+# sprite_key → model file (without dir prefix and .glb)
+const _ENEMY_SPRITE_MAP: Dictionary = {
+	"skeleton":       "enemies/skeleton",
+	"ghoul":          "enemies/ghoul",
+	"bandit":         "enemies/bandit",
+	"thug":           "enemies/thug",
+	"animated_armor": "enemies/animated_armor",
+	"shadow":         "enemies/shadow",
+	"race_enemy":     "enemies/race_enemy",
+	"dragon_red":     "dragons/dragon_red",
+	"dragon_green":   "dragons/dragon_green",
+	"dragon_blue":    "dragons/dragon_blue",
+	"dragon_black":   "dragons/dragon_black",
+	"dragon_white":   "dragons/dragon_white",
+	"dragon_gold":    "dragons/dragon_gold",
+	"dragon_whelp":   "dragons/dragon_whelp",
+}
+
 func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 	var pos = data.get("position", {"x": 0, "y": 0})
 	var root := Node3D.new()
 	root.name = "Enemy_" + enemy_id
 	root.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
 
-	# Body — dark red tapered cylinder
-	var body_mesh := CylinderMesh.new()
-	body_mesh.top_radius    = CELL_SIZE * 0.19
-	body_mesh.bottom_radius = CELL_SIZE * 0.24
-	body_mesh.height        = 0.60
-	body_mesh.radial_segments = 12
-	var body_mat := StandardMaterial3D.new()
-	body_mat.albedo_color = Color(0.65, 0.07, 0.07)
-	body_mat.roughness = 0.55
-	body_mat.metallic  = 0.15
-	var body_inst := MeshInstance3D.new()
-	body_inst.mesh = body_mesh
-	body_inst.material_override = body_mat
-	body_inst.position = Vector3(0, 0.30, 0)
-	root.add_child(body_inst)
+	# Try to load a .glb model based on sprite_key
+	var sprite_key: String = data.get("sprite_key", "")
+	var model_loaded := false
+	if not sprite_key.is_empty() and sprite_key in _ENEMY_SPRITE_MAP:
+		var rel_path: String = _ENEMY_SPRITE_MAP[sprite_key]
+		var glb_path: String = "res://assets/models/" + rel_path + ".glb"
+		if ResourceLoader.exists(glb_path):
+			var scene := load(glb_path) as PackedScene
+			if scene:
+				var inst := scene.instantiate()
+				var is_dragon := rel_path.begins_with("dragons/")
+				inst.scale = Vector3(0.9, 0.9, 0.9) if is_dragon else Vector3(0.55, 0.55, 0.55)
+				# Animate idle if AnimationPlayer present
+				var ap := _find_anim_player_in(inst)
+				if ap:
+					for n in ["Idle", "Idle_A", "idle"]:
+						if ap.has_animation(n):
+							ap.play(n)
+							break
+				root.add_child(inst)
+				model_loaded = true
 
-	# Glow ring on the floor
+	if not model_loaded:
+		# Procedural fallback — dark red tapered cylinder
+		var body_mesh := CylinderMesh.new()
+		body_mesh.top_radius    = CELL_SIZE * 0.19
+		body_mesh.bottom_radius = CELL_SIZE * 0.24
+		body_mesh.height        = 0.60
+		body_mesh.radial_segments = 12
+		var body_mat := StandardMaterial3D.new()
+		body_mat.albedo_color = Color(0.65, 0.07, 0.07)
+		body_mat.roughness = 0.55
+		body_mat.metallic  = 0.15
+		var body_inst := MeshInstance3D.new()
+		body_inst.mesh = body_mesh
+		body_inst.material_override = body_mat
+		body_inst.position = Vector3(0, 0.30, 0)
+		root.add_child(body_inst)
+
+	# Red glow ring regardless of model
 	var ring_mesh := CylinderMesh.new()
 	ring_mesh.top_radius    = CELL_SIZE * 0.30
 	ring_mesh.bottom_radius = CELL_SIZE * 0.30
@@ -790,6 +834,16 @@ func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 
 	add_child(root)
 	_enemy_tokens[enemy_id] = root
+
+
+func _find_anim_player_in(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node as AnimationPlayer
+	for child in node.get_children():
+		var found := _find_anim_player_in(child)
+		if found:
+			return found
+	return null
 
 
 func _update_npc_tokens(state: Dictionary) -> void:
@@ -1010,7 +1064,7 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 	var pc = get_node_or_null("/root/PythonClient")
 	if not pc:
 		return
-	# Play attack animation on the attacker
+	# Attacker swings
 	if actor_id in _miniatures:
 		var mini = _miniatures[actor_id]
 		if mini.has_method("play_attack"):
@@ -1021,6 +1075,15 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 			var resp = JSON.parse_string(body.get_string_from_utf8())
 			if resp is Dictionary:
 				_show_combat_result(resp)
+				# Play death animation on the enemy token if it died
+				if resp.get("enemy_died", false) and enemy_id in _enemy_tokens:
+					var etok: Node3D = _enemy_tokens[enemy_id]
+					var ap := _find_anim_player_in(etok)
+					if ap:
+						for n in ["Death", "Die", "Fall", "death"]:
+							if ap.has_animation(n):
+								ap.play(n)
+								break
 				pc.fetch_full_state()
 		http.queue_free()
 	)
