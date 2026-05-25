@@ -836,3 +836,106 @@ async def nathis_tyty_bark(request: Request):
         flavor = pool_flavor
 
     return {"flavor": flavor}
+
+
+# ═══════════════════════════════════════════════════════════════════
+# PET endpoints  — one unified route, per-pet situation strings
+# ═══════════════════════════════════════════════════════════════════
+
+_PET_PROMPT: dict[str, str] = {
+    "keeva":     "keeva",
+    "teddy":     "teddy",
+    "cyrus":     "cyrus",
+    "bink_bink": "binkbink",
+    "cole":      "cole",
+    "coco":      "coco",
+    "tyty":      "tyty",
+    "snowie":    "snowie",
+}
+
+_PET_SITUATION: dict[str, str] = {
+    "keeva": (
+        "A player has approached Keeva and settled near her. "
+        "She is not being encountered — she is simply present, as she always is. "
+        "Write one or two sentences of what the player feels: the warmth without a source, "
+        "the sense that the room is safer than it was a moment ago, the quiet authority of her presence. "
+        "No dialogue. No direct address. Only what is felt."
+    ),
+    "teddy": (
+        "A player has approached Teddy, the young Divine Hound. "
+        "She is a golden Great Pyrenees puppy radiating soft ambient light. "
+        "She is young, exuberant, and not yet fully aware of the inheritance she carries. "
+        "Write one or two sentences: her enthusiasm, the soft glow, "
+        "and the quiet sense that something in the room just got slightly safer. "
+        "She may make a sound. She does not speak in words."
+    ),
+    "cyrus": (
+        "A player has approached Cyrus at the hearth. "
+        "He is the Winter Wolf — massive, smoke-white, hearthside. He has raised his head. "
+        "Write one or two sentences: the weight of his attention, the way the room goes quiet, "
+        "the silent communication of a being whose nature is unconfirmed. "
+        "No dialogue. No explanation of what he is. Only the experience of being seen by him."
+    ),
+    "bink_bink": (
+        "A player has approached Bink Bink. She has assessed them with one brief glance "
+        "and assigned them a category she has not disclosed. "
+        "Write one sentence: what the assessment felt like, and whether the Interval is due. "
+        "She does not meow for attention. Something may or may not be about to fall."
+    ),
+    "cole": (
+        "A player has approached Cole, Bryne's massive black dog. "
+        "He is in the doorway, as he always is. He is soft. He is warm. "
+        "Write one or two sentences of The Lean: how his considerable mass makes gentle contact, "
+        "how leaving suddenly feels less urgent, how he watches them with quiet hope. "
+        "He does not bark. He simply leans."
+    ),
+    "coco": (
+        "A player has entered The Store and Coco has found them. "
+        "She is an Ember Hound — deep chocolate coat, one speed: enthusiastic. "
+        "Write one or two sentences: the greeting, the warmth, the nose already working. "
+        "She treats this player exactly as she treats everyone — "
+        "as though they are the best thing that has happened today."
+    ),
+    "tyty": (
+        "A player has greeted Tyty, The Wandering Herald. "
+        "He is with Nathis. Long ears. Long hair. Full volume when needed. "
+        "Write one or two sentences: his assessment of the player, "
+        "whether a herald-level announcement is warranted, "
+        "and the way his ears arrive before the rest of him. "
+        "He is doing his job. The job is important."
+    ),
+    "snowie": (
+        "A player has approached Snowie, the household sentinel — white cat, blue eyes, "
+        "watching from the highest point in the room. "
+        "She has been watching the player since before they noticed her. "
+        "Write one or two sentences: the assessment, the gaze that reveals nothing, "
+        "the sense of being evaluated by something that has already decided the outcome. "
+        "She does not move from her post."
+    ),
+}
+
+_PET_FALLBACK: dict[str, str] = {
+    "keeva":     "A warmth without a source settles over you. Something in the room is watching, and it means you well.",
+    "teddy":     "Teddy's soft glow brightens briefly as she bounds toward you, trailing light like a comet that hasn't learned it's a comet yet.",
+    "cyrus":     "Cyrus raises his head from the hearthstone. The room goes quiet in the way rooms do when something unconfirmed turns its full attention toward you.",
+    "bink_bink": "Bink Bink fixes you with a brief, evaluating gaze. She has assigned you a category. You will not learn which one.",
+    "cole":      "Cole's weight settles gently against you. Leaving feels less urgent than it did a moment ago. He hopes you stay.",
+    "coco":      "Coco has found you. She has also found your rations. These are treated as equally important discoveries.",
+    "tyty":      "Tyty's ears arrive first. The rest of him follows at full volume, already announcing your arrival to everyone within operational range.",
+    "snowie":    "Snowie watches you from her post. She was watching before you arrived. She will be watching after you leave.",
+}
+
+
+@router.post("/pet/{pet_id}/interact")
+async def pet_interact(pet_id: str, request: Request):
+    """Narrate a player approaching one of the realm's companion animals."""
+    if pet_id not in _PET_PROMPT:
+        raise HTTPException(status_code=404, detail=f"No pet profile for '{pet_id}'")
+
+    situation = _PET_SITUATION[pet_id]
+    try:
+        flavor = await narrate_npc(_PET_PROMPT[pet_id], situation)
+    except Exception:
+        flavor = _PET_FALLBACK[pet_id]
+
+    return {"flavor": flavor, "pet_id": pet_id}

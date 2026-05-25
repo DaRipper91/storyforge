@@ -1146,6 +1146,23 @@ func _npc_actions_for(encounter_id: String) -> Array:
 				{"label": "Get Report",  "method": "GET",  "path": "/npc/nathis/report"},
 				{"label": "Tyty Speaks", "method": "POST", "path": "/npc/nathis/tyty-bark"},
 			]
+		# ── Pets ────────────────────────────────────────────────────
+		"pet_keeva":
+			return [{"label": "Rest in Her Light", "method": "POST", "path": "/npc/pet/keeva/interact"}]
+		"pet_teddy":
+			return [{"label": "Play with Teddy",   "method": "POST", "path": "/npc/pet/teddy/interact"}]
+		"pet_cyrus":
+			return [{"label": "Approach Cyrus",    "method": "POST", "path": "/npc/pet/cyrus/interact"}]
+		"pet_bink_bink":
+			return [{"label": "Observe the Interval", "method": "POST", "path": "/npc/pet/bink_bink/interact"}]
+		"pet_cole":
+			return [{"label": "Receive the Lean",  "method": "POST", "path": "/npc/pet/cole/interact"}]
+		"pet_coco":
+			return [{"label": "Pet Coco",          "method": "POST", "path": "/npc/pet/coco/interact"}]
+		"pet_tyty":
+			return [{"label": "Greet the Herald",  "method": "POST", "path": "/npc/pet/tyty/interact"}]
+		"pet_snowie":
+			return [{"label": "Meet the Sentinel", "method": "POST", "path": "/npc/pet/snowie/interact"}]
 		_:
 			return []
 
