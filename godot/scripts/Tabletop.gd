@@ -9,6 +9,7 @@ extends Node3D
 var _miniatures: Dictionary = {}
 const CELL_SIZE   = 1.0
 const MINI_Y      = 0.05   # sits on top of floor tile
+const RaceMiniScene = preload("res://scenes/RaceMini.tscn")
 
 # ─── Dungeon geometry ───────────────────────────────────────────────
 var _dungeon_root: Node3D = null
@@ -226,13 +227,15 @@ func _on_time_changed(day: int, hour: int, minute: int):
 		_key_light.rotation_degrees.x = -sun_rotation
 
 func _on_period_changed(is_day: bool):
+	if not _key_light or not get_viewport().world_3d:
+		return
 	var tw = create_tween().set_parallel(true)
 	if is_day:
 		tw.tween_property(_key_light, "light_energy", 1.1, 5.0)
-		tw.tween_property(_env, "ambient_light_energy", 0.8, 5.0)
+		if _env: tw.tween_property(_env, "ambient_light_energy", 0.8, 5.0)
 	else:
 		tw.tween_property(_key_light, "light_energy", 0.1, 5.0)
-		tw.tween_property(_env, "ambient_light_energy", 0.05, 5.0)
+		if _env: tw.tween_property(_env, "ambient_light_energy", 0.05, 5.0)
 
 func _load_level(level_name: String):
 	# Clear existing procedural dungeon

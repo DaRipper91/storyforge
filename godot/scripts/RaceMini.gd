@@ -9,6 +9,7 @@ const MiniatureGlowShader = preload("res://assets/shaders/miniature_glow.gdshade
 var _material: ShaderMaterial
 var move_speed: float = 5.0
 var rotation_speed: float = 10.0
+var _is_walking: bool = false
 
 func _ready() -> void:
 	_material = ShaderMaterial.new()
@@ -328,6 +329,26 @@ func _build_humanoid_mesh() -> void:
 	head.height = 0.5
 	_add_part(head, Vector3(0, 1.4, 0))
 
+func select() -> void:
+	if _material:
+		_material.set_shader_parameter("rim_intensity", 4.0)
+		_material.set_shader_parameter("rim_color", Color(1, 1, 0.5)) # Gold glow for selected
+
+func deselect() -> void:
+	if _material:
+		_material.set_shader_parameter("rim_intensity", 1.5)
+		var base_color = _material.get_shader_parameter("albedo")
+		_material.set_shader_parameter("rim_color", base_color * 1.5)
+
+func play_walk() -> void:
+	if _is_walking:
+		return
+	_is_walking = true
+	var tw := create_tween()
+	tw.tween_property(mesh_instance, "position:y", 0.15, 0.1).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(mesh_instance, "position:y", 0.0, 0.1).set_trans(Tween.TRANS_SINE)
+	tw.finished.connect(func(): _is_walking = false)
+
 func move_with_input(input_dir: Vector3, delta: float, look_at_pos: Vector3 = Vector3.ZERO) -> void:
 	if input_dir.length() > 0.1:
 		velocity = input_dir * move_speed
@@ -374,8 +395,3 @@ func move_towards_target(delta: float) -> void:
 		play_walk()
 	
 	move_and_slide()
-
-func play_walk() -> void:
-	var tw := create_tween()
-	tw.tween_property(mesh_instance, "position:y", 0.2, 0.1)
-	tw.tween_property(mesh_instance, "position:y", 0.0, 0.1)
