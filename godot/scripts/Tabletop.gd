@@ -83,6 +83,7 @@ var _magic_burst_scene: PackedScene = null
 # ─── UI Overlay ─────────────────────────────────────────────────────
 var _ui_layer:      CanvasLayer    = null
 var _room_label:    Label          = null
+var _time_label:    Label          = null
 var _narrative_box: RichTextLabel  = null
 var _stat_panel:    PanelContainer = null
 var _stat_label:    RichTextLabel  = null
@@ -202,6 +203,58 @@ func _setup_ui():
 	_room_label.add_theme_constant_override("shadow_offset_x", 2)
 	_room_label.add_theme_constant_override("shadow_offset_y", 2)
 	margin.add_child(_room_label)
+
+	_time_label = Label.new()
+	_time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_time_label.add_theme_font_size_override("font_size", 20)
+	_time_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.5))
+	_time_label.position.y = 40
+	margin.add_child(_time_label)
+
+	# Connect to TimeManager
+	TimeManager.time_changed.connect(_on_time_changed)
+	TimeManager.period_changed.connect(_on_period_changed)
+
+func _on_time_changed(day: int, hour: int, minute: int):
+	if _time_label:
+		_time_label.text = TimeManager.get_time_string()
+	
+	# Update sun position/color if in a persistent level
+	if _key_light:
+		var sun_rotation = (float(hour) + float(minute)/60.0) / 24.0 * 360.0 - 90.0
+		_key_light.rotation_degrees.x = -sun_rotation
+
+func _on_period_changed(is_day: bool):
+	var tw = create_tween().set_parallel(true)
+	if is_day:
+		tw.tween_property(_key_light, "light_energy", 1.1, 5.0)
+		tw.tween_property(_env, "ambient_light_energy", 0.8, 5.0)
+	else:
+		tw.tween_property(_key_light, "light_energy", 0.1, 5.0)
+		tw.tween_property(_env, "ambient_light_energy", 0.05, 5.0)
+
+func _load_level(level_name: String):
+	# Clear existing procedural dungeon
+	if _dungeon_root:
+		for child in _dungeon_root.get_children():
+			child.queue_free()
+	
+	var path = "res://scenes/levels/%s.tscn" % level_name
+	if ResourceLoader.exists(path):
+		var scene = load(path) as PackedScene
+		var inst = scene.instantiate()
+		_dungeon_root.add_child(inst)
+		
+		# Move characters to spawn point
+		var spawn = inst.get_node_or_null("SpawnPoint")
+		if spawn:
+			for mini in _miniatures.values():
+				mini.position = spawn.global_position
+				_cam_target = mini.position
+		
+		_dungeon_root.bake_navigation_mesh()
+		_room_label.text = level_name.capitalize()
+
 
 	# Narrative Box (bottom-left)
 	var log_margin = MarginContainer.new()
