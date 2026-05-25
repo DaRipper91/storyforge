@@ -106,8 +106,10 @@ var _enemy_cells:  Dictionary = {}  # "x,y" → enemy_id (current room)
 
 # ─── NPC tokens ──────────────────────────────────────────────────────
 var _npc_data:   Dictionary = {}  # npc_id → data dict
-var _npc_tokens: Dictionary = {}  # npc_id → Node3D
+var _npc_tokens: Dictionary = {}  # npc_id → NpcMini instance
 var _npc_cells:  Dictionary = {}  # "x,y" → npc_id (current room)
+
+const NpcMiniScene := preload("res://scenes/NpcMini.tscn")
 
 # ─── Combat overlay ──────────────────────────────────────────────────
 var _combat_overlay: Control = null
@@ -849,54 +851,15 @@ func _npc_color(sprite_key: String) -> Color:
 func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
 	var pos = data.get("position", {"x": 0, "y": 0})
 	var sprite_key: String = data.get("sprite_key", "npc_default")
-	var is_animal := sprite_key in ["npc_cat", "npc_cat_white", "npc_dog", "npc_dog_black",
-									"npc_wolf", "npc_bear"]
+	var display_name: String = data.get("name", npc_id)
 	var col := _npc_color(sprite_key)
 
-	var root := Node3D.new()
-	root.name = "NPC_" + npc_id
-	root.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
-
-	# Body cylinder — shorter/wider for animals
-	var body_mesh := CylinderMesh.new()
-	if is_animal:
-		body_mesh.top_radius    = CELL_SIZE * 0.20
-		body_mesh.bottom_radius = CELL_SIZE * 0.26
-		body_mesh.height        = 0.30
-	else:
-		body_mesh.top_radius    = CELL_SIZE * 0.17
-		body_mesh.bottom_radius = CELL_SIZE * 0.22
-		body_mesh.height        = 0.65
-	body_mesh.radial_segments = 12
-	var body_mat := StandardMaterial3D.new()
-	body_mat.albedo_color = col
-	body_mat.roughness = 0.6
-	body_mat.metallic  = 0.05
-	var body_inst := MeshInstance3D.new()
-	body_inst.mesh = body_mesh
-	body_inst.material_override = body_mat
-	body_inst.position = Vector3(0, body_mesh.height * 0.5, 0)
-	root.add_child(body_inst)
-
-	# Soft glow ring
-	var ring_mesh := CylinderMesh.new()
-	ring_mesh.top_radius    = CELL_SIZE * 0.28
-	ring_mesh.bottom_radius = CELL_SIZE * 0.28
-	ring_mesh.height        = 0.03
-	ring_mesh.radial_segments = 16
-	var ring_mat := StandardMaterial3D.new()
-	ring_mat.albedo_color      = Color(col.r, col.g, col.b, 0.55)
-	ring_mat.emission_enabled  = true
-	ring_mat.emission          = col * 0.7
-	ring_mat.transparency      = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var ring_inst := MeshInstance3D.new()
-	ring_inst.mesh = ring_mesh
-	ring_inst.material_override = ring_mat
-	ring_inst.position = Vector3(0, 0.015, 0)
-	root.add_child(ring_inst)
-
-	add_child(root)
-	_npc_tokens[npc_id] = root
+	var mini = NpcMiniScene.instantiate()
+	mini.name = "NPC_" + npc_id
+	mini.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
+	add_child(mini)
+	mini.setup(npc_id, display_name, col)
+	_npc_tokens[npc_id] = mini
 
 
 func _update_narrative(state: Dictionary):
@@ -931,10 +894,17 @@ func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, c
 
 
 func _move_miniature(character_id: String, grid_pos: Vector2):
-	var mini: Node3D = _miniatures[character_id]
+	var mini = _miniatures[character_id]
 	var target = _grid_to_world(grid_pos)
-	var tween  = create_tween()
+	# Start walk animation
+	if mini.has_method("play_walk"):
+		mini.play_walk()
+	var tween = create_tween()
 	tween.tween_property(mini, "position", target, 0.3).set_trans(Tween.TRANS_SINE)
+	tween.tween_callback(func():
+		if mini.has_method("play_idle"):
+			mini.play_idle()
+	)
 	spawn_magic_burst(target)
 	AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
 
@@ -1040,6 +1010,11 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 	var pc = get_node_or_null("/root/PythonClient")
 	if not pc:
 		return
+	# Play attack animation on the attacker
+	if actor_id in _miniatures:
+		var mini = _miniatures[actor_id]
+		if mini.has_method("play_attack"):
+			mini.play_attack()
 	var http = pc.post_request("/enemy/" + enemy_id + "/attack", {"actor_id": actor_id})
 	http.request_completed.connect(func(_r, code, _h, body):
 		if code >= 200 and code < 300:
@@ -1075,6 +1050,12 @@ func _show_npc_dialog(enc: Dictionary) -> void:
 	var npc_id: String = enc.get("npc_id", "")
 	var npc_name: String = enc.get("npc_name", "Unknown")
 	var encounter_id: String = enc.get("encounter_id", "")
+
+	# Play talk animation on the NPC token
+	if npc_id in _npc_tokens:
+		var tok = _npc_tokens[npc_id]
+		if tok.has_method("play_talk"):
+			tok.play_talk()
 
 	# Get description from cached npc_data
 	var desc: String = ""

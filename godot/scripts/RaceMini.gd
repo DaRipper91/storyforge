@@ -55,6 +55,21 @@ const RACE_GROUP: Dictionary = {
 
 @onready var body: MeshInstance3D = $Body
 
+const MODEL_DIR   := "res://assets/models/player/"
+const RACE_GROUPS := {
+	"voidwraith": "cosmic",   "nullshade":   "cosmic",   "ironlocust":  "cosmic",
+	"embervein":  "cosmic",   "riftwalker":  "cosmic",
+	"solarlord":  "primal",   "thornmimic":  "primal",   "cinderkin":   "primal",
+	"deeptyrant": "primal",   "grimcrow":    "primal",
+	"bloodweaver":"eldritch", "dreamhusk":   "eldritch", "bonedrifter": "eldritch",
+	"mindspider": "eldritch", "chaosling":   "eldritch",
+	"ironveil":   "mechanical","forgespawn": "mechanical","cinderplate":"mechanical",
+	"hexgear":    "mechanical","wirewraith": "mechanical",
+}
+const ANIM_IDLE   := ["Idle", "Idle_A", "Standing", "idle"]
+const ANIM_WALK   := ["Walking", "Walk", "Walk_A",  "walking"]
+const ANIM_ATTACK := ["Attack",  "Slash","Attack_A","attack"]
+
 var _color:          Color  = Color.WHITE
 var _skin_color:     Color  = Color(0.6, 0.5, 0.45)
 var _group:          String = "Humanoid"
@@ -65,19 +80,57 @@ var _name_label:     Label3D        = null
 var _bob_time:       float = 0.0
 var _ring_pulse:     float = 0.0
 
+var _anim_player:  AnimationPlayer = null
+var _has_model:    bool = false
+
 
 func _process(delta: float) -> void:
-	if not body:
-		return
-	body.rotate_y(delta * 0.4)
-	_bob_time += delta
-	body.position.y = 0.4 + sin(_bob_time * 1.2) * 0.012
-
 	if _selected and _selection_ring:
 		_ring_pulse += delta * 3.0
 		var mat := _selection_ring.material_override as StandardMaterial3D
 		if mat:
 			mat.emission_energy_multiplier = 0.8 + (sin(_ring_pulse) + 1.0) * 0.75
+
+	if not _has_model:
+		if not body:
+			return
+		body.rotate_y(delta * 0.4)
+		_bob_time += delta
+		body.position.y = 0.4 + sin(_bob_time * 1.2) * 0.012
+
+
+# ── Animation API ────────────────────────────────────────────────────
+
+func play_idle() -> void:
+	_play(ANIM_IDLE)
+
+func play_walk() -> void:
+	_play(ANIM_WALK)
+
+func play_attack() -> void:
+	_play(ANIM_ATTACK)
+	if _anim_player:
+		var n := _resolve(ANIM_ATTACK)
+		if not n.is_empty():
+			var anim := _anim_player.get_animation(n)
+			if anim:
+				get_tree().create_timer(anim.get_length()).timeout.connect(play_idle)
+
+func _resolve(names: Array) -> String:
+	if not _anim_player:
+		return ""
+	for n in names:
+		if _anim_player.has_animation(n):
+			return n
+	return ""
+
+func _play(names: Array) -> void:
+	if not _anim_player:
+		return
+	var n := _resolve(names)
+	if n.is_empty() or _anim_player.current_animation == n:
+		return
+	_anim_player.play(n)
 
 
 # ─── Public API ──────────────────────────────────────────────────────
@@ -102,6 +155,13 @@ func setup(race_id: String, char_name: String = "") -> void:
 		_selection_ring.queue_free()
 		_selection_ring = null
 
+	# Try loading a real .glb model first
+	if _try_load_model(race_id):
+		_has_model = true
+		_add_name_label(char_name if char_name != "" else race_id)
+		_add_selection_ring()
+		return
+
 	# Invisible placeholder body — all geometry added as children
 	b.mesh = SphereMesh.new()
 	(b.mesh as SphereMesh).radius = 0.001
@@ -119,6 +179,37 @@ func setup(race_id: String, char_name: String = "") -> void:
 	_add_portrait(b, race_id)
 	_add_name_label(char_name if char_name != "" else race_id)
 	_add_selection_ring()
+
+
+func _try_load_model(race_id: String) -> bool:
+	# Try exact race file first, then group fallback
+	var group_key: String = RACE_GROUPS.get(race_id, "humanoid")
+	var candidates: Array[String] = [
+		MODEL_DIR + race_id + ".glb",
+		MODEL_DIR + group_key + ".glb",
+	]
+	for path in candidates:
+		if ResourceLoader.exists(path):
+			var scene := load(path) as PackedScene
+			if not scene:
+				continue
+			var inst := scene.instantiate()
+			inst.scale = Vector3(0.52, 0.52, 0.52)
+			add_child(inst)
+			body.visible = false   # hide placeholder body
+			_anim_player = _find_anim_player(inst)
+			play_idle()
+			return true
+	return false
+
+func _find_anim_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node as AnimationPlayer
+	for child in node.get_children():
+		var found := _find_anim_player(child)
+		if found:
+			return found
+	return null
 
 
 func set_char_name(n: String) -> void:

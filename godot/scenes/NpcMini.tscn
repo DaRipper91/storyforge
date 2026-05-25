@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://npcmini001"]
+
+[ext_resource type="Script" path="res://scripts/NpcMini.gd" id="1_npcmini"]
+
+[node name="NpcMini" type="Node3D"]
+script = ExtResource("1_npcmini")
