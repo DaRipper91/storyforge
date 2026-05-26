@@ -108,6 +108,8 @@ export class CharacterPanel {
     for (const [id, char] of Object.entries(this.state.characters)) {
       const portrait = document.createElement("button");
       portrait.className = "portrait";
+      portrait.setAttribute("aria-label", `Select character ${char.name}`);
+      portrait.setAttribute("title", `Select ${char.name}`);
       if (id === this.activeId) portrait.classList.add("active");
       
       const isBloodied = char.hp_current > 0 && char.hp_current <= char.hp_max / 2;

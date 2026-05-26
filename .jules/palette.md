@@ -1,0 +1,3 @@
+## 2024-05-26 - Keyboard Navigation State Visibility
+**Learning:** In StoryForge, elements rendered natively by the desktop wrapper (`pywebview`) and elements that are deeply custom-styled (like the character portraits or standard buttons) may lack default browser focus indicators depending on the user's OS and chromium wrapper context. Standard CSS `:hover` states do not guarantee visibility for keyboard/gamepad users tabbing through elements.
+**Action:** When adding interactive elements, always explicitly define a `:focus-visible` state (e.g., using an `outline` or `box-shadow`) to ensure a11y across both web and native desktop contexts.

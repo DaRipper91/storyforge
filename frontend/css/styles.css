@@ -93,9 +93,14 @@ body {
   font-size: var(--fs-xl);
   font-weight: 700;
   background: rgba(255, 245, 220, 0.7);
-  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease, outline 0.18s ease;
   cursor: pointer;
   position: relative;
+}
+
+.portrait:focus-visible {
+  outline: 3px solid var(--ink-gilded);
+  outline-offset: 4px;
 }
 
 .portrait.active {
@@ -335,10 +340,22 @@ body {
   background: rgba(255,245,220,0.7);
   color: var(--ink-midnight);
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, outline 0.12s ease;
 }
 
-.btn:hover, .btn:focus { transform: translateY(-2px); box-shadow: var(--glow-gold); }
+.btn:focus-visible {
+  outline: 3px solid var(--ink-gilded);
+  outline-offset: 4px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn:hover:not(:disabled), .btn:focus:not(:disabled) { transform: translateY(-2px); box-shadow: var(--glow-gold); }
 .btn-primary { background: var(--ink-gilded); color: #1a1428; }
 
 #inventory-pane {

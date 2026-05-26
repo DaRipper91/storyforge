@@ -35,6 +35,10 @@
       transition: all 0.2s;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
+    .menu-btn:focus-visible {
+      outline: 2px solid var(--ink-gilded);
+      outline-offset: 4px;
+    }
     .menu-btn:hover {
       background: var(--ink-burgundy);
       transform: translateY(-2px);
@@ -59,7 +63,7 @@
       if (window.pywebview) window.pywebview.api.toggle_fullscreen();
       else document.body.requestFullscreen();
     ">Fullscreen</button>
-    <button class="menu-btn pywebview-only" aria-label="Minimize Window" onclick="window.pywebview.api.minimize()">—</button>
+    <button class="menu-btn pywebview-only" aria-label="Minimize Window" title="Minimize Window" onclick="window.pywebview.api.minimize()">—</button>
     <button class="menu-btn pywebview-only" onclick="window.pywebview.api.quit()">Quit</button>
   </nav>
 
