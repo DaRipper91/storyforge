@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #28180c; }</style>
+  <script src="https://unpkg.com/konva@9.3.15/konva.min.js"></script>
+</head>
+<body>
+  <div id="game-canvas" style="width: 100%; height: 100%;"></div>
+  <script type="module">
+    import { GridCanvas } from '/frontend/js/canvas.js';
+
+    window.onload = () => {
+      const mountEl = document.getElementById('game-canvas');
+      const canvas = new GridCanvas({ mountEl });
+
+      const mockState = {
+          current_room_id: "test_room",
+          rooms: {
+              test_room: { width: 10, height: 8, cells: Array(80).fill({ terrain: "floor" }) }
+          },
+          characters: {},
+          npcs: {}
+      };
+
+      canvas.setState(mockState);
+
+      // Simulate multiple fast cursor moves to test our reuse code
+      canvas.setCursor({ x: 3, y: 3 });
+      setTimeout(() => canvas.setCursor({ x: 4, y: 3 }), 100);
+      setTimeout(() => canvas.setCursor({ x: 5, y: 3 }), 200);
+      setTimeout(() => canvas.setCursor({ x: 6, y: 3 }), 300);
+      setTimeout(() => canvas.setCursor({ x: 7, y: 3 }), 400);
+
+      window.canvas = canvas;
+    };
+  </script>
+</body>
+</html>
