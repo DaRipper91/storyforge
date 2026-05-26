@@ -1,0 +1,10 @@
+127.0.0.1 - - [26/May/2026 14:55:39] code 404, message File not found
+127.0.0.1 - - [26/May/2026 14:55:39] "GET /home/jules/verification/test_app.html HTTP/1.1" 404 -
+127.0.0.1 - - [26/May/2026 14:55:58] code 404, message File not found
+127.0.0.1 - - [26/May/2026 14:55:58] "GET /home/jules/verification/test_app.html HTTP/1.1" 404 -
+127.0.0.1 - - [26/May/2026 14:56:13] "GET /test_app.html HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 14:56:13] code 404, message File not found
+127.0.0.1 - - [26/May/2026 14:56:13] "GET /app/frontend/js/canvas.js HTTP/1.1" 404 -
+127.0.0.1 - - [26/May/2026 14:56:33] "GET /test_app.html HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 14:56:33] "GET /frontend/js/canvas.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 14:56:33] "GET /frontend/js/sprites.js HTTP/1.1" 200 -
