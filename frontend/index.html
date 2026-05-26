@@ -48,11 +48,11 @@
   </script>
 </head>
 <body data-phase="title">
-  <div class="scanlines"></div>
-  <div class="film-grain"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="film-grain" aria-hidden="true"></div>
 
   <!-- App Menu -->
-  <nav class="app-menu">
+  <nav class="app-menu" aria-label="Application Menu">
     <button class="menu-btn" onclick="window.openSettings()">Settings</button>
     <button class="menu-btn" onclick="toggleKeymap()">Controls</button>
     <button class="menu-btn" onclick="
@@ -74,7 +74,7 @@
 
   <!-- ─────── TITLE VIEW ─────── -->
   <section id="title-view" class="phase-view parchment-surface title-view">
-    <div class="flame-container">
+    <div class="flame-container" aria-hidden="true">
       <div class="flame"></div>
       <div class="flame"></div>
       <div class="flame"></div>
@@ -222,7 +222,7 @@
             <span class="char-card-stat-val" id="char-card-pos">—</span>
           </div>
           <div class="char-card-stat char-card-stat-silver">
-            <span class="char-card-stat-label">💰</span>
+            <span class="char-card-stat-label" role="img" aria-label="Silver">💰</span>
             <span class="char-card-stat-val" id="char-card-silver">—</span>
           </div>
         </div>
@@ -246,7 +246,7 @@
       </section>
       <aside id="log-pane" class="parchment-surface ink-midnight">
         <h2 class="log-title">Chronicle</h2>
-        <ol id="narrative-log" class="narrative-log"></ol>
+        <ol id="narrative-log" class="narrative-log" aria-live="polite"></ol>
       </aside>
       <aside id="inventory-pane" class="parchment-surface hidden">
         <h2 class="log-title ink-crimson">Stolen Goods</h2>
