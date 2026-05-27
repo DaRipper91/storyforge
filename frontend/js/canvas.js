@@ -717,60 +717,73 @@ export class GridCanvas {
   }
 
   _renderCursor() {
-    this.cursorLayer.destroyChildren();
-    if (!this.state) return;
+    if (!this.state) {
+      if (this._outerGlow) {
+        this._outerGlow.hide();
+        this._innerGlow.hide();
+      }
+      return;
+    }
 
-    const cs = this.cellSize;
-    const ox = this.offsetX, oy = this.offsetY;
-    const { x, y } = this.cursor;
+    // Lazy initialization of cursor nodes and animation loop
+    if (!this._outerGlow) {
+      this._outerGlow = new Konva.Rect({
+        stroke: "#ff4500",
+        strokeWidth: 4,
+        cornerRadius: 4,
+        shadowColor: "#ff4500",
+        shadowBlur: 20,
+        shadowOpacity: 0.8,
+      });
 
-    // Outer flame glow
-    const outerGlow = new Konva.Rect({
-      x: ox + x * cs + 2,
-      y: oy + y * cs + 2,
-      width: cs - 4,
-      height: cs - 4,
-      stroke: "#ff4500",
-      strokeWidth: 4,
-      cornerRadius: 4,
-      shadowColor: "#ff4500",
-      shadowBlur: 20,
-      shadowOpacity: 0.8,
-    });
+      this._innerGlow = new Konva.Rect({
+        stroke: "#ffd700",
+        strokeWidth: 2,
+        cornerRadius: 4,
+        shadowColor: "#ffd700",
+        shadowBlur: 10,
+        shadowOpacity: 0.9,
+      });
 
-    // Inner core glow
-    const innerGlow = new Konva.Rect({
-      x: ox + x * cs + 6,
-      y: oy + y * cs + 6,
-      width: cs - 12,
-      height: cs - 12,
-      stroke: "#ffd700",
-      strokeWidth: 2,
-      cornerRadius: 4,
-      shadowColor: "#ffd700",
-      shadowBlur: 10,
-      shadowOpacity: 0.9,
-    });
+      this.cursorLayer.add(this._outerGlow);
+      this.cursorLayer.add(this._innerGlow);
 
-    this.cursorLayer.add(outerGlow);
-    this.cursorLayer.add(innerGlow);
+      this._cursorAnim = new Konva.Animation((frame) => {
+        if (!this.state) return;
 
-    this._cursorAnim?.stop();
-    this._cursorAnim = new Konva.Animation((frame) => {
-      const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
-      const pulse = Math.sin(frame.time / 100) * 2;
+        const cs = this.cellSize;
+        const ox = this.offsetX, oy = this.offsetY;
+        const { x, y } = this.cursor;
+
+        const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
+        const pulse = Math.sin(frame.time / 100) * 2;
+
+        this._outerGlow.shadowBlur(20 + pulse * 4);
+        this._outerGlow.opacity(0.6 + flicker * 0.4);
+
+        this._innerGlow.shadowBlur(10 + pulse * 2);
+        this._innerGlow.opacity(0.7 + flicker * 0.3);
+
+        // Dynamically track position and size based on current zoom and state
+        this._outerGlow.width(cs - 4);
+        this._outerGlow.height(cs - 4);
+        // Slightly wobble the outer rect
+        this._outerGlow.x(ox + x * cs + 2 + Math.random() * 2 - 1);
+        this._outerGlow.y(oy + y * cs + 2 + Math.random() * 2 - 1);
+
+        this._innerGlow.width(cs - 12);
+        this._innerGlow.height(cs - 12);
+        this._innerGlow.x(ox + x * cs + 6);
+        this._innerGlow.y(oy + y * cs + 6);
+
+      }, this.cursorLayer);
       
-      outerGlow.shadowBlur(20 + pulse * 4);
-      outerGlow.opacity(0.6 + flicker * 0.4);
-      
-      innerGlow.shadowBlur(10 + pulse * 2);
-      innerGlow.opacity(0.7 + flicker * 0.3);
-      
-      // Slightly wobble the rects
-      outerGlow.x(ox + x * cs + 2 + Math.random() * 2 - 1);
-      outerGlow.y(oy + y * cs + 2 + Math.random() * 2 - 1);
-    }, this.cursorLayer);
-    this._cursorAnim.start();
+      this._cursorAnim.start();
+    }
+
+    // Ensure nodes are visible when state is available
+    this._outerGlow.show();
+    this._innerGlow.show();
   }
 
   setCursor({ x, y }) {
