@@ -886,9 +886,13 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover {
+.escape-btn:hover, .escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+}
+.escape-btn:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
