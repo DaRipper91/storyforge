@@ -717,60 +717,77 @@ export class GridCanvas {
   }
 
   _renderCursor() {
-    this.cursorLayer.destroyChildren();
-    if (!this.state) return;
+    if (!this.state) {
+      this.cursorLayer.hide();
+      return;
+    }
+
+    this.cursorLayer.show();
 
     const cs = this.cellSize;
     const ox = this.offsetX, oy = this.offsetY;
     const { x, y } = this.cursor;
 
-    // Outer flame glow
-    const outerGlow = new Konva.Rect({
+    // Initialize cursor graphics once
+    if (!this._cursorOuterGlow) {
+      this._cursorOuterGlow = new Konva.Rect({
+        stroke: "#ff4500",
+        strokeWidth: 4,
+        cornerRadius: 4,
+        shadowColor: "#ff4500",
+        shadowBlur: 20,
+        shadowOpacity: 0.8,
+      });
+      this.cursorLayer.add(this._cursorOuterGlow);
+    }
+    if (!this._cursorInnerGlow) {
+      this._cursorInnerGlow = new Konva.Rect({
+        stroke: "#ffd700",
+        strokeWidth: 2,
+        cornerRadius: 4,
+        shadowColor: "#ffd700",
+        shadowBlur: 10,
+        shadowOpacity: 0.9,
+      });
+      this.cursorLayer.add(this._cursorInnerGlow);
+    }
+
+    // Update positions and sizes
+    this._cursorOuterGlow.setAttrs({
       x: ox + x * cs + 2,
       y: oy + y * cs + 2,
       width: cs - 4,
       height: cs - 4,
-      stroke: "#ff4500",
-      strokeWidth: 4,
-      cornerRadius: 4,
-      shadowColor: "#ff4500",
-      shadowBlur: 20,
-      shadowOpacity: 0.8,
     });
-
-    // Inner core glow
-    const innerGlow = new Konva.Rect({
+    this._cursorInnerGlow.setAttrs({
       x: ox + x * cs + 6,
       y: oy + y * cs + 6,
       width: cs - 12,
       height: cs - 12,
-      stroke: "#ffd700",
-      strokeWidth: 2,
-      cornerRadius: 4,
-      shadowColor: "#ffd700",
-      shadowBlur: 10,
-      shadowOpacity: 0.9,
     });
 
-    this.cursorLayer.add(outerGlow);
-    this.cursorLayer.add(innerGlow);
+    if (!this._cursorAnim) {
+      this._cursorAnim = new Konva.Animation((frame) => {
+        const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
+        const pulse = Math.sin(frame.time / 100) * 2;
 
-    this._cursorAnim?.stop();
-    this._cursorAnim = new Konva.Animation((frame) => {
-      const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
-      const pulse = Math.sin(frame.time / 100) * 2;
-      
-      outerGlow.shadowBlur(20 + pulse * 4);
-      outerGlow.opacity(0.6 + flicker * 0.4);
-      
-      innerGlow.shadowBlur(10 + pulse * 2);
-      innerGlow.opacity(0.7 + flicker * 0.3);
-      
-      // Slightly wobble the rects
-      outerGlow.x(ox + x * cs + 2 + Math.random() * 2 - 1);
-      outerGlow.y(oy + y * cs + 2 + Math.random() * 2 - 1);
-    }, this.cursorLayer);
-    this._cursorAnim.start();
+        this._cursorOuterGlow.shadowBlur(20 + pulse * 4);
+        this._cursorOuterGlow.opacity(0.6 + flicker * 0.4);
+
+        this._cursorInnerGlow.shadowBlur(10 + pulse * 2);
+        this._cursorInnerGlow.opacity(0.7 + flicker * 0.3);
+
+        // Slightly wobble the rects (re-calculate base position dynamically)
+        const d_cs = this.cellSize;
+        const d_ox = this.offsetX;
+        const d_oy = this.offsetY;
+        const { x: cx, y: cy } = this.cursor;
+
+        this._cursorOuterGlow.x(d_ox + cx * d_cs + 2 + Math.random() * 2 - 1);
+        this._cursorOuterGlow.y(d_oy + cy * d_cs + 2 + Math.random() * 2 - 1);
+      }, this.cursorLayer);
+      this._cursorAnim.start();
+    }
   }
 
   setCursor({ x, y }) {
