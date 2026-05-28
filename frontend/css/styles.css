@@ -339,6 +339,15 @@ body {
 }
 
 .btn:hover, .btn:focus { transform: translateY(-2px); box-shadow: var(--glow-gold); }
+
+/* Global disabled state for all buttons to improve UX and accessibility */
+button:disabled, .btn:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
 .btn-primary { background: var(--ink-gilded); color: #1a1428; }
 
 #inventory-pane {
