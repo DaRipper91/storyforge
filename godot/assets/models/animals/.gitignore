@@ -1,0 +1,2 @@
+# Source glTF files — runtime assets are the compiled .glb files
+*.gltf
