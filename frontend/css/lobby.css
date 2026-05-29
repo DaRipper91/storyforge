@@ -258,11 +258,14 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 .menu-options button.focused,
-.menu-options button:focus {
+.menu-options button:focus-visible {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
   box-shadow: var(--glow-gold);
+}
+
+.menu-options button:focus {
   outline: none;
 }
 
@@ -886,9 +889,13 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover {
+.escape-btn:hover,
+.escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+}
+.escape-btn:focus {
+  outline: none;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {

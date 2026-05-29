@@ -35,9 +35,13 @@
       transition: all 0.2s;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    .menu-btn:hover {
+    .menu-btn:hover,
+    .menu-btn:focus-visible {
       background: var(--ink-burgundy);
       transform: translateY(-2px);
+    }
+    .menu-btn:focus {
+      outline: none;
     }
     .pywebview-only { display: none; }
   </style>
