@@ -19,6 +19,7 @@ Mechanics:
   2. Royal Petition   — party can request a Decree; she grants boons on good standing
   3. Royal Dismissal  — she will leave when she is ready, not before
 """
+
 from __future__ import annotations
 
 import random
@@ -29,20 +30,23 @@ from pydantic import BaseModel
 
 # ─────────────────────── Enums ───────────────────────
 
+
 class AddressForm(StrEnum):
     """How the party chooses to address the Queen."""
-    PROPER      = "proper"       # "Your Majesty" — correct
-    FRIENDLY    = "friendly"     # "Your Grace" — acceptable, mildly noted
-    CASUAL      = "casual"       # first name — incorrect, earns a correction
-    WRONG       = "wrong"        # "Hey you" / completely off — earns an incident
+
+    PROPER = "proper"  # "Your Majesty" — correct
+    FRIENDLY = "friendly"  # "Your Grace" — acceptable, mildly noted
+    CASUAL = "casual"  # first name — incorrect, earns a correction
+    WRONG = "wrong"  # "Hey you" / completely off — earns an incident
 
 
 class PetitionType(StrEnum):
     """What the party petitions the Queen for."""
-    BLESSING    = "blessing"     # morale boon — party advantage on next check
-    INTELLIGENCE = "intelligence" # she shares what she knows of the road ahead
+
+    BLESSING = "blessing"  # morale boon — party advantage on next check
+    INTELLIGENCE = "intelligence"  # she shares what she knows of the road ahead
     ENDORSEMENT = "endorsement"  # her seal opens doors (better NPC relations)
-    MERCY       = "mercy"        # she intervenes on a party member's behalf
+    MERCY = "mercy"  # she intervenes on a party member's behalf
 
 
 # ─────────────────────── Flavor text pools ───────────────────────
@@ -108,18 +112,21 @@ _DECLINE_LOW_FAVOR: list[str] = [
 
 # ─────────────────────── Encounter state ───────────────────────
 
+
 class QueenDAnnaEncounterState(BaseModel):
     """Session-level state for Queen D.Anna's presence in the tavern."""
+
     active: bool = True
     correct_addresses: int = 0
     incorrect_addresses: int = 0
     petitions_granted: int = 0
     petitions_declined: int = 0
     is_offended: bool = False
-    favor: int = 0          # −2 to +3; gates petitions
+    favor: int = 0  # −2 to +3; gates petitions
 
 
 # ─────────────────────── Result dataclasses ───────────────────────
+
 
 @dataclass(frozen=True)
 class AddressResult:
@@ -142,6 +149,7 @@ class PetitionResult:
 
 # ─────────────────────── Service class ───────────────────────
 
+
 class QueenDAnna:
     """
     Pure service layer for Queen D.Anna.
@@ -151,16 +159,16 @@ class QueenDAnna:
     """
 
     _FAVOR_THRESHOLDS = {
-        PetitionType.BLESSING:      1,
-        PetitionType.INTELLIGENCE:  1,
-        PetitionType.ENDORSEMENT:   2,
-        PetitionType.MERCY:         3,
+        PetitionType.BLESSING: 1,
+        PetitionType.INTELLIGENCE: 1,
+        PetitionType.ENDORSEMENT: 2,
+        PetitionType.MERCY: 3,
     }
     _FAVOR_COSTS = {
-        PetitionType.BLESSING:      1,
-        PetitionType.INTELLIGENCE:  1,
-        PetitionType.ENDORSEMENT:   2,
-        PetitionType.MERCY:         2,
+        PetitionType.BLESSING: 1,
+        PetitionType.INTELLIGENCE: 1,
+        PetitionType.ENDORSEMENT: 2,
+        PetitionType.MERCY: 2,
     }
 
     def __init__(self, state: QueenDAnnaEncounterState | None = None) -> None:
@@ -230,10 +238,10 @@ class QueenDAnna:
         e.petitions_granted += 1
 
         text_pool = {
-            PetitionType.BLESSING:       _PETITION_BLESSING,
-            PetitionType.INTELLIGENCE:   _PETITION_INTELLIGENCE,
-            PetitionType.ENDORSEMENT:    _PETITION_ENDORSEMENT,
-            PetitionType.MERCY:          _PETITION_MERCY,
+            PetitionType.BLESSING: _PETITION_BLESSING,
+            PetitionType.INTELLIGENCE: _PETITION_INTELLIGENCE,
+            PetitionType.ENDORSEMENT: _PETITION_ENDORSEMENT,
+            PetitionType.MERCY: _PETITION_MERCY,
         }
         response = random.choice(text_pool[petition_type])
 
@@ -248,8 +256,12 @@ class QueenDAnna:
     @property
     def standing_label(self) -> str:
         f = self.encounter.favor
-        if f >= 3:   return "Esteemed"
-        if f >= 1:   return "Acknowledged"
-        if f == 0:   return "Neutral"
-        if f >= -1:  return "Noted (Unfavorably)"
+        if f >= 3:
+            return "Esteemed"
+        if f >= 1:
+            return "Acknowledged"
+        if f == 0:
+            return "Neutral"
+        if f >= -1:
+            return "Noted (Unfavorably)"
         return "In Poor Standing"
