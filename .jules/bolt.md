@@ -1,3 +1,6 @@
 ## 2023-10-27 - Memoized Sprite Rendering
 **Learning:** In a canvas-based grid rendering architecture, re-rendering pixel art sprites frame-by-frame during animation creates a significant number of detached DOM nodes (via `document.createElement('canvas')`) and context operations. The garbage collector pressure causes micro-stutters during walking animations. By memoizing the generated canvases based on frame, color, scale, and accent, we eliminate runtime DOM manipulation and canvas context fetching entirely for repeated frames.
 **Action:** Always memoize procedurally generated graphical assets (like customized character sprites) when they are used in high-frequency update loops (like `requestAnimationFrame` or Konva layer updates).
+## 2023-11-20 - Memoized Konva Graphics
+**Learning:** Destroying and recreating Konva nodes (like the cursor glow effect) on high-frequency events such as `mousemove` or cursor updates causes severe Garbage Collection churn and micro-stutters. Konva animations and layers can run much more efficiently if graphics nodes are instantiated once and then simply modified via their properties (like `x`, `y`, `width`, `height` through `setAttrs()`).
+**Action:** Always prefer updating existing canvas nodes over destroying and recreating them, especially in high-frequency rendering loops.
