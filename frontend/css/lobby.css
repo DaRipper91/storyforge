@@ -258,7 +258,7 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 .menu-options button.focused,
-.menu-options button:focus {
+.menu-options button:focus-visible {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
