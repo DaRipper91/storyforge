@@ -1,3 +1,3 @@
-## 2024-05-23 - Minimize Button Accessibility
-**Learning:** Added `aria-label="Minimize Window"` to the app menu minimize button. Found that adding `aria-label` to buttons that already have clear descriptive text (e.g. "Settings", "Quit") is an accessibility anti-pattern because it's redundant. `aria-label` should only be used when visible text is missing or insufficient (like the "—" button).
-**Action:** Only use `aria-label` on buttons that are icon-only or have text that doesn't fully explain their action.
+## 2024-05-30 - Focus vs Focus-Visible
+**Learning:** Generic `:focus` states in the `lobby.css`, `styles.css`, and `index.html` were causing "sticky" focus rings after mouse clicks, leading to a confusing UI experience for mouse users while providing keyboard accessibility.
+**Action:** Replaced `:focus` pseudo-classes with `:focus-visible` to ensure focus rings are visible *only* when navigating via keyboard, and explicitly set `outline: none` for generic `:focus` so that clicks don't leave lingering artifacts. This pattern of using `:focus-visible` should be applied universally across new interactive UI components.
