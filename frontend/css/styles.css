@@ -338,7 +338,7 @@ body {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.btn:hover, .btn:focus { transform: translateY(-2px); box-shadow: var(--glow-gold); }
+.btn:hover, .btn:focus-visible { transform: translateY(-2px); box-shadow: var(--glow-gold); outline: none; }
 .btn-primary { background: var(--ink-gilded); color: #1a1428; }
 
 #inventory-pane {
