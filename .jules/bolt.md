@@ -1,3 +1,7 @@
 ## 2023-10-27 - Memoized Sprite Rendering
 **Learning:** In a canvas-based grid rendering architecture, re-rendering pixel art sprites frame-by-frame during animation creates a significant number of detached DOM nodes (via `document.createElement('canvas')`) and context operations. The garbage collector pressure causes micro-stutters during walking animations. By memoizing the generated canvases based on frame, color, scale, and accent, we eliminate runtime DOM manipulation and canvas context fetching entirely for repeated frames.
 **Action:** Always memoize procedurally generated graphical assets (like customized character sprites) when they are used in high-frequency update loops (like `requestAnimationFrame` or Konva layer updates).
+
+## 2024-05-20 - Reuse Konva Nodes for High-Frequency Events
+**Learning:** Destroying and recreating Konva layers or nodes (like `Konva.Rect` or `Konva.Animation`) on high-frequency events such as `mousemove` creates excessive garbage collection churn, which leads to micro-stutters and degrades frontend performance.
+**Action:** Instead of clearing a layer with `destroyChildren()` and instantiating new Konva shapes or animations on every pointer update, instantiate these graphical objects exactly once (e.g. tracking them with IDs or variables), mutate their properties during the event loop (e.g., updating their `x` and `y`), and update explicitly stored instance variables (like `_baseX`) so animations don't read from stale closures.
