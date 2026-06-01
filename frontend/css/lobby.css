@@ -207,7 +207,7 @@ body[data-phase="saves"] #game-view { display: none; }
   text-align: center;
 }
 
-.slot-name-input:focus {
+.slot-name-input:focus-visible {
   outline: none;
   box-shadow: 0 0 5px var(--ink-gilded);
 }
@@ -258,7 +258,7 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 .menu-options button.focused,
-.menu-options button:focus {
+.menu-options button:focus-visible {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
@@ -619,7 +619,7 @@ body[data-phase="saves"] #game-view { display: none; }
   user-select: text;
 }
 
-.name-input:focus {
+.name-input:focus-visible {
   outline: none;
   box-shadow: var(--glow-gold);
 }
@@ -1668,7 +1668,7 @@ body[data-phase="saves"] #game-view { display: none; }
   padding: 0.4rem 0.7rem;
 }
 
-.identity-text-input:focus {
+.identity-text-input:focus-visible {
   outline: none;
   border-color: var(--ink-gilded);
 }
@@ -1756,7 +1756,7 @@ body[data-phase="saves"] #game-view { display: none; }
   transition: border-color 0.15s;
 }
 
-.story-textarea:focus {
+.story-textarea:focus-visible {
   outline: none;
   border-color: var(--ink-gilded);
 }
@@ -1771,7 +1771,7 @@ body[data-phase="saves"] #game-view { display: none; }
   padding: 0.5rem 0.7rem;
 }
 
-.story-text-input:focus {
+.story-text-input:focus-visible {
   outline: none;
   border-color: var(--ink-gilded);
 }
