@@ -98,12 +98,18 @@ body {
   position: relative;
 }
 
-.portrait:hover,
+.portrait:hover {
+  border-color: var(--ink-gilded);
+  box-shadow: var(--glow-gold);
+  transform: scale(1.05);
+}
+
 .portrait:focus-visible {
   border-color: var(--ink-gilded);
   box-shadow: var(--glow-gold);
   transform: scale(1.05);
-  outline: none;
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .portrait.active {
