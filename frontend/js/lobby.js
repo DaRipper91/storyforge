@@ -109,8 +109,23 @@ export class Lobby {
 
     // Attract mode — reset idle timer on any input
     const resetIdle = () => this._resetAttractTimer();
+
+    // ⚡ Bolt Optimization: Throttle the mousemove event handler
+    // 'mousemove' fires continuously. Calling _resetAttractTimer()
+    // every frame causes unnecessary micro-allocations and GC churn.
+    // Throttling to 500ms preserves the UX while dropping 99% of calls.
+    let throttleTimer = null;
+    const throttledResetIdle = () => {
+      if (!throttleTimer) {
+        throttleTimer = setTimeout(() => {
+          throttleTimer = null;
+          resetIdle();
+        }, 500);
+      }
+    };
+
     window.addEventListener("keydown",    resetIdle, { passive: true });
-    window.addEventListener("mousemove",  resetIdle, { passive: true });
+    window.addEventListener("mousemove",  throttledResetIdle, { passive: true });
     window.addEventListener("mousedown",  resetIdle, { passive: true });
     window.addEventListener("touchstart", resetIdle, { passive: true });
     this._resetAttractTimer();
