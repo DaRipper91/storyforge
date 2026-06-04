@@ -1,0 +1,38 @@
+{
+  "campaign_id": "family_campaign_01",
+  "current_room_id": "tavern_01",
+  "phase": "lobby",
+  "revision": 0,
+  "narrative_log": [],
+  "characters": {},
+  "lobby_slots": [
+    {"slot_index": 0, "status": "empty", "controller_id": null, "character_id": null,
+     "chosen_name": null, "chosen_race": null, "chosen_class": null, "chosen_ability_layout": null},
+    {"slot_index": 1, "status": "empty", "controller_id": null, "character_id": null,
+     "chosen_name": null, "chosen_race": null, "chosen_class": null, "chosen_ability_layout": null},
+    {"slot_index": 2, "status": "empty", "controller_id": null, "character_id": null,
+     "chosen_name": null, "chosen_race": null, "chosen_class": null, "chosen_ability_layout": null},
+    {"slot_index": 3, "status": "empty", "controller_id": null, "character_id": null,
+     "chosen_name": null, "chosen_race": null, "chosen_class": null, "chosen_ability_layout": null}
+  ],
+  "rooms": {
+    "tavern_01": {
+      "id": "tavern_01",
+      "name": "The Crooked Tankard",
+      "width": 10,
+      "height": 8,
+      "description": "A cramped common room with low oak beams smoke-stained nearly black. A stone hearth dominates the back wall. Two round tables sit askew between you and the bar. A bard tunes a lute in the far corner.",
+      "cells": [
+        {"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"hazard","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":"bard"},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"difficult","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"difficult","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"difficult","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"difficult","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"floor","occupant_id":null},{"terrain":"wall","occupant_id":null},
+        {"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"door","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null},{"terrain":"wall","occupant_id":null}
+      ]
+    }
+  },
+  "combat": null
+}

@@ -1,0 +1,390 @@
+{
+  "campaign_id": "family_campaign_01",
+  "current_room_id": "tavern_01",
+  "phase": "creation",
+  "characters": {},
+  "rooms": {
+    "tavern_01": {
+      "id": "tavern_01",
+      "name": "The Crooked Tankard",
+      "width": 10,
+      "height": 8,
+      "cells": [
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "hazard",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "bard"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "difficult",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "door",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        },
+        {
+          "terrain": "wall",
+          "occupant_id": null
+        }
+      ],
+      "description": "The Crooked Tankard. A place where dreams go to die, usually face-down in a puddle of lukewarm ale. The beams are black with smoke, the tables are sticky with heaven-knows-what, and a bard in the corner is murdering a lute for coins he clearly doesn't deserve."
+    }
+  },
+  "combat": null,
+  "lobby_slots": [
+    {
+      "slot_index": 0,
+      "status": "claimed",
+      "controller_id": "045e-0b00-Microsoft X-Box One Elite 2 pad::0",
+      "character_id": null,
+      "chosen_name": null,
+      "chosen_race": null,
+      "chosen_class": null,
+      "chosen_ability_layout": null
+    },
+    {
+      "slot_index": 1,
+      "status": "empty",
+      "controller_id": null,
+      "character_id": null,
+      "chosen_name": null,
+      "chosen_race": null,
+      "chosen_class": null,
+      "chosen_ability_layout": null
+    },
+    {
+      "slot_index": 2,
+      "status": "empty",
+      "controller_id": null,
+      "character_id": null,
+      "chosen_name": null,
+      "chosen_race": null,
+      "chosen_class": null,
+      "chosen_ability_layout": null
+    },
+    {
+      "slot_index": 3,
+      "status": "empty",
+      "controller_id": null,
+      "character_id": null,
+      "chosen_name": null,
+      "chosen_race": null,
+      "chosen_class": null,
+      "chosen_ability_layout": null
+    }
+  ],
+  "narrative_log": [
+    {
+      "revision": 0,
+      "actor_id": null,
+      "kind": "system",
+      "text": "Oh, wonderful. Another group of 'heroes' has stumbled into the tavern. I'm sure the world is breathlessly awaiting your first clumsy steps toward destiny. Or the bar. Probably the bar.",
+      "timestamp": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "revision": 2
+}

@@ -64,10 +64,11 @@ let appState = null;
 let session  = null;
 let currentUser = null;
 
-const _esc = (() => {
-  const d = document.createElement("div");
-  return (s) => { d.textContent = String(s ?? ""); return d.innerHTML; };
-})();
+const _esc = (s) => {
+  return String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+};
 
 // Expose auth to window for Google SDK callback
 window.onGoogleLogin = async (response) => {
