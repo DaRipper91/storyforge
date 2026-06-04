@@ -117,6 +117,7 @@ export class CharacterPanel {
       if (isDead) portrait.classList.add("dead");
       
       portrait.dataset.charId = id;
+      portrait.setAttribute("aria-label", `Select character: ${char.name}`);
 
       const initial = document.createElement("span");
       initial.className = CHAR_INK_CLASS[id] ?? "ink-midnight";
