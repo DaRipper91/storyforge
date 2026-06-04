@@ -257,13 +257,21 @@ body[data-phase="saves"] #game-view { display: none; }
   gap: 0.2rem;
 }
 
-.menu-options button.focused,
-.menu-options button:focus {
+.menu-options button.focused {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
   box-shadow: var(--glow-gold);
   outline: none;
+}
+
+.menu-options button:focus-visible {
+  background: var(--ink-gilded);
+  color: var(--ink-midnight);
+  transform: translateY(-3px);
+  box-shadow: var(--glow-gold);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 
 .mode-btn-title {
