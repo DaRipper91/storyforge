@@ -108,7 +108,18 @@ export class Lobby {
     }
 
     // Attract mode — reset idle timer on any input
-    const resetIdle = () => this._resetAttractTimer();
+    // ⚡ Bolt: Throttled to prevent micro-allocations & GC churn on high-frequency events
+    let lastReset = 0;
+    const resetIdle = () => {
+      const now = Date.now();
+      // If attract mode is visible, we want to hide it instantly.
+      // Otherwise, only reset the timer at most once per second.
+      if (this._attractVisible || now - lastReset > 1000) {
+        lastReset = now;
+        this._resetAttractTimer();
+      }
+    };
+
     window.addEventListener("keydown",    resetIdle, { passive: true });
     window.addEventListener("mousemove",  resetIdle, { passive: true });
     window.addEventListener("mousedown",  resetIdle, { passive: true });
