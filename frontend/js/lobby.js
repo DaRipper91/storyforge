@@ -120,6 +120,12 @@ export class Lobby {
 
   _resetAttractTimer() {
     if (this._attractVisible) { this._hideAttract(); return; }
+
+    // Throttle to prevent GC churn from mousemove calling clearTimeout/setTimeout constantly
+    const now = Date.now();
+    if (this._lastAttractReset && now - this._lastAttractReset < 1000) return;
+    this._lastAttractReset = now;
+
     clearTimeout(this._attractTimer);
     const phase = document.body.dataset.phase;
     if (phase === "title" || phase === "menu") {
