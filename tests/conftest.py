@@ -7,19 +7,17 @@ storyforge package so tests never touch the real Gemini API.
 """
 import json
 import os
-import tempfile
 from pathlib import Path
 
 import pytest
 import pytest_asyncio
-import httpx
 from httpx import AsyncClient, ASGITransport
 
 # Provide a fake key before any storyforge module is imported.
 os.environ.setdefault("STORYFORGE_GEMINI_API_KEY", "test-fake-key-not-real")
 
 from storyforge.main import app  # noqa: E402 — must follow env setup
-from storyforge.core.models import GameState, TurnPhase
+from storyforge.core.models import GameState
 from storyforge.core.state_manager import StateManager
 from storyforge.persistence import snapshot
 
