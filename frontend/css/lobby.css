@@ -872,6 +872,11 @@ body[data-phase="saves"] #game-view { display: none; }
   white-space: nowrap;
 }
 .jon-item-buy:hover { filter: brightness(1.1); }
+.jon-item-buy:focus-visible {
+  filter: brightness(1.1);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
+}
 
 .escape-methods {
   display: flex;
@@ -897,6 +902,12 @@ body[data-phase="saves"] #game-view { display: none; }
 .escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+}
+.escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
@@ -990,6 +1001,10 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 .settings-slider:hover::-webkit-slider-thumb {
   background: #e8c060;
+}
+.settings-slider:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 4px;
 }
 
 /* ─────────────────────── Queen D.Anna Overlay ─────────────────────── */
