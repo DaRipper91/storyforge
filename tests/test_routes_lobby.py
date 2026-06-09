@@ -8,11 +8,9 @@ No Gemini calls are made by any of the routes under test.
 """
 import os
 
-import pytest
 
 os.environ.setdefault("STORYFORGE_GEMINI_API_KEY", "test-fake-key-not-real")
 
-from storyforge.core.models import TurnPhase
 
 
 # ─────────────────────── /api/lobby/catalog ───────────────────────
