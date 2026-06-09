@@ -7,3 +7,7 @@
 **Vulnerability:** The API endpoint `POST /api/campaigns/load` validated `campaign_id` against path traversal by using a naive string blocklist checking for `/`, `\`, and `..`. This is susceptible to bypasses (e.g. symlinks within the directory, Windows absolute paths).
 **Learning:** While simple string blocklisting might appear effective, it can be bypassed. Furthermore, strict blocklists prevent legitimate directory organization (like using a folder prefix `archived/campaign`). Python's `pathlib` offers secure semantic operations like `resolve()` and `is_relative_to()`.
 **Prevention:** Always validate resolved target paths semantically to ensure they fall within the designated root directory boundary using `path.resolve().is_relative_to(base_dir)` instead of checking the string payload for traversal patterns.
+## 2026-06-09 - Missing Essential Security Headers
+**Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
+**Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
+**Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
