@@ -109,8 +109,19 @@ export class Lobby {
 
     // Attract mode — reset idle timer on any input
     const resetIdle = () => this._resetAttractTimer();
+
+    // Throttle mousemove to prevent GC churn from continuous timer resets
+    let lastMouseMove = 0;
+    const throttledMouseMove = () => {
+      const now = Date.now();
+      if (now - lastMouseMove > 1000) {
+        lastMouseMove = now;
+        resetIdle();
+      }
+    };
+
     window.addEventListener("keydown",    resetIdle, { passive: true });
-    window.addEventListener("mousemove",  resetIdle, { passive: true });
+    window.addEventListener("mousemove",  throttledMouseMove, { passive: true });
     window.addEventListener("mousedown",  resetIdle, { passive: true });
     window.addEventListener("touchstart", resetIdle, { passive: true });
     this._resetAttractTimer();
