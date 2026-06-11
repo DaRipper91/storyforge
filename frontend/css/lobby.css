@@ -890,13 +890,19 @@ body[data-phase="saves"] #game-view { display: none; }
   border-radius: 6px;
   color: #f4ead4;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
   font-family: inherit;
   font-size: var(--fs-sm);
 }
 .escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+}
+.escape-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
@@ -990,6 +996,10 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 .settings-slider:hover::-webkit-slider-thumb {
   background: #e8c060;
+}
+.settings-slider:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 /* ─────────────────────── Queen D.Anna Overlay ─────────────────────── */
@@ -1284,7 +1294,8 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: rgba(75, 0, 130, 0.4);
 }
 
-.samael-consult-btns .escape-btn:hover {
+.samael-consult-btns .escape-btn:hover,
+.samael-consult-btns .escape-btn:focus-visible {
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
 }
@@ -1373,12 +1384,14 @@ body[data-phase="saves"] #game-view { display: none; }
   line-height: 1.6;
 }
 
-.keeva-action-btns .escape-btn:hover {
+.keeva-action-btns .escape-btn:hover,
+.keeva-action-btns .escape-btn:focus-visible {
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
 
-.keeva-btn-risky:hover {
+.keeva-btn-risky:hover,
+.keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
@@ -1769,6 +1782,11 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-gilded);
 }
 
+.story-textarea:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
+}
+
 .story-text-input {
   background: rgba(255, 245, 220, 0.1);
   border: 2px solid rgba(30, 20, 10, 0.4);
@@ -1782,6 +1800,11 @@ body[data-phase="saves"] #game-view { display: none; }
 .story-text-input:focus {
   outline: none;
   border-color: var(--ink-gilded);
+}
+
+.story-text-input:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .story-hint {
