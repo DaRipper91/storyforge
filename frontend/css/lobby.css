@@ -890,13 +890,23 @@ body[data-phase="saves"] #game-view { display: none; }
   border-radius: 6px;
   color: #f4ead4;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s, border-color 0.15s;
   font-family: inherit;
   font-size: var(--fs-sm);
 }
 .escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+}
+.escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
