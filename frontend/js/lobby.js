@@ -108,7 +108,16 @@ export class Lobby {
     }
 
     // Attract mode — reset idle timer on any input
-    const resetIdle = () => this._resetAttractTimer();
+    // ⚡ Bolt Optimization: Throttle high-frequency events (like mousemove)
+    // to prevent continuous clearTimeout/setTimeout churn and reduce GC pressure.
+    let idleThrottleTimer = null;
+    const resetIdle = () => {
+      if (idleThrottleTimer) return;
+      idleThrottleTimer = setTimeout(() => {
+        idleThrottleTimer = null;
+        this._resetAttractTimer();
+      }, 500);
+    };
     window.addEventListener("keydown",    resetIdle, { passive: true });
     window.addEventListener("mousemove",  resetIdle, { passive: true });
     window.addEventListener("mousedown",  resetIdle, { passive: true });
