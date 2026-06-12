@@ -898,6 +898,12 @@ body[data-phase="saves"] #game-view { display: none; }
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
+.escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
+}
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
   font-family: "JetBrains Mono", monospace;
@@ -1288,6 +1294,10 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
 }
+.samael-consult-btns .escape-btn:focus-visible {
+  border-color: #9b4dca;
+  background: rgba(155, 77, 202, 0.15);
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    Madame Haylie overlay
@@ -1329,6 +1339,12 @@ body[data-phase="saves"] #game-view { display: none; }
 .haylie-bailout-btn:not(:disabled):hover {
   background: rgba(204, 34, 34, 0.3);
   border-color: #e05050;
+}
+.haylie-bailout-btn:not(:disabled):focus-visible {
+  background: rgba(204, 34, 34, 0.3);
+  border-color: #e05050;
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 
 .haylie-bailout-btn:disabled {
@@ -1377,8 +1393,17 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
+.keeva-action-btns .escape-btn:focus-visible {
+  border-color: #daa520;
+  background: rgba(218, 165, 32, 0.15);
+}
 
 .keeva-btn-risky:hover {
+  border-color: #cc2222 !important;
+  background: rgba(204, 34, 34, 0.15) !important;
+  color: #ffaaaa;
+}
+.keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
