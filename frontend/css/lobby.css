@@ -898,6 +898,12 @@ body[data-phase="saves"] #game-view { display: none; }
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
+.escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
+}
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
   font-family: "JetBrains Mono", monospace;
