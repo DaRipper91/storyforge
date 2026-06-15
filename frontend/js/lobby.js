@@ -108,7 +108,14 @@ export class Lobby {
     }
 
     // Attract mode — reset idle timer on any input
-    const resetIdle = () => this._resetAttractTimer();
+    let lastReset = 0;
+    const resetIdle = () => {
+      const now = Date.now();
+      if (this._attractVisible || now - lastReset > 1000) {
+        this._resetAttractTimer();
+        lastReset = now;
+      }
+    };
     window.addEventListener("keydown",    resetIdle, { passive: true });
     window.addEventListener("mousemove",  resetIdle, { passive: true });
     window.addEventListener("mousedown",  resetIdle, { passive: true });
