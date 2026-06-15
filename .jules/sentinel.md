@@ -7,3 +7,8 @@
 **Vulnerability:** The API endpoint `POST /api/campaigns/load` validated `campaign_id` against path traversal by using a naive string blocklist checking for `/`, `\`, and `..`. This is susceptible to bypasses (e.g. symlinks within the directory, Windows absolute paths).
 **Learning:** While simple string blocklisting might appear effective, it can be bypassed. Furthermore, strict blocklists prevent legitimate directory organization (like using a folder prefix `archived/campaign`). Python's `pathlib` offers secure semantic operations like `resolve()` and `is_relative_to()`.
 **Prevention:** Always validate resolved target paths semantically to ensure they fall within the designated root directory boundary using `path.resolve().is_relative_to(base_dir)` instead of checking the string payload for traversal patterns.
+
+## 2025-06-15 - Dynamic Secure Cookie Flag
+**Vulnerability:** The session authentication cookie (`storyforge_session`) lacked the `secure=True` flag in production, exposing users to Insecure Session Management as the cookie could be transmitted unencrypted over HTTP.
+**Learning:** Defaulting to `secure=False` for developer convenience leaves production instances vulnerable. The `secure` flag should always reflect the environment's transport layer.
+**Prevention:** Dynamically assign the secure flag by inspecting the request protocol (`request.url.scheme == "https"`) to ensure the cookie is only transmitted over encrypted connections in production, while maintaining local HTTP development operability.

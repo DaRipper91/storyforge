@@ -19,7 +19,7 @@ from storyforge.auth import authenticate_google_user
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/desktop_login")
-async def desktop_login(response: Response):
+async def desktop_login(request: Request, response: Response):
     """Triggers the InstalledAppFlow for desktop clients (like Godot)."""
     try:
         # Run the blocking OAuth flow in a separate thread to keep FastAPI responsive
@@ -41,6 +41,7 @@ async def desktop_login(response: Response):
             key="storyforge_session",
             value=token,
             httponly=True,
+            secure=request.url.scheme == "https",
             samesite="lax",
             max_age=24 * 3600
         )
@@ -73,7 +74,7 @@ def create_session_token(id_info: dict) -> str:
 
 
 @router.post("/google")
-async def google_auth(body: AuthToken, response: Response):
+async def google_auth(request: Request, body: AuthToken, response: Response):
     """Verify Google ID token and set session cookie."""
     if not settings.google_client_id:
         raise HTTPException(status_code=501, detail="Google Auth not configured on server")
@@ -92,7 +93,7 @@ async def google_auth(body: AuthToken, response: Response):
             key="storyforge_session",
             value=token,
             httponly=True,
-            secure=False,  # Set to True if using HTTPS
+            secure=request.url.scheme == "https",
             samesite="lax",
             max_age=24 * 3600
         )
