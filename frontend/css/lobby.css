@@ -870,8 +870,20 @@ body[data-phase="saves"] #game-view { display: none; }
   font-weight: bold;
   font-family: inherit;
   white-space: nowrap;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
-.jon-item-buy:hover { filter: brightness(1.1); }
+.jon-item-buy:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+}
+.jon-item-buy:focus-visible {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
+}
 
 .escape-methods {
   display: flex;
@@ -890,13 +902,23 @@ body[data-phase="saves"] #game-view { display: none; }
   border-radius: 6px;
   color: #f4ead4;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s ease, box-shadow 0.12s ease;
   font-family: inherit;
   font-size: var(--fs-sm);
 }
 .escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
