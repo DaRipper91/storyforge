@@ -4,3 +4,6 @@
 ## 2024-05-19 - Avoid Recreating Konva Graphics on High-Frequency Events
 **Learning:** Destroying and recreating Konva layers or Canvas nodes on high-frequency events (e.g., `mousemove` causing cursor position updates) creates severe Garbage Collection pressure and micro-stutters.
 **Action:** Optimize by instantiating graphics objects and animations once and mutating their properties (like `x`, `y`, `width`, `height`, or `setAttrs`) during the event loop instead of destroying and recreating them.
+## 2024-06-16 - Throttling High-Frequency Timer Resets
+**Learning:** High-frequency DOM events (like `mousemove` or `scroll`) that continuously trigger timer operations (calling `clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection (GC) churn. This degrades performance over time, causing micro-stutters.
+**Action:** When throttling high-frequency events to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers or executing the heavy logic continuously. Ensure the throttling logic can be bypassed if instant reaction is needed (e.g., hiding a screensaver).
