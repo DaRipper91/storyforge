@@ -102,7 +102,14 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    // ⚡ Bolt: Throttled mousemove using Date.now() to reduce GC pressure
+    // and layout calculation churn caused by continuous _pixelToGrid conversions
+    let lastMouseMove = 0;
     this.stage.on("mousemove", (e) => {
+      const now = Date.now();
+      if (now - lastMouseMove < 16) return; // ~60fps throttle
+      lastMouseMove = now;
+
       const pos = this.stage.getPointerPosition();
       if (!pos) return;
       const coord = this._pixelToGrid(pos.x, pos.y);
