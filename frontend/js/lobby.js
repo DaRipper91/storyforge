@@ -940,6 +940,7 @@ export class Lobby {
       nameInput.className = "slot-name-input";
       nameInput.value = slot.name_draft || "";
       nameInput.disabled = slot.status === "ready";
+      nameInput.setAttribute("aria-label", "Character Name");
 
       nameInput.addEventListener("change", async (e) => {
         const val = e.target.value.trim();
@@ -1444,6 +1445,7 @@ export class Lobby {
         `).join("")}
       </div>
       <input type="text" class="identity-text-input" id="pronouns-custom" placeholder="Custom pronouns…"
+        aria-label="Custom Pronouns"
         value="${!pronounOptions.includes(draft.pronouns) ? this._escape(draft.pronouns) : ""}"
         style="margin-top:0.5rem;width:100%">
     `));
@@ -1457,6 +1459,7 @@ export class Lobby {
         `).join("")}
       </div>
       <input type="text" class="identity-text-input" id="title-custom" placeholder="Custom title…"
+        aria-label="Custom Title"
         value="${(draft.title && !titleOptions.includes(draft.title)) ? this._escape(draft.title) : ""}"
         style="margin-top:0.5rem;width:100%">
     `));
@@ -1587,6 +1590,7 @@ export class Lobby {
     keepsakeInput.placeholder = "A glowing coin, a letter from a dead relative, a broken locket…";
     keepsakeInput.maxLength = 100;
     keepsakeInput.value = draft.keepsakeName ?? "";
+    keepsakeInput.setAttribute("aria-label", "Keepsake or Trinket");
     keepsakeInput.addEventListener("input", e => { draft.keepsakeName = e.target.value || null; });
 
     const keepsakeHint = document.createElement("p");
@@ -1701,6 +1705,7 @@ export class Lobby {
     input.maxLength = 24;
     input.placeholder = "Kael, Lyra, Whisper…";
     input.value = draft.name;
+    input.setAttribute("aria-label", "Hero Name");
 
     input.addEventListener("input", (e) => { draft.name = e.target.value; });
     input.addEventListener("keydown", (e) => {
