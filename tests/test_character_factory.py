@@ -9,12 +9,10 @@ import json
 import os
 from pathlib import Path
 
-import pytest
 
 os.environ.setdefault("STORYFORGE_GEMINI_API_KEY", "test-fake-key-not-real")
 
 from storyforge.core.character_factory import (
-    RACES,
     ROLES,
     build_character,
     is_valid_standard_array,
@@ -25,7 +23,6 @@ from storyforge.core.models import (
     GameState,
     PredatorRole,
     Race,
-    TurnPhase,
 )
 
 _SEED_PATH = Path(__file__).resolve().parents[1] / "data" / "seeds" / "default_campaign.json"
