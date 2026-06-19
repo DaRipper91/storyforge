@@ -7,3 +7,8 @@
 **Vulnerability:** The API endpoint `POST /api/campaigns/load` validated `campaign_id` against path traversal by using a naive string blocklist checking for `/`, `\`, and `..`. This is susceptible to bypasses (e.g. symlinks within the directory, Windows absolute paths).
 **Learning:** While simple string blocklisting might appear effective, it can be bypassed. Furthermore, strict blocklists prevent legitimate directory organization (like using a folder prefix `archived/campaign`). Python's `pathlib` offers secure semantic operations like `resolve()` and `is_relative_to()`.
 **Prevention:** Always validate resolved target paths semantically to ensure they fall within the designated root directory boundary using `path.resolve().is_relative_to(base_dir)` instead of checking the string payload for traversal patterns.
+
+## 2026-06-19 - Prevent XSS in HTML attribute injection via textContent
+**Vulnerability:** The custom `_esc` function in `frontend/js/main.js` used DOM `textContent` conversion to escape strings. This method correctly escapes `&`, `<`, and `>` but fails to escape quotes (`"` and `'`). Because this function is heavily used to escape data injected into HTML attributes (e.g., `data-item-id="${_esc(item.id)}"`), it created a severe XSS vulnerability where attackers could break out of attributes.
+**Learning:** Using DOM `textContent` is a well-known anti-pattern for attribute escaping. It is only safe for injecting text nodes into the DOM, not for constructing raw HTML strings with attributes.
+**Prevention:** Always use a comprehensive regex replacement (or a dedicated sanitization library) that explicitly targets `&`, `<`, `>`, `"`, and `'` when escaping untrusted input for raw HTML string construction.
