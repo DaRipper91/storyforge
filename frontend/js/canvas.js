@@ -102,13 +102,23 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    // ⚡ Bolt: Throttle high-frequency mousemove events using requestAnimationFrame.
+    // This aligns grid recalculations with the screen refresh rate,
+    // eliminating redundant processing of intermediate sub-frame cursor positions.
+    // The pending flag ensures the final position is always rendered, preventing stale states.
+    let pendingMouseMove = false;
     this.stage.on("mousemove", (e) => {
-      const pos = this.stage.getPointerPosition();
-      if (!pos) return;
-      const coord = this._pixelToGrid(pos.x, pos.y);
-      if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
-        this.setCursor(coord);
-      }
+      if (pendingMouseMove) return;
+      pendingMouseMove = true;
+      requestAnimationFrame(() => {
+        pendingMouseMove = false;
+        const pos = this.stage.getPointerPosition();
+        if (!pos) return;
+        const coord = this._pixelToGrid(pos.x, pos.y);
+        if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
+          this.setCursor(coord);
+        }
+      });
     });
 
     this._startAmbientParticles();
