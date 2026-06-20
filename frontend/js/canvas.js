@@ -102,13 +102,20 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    // ⚡ Bolt: Throttled mousemove with rAF to reduce main thread blocking and GC pressure.
+    let _mouseMovePending = false;
     this.stage.on("mousemove", (e) => {
-      const pos = this.stage.getPointerPosition();
-      if (!pos) return;
-      const coord = this._pixelToGrid(pos.x, pos.y);
-      if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
-        this.setCursor(coord);
-      }
+      if (_mouseMovePending) return;
+      _mouseMovePending = true;
+      requestAnimationFrame(() => {
+        _mouseMovePending = false;
+        const pos = this.stage.getPointerPosition();
+        if (!pos) return;
+        const coord = this._pixelToGrid(pos.x, pos.y);
+        if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
+          this.setCursor(coord);
+        }
+      });
     });
 
     this._startAmbientParticles();
