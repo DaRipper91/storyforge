@@ -7,3 +7,7 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+
+## 2025-02-14 - Throttle Canvas Updates with requestAnimationFrame
+**Learning:** When throttling high-frequency canvas or drawing updates (e.g., `mousemove` on a Konva stage), using a naive `Date.now()` timestamp throttle can drop inputs or leave the visual state stale if the trailing event is discarded.
+**Action:** Prefer `requestAnimationFrame` with a pending flag (e.g. `_pendingMouseMove`). This ensures execution aligns exactly with the screen refresh rate, reduces redundant processing between paints, and guarantees the final input state is always processed.
