@@ -947,6 +947,10 @@ body[data-phase="saves"] #game-view { display: none; }
   color: var(--ink-crimson);
 }
 .btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:focus-visible {
+  outline: 2px solid var(--ink-crimson) !important;
+  outline-offset: 2px;
+}
 
 /* ─────────────────────── Settings Modal ─────────────────────── */
 
@@ -1390,11 +1394,18 @@ body[data-phase="saves"] #game-view { display: none; }
   background: rgba(218, 165, 32, 0.15);
 }
 
-.keeva-btn-risky:hover,
+.keeva-btn-risky:hover {
+  border-color: #cc2222 !important;
+  background: rgba(204, 34, 34, 0.15) !important;
+  color: #ffaaaa;
+}
+
 .keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
+  outline: 2px solid #cc2222 !important;
+  outline-offset: 2px;
 }
 
 
