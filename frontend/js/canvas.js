@@ -102,12 +102,20 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    // ⚡ Bolt: Throttled mousemove with requestAnimationFrame to prevent redundant calculations and reduce GC pressure
+    let isMousemovePending = false;
     this.stage.on("mousemove", (e) => {
-      const pos = this.stage.getPointerPosition();
-      if (!pos) return;
-      const coord = this._pixelToGrid(pos.x, pos.y);
-      if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
-        this.setCursor(coord);
+      if (!isMousemovePending) {
+        isMousemovePending = true;
+        requestAnimationFrame(() => {
+          isMousemovePending = false;
+          const pos = this.stage.getPointerPosition();
+          if (!pos) return;
+          const coord = this._pixelToGrid(pos.x, pos.y);
+          if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
+            this.setCursor(coord);
+          }
+        });
       }
     });
 
