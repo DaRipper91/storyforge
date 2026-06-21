@@ -102,13 +102,22 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    let movePending = false;
     this.stage.on("mousemove", (e) => {
-      const pos = this.stage.getPointerPosition();
-      if (!pos) return;
-      const coord = this._pixelToGrid(pos.x, pos.y);
-      if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
-        this.setCursor(coord);
-      }
+      // ⚡ Bolt: Throttle high-frequency canvas pointer events using requestAnimationFrame.
+      // This aligns grid intersection calculations with the screen refresh rate,
+      // significantly reducing CPU overhead and garbage collection micro-stutters during movement.
+      if (movePending) return;
+      movePending = true;
+      requestAnimationFrame(() => {
+        movePending = false;
+        const pos = this.stage.getPointerPosition();
+        if (!pos) return;
+        const coord = this._pixelToGrid(pos.x, pos.y);
+        if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
+          this.setCursor(coord);
+        }
+      });
     });
 
     this._startAmbientParticles();
