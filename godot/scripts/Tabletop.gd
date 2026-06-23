@@ -153,6 +153,7 @@ var _npc_active_data:  Dictionary    = {}  # encounter data from server
 # ─── Jon shop ────────────────────────────────────────────────────────
 const JON_SHOP_SCENE := preload("res://scenes/JonShopPanel.tscn")
 var _jon_shop: Control = null
+var _sync_timer: Timer = null
 
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
@@ -192,6 +193,13 @@ func _ready():
 		_magic_burst_scene = load("res://scenes/MagicBurst.tscn")
 
 	AudioManager.play_ambient("res://assets/audio/ambient_keep.wav")
+
+	_sync_timer = Timer.new()
+	_sync_timer.wait_time = 3.0
+	_sync_timer.one_shot = false
+	_sync_timer.autostart = true
+	_sync_timer.timeout.connect(_on_sync_timer_timeout)
+	add_child(_sync_timer)
 
 
 func _setup_ui():
@@ -1801,6 +1809,38 @@ func spawn_magic_burst(world_pos: Vector3):
 		var inst = _magic_burst_scene.instantiate()
 		particles_root.add_child(inst)
 		inst.position = world_pos + Vector3(0, 0.5, 0)
+
+
+func _on_sync_timer_timeout() -> void:
+	if _selected_cid.is_empty() or not _miniatures.has(_selected_cid):
+		return
+	
+	var leader = _miniatures[_selected_cid]
+	if not is_instance_valid(leader):
+		return
+	
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		return
+	
+	var char_data: Dictionary = _character_data.get(_selected_cid, {})
+	var hp_current: int = char_data.get("hp_current", 10)
+	
+	var grid_x: float = leader.position.x / CELL_SIZE
+	var grid_y: float = leader.position.z / CELL_SIZE
+	
+	var payload = {
+		"hp_current": hp_current,
+		"position_x": grid_x,
+		"position_y": grid_y,
+		"room_id": _current_room_id
+	}
+	
+	var path = "/d2/character/" + _selected_cid + "/sync"
+	var http = pc.post_request(path, payload)
+	http.request_completed.connect(func(_r, _c, _h, _b):
+		http.queue_free()
+	)
 
 
 # ─── Environment setup ──────────────────────────────────────────────
