@@ -1217,7 +1217,7 @@ func _on_state_updated(new_state: Dictionary):
 			_select_mini(cid)
 			spawned_leader = true
 
-	if spawned_leader:
+	if spawned_leader and _selected_cid in _miniatures and is_instance_valid(_miniatures[_selected_cid]):
 		var leader = _miniatures[_selected_cid]
 		_cam_target = leader.position
 		_update_camera()
