@@ -102,13 +102,22 @@ export class GridCanvas {
       this.adjustZoom(delta);
     });
 
+    // ⚡ Bolt: Throttle mousemove events to screen refresh rate (16ms)
+    // Prevents redundant calculations and micro-stutters from high polling rate mice
+    let mouseMovePending = false;
     this.stage.on("mousemove", (e) => {
-      const pos = this.stage.getPointerPosition();
-      if (!pos) return;
-      const coord = this._pixelToGrid(pos.x, pos.y);
-      if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
-        this.setCursor(coord);
-      }
+      if (mouseMovePending) return;
+      mouseMovePending = true;
+      requestAnimationFrame(() => {
+        const pos = this.stage.getPointerPosition();
+        if (pos) {
+          const coord = this._pixelToGrid(pos.x, pos.y);
+          if (coord && (coord.x !== this.cursor.x || coord.y !== this.cursor.y)) {
+            this.setCursor(coord);
+          }
+        }
+        mouseMovePending = false;
+      });
     });
 
     this._startAmbientParticles();
