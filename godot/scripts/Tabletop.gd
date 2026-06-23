@@ -933,7 +933,7 @@ func _rebuild_room(state: Dictionary):
 			match terrain:
 				"wall":
 					inst.mesh = wall_mesh
-					inst.material_override = _mat_wall
+					inst.material_override = _mat_wall.duplicate()
 					_add_box_collision(inst, wall_mesh.size)
 					inst.position = Vector3(wx, 1.25, wz)
 
@@ -944,7 +944,7 @@ func _rebuild_room(state: Dictionary):
 					floor_inst.position = Vector3(wx, -0.06, wz)
 					_dungeon_root.add_child(floor_inst)
 					inst.mesh = door_mesh
-					inst.material_override = _mat_door
+					inst.material_override = _mat_door.duplicate()
 					inst.position = Vector3(wx, 1.1, wz)
 
 					var exit_key = "%d,%d" % [x, y]
@@ -987,12 +987,12 @@ func _rebuild_room(state: Dictionary):
 					base_mesh.size = Vector3(CELL_SIZE * 0.5, 0.12, CELL_SIZE * 0.5)
 					var base_inst = MeshInstance3D.new()
 					base_inst.mesh = base_mesh
-					base_inst.material_override = _mat_pillar
+					base_inst.material_override = _mat_pillar.duplicate()
 					base_inst.position = Vector3(wx, 0.06, wz)
 					_dungeon_root.add_child(base_inst)
 					# Shaft
 					inst.mesh = pillar_mesh
-					inst.material_override = _mat_pillar
+					inst.material_override = _mat_pillar.duplicate()
 					_add_cylinder_collision(inst, pillar_mesh.bottom_radius, pillar_mesh.height)
 					inst.position = Vector3(wx, 1.0, wz)
 
@@ -1018,7 +1018,7 @@ func _rebuild_room(state: Dictionary):
 						_dungeon_root.add_child(leg_inst)
 					# Tabletop
 					inst.mesh = table_top_mesh
-					inst.material_override = _mat_table
+					inst.material_override = _mat_table.duplicate()
 					_add_box_collision(inst, table_top_mesh.size)
 					inst.position = Vector3(wx, 0.60, wz)
 
