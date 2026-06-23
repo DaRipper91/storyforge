@@ -8,6 +8,7 @@ the GameState is loaded in-memory from the seed file.
 import json
 import os
 from pathlib import Path
+import pytest
 
 
 os.environ.setdefault("STORYFORGE_GEMINI_API_KEY", "test-fake-key-not-real")
@@ -199,3 +200,11 @@ def test_is_valid_standard_array_rejects_duplicates():
     """[15,14,13,12,10,10] has a duplicate 10, not valid."""
     scores = AbilityScores(STR=15, DEX=14, CON=13, INT=12, WIS=10, CHA=10)
     assert is_valid_standard_array(scores) is False
+
+
+def test_build_character_rejects_invalid_abilities():
+    """build_character should raise ValueError for invalid ability score arrays."""
+    invalid_scores = AbilityScores(STR=15, DEX=14, CON=13, INT=12, WIS=10, CHA=10)
+    with pytest.raises(ValueError, match="abilities must be a permutation of the standard array"):
+        _build(abilities=invalid_scores)
+

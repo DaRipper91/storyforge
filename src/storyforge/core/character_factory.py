@@ -622,6 +622,12 @@ def build_character(
     ideals: str = "",
     keepsake_name: str | None = None,
 ) -> CharacterSheet:
+    if not is_valid_standard_array(abilities):
+        raise ValueError(
+            "abilities must be a permutation of the standard array "
+            f"{STANDARD_ARRAY}"
+        )
+
     r_def = RACES[race]
     s_def = STATES[state]
     p_def = ROLES[role]

@@ -58,7 +58,7 @@ The Godot 4 3D tabletop client is complete. The Python backend remains the autho
 ### 🎵 Milestone 5: Audio & Polish - PENDING
 - [ ] Replace synthesized .wav placeholders with real audio assets.
 - [ ] Final balance pass on ability score bonuses.
-- [ ] Duplicate ability score server validation (`is_valid_standard_array` not yet called in creation route).
+- [x] Duplicate ability score server validation (`is_valid_standard_array` not yet called in creation route).
 - [ ] CI itch.io publishing (needs `BUTLER_API_KEY` + `ITCH_USER`/`ITCH_GAME` GitHub secrets).
 
 ---
