@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from storyforge.config import settings
 from storyforge.api import (
     routes_state, routes_action, routes_lobby, routes_npc, routes_enemy,
-    ws_session, routes_auth,
+    ws_session, routes_auth, routes_d2,
 )
 from storyforge.core.state_manager import StateManager
 from storyforge.persistence import snapshot
@@ -70,6 +70,7 @@ app.include_router(routes_action.router)
 app.include_router(routes_lobby.router)
 app.include_router(routes_npc.router)
 app.include_router(routes_enemy.router)
+app.include_router(routes_d2.router)
 app.include_router(ws_session.router)
 
 # Frontend static

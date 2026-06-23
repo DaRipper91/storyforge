@@ -27,6 +27,8 @@ TimeManager="*res://scripts/TimeManager.gd"
 NpcManager="*res://scripts/NpcManager.gd"
 InventorySystem="*res://scenes/ui/inventory_system.tscn"
 ItemTooltip="*res://scenes/ui/item_tooltip.tscn"
+AffixPool="*res://scripts/itemization/AffixPool.gd"
+PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
 
 [display]
 
@@ -36,7 +38,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/multimesh_scatter/plugin.cfg", "res://addons/PushDownAutomata/plugin.cfg")
+enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/multimesh_scatter/plugin.cfg")
 
 [rendering]
 

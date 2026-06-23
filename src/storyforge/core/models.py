@@ -44,6 +44,13 @@ class InventoryItem(BaseModel):
     notes: str | None = None
     damage_dice: str | None = None       # e.g. "1d8" — None means use default (1d6)
     armor_ac_bonus: int = 0              # flat AC bonus when equipped
+    
+    # Diablo 2 Specifics
+    rarity: str = "normal"
+    affixes: list[dict] = Field(default_factory=list)
+    sockets_max: int = 0
+    socketed_items: list[dict] = Field(default_factory=list)
+    required_level: int = 1
 
 
 class CharacterSheet(BaseModel):
@@ -67,6 +74,10 @@ class CharacterSheet(BaseModel):
     proficiency_bonus: int = Field(ge=2, le=6, default=2)
     skill_proficiencies: list[str] = Field(default_factory=list)
     inventory: list[InventoryItem] = Field(default_factory=list)
+
+    # Diablo 2 Specifics
+    skill_tree: dict = Field(default_factory=dict)
+    unspent_skill_points: int = 0
 
     # Combat-turn ephemeral state
     position: Coord

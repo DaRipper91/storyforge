@@ -366,7 +366,7 @@ func _create_miniature_base(clean_race_id: String) -> void:
 			tor.outer_radius = radius
 			tor.inner_radius = radius * 0.75
 			tor.ring_segments = 12
-			tor.radial_segments = 16
+			tor.rings = 16
 			base_mesh = tor
 			base_mi.scale = Vector3(1.0, 0.12 / 2.0, 1.0)
 			height = 0.06
@@ -501,7 +501,9 @@ func _load_obj_standee(clean_race_id: String) -> bool:
 					tex = surf_mat.albedo_texture
 			
 			if not tex:
-				var png_path = "res://assets/characters/" + clean_race_id + ".png"
+				var png_cropped = "res://assets/characters/" + clean_race_id + "_cropped.png"
+				var png_normal = "res://assets/characters/" + clean_race_id + ".png"
+				var png_path = png_cropped if FileAccess.file_exists(png_cropped) else png_normal
 				if FileAccess.file_exists(png_path):
 					tex = ResourceLoader.load(png_path, "Texture2D", ResourceLoader.CACHE_MODE_IGNORE)
 			
@@ -567,9 +569,14 @@ func _load_glb_model(clean_race_id: String, race_id: String) -> bool:
 			mesh_instance.material_override = null
 			var model_instance = model_scene.instantiate()
 			mesh_instance.add_child(model_instance)
+			_debug_apply_materials(model_instance)
 			
 			model_instance.scale = custom_scale
 			model_instance.rotation = custom_rotation
+			
+			print("=== VERBOSE GLB NODE TREE FOR: ", model_path, " ===")
+			_print_tree_verbose(model_instance, "  ")
+			print("====================================================")
 			
 			var anim_player = model_instance.get_node_or_null("AnimationPlayer")
 			if anim_player:
@@ -577,6 +584,30 @@ func _load_glb_model(clean_race_id: String, race_id: String) -> bool:
 				_play_anim("Idle")
 			return true
 	return false
+
+func _debug_apply_materials(node: Node) -> void:
+	pass
+
+
+
+
+func _print_tree_verbose(node: Node, indent: String) -> void:
+	var type_name = node.get_class()
+	var visible_str = ""
+	if "visible" in node:
+		visible_str = " visible=" + str(node.visible)
+	var transform_str = ""
+	if node is Node3D:
+		transform_str = " pos=" + str(node.position) + " rot=" + str(node.rotation) + " scale=" + str(node.scale)
+	var extra_str = ""
+	if node is MeshInstance3D:
+		extra_str = " mesh=" + str(node.mesh) + " mat_override=" + str(node.material_override) + " active_mat=" + str(node.get_active_material(0))
+		if "skeleton" in node:
+			extra_str += " skeleton_path=" + str(node.skeleton)
+	print(indent, node.name, " (", type_name, ")", visible_str, transform_str, extra_str)
+	for child in node.get_children():
+		_print_tree_verbose(child, indent + "  ")
+
 
 func _play_anim(anim_name: String) -> void:
 	if not _anim_player: return

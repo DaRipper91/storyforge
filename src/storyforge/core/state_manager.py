@@ -113,6 +113,37 @@ class StateManager:
                 char.evolution_points += enemy.xp_reward
                 result["enemy_died"] = True
                 result["xp_reward"] = enemy.xp_reward
+                
+                # Check for Level Up (Diablo 2 style: 1000 XP * level threshold)
+                xp_needed = char.level * 1000
+                if char.evolution_points >= xp_needed:
+                    char.level += 1
+                    char.evolution_points -= xp_needed
+                    char.unspent_skill_points += 1
+                    
+                    # Increase Max HP dynamically based on CON modifier
+                    con_mod = (char.abilities.CON - 10) // 2
+                    hp_gain = max(1, 5 + con_mod)
+                    char.hp_max += hp_gain
+                    char.hp_current = char.hp_max
+                    
+                    result["level_up"] = {
+                        "new_level": char.level,
+                        "unspent_skill_points": char.unspent_skill_points,
+                        "hp_gain": hp_gain,
+                    }
+                    
+                    # Log narration
+                    msg = f"✨ LEVEL UP! {char.name} has reached Level {char.level} and gained 1 Skill Point!"
+                    self._state.narrative_log.append(
+                        NarrativeEntry(
+                            revision=self._state.revision + 1,
+                            actor_id=char.id,
+                            kind="narration",
+                            text=msg,
+                            timestamp=dt.datetime.now(dt.timezone.utc).isoformat(),
+                        )
+                    )
             else:
                 counter = resolve_enemy_attack(enemy, char)
                 if counter.hit:

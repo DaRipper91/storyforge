@@ -93,6 +93,7 @@ var _controller_label: Label = null
 var _waiting_screen: ColorRect = null
 var _world_map:     Control        = null
 var _world_map_visible: bool       = false
+var _map_texture_rect: TextureRect = null
 
 # World map layout: room_id → {label, pos (pixels), connections}
 const WORLD_MAP_NODES: Dictionary = {
@@ -458,6 +459,28 @@ func _setup_world_map() -> void:
 	map_container.offset_right  =  360
 	map_container.offset_bottom =  290
 	_world_map.add_child(map_container)
+
+	# Map image background (supports before/after paradox)
+	_map_texture_rect = TextureRect.new()
+	_map_texture_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_map_texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_map_texture_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	_map_texture_rect.modulate = Color(1.0, 1.0, 1.0, 0.85)
+	map_container.add_child(_map_texture_rect)
+
+
+func _update_world_map_texture(era: String) -> void:
+	if not _map_texture_rect:
+		return
+	var texture_path := "res://assets/textures/map2.png" # default to after paradox
+	if era == "before":
+		texture_path = "res://assets/textures/map1.png"
+	
+	if ResourceLoader.exists(texture_path):
+		var tex = load(texture_path)
+		if tex:
+			_map_texture_rect.texture = tex
+
 
 	# Draw connection lines as ColorRects
 	const CONNECTIONS: Array = [
@@ -987,6 +1010,9 @@ func _rebuild_room(state: Dictionary):
 # ─── State / miniatures ─────────────────────────────────────────────
 
 func _on_state_updated(new_state: Dictionary):
+	var era = new_state.get("era", "after")
+	_update_world_map_texture(era)
+
 	var old_room := _current_room_id
 	_rebuild_room(new_state)
 	# On room transition, clear minis and enemy tokens so they respawn
@@ -1718,23 +1744,20 @@ func _open_jon_shop() -> void:
 
 	# Determine genre from current room
 	var genre := "fantasy"
-	if _game_state.has("current_room"):
-		var room_id: String = str(_game_state["current_room"])
-		if "sci" in room_id or "space" in room_id:
-			genre = "sci_fi"
-		elif "western" in room_id or "frontier" in room_id:
-			genre = "western"
+	if "sci" in _current_room_id or "space" in _current_room_id:
+		genre = "sci_fi"
+	elif "western" in _current_room_id or "frontier" in _current_room_id:
+		genre = "western"
 
 	# Get selected character's gold from inventory
 	var gold := 0
-	if _selected_cid != "":
-		for ch in _game_state.get("characters", []):
-			if ch.get("id", "") == _selected_cid:
-				for it in ch.get("inventory", []):
-					var iname: String = it.get("id", "") + it.get("name", "")
-					if "gold" in iname.to_lower():
-						gold += it.get("quantity", 1) * it.get("value", 1)
-				break
+	if _selected_cid != "" and _character_data.has(_selected_cid):
+		var ch = _character_data[_selected_cid]
+		for it in ch.get("inventory", []):
+			var iname: String = it.get("id", "") + it.get("name", "")
+			if "gold" in iname.to_lower():
+				gold += it.get("quantity", 1) * it.get("value", 1)
+
 
 	_jon_shop.open(_selected_cid, genre, gold)
 
