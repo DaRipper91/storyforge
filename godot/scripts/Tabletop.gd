@@ -652,6 +652,125 @@ func _process(delta):
 		if _combat_timer <= 0.0:
 			_combat_overlay.visible = false
 
+	# 1. Camera angle and zoom interpolation
+	_cam_yaw = rad_to_deg(lerp_angle(deg_to_rad(_cam_yaw), deg_to_rad(_target_yaw), delta * 8.0))
+	_cam_pitch = lerp(_cam_pitch, _target_pitch, delta * 8.0)
+	_cam_distance = lerp(_cam_distance, _target_distance, delta * 8.0)
+
+	# 2. Smooth camera follow
+	if not _selected_cid.is_empty() and _selected_cid in _miniatures:
+		var leader = _miniatures[_selected_cid]
+		if is_instance_valid(leader):
+			var target_follow_pos = leader.global_position
+			if Input.is_action_pressed("lock_on"):
+				var closest_target = null
+				var closest_dist = INF
+				var candidates = _npc_tokens.values() + _enemy_tokens.values()
+				for c in candidates:
+					if not is_instance_valid(c):
+						continue
+					var dist = leader.global_position.distance_to(c.global_position)
+					if dist < 15.0 and dist < closest_dist:
+						closest_dist = dist
+						closest_target = c
+				if closest_target:
+					target_follow_pos = (leader.global_position + closest_target.global_position) * 0.5
+			_cam_target = _cam_target.lerp(target_follow_pos, delta * 5.0)
+
+	# 3. Run _update_camera()
+	_update_camera()
+
+	# 4. Raycast obstacle fading
+	var space_state = get_world_3d().direct_space_state
+	var currently_hit_meshes = {}
+	if space_state and not _selected_cid.is_empty() and _selected_cid in _miniatures:
+		var leader = _miniatures[_selected_cid]
+		if is_instance_valid(leader):
+			var from = camera.global_position
+			var to = leader.global_position + Vector3(0, 0.8, 0)
+			var exclude_list: Array[RID] = []
+			exclude_list.append(leader.get_rid())
+			
+			for i in range(6):
+				var query = PhysicsRayQueryParameters3D.create(from, to)
+				query.exclude = exclude_list
+				var result = space_state.intersect_ray(query)
+				if result.is_empty():
+					break
+				
+				var hit_rid = result.get("rid")
+				if hit_rid:
+					exclude_list.append(hit_rid)
+				
+				var collider = result.get("collider")
+				if is_instance_valid(collider):
+					var mesh: MeshInstance3D = null
+					if collider is MeshInstance3D:
+						mesh = collider
+					elif collider.get_parent() is MeshInstance3D:
+						mesh = collider.get_parent()
+					else:
+						# Search children/parent children for a MeshInstance3D
+						for child in collider.get_children():
+							if child is MeshInstance3D:
+								mesh = child
+								break
+						if not mesh:
+							var parent = collider.get_parent()
+							if parent:
+								for child in parent.get_children():
+									if child is MeshInstance3D:
+										mesh = child
+										break
+					
+					if mesh and is_instance_valid(mesh):
+						currently_hit_meshes[mesh] = true
+
+	# Update opacities for currently hit meshes
+	for mesh in currently_hit_meshes:
+		if is_instance_valid(mesh):
+			var current_op = _faded_meshes.get(mesh, 1.0)
+			var new_op = move_toward(current_op, 0.25, delta * 4.0)
+			_faded_meshes[mesh] = new_op
+			_apply_mesh_opacity(mesh, new_op)
+		
+	# Restore other previously faded meshes
+	var to_remove = []
+	for mesh in _faded_meshes.keys():
+		if not currently_hit_meshes.has(mesh):
+			if is_instance_valid(mesh):
+				var current_op = _faded_meshes[mesh]
+				var new_op = move_toward(current_op, 1.0, delta * 4.0)
+				_faded_meshes[mesh] = new_op
+				_apply_mesh_opacity(mesh, new_op)
+				if is_equal_approx(new_op, 1.0):
+					if mesh.has_meta("original_material"):
+						mesh.material_override = mesh.get_meta("original_material")
+						mesh.remove_meta("original_material")
+					to_remove.append(mesh)
+			else:
+				to_remove.append(mesh)
+				
+	for mesh in to_remove:
+		_faded_meshes.erase(mesh)
+
+
+func _apply_mesh_opacity(mesh: MeshInstance3D, opacity: float) -> void:
+	if not is_instance_valid(mesh):
+		return
+	var mat = mesh.material_override
+	if not mat:
+		return
+	if not mesh.has_meta("original_material"):
+		mesh.set_meta("original_material", mat)
+		mat = mat.duplicate()
+		mesh.material_override = mat
+	
+	if mat is ShaderMaterial:
+		mat.set_shader_parameter("alpha", opacity)
+	elif mat is StandardMaterial3D:
+		mat.albedo_color.a = opacity
+
 
 # ─── Camera input ───────────────────────────────────────────────────
 
@@ -826,6 +945,8 @@ func _update_camera():
 	)
 	camera.position = _cam_target + offset
 	camera.look_at(_cam_target, Vector3.UP)
+	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		camera.size = _cam_distance
 
 
 # ─── Dungeon geometry ───────────────────────────────────────────────
