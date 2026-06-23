@@ -54,11 +54,11 @@
   </script>
 </head>
 <body data-phase="title">
-  <div class="scanlines"></div>
-  <div class="film-grain"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="film-grain" aria-hidden="true"></div>
 
   <!-- App Menu -->
-  <nav class="app-menu">
+  <nav class="app-menu" aria-label="Application Menu">
     <button class="menu-btn" onclick="window.openSettings()">Settings</button>
     <button class="menu-btn" onclick="toggleKeymap()">Controls</button>
     <button class="menu-btn" onclick="
@@ -80,7 +80,7 @@
 
   <!-- ─────── TITLE VIEW ─────── -->
   <section id="title-view" class="phase-view parchment-surface title-view">
-    <div class="flame-container">
+    <div class="flame-container" aria-hidden="true">
       <div class="flame"></div>
       <div class="flame"></div>
       <div class="flame"></div>
@@ -228,7 +228,7 @@
             <span class="char-card-stat-val" id="char-card-pos">—</span>
           </div>
           <div class="char-card-stat char-card-stat-silver">
-            <span class="char-card-stat-label">💰</span>
+            <span class="char-card-stat-label" role="img" aria-label="Silver">💰</span>
             <span class="char-card-stat-val" id="char-card-silver">—</span>
           </div>
         </div>
@@ -252,7 +252,7 @@
       </section>
       <aside id="log-pane" class="parchment-surface ink-midnight">
         <h2 class="log-title">Chronicle</h2>
-        <ol id="narrative-log" class="narrative-log"></ol>
+        <ol id="narrative-log" class="narrative-log" aria-live="polite"></ol>
       </aside>
       <aside id="inventory-pane" class="parchment-surface hidden">
         <h2 class="log-title ink-crimson">Stolen Goods</h2>
@@ -689,7 +689,7 @@
     <div class="modal-card parchment-surface">
       <h2 class="ink-crimson">Speak Your Action</h2>
       <p class="hint-small">Press <kbd>Esc</kbd> or <kbd>B</kbd> to cancel · <kbd>Enter</kbd> to commit</p>
-      <textarea id="freeform-input" rows="4" maxlength="500"
+      <textarea id="freeform-input" rows="4" maxlength="500" aria-label="Speak Your Action"
                 placeholder="I creep along the shadowed wall toward the bard..."></textarea>
       <div class="modal-actions">
         <button id="freeform-cancel" class="btn">Cancel</button>
@@ -705,7 +705,7 @@
 
       <div class="settings-section">
         <div class="settings-label">
-          <span>UI Scale</span>
+          <label for="ui-scale-slider">UI Scale</label>
           <span id="ui-scale-value" class="settings-value ink-gilded">100%</span>
         </div>
         <input type="range" id="ui-scale-slider" class="settings-slider"
@@ -715,7 +715,7 @@
 
       <div class="settings-section">
         <div class="settings-label">
-          <span>Game Zoom</span>
+          <label for="game-zoom-slider">Game Zoom</label>
           <span id="game-zoom-value" class="settings-value ink-gilded">70%</span>
         </div>
         <input type="range" id="game-zoom-slider" class="settings-slider"

@@ -80,10 +80,13 @@ async def new_campaign(request: Request):
 
 @router.post("/campaigns/load")
 async def load_campaign(body: LoadCampaignRequest, request: Request):
-    if "/" in body.campaign_id or "\\" in body.campaign_id or ".." in body.campaign_id:
-        raise HTTPException(status_code=400, detail="Invalid campaign_id: cannot contain path traversal characters.")
+    base_dir = settings.campaign_path.parent.resolve()
+    campaign_dir = (base_dir / body.campaign_id).resolve()
 
-    campaign_dir = settings.campaign_path.parent / body.campaign_id
+    # Secure path traversal check: ensure the resolved target is within the base directory
+    if not campaign_dir.is_relative_to(base_dir) or campaign_dir == base_dir:
+        raise HTTPException(status_code=400, detail="Invalid campaign_id: potential path traversal detected.")
+
     state = snapshot.load(campaign_dir)
     if state is None:
         raise HTTPException(status_code=404, detail=f"campaign '{body.campaign_id}' not found")

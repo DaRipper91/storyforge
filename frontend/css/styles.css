@@ -98,6 +98,14 @@ body {
   position: relative;
 }
 
+.portrait:hover,
+.portrait:focus-visible {
+  border-color: var(--ink-gilded);
+  box-shadow: var(--glow-gold);
+  transform: scale(1.05);
+  outline: none;
+}
+
 .portrait.active {
   border-color: var(--ink-gilded);
   box-shadow: var(--glow-active);
@@ -339,9 +347,9 @@ body {
 }
 
 .btn:hover { transform: translateY(-2px); box-shadow: var(--glow-gold); }
-.btn:focus-visible { 
-  transform: translateY(-2px); 
-  box-shadow: var(--glow-gold); 
+.btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
 }
