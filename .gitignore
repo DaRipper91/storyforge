@@ -31,3 +31,7 @@ Thumbs.db
 # Google OAuth
 client_secret.json
 token.json
+
+# Git Worktrees
+.worktrees/
+
