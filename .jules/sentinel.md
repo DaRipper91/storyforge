@@ -22,3 +22,8 @@
 **Vulnerability:** The session authentication cookie (`storyforge_session`) lacked the `secure=True` flag in production, exposing users to Insecure Session Management as the cookie could be transmitted unencrypted over HTTP.
 **Learning:** Defaulting to `secure=False` for developer convenience leaves production instances vulnerable. The `secure` flag should always reflect the environment's transport layer.
 **Prevention:** Dynamically assign the secure flag by inspecting the request protocol (`request.url.scheme == "https"`) to ensure the cookie is only transmitted over encrypted connections in production, while maintaining local HTTP development operability.
+
+## 2026-06-09 - Missing Essential Security Headers
+**Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
+**Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
+**Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
