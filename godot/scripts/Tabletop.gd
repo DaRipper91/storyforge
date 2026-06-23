@@ -94,6 +94,7 @@ var _waiting_screen: ColorRect = null
 var _world_map:     Control        = null
 var _world_map_visible: bool       = false
 var _map_texture_rect: TextureRect = null
+var _map_container:    Control        = null
 
 # World map layout: room_id → {label, pos (pixels), connections}
 const WORLD_MAP_NODES: Dictionary = {
@@ -451,14 +452,14 @@ func _setup_world_map() -> void:
 	_world_map.add_child(hint)
 
 	# Map canvas centered in screen
-	var map_container := Control.new()
-	map_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	map_container.custom_minimum_size = Vector2(720, 500)
-	map_container.offset_left   = -360
-	map_container.offset_top    = -210
-	map_container.offset_right  =  360
-	map_container.offset_bottom =  290
-	_world_map.add_child(map_container)
+	_map_container = Control.new()
+	_map_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_map_container.custom_minimum_size = Vector2(720, 500)
+	_map_container.offset_left   = -360
+	_map_container.offset_top    = -210
+	_map_container.offset_right  =  360
+	_map_container.offset_bottom =  290
+	_world_map.add_child(_map_container)
 
 	# Map image background (supports before/after paradox)
 	_map_texture_rect = TextureRect.new()
@@ -466,11 +467,11 @@ func _setup_world_map() -> void:
 	_map_texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_map_texture_rect.stretch_mode = TextureRect.STRETCH_SCALE
 	_map_texture_rect.modulate = Color(1.0, 1.0, 1.0, 0.85)
-	map_container.add_child(_map_texture_rect)
+	_map_container.add_child(_map_texture_rect)
 
 
 func _update_world_map_texture(era: String) -> void:
-	if not _map_texture_rect:
+	if not _map_texture_rect or not _map_container:
 		return
 	var texture_path := "res://assets/textures/map2.png" # default to after paradox
 	if era == "before":
@@ -481,6 +482,10 @@ func _update_world_map_texture(era: String) -> void:
 		if tex:
 			_map_texture_rect.texture = tex
 
+	# Clear previous connection lines and buttons
+	for child in _map_container.get_children():
+		if child != _map_texture_rect:
+			child.queue_free()
 
 	# Draw connection lines as ColorRects
 	const CONNECTIONS: Array = [
@@ -504,7 +509,7 @@ func _update_world_map_texture(era: String) -> void:
 		line.rotation = diff.angle()
 		line.pivot_offset = Vector2(length * 0.5, 1)
 		line.color = Color(0.5, 0.45, 0.35, 0.55)
-		map_container.add_child(line)
+		_map_container.add_child(line)
 
 	# Room buttons
 	for room_id in WORLD_MAP_NODES:
@@ -518,7 +523,7 @@ func _update_world_map_texture(era: String) -> void:
 		btn.pressed.connect(func():
 			_travel_to(rid_copy)
 		)
-		map_container.add_child(btn)
+		_map_container.add_child(btn)
 
 
 func _travel_to(room_id: String) -> void:
@@ -777,7 +782,7 @@ func _physics_process(delta: float) -> void:
 			leader.move_with_input(move_dir, delta, target_pos)
 	
 	# Camera Follow
-	var target_dest := leader.position
+	var target_dest: Vector3 = leader.position
 	if closest_target:
 		# Midpoint camera
 		target_dest = leader.position.lerp(closest_target.position, 0.3)
@@ -924,6 +929,24 @@ func _rebuild_room(state: Dictionary):
 					inst.mesh = door_mesh
 					inst.material_override = _mat_door
 					inst.position = Vector3(wx, 1.1, wz)
+
+					var exit_key = "%d,%d" % [x, y]
+					if exit_key in _room_exits:
+						var exit_room_id = _room_exits[exit_key]
+						var trigger = Area3D.new()
+						trigger.position = Vector3(wx, 1.1, wz)
+						
+						var col_shape = CollisionShape3D.new()
+						var box_shape = BoxShape3D.new()
+						box_shape.size = Vector3(CELL_SIZE * 0.8, 2.2, CELL_SIZE * 0.8)
+						col_shape.shape = box_shape
+						
+						trigger.add_child(col_shape)
+						trigger.body_entered.connect(func(body):
+							if body.name.begins_with("Mini_"):
+								_travel_to(exit_room_id)
+						)
+						_dungeon_root.add_child(trigger)
 
 				"hazard":
 					inst.mesh = hazard_mesh
