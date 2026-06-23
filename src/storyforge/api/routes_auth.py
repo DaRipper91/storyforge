@@ -42,7 +42,7 @@ async def desktop_login(request: Request, response: Response):
             key="storyforge_session",
             value=token,
             httponly=True,
-            secure=request.url.scheme == 'https',
+            secure=request.url.scheme == "https",
             samesite="lax",
             max_age=24 * 3600
         )
@@ -94,7 +94,7 @@ async def google_auth(request: Request, body: AuthToken, response: Response):
             key="storyforge_session",
             value=token,
             httponly=True,
-            secure=request.url.scheme == 'https',
+            secure=request.url.scheme == "https",
             samesite="lax",
             max_age=24 * 3600
         )
