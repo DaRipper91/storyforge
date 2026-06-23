@@ -691,8 +691,8 @@ func _process(delta):
 			var exclude_list: Array[RID] = []
 			exclude_list.append(leader.get_rid())
 			
+			var query = PhysicsRayQueryParameters3D.create(from, to)
 			for i in range(6):
-				var query = PhysicsRayQueryParameters3D.create(from, to)
 				query.exclude = exclude_list
 				var result = space_state.intersect_ray(query)
 				if result.is_empty():
@@ -705,12 +705,10 @@ func _process(delta):
 				var collider = result.get("collider")
 				if is_instance_valid(collider):
 					var mesh: MeshInstance3D = null
-					if collider is MeshInstance3D:
-						mesh = collider
-					elif collider.get_parent() is MeshInstance3D:
+					if collider.get_parent() is MeshInstance3D:
 						mesh = collider.get_parent()
 					else:
-						# Search children/parent children for a MeshInstance3D
+						# Search children of collider for a MeshInstance3D
 						for child in collider.get_children():
 							if child is MeshInstance3D:
 								mesh = child
@@ -731,8 +729,8 @@ func _process(delta):
 		if is_instance_valid(mesh):
 			var current_op = _faded_meshes.get(mesh, 1.0)
 			var new_op = move_toward(current_op, 0.25, delta * 4.0)
-			_faded_meshes[mesh] = new_op
-			_apply_mesh_opacity(mesh, new_op)
+			if _apply_mesh_opacity(mesh, new_op):
+				_faded_meshes[mesh] = new_op
 		
 	# Restore other previously faded meshes
 	var to_remove = []
@@ -755,21 +753,23 @@ func _process(delta):
 		_faded_meshes.erase(mesh)
 
 
-func _apply_mesh_opacity(mesh: MeshInstance3D, opacity: float) -> void:
+func _apply_mesh_opacity(mesh: MeshInstance3D, opacity: float) -> bool:
 	if not is_instance_valid(mesh):
-		return
-	var mat = mesh.material_override
-	if not mat:
-		return
-	if not mesh.has_meta("original_material"):
-		mesh.set_meta("original_material", mat)
-		mat = mat.duplicate()
-		mesh.material_override = mat
+		return false
 	
-	if mat is ShaderMaterial:
+	# Use Godot 4's built-in GeometryInstance3D transparency (0.0 = opaque, 1.0 = transparent)
+	mesh.transparency = 1.0 - opacity
+	
+	# Also update material_override if it is a custom shader material that expects "alpha"
+	var mat = mesh.material_override
+	if mat and mat is ShaderMaterial:
+		if not mesh.has_meta("original_material"):
+			mesh.set_meta("original_material", mat)
+			mat = mat.duplicate()
+			mesh.material_override = mat
 		mat.set_shader_parameter("alpha", opacity)
-	elif mat is StandardMaterial3D:
-		mat.albedo_color.a = opacity
+		
+	return true
 
 
 # ─── Camera input ───────────────────────────────────────────────────
@@ -1196,6 +1196,7 @@ func _on_state_updated(new_state: Dictionary):
 	# characters is dict[str, CharacterSheet] — iterate over key→value pairs
 	var characters = new_state.get("characters", {})
 	var char_items: Array = characters.values() if characters is Dictionary else characters
+	var spawned_leader = false
 	for char_data in char_items:
 		if char_data is String:
 			continue
@@ -1211,6 +1212,16 @@ func _on_state_updated(new_state: Dictionary):
 			_move_miniature(cid, Vector2(pos.x, pos.y))
 		else:
 			spawn_miniature(cid, Vector2(pos.x, pos.y), race_id, char_name)
+
+		if _selected_cid.is_empty():
+			_select_mini(cid)
+			spawned_leader = true
+
+	if spawned_leader:
+		var leader = _miniatures[_selected_cid]
+		_cam_target = leader.position
+		_update_camera()
+
 
 	_update_enemy_tokens(new_state)
 	_update_npc_tokens(new_state)
