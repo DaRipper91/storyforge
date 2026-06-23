@@ -558,6 +558,8 @@ func _build_materials():
 	wall_sm.shader = Shader.new()
 	wall_sm.shader.code = """
 shader_type spatial;
+render_mode depth_draw_always;
+uniform float alpha = 1.0;
 void fragment() {
 	vec2 uv = UV * 2.5;
 	vec2 tile = floor(uv);
@@ -572,6 +574,7 @@ void fragment() {
 	float ey  = (frc.y - 0.5) * grout * 0.5;
 	NORMAL_MAP       = normalize(vec3(ex, ey, 1.0));
 	NORMAL_MAP_DEPTH = 1.1;
+	ALPHA = alpha;
 }
 """
 	_mat_wall = wall_sm
@@ -603,6 +606,8 @@ void fragment() {
 	_mat_door.albedo_color = Color(0.35, 0.25, 0.15)
 	_mat_door.roughness = 0.7
 	_mat_door.metallic = 0.1
+	_mat_door.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_door.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 
 	_mat_hazard = StandardMaterial3D.new()
 	_mat_hazard.albedo_color = Color(0.4, 0.1, 0.05)
@@ -615,11 +620,15 @@ void fragment() {
 	_mat_pillar.albedo_color = Color(0.52, 0.48, 0.42)
 	_mat_pillar.roughness = 0.78
 	_mat_pillar.metallic = 0.04
+	_mat_pillar.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_pillar.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 
 	_mat_table = StandardMaterial3D.new()
 	_mat_table.albedo_color = Color(0.32, 0.20, 0.11)
 	_mat_table.roughness = 0.88
 	_mat_table.metallic = 0.0
+	_mat_table.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mat_table.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 
 	_mat_difficult = StandardMaterial3D.new()
 	_mat_difficult.albedo_color = Color(0.30, 0.24, 0.18)
