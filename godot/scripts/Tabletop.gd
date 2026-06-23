@@ -976,6 +976,7 @@ func _rebuild_room(state: Dictionary):
 					inst.position = Vector3(wx, -0.06, wz)
 
 				"pillar":
+					var unique_pillar_mat = _mat_pillar.duplicate()
 					# Floor slab beneath
 					var floor_inst = MeshInstance3D.new()
 					floor_inst.mesh = floor_mesh
@@ -987,16 +988,17 @@ func _rebuild_room(state: Dictionary):
 					base_mesh.size = Vector3(CELL_SIZE * 0.5, 0.12, CELL_SIZE * 0.5)
 					var base_inst = MeshInstance3D.new()
 					base_inst.mesh = base_mesh
-					base_inst.material_override = _mat_pillar.duplicate()
+					base_inst.material_override = unique_pillar_mat
 					base_inst.position = Vector3(wx, 0.06, wz)
 					_dungeon_root.add_child(base_inst)
 					# Shaft
 					inst.mesh = pillar_mesh
-					inst.material_override = _mat_pillar.duplicate()
+					inst.material_override = unique_pillar_mat
 					_add_cylinder_collision(inst, pillar_mesh.bottom_radius, pillar_mesh.height)
 					inst.position = Vector3(wx, 1.0, wz)
 
 				"table":
+					var unique_table_mat = _mat_table.duplicate()
 					# Floor slab beneath
 					var floor_inst = MeshInstance3D.new()
 					floor_inst.mesh = floor_mesh
@@ -1013,12 +1015,12 @@ func _rebuild_room(state: Dictionary):
 					for lo in leg_offsets:
 						var leg_inst = MeshInstance3D.new()
 						leg_inst.mesh = table_leg_mesh
-						leg_inst.material_override = _mat_table
+						leg_inst.material_override = unique_table_mat
 						leg_inst.position = Vector3(wx, 0, wz) + lo
 						_dungeon_root.add_child(leg_inst)
 					# Tabletop
 					inst.mesh = table_top_mesh
-					inst.material_override = _mat_table.duplicate()
+					inst.material_override = unique_table_mat
 					_add_box_collision(inst, table_top_mesh.size)
 					inst.position = Vector3(wx, 0.60, wz)
 
