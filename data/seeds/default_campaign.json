@@ -20,9 +20,18 @@
       "blocks_movement": true,
       "description": "The proprietor of The Store.",
       "schedule": {
-        "8": {"x": 10, "y": 8},
-        "12": {"x": 0, "y": 0},
-        "18": {"x": 10, "y": 8}
+        "8": {
+          "x": 10,
+          "y": 8
+        },
+        "12": {
+          "x": 0,
+          "y": 0
+        },
+        "18": {
+          "x": 10,
+          "y": 8
+        }
       }
     },
     "samael": {
@@ -7029,6 +7038,1616 @@
         "6,9": "ironhold_keep"
       },
       "description": "The soldiers' quarters inside Ironhold Keep. Rows of bunks, weapons racks, and the smell of boot leather. The Iron Ledge Company's roster is pinned to the center post."
+    },
+    "central_hub": {
+      "id": "central_hub",
+      "name": "Central Hub",
+      "width": 20,
+      "height": 20,
+      "cells": [
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": "npc_jon"
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        },
+        {
+          "terrain": "floor",
+          "occupant_id": null
+        }
+      ],
+      "exits": {},
+      "description": "The central town square of Iron Ledge, featuring a stone fountain and pathways leading to the various establishments."
     }
   },
   "narrative_log": [
