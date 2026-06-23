@@ -4,13 +4,20 @@ import random
 
 from storyforge.api.deps import get_state_manager
 from storyforge.core.state_manager import StateManager, StateError
-from storyforge.core.models import InventoryItem, CharacterSheet, NarrativeEntry
+from storyforge.core.models import InventoryItem, CharacterSheet, NarrativeEntry, Coord
 import datetime as dt
 
 router = APIRouter(prefix="/api/d2", tags=["d2"])
 
 class LearnSkillRequest(BaseModel):
     skill_id: str
+
+
+class CharacterSyncRequest(BaseModel):
+    hp_current: int
+    position_x: float
+    position_y: float
+    room_id: str
 
 # Define static skill templates for Predator Roles
 SKILL_TEMPLATES = {
@@ -249,3 +256,33 @@ async def roll_loot(
         
         await state._commit(summary)
         return summary
+
+
+@router.post("/character/{char_id}/sync")
+async def sync_character_state(
+    char_id: str,
+    req: CharacterSyncRequest,
+    state: StateManager = Depends(get_state_manager)
+) -> dict:
+    """Sync character HP, position, and room ID in real-time."""
+    async with state._lock:
+        char = state.current.characters.get(char_id)
+        if char is None:
+            raise HTTPException(status_code=404, detail=f"Character not found: {char_id}")
+
+        char.hp_current = min(char.hp_max, max(0, req.hp_current))
+        char.position = Coord(x=int(round(req.position_x)), y=int(round(req.position_y)))
+        char.room_id = req.room_id
+
+        summary = {
+            "type": "character_synced",
+            "character_id": char_id,
+            "hp_current": char.hp_current,
+            "position_x": req.position_x,
+            "position_y": req.position_y,
+            "room_id": char.room_id
+        }
+
+        await state._commit(summary)
+        return summary
+

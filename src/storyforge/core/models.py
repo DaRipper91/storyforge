@@ -78,6 +78,7 @@ class CharacterSheet(BaseModel):
     # Diablo 2 Specifics
     skill_tree: dict = Field(default_factory=dict)
     unspent_skill_points: int = 0
+    room_id: str | None = None
 
     # Combat-turn ephemeral state
     position: Coord

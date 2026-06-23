@@ -90,3 +90,62 @@ async def test_enemy_defeat_and_level_up(state_manager):
     response = await learn_skill(char_id="test_char", req=LearnSkillRequest(skill_id="shadow_strike"), state=state_manager)
     assert response["points_spent"] == 1
     assert response["unspent_skill_points"] == 0
+
+
+@pytest.mark.asyncio
+async def test_sync_character_state(client):
+    from storyforge.main import app
+    # Setup test character in state manager
+    sm = app.state.state_manager
+    char = CharacterSheet(
+        id="test_char",
+        name="Hero",
+        player="Player",
+        race=Race.ASHENBORN,
+        evolution_state=EvolutionaryState.BEHEMOTH,
+        predator_role=PredatorRole.STALKER,
+        hp_current=50,
+        hp_max=100,
+        armor_class=10,
+        speed=30,
+        abilities=AbilityScores(STR=15, DEX=14, CON=13, INT=12, WIS=10, CHA=8),
+        position=Coord(x=0, y=0),
+        inventory=[]
+    )
+    async with sm._lock:
+        sm._state.characters["test_char"] = char
+
+    # Sync request payload
+    payload = {
+        "hp_current": 75,
+        "position_x": 2.6,
+        "position_y": 4.1,
+        "room_id": "ironhold_keep"
+    }
+
+    # POST to sync route
+    response = await client.post("/api/d2/character/test_char/sync", json=payload)
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["type"] == "character_synced"
+    assert data["character_id"] == "test_char"
+
+    # Verify values inside state manager
+    updated_char = sm.current.characters["test_char"]
+    assert updated_char.hp_current == 75
+    assert updated_char.position.x == 3
+    assert updated_char.position.y == 4
+    assert updated_char.room_id == "ironhold_keep"
+
+    # Verify hp bounds (capping at hp_max and floor at 0)
+    payload_overflow = {
+        "hp_current": 120,  # exceeds hp_max of 100
+        "position_x": 1.0,
+        "position_y": 2.0,
+        "room_id": "ironhold_keep"
+    }
+    response_overflow = await client.post("/api/d2/character/test_char/sync", json=payload_overflow)
+    assert response_overflow.status_code == 200
+    assert sm.current.characters["test_char"].hp_current == 100
+
