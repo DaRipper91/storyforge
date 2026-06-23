@@ -10,7 +10,7 @@ dependencies = [
     "pydantic-settings>=2.6",
     "google-genai>=0.3",
     "websockets>=13",
-    "python-multipart>=0.0.12",
+    "python-multipart>=0.0.31",
     "pyinstaller>=6.20.0",
     "pywebview>=6.2.1",
 ]
