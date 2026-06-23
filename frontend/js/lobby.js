@@ -937,6 +937,7 @@ export class Lobby {
       const nameInput = document.createElement("input");
       nameInput.type = "text";
       nameInput.placeholder = "Enter name...";
+      nameInput.ariaLabel = "Character name";
       nameInput.className = "slot-name-input";
       nameInput.value = slot.name_draft || "";
       nameInput.disabled = slot.status === "ready";
@@ -1558,13 +1559,15 @@ export class Lobby {
       { key: "flaws",               label: "Flaws",                 placeholder: "What's their weakness, vice, or blind spot?", rows: 2 },
     ];
 
-    fields.forEach(f => {
+    fields.forEach((f, idx) => {
       const group = document.createElement("div");
       group.className = "story-field-group";
       const label = document.createElement("label");
       label.className = "story-label";
       label.textContent = f.label;
+      label.htmlFor = `story-field-${idx}`;
       const ta = document.createElement("textarea");
+      ta.id = `story-field-${idx}`;
       ta.className = "story-textarea";
       ta.rows = f.rows;
       ta.placeholder = f.placeholder;
@@ -1581,7 +1584,9 @@ export class Lobby {
     const keepsakeLabel = document.createElement("label");
     keepsakeLabel.className = "story-label";
     keepsakeLabel.textContent = "Keepsake / Trinket";
+    keepsakeLabel.htmlFor = "story-keepsake-input";
     const keepsakeInput = document.createElement("input");
+    keepsakeInput.id = "story-keepsake-input";
     keepsakeInput.type = "text";
     keepsakeInput.className = "story-text-input";
     keepsakeInput.placeholder = "A glowing coin, a letter from a dead relative, a broken locket…";
@@ -1690,12 +1695,15 @@ export class Lobby {
     const wrap = document.createElement("div");
     wrap.className = "name-stage";
 
-    const label = document.createElement("p");
+    const label = document.createElement("label");
     label.className = "name-prompt";
+    label.style.display = "block";
     label.textContent = "What is your hero called?";
+    label.htmlFor = "hero-name-input";
     wrap.appendChild(label);
 
     const input = document.createElement("input");
+    input.id = "hero-name-input";
     input.type = "text";
     input.className = "name-input";
     input.maxLength = 24;
