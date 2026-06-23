@@ -8,6 +8,11 @@
 **Learning:** In FastAPI, global dependencies (like `get_current_user` on HTTP routes) do not automatically apply to websocket connections unless explicitly injected or checked during the connection lifecycle.
 **Prevention:** Always extract and manually verify authentication tokens (e.g. from cookies via `websocket.cookies.get`) in the `websocket` endpoint function before calling `await websocket.accept()`. If unauthorized, use `await websocket.close(code=1008)` to cleanly reject the connection.
 
+## 2024-06-21 - Fix XSS vulnerability in frontend _esc function
+**Vulnerability:** The application's core string escaping utility (`_esc` in `frontend/js/main.js`) relied on DOM `textContent` to `innerHTML` conversion, which fails to escape single and double quotes.
+**Learning:** If this function were used to escape text destined for an HTML attribute (e.g. `<div data-name="${_esc(name)}">`), a malicious user could break out of the attribute using quotes and inject arbitrary HTML or JavaScript, leading to Cross-Site Scripting (XSS).
+**Prevention:** When writing custom HTML string escaping utilities, always use a regex replacement strategy (`replace(/[&<>"']/g, ...)`) instead of relying on the DOM's native text node serialization to ensure quotes are properly sanitized.
+
 ## 2025-02-14 - Prevent Hardcoded JWT Secrets and Path Traversal
 **Vulnerability:** A hardcoded `jwt_secret` ("dev-secret-change-me-in-production") in `src/storyforge/config.py` was used by default. This makes the application vulnerable to session forging/hijacking since anyone who obtains the code can guess the secret. Additionally, `campaign_id` user input in the `load_campaign` POST request in `src/storyforge/api/routes_state.py` lacked validation, allowing an attacker to traverse to arbitrary directories by using relative paths like `../../etc`.
 **Learning:** Configurations shouldn't default to unsafe, easily guessed values in production even if they say "change-me-in-production". For path traversal, untrusted input shouldn't be blindly appended to file paths.
