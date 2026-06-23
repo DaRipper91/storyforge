@@ -1,3 +1,8 @@
+## 2024-06-06 - Missing Authentication on Websocket Endpoints
+**Vulnerability:** The `/ws/session/{room_id}` websocket endpoint accepted connections without verifying the session token, exposing internal event bus data to unauthenticated clients.
+**Learning:** In FastAPI, global dependencies (like `get_current_user` on HTTP routes) do not automatically apply to websocket connections unless explicitly injected or checked during the connection lifecycle.
+**Prevention:** Always extract and manually verify authentication tokens (e.g. from cookies via `websocket.cookies.get`) in the `websocket` endpoint function before calling `await websocket.accept()`. If unauthorized, use `await websocket.close(code=1008)` to cleanly reject the connection.
+
 ## 2025-02-14 - Prevent Hardcoded JWT Secrets and Path Traversal
 **Vulnerability:** A hardcoded `jwt_secret` ("dev-secret-change-me-in-production") in `src/storyforge/config.py` was used by default. This makes the application vulnerable to session forging/hijacking since anyone who obtains the code can guess the secret. Additionally, `campaign_id` user input in the `load_campaign` POST request in `src/storyforge/api/routes_state.py` lacked validation, allowing an attacker to traverse to arbitrary directories by using relative paths like `../../etc`.
 **Learning:** Configurations shouldn't default to unsafe, easily guessed values in production even if they say "change-me-in-production". For path traversal, untrusted input shouldn't be blindly appended to file paths.

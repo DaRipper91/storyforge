@@ -37,6 +37,7 @@ async def desktop_login(request: Request, response: Response):
         }
         token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
+        # Security: Dynamically set secure flag based on scheme (HTTPS for production, HTTP for local)
         response.set_cookie(
             key="storyforge_session",
             value=token,
@@ -88,7 +89,7 @@ async def google_auth(request: Request, body: AuthToken, response: Response):
         # Create our own session JWT
         token = create_session_token(id_info)
 
-        # Set HttpOnly Cookie
+        # Security: Dynamically set secure flag based on scheme (HTTPS for production, HTTP for local)
         response.set_cookie(
             key="storyforge_session",
             value=token,
