@@ -911,6 +911,7 @@ func _rebuild_room(state: Dictionary):
 				"wall":
 					inst.mesh = wall_mesh
 					inst.material_override = _mat_wall
+					_add_box_collision(inst, wall_mesh.size)
 					inst.position = Vector3(wx, 1.25, wz)
 
 				"door":
@@ -951,6 +952,7 @@ func _rebuild_room(state: Dictionary):
 					# Shaft
 					inst.mesh = pillar_mesh
 					inst.material_override = _mat_pillar
+					_add_cylinder_collision(inst, pillar_mesh.bottom_radius, pillar_mesh.height)
 					inst.position = Vector3(wx, 1.0, wz)
 
 				"table":
@@ -976,6 +978,7 @@ func _rebuild_room(state: Dictionary):
 					# Tabletop
 					inst.mesh = table_top_mesh
 					inst.material_override = _mat_table
+					_add_box_collision(inst, table_top_mesh.size)
 					inst.position = Vector3(wx, 0.60, wz)
 
 				_:
@@ -2227,3 +2230,24 @@ func _pop_up_node(node: Node3D, delay: float) -> void:
 	
 	var rot_tween = tween.tween_property(node, "rotation:y", target_rot_y, 0.5)
 	rot_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _add_box_collision(parent_mesh: MeshInstance3D, size: Vector3) -> void:
+	var static_body := StaticBody3D.new()
+	var collision_shape := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = size
+	collision_shape.shape = shape
+	static_body.add_child(collision_shape)
+	parent_mesh.add_child(static_body)
+
+
+func _add_cylinder_collision(parent_mesh: MeshInstance3D, radius: float, height: float) -> void:
+	var static_body := StaticBody3D.new()
+	var collision_shape := CollisionShape3D.new()
+	var shape := CylinderShape3D.new()
+	shape.radius = radius
+	shape.height = height
+	collision_shape.shape = shape
+	static_body.add_child(collision_shape)
+	parent_mesh.add_child(static_body)
