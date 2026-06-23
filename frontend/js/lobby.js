@@ -1561,10 +1561,13 @@ export class Lobby {
     fields.forEach(f => {
       const group = document.createElement("div");
       group.className = "story-field-group";
+      const fieldId = `story-${f.key}-${draft.slotIndex}`;
       const label = document.createElement("label");
       label.className = "story-label";
       label.textContent = f.label;
+      label.htmlFor = fieldId;
       const ta = document.createElement("textarea");
+      ta.id = fieldId;
       ta.className = "story-textarea";
       ta.rows = f.rows;
       ta.placeholder = f.placeholder;
@@ -1578,10 +1581,13 @@ export class Lobby {
     // Keepsake / Trinket
     const keepsakeGroup = document.createElement("div");
     keepsakeGroup.className = "story-field-group";
+    const keepsakeId = `story-keepsake-${draft.slotIndex}`;
     const keepsakeLabel = document.createElement("label");
     keepsakeLabel.className = "story-label";
     keepsakeLabel.textContent = "Keepsake / Trinket";
+    keepsakeLabel.htmlFor = keepsakeId;
     const keepsakeInput = document.createElement("input");
+    keepsakeInput.id = keepsakeId;
     keepsakeInput.type = "text";
     keepsakeInput.className = "story-text-input";
     keepsakeInput.placeholder = "A glowing coin, a letter from a dead relative, a broken locket…";
@@ -1690,12 +1696,15 @@ export class Lobby {
     const wrap = document.createElement("div");
     wrap.className = "name-stage";
 
-    const label = document.createElement("p");
+    const nameId = `hero-name-${draft.slotIndex}`;
+    const label = document.createElement("label");
     label.className = "name-prompt";
     label.textContent = "What is your hero called?";
+    label.htmlFor = nameId;
     wrap.appendChild(label);
 
     const input = document.createElement("input");
+    input.id = nameId;
     input.type = "text";
     input.className = "name-input";
     input.maxLength = 24;
