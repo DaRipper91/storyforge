@@ -30,6 +30,7 @@ const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 
 @onready var step_label       = $MarginContainer/VBoxContainer/StepLabel
 @onready var race_list        = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/RaceList
+@onready var left_panel_label = $MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/Label
 @onready var description_label = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/DescriptionLabel
 @onready var race_mini       = $MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport/RaceMini
 @onready var next_btn         = $MarginContainer/VBoxContainer/Footer/NextBtn
@@ -105,6 +106,15 @@ func _render_step():
 	next_btn.disabled = true
 	step_label.text = "Step %d / %d  —  %s" % [current_step + 1, STEPS.size(), STEPS[current_step]]
 
+	if left_panel_label:
+		match current_step:
+			0: left_panel_label.text = "Select Starting Era:"
+			1: left_panel_label.text = "Choose Your Ancestry:"
+			2: left_panel_label.text = "Select Evolutionary State:"
+			3: left_panel_label.text = "Select Predator Role:"
+			4: left_panel_label.text = "Allocate Ability Scores:"
+			5: left_panel_label.text = "Enter Character Name:"
+
 	match current_step:
 		0: _render_era_step()
 		1: _render_race_step()
@@ -115,6 +125,7 @@ func _render_step():
 
 func _clear_list():
 	for child in race_list.get_children():
+		race_list.remove_child(child)
 		child.queue_free()
 	description_label.text = ""
 	if race_mini:
@@ -349,7 +360,10 @@ func _render_abilities_step():
 		if _focused_ability == ab:
 			val_btn.set_pressed_no_signal(true)
 		val_btn.pressed.connect(func():
-			_focused_ability = ab
+			if _focused_ability == ab:
+				_focused_ability = ""
+			else:
+				_focused_ability = ab
 			_render_step()
 		)
 		row.add_child(val_btn)
@@ -429,6 +443,10 @@ func _render_name_step():
 
 	description_label.text = "\n".join(summary)
 
+	var name_label := Label.new()
+	name_label.text = "Character Name:"
+	race_list.add_child(name_label)
+
 	var name_input = LineEdit.new()
 	name_input.placeholder_text = "Enter your hero's name…"
 	name_input.text = selection["name"]
@@ -442,6 +460,38 @@ func _render_name_step():
 	)
 	race_list.add_child(name_input)
 	name_input.grab_focus()
+
+	# Add spacing
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 20
+	race_list.add_child(spacer)
+
+	# Portrait Forging Section
+	var forge_title := Label.new()
+	forge_title.text = "Live AI Portrait Forging (Gemini/Imagen):"
+	race_list.add_child(forge_title)
+
+	var desc_input = LineEdit.new()
+	desc_input.placeholder_text = "Describe your character's look..."
+	desc_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	var forge_btn = Button.new()
+	forge_btn.text = "Forge Portrait"
+	
+	var status_label = RichTextLabel.new()
+	status_label.bbcode_enabled = true
+	status_label.fit_content = true
+	status_label.text = "Forging a portrait will generate a custom 3D standee illustration.\n[color=cyan]Press [T] (Keyboard) or [Y] (Xbox) to toggle True 3D vs Standees[/color]"
+
+	var forge_hbox = HBoxContainer.new()
+	forge_hbox.add_child(desc_input)
+	forge_hbox.add_child(forge_btn)
+	race_list.add_child(forge_hbox)
+	race_list.add_child(status_label)
+
+	forge_btn.pressed.connect(func():
+		_forge_portrait(desc_input.text, forge_btn, status_label)
+	)
 
 	if not selection["name"].is_empty():
 		next_btn.disabled = false
@@ -526,3 +576,50 @@ func _setup_mock_catalog():
 		},
 	}
 	_render_step()
+
+
+func _forge_portrait(prompt: String, forge_btn: Button, status_label: RichTextLabel):
+	if prompt.strip_edges().is_empty():
+		status_label.text = "[color=red]Please enter a description first![/color]"
+		return
+	
+	forge_btn.disabled = true
+	forge_btn.text = "Forging..."
+	status_label.text = "Consulting the Forge..."
+	
+	var pc = get_node_or_null("/root/PythonClient")
+	if not pc:
+		status_label.text = "[color=red]Server offline[/color]"
+		forge_btn.disabled = false
+		forge_btn.text = "Forge Portrait"
+		return
+		
+	var http = pc.post_request("/character/generate_portrait", {
+		"prompt": prompt,
+		"race": selection["race"]
+	})
+	http.request_completed.connect(func(_r, response_code, _h, body):
+		forge_btn.disabled = false
+		forge_btn.text = "Forge Portrait"
+		
+		if response_code == 200:
+			status_label.text = "[color=green]Portrait forged successfully![/color]"
+			AudioManager.play_sfx("res://assets/audio/sfx_character_created.wav")
+			var portrait_key = selection["race"].to_lower().replace(" ", "_").replace("-", "_")
+			if race_mini:
+				race_mini.setup(portrait_key)
+		else:
+			var json = JSON.parse_string(body.get_string_from_utf8())
+			var err_msg = json.get("detail", "Error") if json else "Unknown error"
+			status_label.text = "[color=red]Forge failed: " + err_msg + "[/color]"
+		http.queue_free()
+	)
+
+
+func _input(event: InputEvent):
+	if (event is InputEventKey and event.pressed and event.keycode == KEY_T) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_Y):
+		RaceMini.use_true_3d = not RaceMini.use_true_3d
+		AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav")
+		if race_mini:
+			var portrait_key = selection["race"].to_lower().replace(" ", "_").replace("-", "_") if selection["race"] else "ashenborn"
+			race_mini.setup(portrait_key)

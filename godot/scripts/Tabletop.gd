@@ -334,9 +334,9 @@ func _update_controller_status():
 	
 	if _keyhint_label:
 		if connected:
-			_keyhint_label.text = "L-Stick: Move   R-Stick: Camera   A: Interact   LT: Lock-On   RT: Freeform   D-Pad: Character   Back: Map   Start: Menu"
+			_keyhint_label.text = "L-Stick: Move   R-Stick: Camera   A: Interact   LT: Lock-On   RT: Freeform   D-Pad: Character   Back: Map   Start: Menu   Y: Toggle 3D"
 		else:
-			_keyhint_label.text = "WASD: Move   Mouse: Camera   E: Interact   Q: Lock-On   F: Freeform action   1-4: Select   Tab: Cycle   M: Map"
+			_keyhint_label.text = "WASD: Move   Mouse: Camera   E: Interact   Q: Lock-On   F: Freeform action   1-4: Select   Tab: Cycle   M: Map   T: Toggle 3D"
 	
 	print("[Tabletop] Controller connected: ", connected)
 
@@ -629,6 +629,28 @@ func _input(event: InputEvent):
 		_cam_pitch  = clamp(_cam_pitch - d.y * 0.2, -82.0, -8.0)
 		_last_mouse = event.position
 		_update_camera()
+
+	if (event is InputEventKey and event.pressed and event.keycode == KEY_T) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_Y):
+		RaceMini.use_true_3d = not RaceMini.use_true_3d
+		print("[Tabletop] Toggled 3D mode. Use True 3D: ", RaceMini.use_true_3d)
+		for mini_id in _miniatures:
+			var mini = _miniatures[mini_id]
+			if mini.has_method("setup"):
+				mini.setup(mini._race_id, mini.name, mini._is_enemy)
+		for tok_id in _enemy_tokens:
+			var tok = _enemy_tokens[tok_id]
+			var mini = tok.get_node_or_null("RaceMini")
+			if mini and mini.has_method("setup"):
+				mini.setup(mini._race_id, mini.name, true)
+		for npc_id in _npc_tokens:
+			var mini = _npc_tokens[npc_id]
+			if mini.has_method("setup"):
+				mini.setup(mini._race_id, mini.name, false)
+		
+		AudioManager.play_sfx("res://assets/audio/sfx_paradox_glitch.wav")
+		if _narrative_box:
+			_narrative_box.text += "\n\n[color=cyan][i]Reality shifts... Render mode: %s[/i][/color]" % ("True 3D Models" if RaceMini.use_true_3d else "Miniature Standees")
+		return
 
 	if event is InputEventKey and event.pressed:
 		# Escape always closes overlays/freeform regardless of focus
@@ -953,6 +975,14 @@ func _rebuild_room(state: Dictionary):
 	if _dungeon_root:
 		_dungeon_root.bake_navigation_mesh()
 
+	# Radial pop-up wave transition from the center
+	var room_center := Vector3((w - 1) * CELL_SIZE * 0.5, 0.0, (h - 1) * CELL_SIZE * 0.5)
+	for child in _dungeon_root.get_children():
+		if child is Node3D:
+			var dist = child.position.distance_to(room_center)
+			var delay = dist * 0.04
+			_pop_up_node(child, delay)
+
 
 # ─── State / miniatures ─────────────────────────────────────────────
 
@@ -1222,6 +1252,7 @@ func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, c
 	add_child(root)          # add first so @onready vars resolve before setup()
 	root.setup(race_id, char_name)
 	_miniatures[character_id] = root
+	AudioManager.play_sfx("res://assets/audio/sfx_place.wav")
 	return root
 
 
@@ -1236,6 +1267,7 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	tween.tween_callback(func():
 		if mini.has_method("play_idle"):
 			mini.play_idle()
+		AudioManager.play_sfx("res://assets/audio/sfx_place.wav")
 	)
 	spawn_magic_burst(target)
 	AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
@@ -1613,11 +1645,13 @@ func _select_mini(cid: String) -> void:
 	_selected_cid = cid
 	_miniatures[cid].select()
 	_show_stat_panel(cid)
+	AudioManager.play_sfx("res://assets/audio/sfx_select.wav")
 
 
 func _deselect_mini() -> void:
 	if _selected_cid != "" and _selected_cid in _miniatures:
 		_miniatures[_selected_cid].deselect()
+		AudioManager.play_sfx("res://assets/audio/sfx_deselect.wav")
 	_selected_cid = ""
 	if _stat_panel:
 		_stat_panel.visible = false
@@ -1817,6 +1851,7 @@ void fragment() {
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(size, size)
 	var void_inst := MeshInstance3D.new()
+	void_inst.name = "VoidFloor"
 	void_inst.mesh = plane
 	void_inst.material_override = void_sm
 	void_inst.position = Vector3(cx, -0.14, cz)
@@ -2150,3 +2185,22 @@ func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
 		bar.add_child(fg)
 
 	root.add_child(bar)
+
+
+func _pop_up_node(node: Node3D, delay: float) -> void:
+	if node.name == "VoidFloor":
+		return
+	var target_scale = node.scale
+	node.scale = Vector3.ZERO
+	
+	var target_rot_y = node.rotation.y
+	node.rotation.y = target_rot_y + randf_range(-0.15, 0.15)
+	
+	var tween = create_tween().set_parallel(true)
+	tween.tween_interval(delay)
+	
+	var scale_tween = tween.tween_property(node, "scale", target_scale, 0.6)
+	scale_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	
+	var rot_tween = tween.tween_property(node, "rotation:y", target_rot_y, 0.5)
+	rot_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
