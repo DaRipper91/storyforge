@@ -71,6 +71,10 @@ var _cam_distance: float = 14.14
 var _cam_target:   Vector3 = Vector3.ZERO
 var _is_orbiting:  bool = false
 var _last_mouse:   Vector2 = Vector2.ZERO
+var _target_yaw:      float = 0.0
+var _target_pitch:    float = -45.0
+var _target_distance: float = 14.14
+var _faded_meshes:    Dictionary = {}
 
 # ─── Lantern flicker ────────────────────────────────────────────────
 const _LANTERN_BASE  = 2.5
@@ -159,6 +163,9 @@ var _sync_timer: Timer = null
 # ─── Lifecycle ──────────────────────────────────────────────────────
 
 func _ready():
+	_target_yaw = _cam_yaw
+	_target_pitch = _cam_pitch
+	_target_distance = _cam_distance
 	_build_materials()
 	_setup_ui()
 	_setup_environment()
@@ -662,18 +669,15 @@ func _input(event: InputEvent):
 				if event.pressed:
 					_last_mouse = event.position
 			MOUSE_BUTTON_WHEEL_UP:
-				_cam_distance = max(5.0, _cam_distance - 1.2)
-				_update_camera()
+				_target_distance = max(5.0, _target_distance - 1.2)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				_cam_distance = min(30.0, _cam_distance + 1.2)
-				_update_camera()
+				_target_distance = min(30.0, _target_distance + 1.2)
 
 	if event is InputEventMouseMotion and _is_orbiting:
 		var d = event.position - _last_mouse
-		_cam_yaw   -= d.x * 0.25
-		_cam_pitch  = clamp(_cam_pitch - d.y * 0.2, -82.0, -8.0)
+		_target_yaw   -= d.x * 0.25
+		_target_pitch  = clamp(_target_pitch - d.y * 0.2, -82.0, -8.0)
 		_last_mouse = event.position
-		_update_camera()
 
 	if (event is InputEventKey and event.pressed and event.keycode == KEY_T) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_Y):
 		RaceMini.use_true_3d = not RaceMini.use_true_3d
@@ -715,10 +719,9 @@ func _input(event: InputEvent):
 		return
 
 	if Input.is_action_just_pressed("reset_cam"):
-		_cam_yaw      = 0.0
-		_cam_pitch    = -45.0
-		_cam_distance = 14.14
-		_update_camera()
+		_target_yaw      = 0.0
+		_target_pitch    = -45.0
+		_target_distance = 14.14
 	elif Input.is_action_just_pressed("map"):
 		_toggle_world_map()
 	elif Input.is_action_just_pressed("cycle_next"):
@@ -754,9 +757,8 @@ func _physics_process(delta: float) -> void:
 	# 1. Camera Control (Right Stick / Bluetooth Xbox)
 	var look_vec = Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if look_vec.length() > 0.05 and not Input.is_action_pressed("lock_on"):
-		_cam_yaw -= look_vec.x * 2.5
-		_cam_pitch = clamp(_cam_pitch - look_vec.y * 2.0, -82.0, -8.0)
-		_update_camera()
+		_target_yaw -= look_vec.x * 2.5
+		_target_pitch = clamp(_target_pitch - look_vec.y * 2.0, -82.0, -8.0)
 
 	# 2. Leader Movement (Left Stick / WASD)
 	var leader = _miniatures[_selected_cid]
@@ -781,7 +783,7 @@ func _physics_process(delta: float) -> void:
 			target_pos = closest_target.global_position
 			# Lock camera looking at target
 			var dir_to_target = leader.global_position.direction_to(target_pos)
-			_cam_yaw = rad_to_deg(atan2(-dir_to_target.x, -dir_to_target.z))
+			_target_yaw = rad_to_deg(atan2(-dir_to_target.x, -dir_to_target.z))
 	
 	var input_vec = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	
@@ -797,15 +799,6 @@ func _physics_process(delta: float) -> void:
 			
 		if leader.has_method("move_with_input"):
 			leader.move_with_input(move_dir, delta, target_pos)
-	
-	# Camera Follow
-	var target_dest: Vector3 = leader.position
-	if closest_target:
-		# Midpoint camera
-		target_dest = leader.position.lerp(closest_target.position, 0.3)
-	
-	_cam_target = _cam_target.lerp(target_dest, delta * 5.0)
-	_update_camera()
 	
 	# 3. Party Follower Logic
 	for cid in _miniatures:
