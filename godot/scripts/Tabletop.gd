@@ -777,11 +777,12 @@ func _physics_process(delta: float) -> void:
 			leader.move_with_input(move_dir, delta, target_pos)
 	
 	# Camera Follow
+	var target_dest := leader.position
 	if closest_target:
 		# Midpoint camera
-		_cam_target = leader.position.lerp(closest_target.position, 0.3)
-	else:
-		_cam_target = leader.position
+		target_dest = leader.position.lerp(closest_target.position, 0.3)
+	
+	_cam_target = _cam_target.lerp(target_dest, delta * 5.0)
 	_update_camera()
 	
 	# 3. Party Follower Logic
