@@ -643,6 +643,7 @@ export class GridCanvas {
       const npcId = id.slice(4);
       const npc = this.state.npcs[npcId];
       if (!npc || (npc.room_id && npc.room_id !== currentRoomId)) {
+        if (node._pulseAnim) node._pulseAnim.stop();
         node.destroy();
         this._tokenNodes.delete(id);
       }
@@ -716,6 +717,7 @@ export class GridCanvas {
             diamond.scaleY(scale);
           }, this.tokenLayer);
           pulse.start();
+          group._pulseAnim = pulse;
         }
       } else {
         group.x(cx);
@@ -727,6 +729,7 @@ export class GridCanvas {
 
   _renderCursor() {
     if (!this.state) {
+      if (this._cursorAnim) this._cursorAnim.stop();
       this.cursorLayer.hide();
       return;
     }
