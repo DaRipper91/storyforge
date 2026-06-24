@@ -286,6 +286,17 @@ export class GridCanvas {
     if (firstTime) {
       this._followCursor(true);
     }
+
+    // Play/Pause persistent animations based on state presence
+    if (this.state) {
+      if (this._lightingAnim && !this._lightingAnim.isRunning()) this._lightingAnim.start();
+      if (this._particleAnim && !this._particleAnim.isRunning()) this._particleAnim.start();
+      if (this._cursorAnim && !this._cursorAnim.isRunning()) this._cursorAnim.start();
+    } else {
+      if (this._lightingAnim && this._lightingAnim.isRunning()) this._lightingAnim.stop();
+      if (this._particleAnim && this._particleAnim.isRunning()) this._particleAnim.stop();
+      if (this._cursorAnim && this._cursorAnim.isRunning()) this._cursorAnim.stop();
+    }
   }
 
   _currentRoom() {
@@ -643,6 +654,9 @@ export class GridCanvas {
       const npcId = id.slice(4);
       const npc = this.state.npcs[npcId];
       if (!npc || (npc.room_id && npc.room_id !== currentRoomId)) {
+        if (node._pulseAnim) {
+          node._pulseAnim.stop();
+        }
         node.destroy();
         this._tokenNodes.delete(id);
       }
@@ -716,6 +730,7 @@ export class GridCanvas {
             diamond.scaleY(scale);
           }, this.tokenLayer);
           pulse.start();
+          group._pulseAnim = pulse;
         }
       } else {
         group.x(cx);
