@@ -279,15 +279,15 @@ async def test_path_traversal_blocked(client):
 
 
 async def test_path_traversal_with_slash_blocked(client):
-    """campaign_id containing forward slash → 404 since it's a subfolder but doesn't exist."""
+    """campaign_id containing forward slash → 400 since it's explicitly rejected."""
     resp = await client.post("/api/campaigns/load", json={"campaign_id": "foo/bar"})
-    assert resp.status_code == 404
+    assert resp.status_code == 400
 
 
 async def test_path_traversal_with_backslash_blocked(client):
-    """campaign_id containing backslash → 404 since it's a subfolder but doesn't exist."""
+    """campaign_id containing backslash → 400 since it's explicitly rejected."""
     resp = await client.post("/api/campaigns/load", json={"campaign_id": "foo\\bar"})
-    assert resp.status_code == 404
+    assert resp.status_code == 400
 
 
 # ─────────────────────── Healthcheck ───────────────────────
