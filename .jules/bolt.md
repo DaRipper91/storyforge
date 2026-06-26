@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-11-09 - Avoid Array String Serialization in High-Frequency Cache Keys
+**Learning:** Generating Map cache keys by continuously serializing large arrays into strings via methods like `array.join(',')` causes unnecessary micro-allocations and Garbage Collection churn, creating micro-stutters in high-frequency rendering functions.
+**Action:** Construct cache keys using available metadata (e.g., race ID, frame index, direction) rather than continuously serializing data structures, passing these pre-computed keys down to generic rendering functions.
