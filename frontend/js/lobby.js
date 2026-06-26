@@ -940,6 +940,7 @@ export class Lobby {
       nameInput.className = "slot-name-input";
       nameInput.value = slot.name_draft || "";
       nameInput.disabled = slot.status === "ready";
+      nameInput.setAttribute("aria-label", "Character Name");
 
       nameInput.addEventListener("change", async (e) => {
         const val = e.target.value.trim();
@@ -1443,7 +1444,7 @@ export class Lobby {
           <div class="identity-chip ${draft.pronouns === p ? "selected" : ""}" data-value="${p}">${p}</div>
         `).join("")}
       </div>
-      <input type="text" class="identity-text-input" id="pronouns-custom" placeholder="Custom pronouns…"
+      <input type="text" class="identity-text-input" id="pronouns-custom" aria-label="Custom Pronouns" placeholder="Custom pronouns…"
         value="${!pronounOptions.includes(draft.pronouns) ? this._escape(draft.pronouns) : ""}"
         style="margin-top:0.5rem;width:100%">
     `));
@@ -1456,7 +1457,7 @@ export class Lobby {
           <div class="identity-chip ${(draft.title ?? "None") === t ? "selected" : ""}" data-title="${t}">${t}</div>
         `).join("")}
       </div>
-      <input type="text" class="identity-text-input" id="title-custom" placeholder="Custom title…"
+      <input type="text" class="identity-text-input" id="title-custom" aria-label="Custom Title" placeholder="Custom title…"
         value="${(draft.title && !titleOptions.includes(draft.title)) ? this._escape(draft.title) : ""}"
         style="margin-top:0.5rem;width:100%">
     `));
@@ -1562,9 +1563,11 @@ export class Lobby {
       const group = document.createElement("div");
       group.className = "story-field-group";
       const label = document.createElement("label");
+      label.htmlFor = f.key;
       label.className = "story-label";
       label.textContent = f.label;
       const ta = document.createElement("textarea");
+      ta.id = f.key;
       ta.className = "story-textarea";
       ta.rows = f.rows;
       ta.placeholder = f.placeholder;
@@ -1579,10 +1582,12 @@ export class Lobby {
     const keepsakeGroup = document.createElement("div");
     keepsakeGroup.className = "story-field-group";
     const keepsakeLabel = document.createElement("label");
+    keepsakeLabel.htmlFor = "keepsakeName";
     keepsakeLabel.className = "story-label";
     keepsakeLabel.textContent = "Keepsake / Trinket";
     const keepsakeInput = document.createElement("input");
     keepsakeInput.type = "text";
+    keepsakeInput.id = "keepsakeName";
     keepsakeInput.className = "story-text-input";
     keepsakeInput.placeholder = "A glowing coin, a letter from a dead relative, a broken locket…";
     keepsakeInput.maxLength = 100;
@@ -1701,6 +1706,7 @@ export class Lobby {
     input.maxLength = 24;
     input.placeholder = "Kael, Lyra, Whisper…";
     input.value = draft.name;
+    input.setAttribute("aria-label", "Hero Name");
 
     input.addEventListener("input", (e) => { draft.name = e.target.value; });
     input.addEventListener("keydown", (e) => {
