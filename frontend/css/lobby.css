@@ -209,7 +209,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .slot-name-input:focus {
   outline: none;
-  box-shadow: 0 0 5px var(--ink-gilded);
+}
+
+.slot-name-input:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .lobby-actions {
@@ -1348,6 +1352,11 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #e05050;
 }
 
+.haylie-bailout-btn:focus-visible {
+  outline: 2px solid #cc2222;
+  outline-offset: 2px;
+}
+
 .haylie-bailout-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -1697,7 +1706,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .identity-text-input:focus {
   outline: none;
-  border-color: var(--ink-gilded);
+}
+
+.identity-text-input:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .alignment-grid {
@@ -1785,7 +1798,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .story-textarea:focus {
   outline: none;
-  border-color: var(--ink-gilded);
+}
+
+.story-textarea:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .story-text-input {
@@ -1800,7 +1817,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .story-text-input:focus {
   outline: none;
-  border-color: var(--ink-gilded);
+}
+
+.story-text-input:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .story-hint {
