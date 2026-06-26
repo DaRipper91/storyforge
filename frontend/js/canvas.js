@@ -282,9 +282,19 @@ export class GridCanvas {
   setState(state) {
     const firstTime = !this.state;
     this.state = state;
-    this._fitAndRedraw();
-    if (firstTime) {
-      this._followCursor(true);
+
+    if (!this.state) {
+      this._lightingAnim?.stop();
+      this._particleAnim?.stop();
+      this._cursorAnim?.stop();
+    } else {
+      this._lightingAnim?.start();
+      this._particleAnim?.start();
+      this._cursorAnim?.start();
+      this._fitAndRedraw();
+      if (firstTime) {
+        this._followCursor(true);
+      }
     }
   }
 
@@ -711,6 +721,11 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            if (!diamond.parent) {
+              pulse.stop();
+              return;
+            }
+            if (!this.state) return;
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
