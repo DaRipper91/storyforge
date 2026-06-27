@@ -899,12 +899,16 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover,
-.escape-btn:focus-visible {
+.escape-btn:hover {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
+.escape-btn:focus {
+  outline: none;
+}
 .escape-btn:focus-visible {
+  background: rgba(139,69,19,0.25);
+  border-color: var(--ink-gilded);
   outline: 2px solid var(--ink-gilded);
   outline-offset: 2px;
 }
@@ -1300,10 +1304,18 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: rgba(75, 0, 130, 0.4);
 }
 
-.samael-consult-btns .escape-btn:hover,
+.samael-consult-btns .escape-btn:hover {
+  border-color: #9b4dca;
+  background: rgba(155, 77, 202, 0.15);
+}
+.samael-consult-btns .escape-btn:focus {
+  outline: none;
+}
 .samael-consult-btns .escape-btn:focus-visible {
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
+  outline: 2px solid #9b4dca;
+  outline-offset: 2px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1390,17 +1402,34 @@ body[data-phase="saves"] #game-view { display: none; }
   line-height: 1.6;
 }
 
-.keeva-action-btns .escape-btn:hover,
-.keeva-action-btns .escape-btn:focus-visible {
+.keeva-action-btns .escape-btn:hover {
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
+.keeva-action-btns .escape-btn:focus {
+  outline: none;
+}
+.keeva-action-btns .escape-btn:focus-visible {
+  border-color: #daa520;
+  background: rgba(218, 165, 32, 0.15);
+  outline: 2px solid #daa520;
+  outline-offset: 2px;
+}
 
-.keeva-btn-risky:hover,
+.keeva-btn-risky:hover {
+  border-color: #cc2222 !important;
+  background: rgba(204, 34, 34, 0.15) !important;
+  color: #ffaaaa;
+}
+.keeva-btn-risky:focus {
+  outline: none;
+}
 .keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
+  outline: 2px solid #cc2222;
+  outline-offset: 2px;
 }
 
 
