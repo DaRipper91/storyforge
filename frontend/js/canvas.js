@@ -135,7 +135,10 @@ export class GridCanvas {
 
   _startLightingAnimation() {
     this._lightingAnim = new Konva.Animation((frame) => {
-      if (!this.state) return;
+      if (!this.state) {
+        this._lightingAnim.stop();
+        return;
+      }
       const cs = this.cellSize;
       
       for (const [id, circle] of this._lightCircles.entries()) {
@@ -159,6 +162,10 @@ export class GridCanvas {
 
   _startAmbientParticles() {
     this._particleAnim = new Konva.Animation((frame) => {
+      if (!this.state) {
+        this._particleAnim.stop();
+        return;
+      }
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
         const sx = this.stage.x();
@@ -285,6 +292,13 @@ export class GridCanvas {
     this._fitAndRedraw();
     if (firstTime) {
       this._followCursor(true);
+    }
+
+    // Explicitly restart persistent animations when state becomes active
+    if (this.state) {
+      if (this._lightingAnim && !this._lightingAnim.isRunning()) this._lightingAnim.start();
+      if (this._particleAnim && !this._particleAnim.isRunning()) this._particleAnim.start();
+      if (this._cursorAnim && !this._cursorAnim.isRunning()) this._cursorAnim.start();
     }
   }
 
@@ -711,6 +725,10 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            if (!diamond.parent) {
+              pulse.stop();
+              return;
+            }
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
@@ -761,6 +779,10 @@ export class GridCanvas {
       this.cursorLayer.add(this._innerGlow);
 
       this._cursorAnim = new Konva.Animation((frame) => {
+        if (!this.state) {
+          this._cursorAnim.stop();
+          return;
+        }
         const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
         const pulse = Math.sin(frame.time / 100) * 2;
 
