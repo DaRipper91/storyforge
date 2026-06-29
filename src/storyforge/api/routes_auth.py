@@ -15,10 +15,12 @@ import anyio
 
 from storyforge.config import settings
 from storyforge.auth import authenticate_google_user
+from storyforge.api.limiter import limiter
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/desktop_login")
+@limiter.limit("5/minute")
 async def desktop_login(request: Request, response: Response):
     """Triggers the InstalledAppFlow for desktop clients (like Godot)."""
     try:
@@ -75,6 +77,7 @@ def create_session_token(id_info: dict) -> str:
 
 
 @router.post("/google")
+@limiter.limit("5/minute")
 async def google_auth(request: Request, body: AuthToken, response: Response):
     """Verify Google ID token and set session cookie."""
     if not settings.google_client_id:

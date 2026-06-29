@@ -8,6 +8,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from storyforge.api.limiter import limiter
 from fastapi.staticfiles import StaticFiles
 from fastapi import Request
 from fastapi.responses import FileResponse
@@ -44,6 +47,9 @@ app = FastAPI(
     description="Hybrid VTT + AI Dungeon Master",
     lifespan=lifespan,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
