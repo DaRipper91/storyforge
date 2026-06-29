@@ -5,3 +5,7 @@
 ## 2024-05-26 - Dynamic Content Accessibility
 **Learning:** For Virtual Tabletop (VTT) web applications, dynamic game logs and narrative elements (like an event log or chat) need to be automatically announced to screen readers. Adding `aria-live="polite"` to elements like `<ol id="narrative-log">` ensures screen reader users can passively track the game state without having to manually navigate back to the log after every action.
 **Action:** Always use `aria-live` on containers that receive continuous appended updates crucial to the primary user experience.
+
+## 2024-05-28 - Decoupling Hover and Focus-Visible
+**Learning:** When styling interactive elements, grouping `:hover` and `:focus-visible` pseudo-class selectors together can cause unintuitive visual behaviors, such as keyboard focus unintentionally inheriting hover background colors. Furthermore, custom `:focus-visible` styling requires explicitly clearing the base `:focus { outline: none; }` to prevent default browser rings from appearing during mouse clicks.
+**Action:** Always decouple `:hover` and `:focus-visible` styles if they require different backgrounds. Explicitly add `outline: none;` to `:focus` when designing custom focus indicators.
