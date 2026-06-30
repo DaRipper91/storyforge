@@ -713,8 +713,9 @@ const _spriteCache = new Map();
  * @param {string}  [accent]     - override for palette index 1 (default parchment)
  * @returns {HTMLCanvasElement}
  */
-export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
-  const cacheKey = `${frame.join(',')}_${charColor}_${scale}_${accent}`;
+export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4', cacheId = null) {
+  const frameKey = cacheId ? cacheId : frame.join(',');
+  const cacheKey = `${frameKey}_${charColor}_${scale}_${accent}`;
   if (_spriteCache.has(cacheKey)) {
     return _spriteCache.get(cacheKey);
   }
