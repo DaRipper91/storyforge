@@ -711,10 +711,13 @@ const _spriteCache = new Map();
  * @param {string}   charColor   - CSS hex used for palette index 2
  * @param {number}  [scale=5]    - pixel scale factor
  * @param {string}  [accent]     - override for palette index 1 (default parchment)
+ * @param {string}  [cacheId]    - optional pre-calculated cache identifier to avoid frame.join(',')
  * @returns {HTMLCanvasElement}
  */
-export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4') {
-  const cacheKey = `${frame.join(',')}_${charColor}_${scale}_${accent}`;
+export function renderSprite(frame, charColor, scale = 5, accent = '#f4ead4', cacheId = null) {
+  // Optimization: use cacheId instead of frame.join(',') if provided to avoid GC churn from array stringification
+  const baseKey = cacheId || frame.join(',');
+  const cacheKey = `${baseKey}_${charColor}_${scale}_${accent}`;
   if (_spriteCache.has(cacheKey)) {
     return _spriteCache.get(cacheKey);
   }
