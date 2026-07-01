@@ -1,8 +1,12 @@
 from fastapi import Request, HTTPException
 import jwt
 from jwt import PyJWTError
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from storyforge.config import settings
 from storyforge.core.state_manager import StateManager
+
+limiter = Limiter(key_func=get_remote_address)
 
 
 def get_state_manager(request: Request) -> StateManager:
