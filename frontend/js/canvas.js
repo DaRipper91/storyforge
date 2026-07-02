@@ -537,8 +537,9 @@ export class GridCanvas {
     // Pre-render all 4 frames (flipped if walking left)
     const raceFrames = getRaceFrames(char.race);
     const accent = RACE_ACCENT_COLORS[char.race] ?? '#f4ead4';
-    const frames = raceFrames.map(f =>
-      renderSprite(facingLeft ? flipH(f) : f, charColor, scale, accent)
+    const raceId = char.race || 'generic';
+    const frames = raceFrames.map((f, i) =>
+      renderSprite(facingLeft ? flipH(f) : f, charColor, scale, accent, `${raceId}_w_${i}_${facingLeft ? 'L' : 'R'}`)
     );
 
     // Sprite image node — positioned so feet land at the cell centre
