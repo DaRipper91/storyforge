@@ -940,6 +940,7 @@ export class Lobby {
       nameInput.className = "slot-name-input";
       nameInput.value = slot.name_draft || "";
       nameInput.disabled = slot.status === "ready";
+      nameInput.ariaLabel = "Player Slot Name";
 
       nameInput.addEventListener("change", async (e) => {
         const val = e.target.value.trim();
@@ -1563,8 +1564,10 @@ export class Lobby {
       group.className = "story-field-group";
       const label = document.createElement("label");
       label.className = "story-label";
+      label.htmlFor = `story-field-${f.key}`;
       label.textContent = f.label;
       const ta = document.createElement("textarea");
+      ta.id = `story-field-${f.key}`;
       ta.className = "story-textarea";
       ta.rows = f.rows;
       ta.placeholder = f.placeholder;
@@ -1580,8 +1583,10 @@ export class Lobby {
     keepsakeGroup.className = "story-field-group";
     const keepsakeLabel = document.createElement("label");
     keepsakeLabel.className = "story-label";
+    keepsakeLabel.htmlFor = "story-keepsake";
     keepsakeLabel.textContent = "Keepsake / Trinket";
     const keepsakeInput = document.createElement("input");
+    keepsakeInput.id = "story-keepsake";
     keepsakeInput.type = "text";
     keepsakeInput.className = "story-text-input";
     keepsakeInput.placeholder = "A glowing coin, a letter from a dead relative, a broken locket…";
@@ -1690,12 +1695,14 @@ export class Lobby {
     const wrap = document.createElement("div");
     wrap.className = "name-stage";
 
-    const label = document.createElement("p");
+    const label = document.createElement("label");
     label.className = "name-prompt";
+    label.htmlFor = "hero-name-input";
     label.textContent = "What is your hero called?";
     wrap.appendChild(label);
 
     const input = document.createElement("input");
+    input.id = "hero-name-input";
     input.type = "text";
     input.className = "name-input";
     input.maxLength = 24;
