@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2026-07-04 - Stop Persistent Animations on Hidden Canvas
+**Learning:** When reusing graphical animation loops (like Konva.Animation) for persistent objects, they keep running invisibly in the background, needlessly burning CPU cycles, and causing memory leaks from detached nodes if they are hidden or unmounted. In the StoryForge frontend, `this.state` being null or falsy indicates the main canvas is hidden/inactive.
+**Action:** Explicitly call `.stop()` when the component/layer is hidden, unmounted, or its parent node is destroyed, and `.start()` when it is shown. Check for node destruction inside the animation frame loop itself if the node is dynamically generated and destroyed (e.g., NPC tokens).
