@@ -12,8 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from storyforge.config import settings
+from storyforge.api.limiter import limiter
 from storyforge.api import (
     routes_state, routes_action, routes_lobby, routes_npc, routes_enemy,
     ws_session, routes_auth,
@@ -44,6 +47,8 @@ app = FastAPI(
     description="Hybrid VTT + AI Dungeon Master",
     lifespan=lifespan,
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
