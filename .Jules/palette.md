@@ -5,3 +5,7 @@
 ## 2024-05-26 - Dynamic Content Accessibility
 **Learning:** For Virtual Tabletop (VTT) web applications, dynamic game logs and narrative elements (like an event log or chat) need to be automatically announced to screen readers. Adding `aria-live="polite"` to elements like `<ol id="narrative-log">` ensures screen reader users can passively track the game state without having to manually navigate back to the log after every action.
 **Action:** Always use `aria-live` on containers that receive continuous appended updates crucial to the primary user experience.
+
+## 2024-05-27 - Explicit Associations for Dynamic DOM Forms
+**Learning:** When generating complex form structures (like character creation wizards) dynamically with vanilla JavaScript, screen readers lose context if elements are merely grouped visually. `<label>` and `<input>` must explicitly be linked.
+**Action:** Always manually assign `id` to generated `input`/`textarea` elements and `htmlFor` to their corresponding `label` elements.
