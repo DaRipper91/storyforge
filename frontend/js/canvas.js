@@ -135,7 +135,10 @@ export class GridCanvas {
 
   _startLightingAnimation() {
     this._lightingAnim = new Konva.Animation((frame) => {
-      if (!this.state) return;
+      if (!this.state) {
+        this._lightingAnim.stop();
+        return;
+      }
       const cs = this.cellSize;
       
       for (const [id, circle] of this._lightCircles.entries()) {
@@ -154,11 +157,15 @@ export class GridCanvas {
         }
       }
     }, this.lightLayer);
-    this._lightingAnim.start();
+    // don't start immediately, let setState handle it
   }
 
   _startAmbientParticles() {
     this._particleAnim = new Konva.Animation((frame) => {
+      if (!this.state) {
+        this._particleAnim.stop();
+        return;
+      }
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
         const sx = this.stage.x();
@@ -198,7 +205,7 @@ export class GridCanvas {
         }
       }
     }, this.fxLayer);
-    this._particleAnim.start();
+    // don't start immediately, let setState handle it
   }
 
   spawnFloatingText(coord, text, color = "#ff4444") {
@@ -282,6 +289,20 @@ export class GridCanvas {
   setState(state) {
     const firstTime = !this.state;
     this.state = state;
+
+    if (!state) {
+      this._lightingAnim?.stop();
+      this._particleAnim?.stop();
+      this._cursorAnim?.stop();
+      return;
+    }
+
+    if (firstTime && state) {
+      this._lightingAnim?.start();
+      this._particleAnim?.start();
+      this._cursorAnim?.start();
+    }
+
     this._fitAndRedraw();
     if (firstTime) {
       this._followCursor(true);
@@ -711,6 +732,10 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            if (!diamond.parent) {
+              pulse.stop();
+              return;
+            }
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
@@ -761,6 +786,10 @@ export class GridCanvas {
       this.cursorLayer.add(this._innerGlow);
 
       this._cursorAnim = new Konva.Animation((frame) => {
+        if (!this.state) {
+          this._cursorAnim.stop();
+          return;
+        }
         const flicker = Math.sin(frame.time / 50) * 0.2 + 0.8;
         const pulse = Math.sin(frame.time / 100) * 2;
 
@@ -775,9 +804,13 @@ export class GridCanvas {
         this._outerGlow.y(this._cursorBaseY + 2 + Math.cos(frame.time / 130));
       }, this.cursorLayer);
 
-      this._cursorAnim.start();
+      if (this.state) {
+        this._cursorAnim.start();
+      }
     } else {
-      this._cursorAnim.start();
+      if (this.state) {
+        this._cursorAnim.start();
+      }
     }
 
     this._cursorBaseX = ox + x * cs;
