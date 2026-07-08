@@ -154,7 +154,6 @@ export class GridCanvas {
         }
       }
     }, this.lightLayer);
-    this._lightingAnim.start();
   }
 
   _startAmbientParticles() {
@@ -198,7 +197,6 @@ export class GridCanvas {
         }
       }
     }, this.fxLayer);
-    this._particleAnim.start();
   }
 
   spawnFloatingText(coord, text, color = "#ff4444") {
@@ -285,6 +283,15 @@ export class GridCanvas {
     this._fitAndRedraw();
     if (firstTime) {
       this._followCursor(true);
+    }
+
+    // Stop persistent animations when navigating away from exploration mode
+    if (this.state) {
+      if (!this._lightingAnim.isRunning()) this._lightingAnim.start();
+      if (!this._particleAnim.isRunning()) this._particleAnim.start();
+    } else {
+      if (this._lightingAnim.isRunning()) this._lightingAnim.stop();
+      if (this._particleAnim.isRunning()) this._particleAnim.stop();
     }
   }
 
@@ -711,6 +718,10 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            if (!diamond.parent) {
+              pulse.stop();
+              return;
+            }
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
