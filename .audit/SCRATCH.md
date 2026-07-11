@@ -43,7 +43,201 @@ From README.md / ROADMAP.md / CLAUDE.md, in the authors' own words:
 Godot client (`godot/scripts/*.gd`, ~16,113 lines total) and `frontend/js/*.js` (~5,939 lines total) were sized but not individually profiled — out of scope for a Python-backend-focused hotspot list, but note their existence for any stage that decides to review the frontend/client layers directly.
 
 ## 02 — Core Verification
-(pending)
+
+### Findings
+
+1. **CLAUDE.md's "tests/ is empty" claim is stale — all 88 tests pass.** Ran `uv run pytest -q`
+   after `uv sync --group dev`: `88 passed in 3.53s`, covering `test_character_factory.py`,
+   `test_routes_lobby.py`, `test_routes_npc.py`, `test_validators.py`. The documentation is simply
+   out of date, not a red flag about test health. Severity: low (docs drift). [VERIFIED]
+
+2. **`core/` violates its own documented "no I/O, never imports ai/api/persistence" invariant** —
+   `src/storyforge/core/state_manager.py:31` does `from storyforge.persistence import snapshot`
+   and calls `snapshot.save(self._campaign_dir, self._state)` directly at
+   `state_manager.py:233` and `:652` (disk I/O inside `core/`, the exact thing CLAUDE.md says
+   never happens). It also imports `storyforge.encounters.enemies` (`state_manager.py:29`) and
+   `storyforge.events.bus` (`:30`) — both outside `core/`. Verified by
+   `grep -n "^from storyforge\.\|^import storyforge\." src/storyforge/core/*.py`: every other file
+   in `core/` (`grid.py`, `rules.py`, `validators.py`, `character_factory.py`) only imports from
+   `storyforge.core.*`; `state_manager.py` is the sole offender. This is a real, checkable
+   contradiction between CLAUDE.md's architecture doc and the actual dependency graph — not
+   catastrophic (it's the designated single mutation/persistence choke point, so the coupling is
+   arguably intentional), but it directly falsifies invariant #4 as literally written. Severity:
+   medium (docs/architecture-invariant violation, not a functional bug). [VERIFIED]
+
+3. **`StateDiff` validator whitelist in `core/validators.py` fully matches CLAUDE.md's documented
+   invariants, with no drift against `core/models.py`.** Read `validators.py` in full and
+   cross-checked against `StateDiff` in `models.py:354-363` (5 fields:
+   `character_updates`, `cell_updates`, `add_inventory`, `remove_inventory`, `phase_change` — all
+   5 have a corresponding `_filter_*` function, no missing/extra fields).
+   - LOBBY/CREATION phase → returns empty diff + rejection message (`validators.py:44-48`).
+   - `character_updates` allowed fields = `hp_current`, `conditions`, `movement_remaining`,
+     `position` — but `position` is explicitly rejected inside its own branch
+     (`validators.py:125-131`, "must go through cell_updates"), matching CLAUDE.md exactly.
+   - `add_inventory` quantity cap of 10 enforced per-item (`validators.py:182-186`).
+   - `phase_change == COMBAT` rejected (`validators.py:222-224`), matching "COMBAT deferred to v0.2."
+   - Confirmed `apply_diff()` in `state_manager.py:163-169` is *not* self-sanitizing — its own
+     docstring warns "assumes diff has already been through validators.sanitize()... Calling this
+     with a raw Gemini response bypasses every safety check." Traced all 3 call sites of
+     `apply_diff()`: `routes_action.py:87` (calls `validators.sanitize()` first at line 84 — the
+     only call site fed by real Gemini/AI output), and two call sites in `routes_npc.py:181,256`
+     that pass diffs built deterministically by Python NPC service classes
+     (`jon.buy_item()`, `jon.roll_escape_check()`) — never raw Gemini output, so skipping
+     `sanitize()` there is consistent with the documented model rather than a bypass. No call site
+     was found passing an unsanitized AI diff into `apply_diff`. Severity: none (invariant holds).
+     [VERIFIED]
+
+4. **`get_current_user` auth dependency (`api/deps.py:12`) is dead code — never wired into any
+   route.** `grep -rn "get_current_user" src/` returns exactly one hit: its own definition. None
+   of `routes_action.py` (`/api/action/grid`, `/freeform`, `/interact_entity`, `/travel`),
+   `routes_lobby.py` (`/api/lobby/*`, `/api/character/create`), or `routes_npc.py` (all 26
+   endpoints) depend on it, and `main.py` has no global auth middleware — only a security-headers
+   middleware and CORS. The only place that actually enforces the session JWT is
+   `ws_session.py` (manual `jwt.decode` before `websocket.accept()`) and `routes_lobby.py:147-158`
+   (`join_lobby`, which does its own inline cookie parse with a fallback to a client-supplied
+   `controller_id` for guest/local-controller play — by design, not broken, confirmed by
+   `tests/test_routes_lobby.py::test_join_requires_controller_id` which only expects 401 when
+   *both* the cookie and `controller_id` are absent). Net effect: every actual gameplay
+   mutation endpoint (grid/freeform actions, all NPC encounters, character creation) is reachable
+   with **no authentication check at all** — the Google OAuth / JWT session system exists and is
+   internally correct, but isn't applied to REST endpoints, only informally consulted by lobby
+   join and enforced only on the websocket. For a local family app on 127.0.0.1 this may be an
+   accepted risk, but it contradicts CLAUDE.md's description of `get_current_user` as the thing
+   that "raises 401 if missing or invalid" (true of the function in isolation, false of its
+   effect on the API surface — it's never invoked at runtime). Severity: high (auth exists but
+   isn't enforced anywhere it would matter). [VERIFIED]
+
+5. **NPC prompt/encounter split (17 prompts vs 8 encounter classes) is legitimately intentional
+   for 7 of the 9 "extra" prompts, but 2 (`npc_mykael.md`, `npc_yeldarb.md`) are dead/orphaned
+   files, not wired to anything.**
+   - `npc_keeva`, `npc_teddy`, `npc_cyrus`, `npc_binkbink`, `npc_cole`, `npc_coco`, `npc_tyty`,
+     `npc_snowie` are all reachable via a single unified flavor-only endpoint,
+     `POST /api/pet/{pet_id}/interact` (`routes_npc.py:929-939`), which maps each to
+     `narrate_npc(name, situation)` with a hardcoded pool fallback and **no state/StateDiff** —
+     matches GEMINI.md's "never stat a beast" rule exactly and is a real, working feature, not a
+     bug. Verified by reading `routes_npc.py:841-939` in full and confirming `_PET_PROMPT`,
+     `_PET_SITUATION`, `_PET_FALLBACK` dicts cover all 8 names.
+   - `npc_mykael.md` and `npc_yeldarb.md`, by contrast, describe named human(-ish) characters with
+     actual mechanics ("The 4-Second Peak" strength surge for Mykael; "appears without warning"
+     for Yeldarb) per `STORYFORGE_CODEX.md:87-95,128-136` — these are not beasts, so the
+     "never stat a beast" exemption doesn't apply. Verified there is **no call site anywhere**
+     invoking `narrate_npc("mykael", ...)` or `narrate_npc("yeldarb", ...)`
+     (`grep -rn "mykael|yeldarb" src/` only matches the prompt files themselves, plus a passing
+     mention in `npc_kodrik.md` flavor text and two bullet points in `ai/prompts/system_dm.md:48,55`
+     — the latter is the base system prompt loaded by both `interpreter.py:77` and
+     `narrator.py:16` for *all* general narration, so the *characters* are reachable ambiently
+     through the main DM's system prompt, but the dedicated `npc_mykael.md`/`npc_yeldarb.md` files
+     with their detailed mechanics are never loaded by `load_prompt()` anywhere — orphaned content,
+     not a functioning encounter). Severity: low (unused/dead prompt content, not a broken
+     player-facing feature — the characters still function via ambient DM narration).
+     [VERIFIED]
+
+6. **Security-remediation commits from other bots are all still intact and consistent in current
+   code** — checked each of the 5 security commits recon flagged:
+   - `cd3879c` (HTTP security headers middleware): present verbatim in
+     `main.py:48-55` (`X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`,
+     `Content-Security-Policy`).
+   - `fb64750` (XSS fix in `_esc`): current `frontend/js/main.js:67-71` uses the regex-based
+     `/[&<>"']/g` replace escaping `&<>"'` exactly as the commit message describes (not the old
+     `textContent`-to-`innerHTML` trick). Spot-checked 3 call sites
+     (`main.js:753` shop inventory render, `inventory.js:45`, `lobby.js:677-680` save-card render)
+     — all route user/AI-derived strings through `_esc()`/`this._escape()` before `innerHTML`
+     interpolation. Did not exhaustively check all ~30 `innerHTML` sites in `lobby.js`/`main.js`
+     (out of scope for this stage — flagging for stage 3 bug hunt if it wants full coverage).
+   - `681dd38`/`245b4c6` (secure cookie flag): `routes_auth.py:41-46,93-98` sets
+     `secure=request.url.scheme == "https"` dynamically on both cookie-setting call sites (desktop
+     and web login) — matches commit intent.
+   - `1d4ea36` (websocket auth): `ws_session.py:13-22` — closes with code 1008 if no
+     `storyforge_session` cookie, and again if `jwt.decode` raises `PyJWTError`, before ever
+     calling `websocket.accept()`. Verified there is only one `@router.websocket` in the whole
+     codebase (`grep -rn "@router.websocket\|@app.websocket" src/storyforge`), so there's no
+     second unguarded WS endpoint.
+   - `fefa047` (CORS wildcard / shop XSS / token file permissions): `main.py:58-64` uses
+     `settings.cors_origins` (explicit origin list from `STORYFORGE_ALLOWED_ORIGINS`, default
+     `localhost` only) rather than `"*"`; `auth.py:71` does
+     `token_file.chmod(stat.S_IRUSR | stat.S_IWUSR)` (0600) after writing, and `token.json` is
+     stored under `~/.local/share/storyforge/` per `auth.py:12` rather than the project root.
+     Confirmed no `token.json` is tracked in git (`git ls-files | grep token.json` → empty).
+   All 5 fixes verified present and consistent, not partial. Severity: none (all confirmed intact).
+   [VERIFIED]
+
+7. **`jwt_secret` defaults to a fresh random value per process (`secrets.token_urlsafe(32)`,
+   `config.py:28`), not a static "dev secret" as CLAUDE.md's env var comment implies.** This is
+   more secure than documented (unguessable per-boot secret rather than a shared default string),
+   but it does mean every server restart invalidates all previously issued session cookies —
+   worth knowing operationally (e.g. under `uvicorn --reload`, a source-file save triggers a
+   subprocess restart and silently logs everyone out). Severity: low (docs inaccuracy /
+   minor operational surprise, not a vulnerability — if anything the current behavior is safer
+   than what's documented). [VERIFIED]
+
+8. **No secrets found in git-tracked files** — ran `uvx trufflehog3 -f json --no-history` (v3.0.10)
+   over the working tree (excluding `godot/`, `standalone/`, `current_backup/`), then filtered the
+   15,989 raw findings down to the 2,385 that fall on `git ls-files`-tracked paths, then further
+   filtered by pattern-rule (excluding the `high-entropy` heuristic, which fires on legitimate
+   sha256 hashes in `uv.lock`/`standalone/uv.lock` and Godot `.import` asset hashes): **0
+   pattern-based hits (API keys, private keys, tokens) in any tracked file.** All `private.key`
+   (HIGH severity) hits were confined to `.venv/lib/...` third-party library source/docstrings
+   (google-auth, cryptography), not the repo itself, and `.venv/` is not tracked by git
+   (confirmed no `.venv` paths in `git ls-files`). Also ran `uvx pip-audit --local` against the
+   synced environment: **"No known vulnerabilities found."** Severity: none. [VERIFIED]
+
+9. **Stray tracked artifacts confirmed but benign** — `PXL_20260525_011843405.jpg` (2.6MB) and
+   `uvicorn_output.log` are both tracked (`git ls-files | grep` confirms). `git log --oneline --
+   uvicorn_output.log` shows it entered via `c804762` ("chore: apply remaining Jules sessions").
+   Read the full 13-line log content: only startup banner + one 400 Bad Request line, no secrets,
+   no stack traces. Severity: low (repo hygiene only). [VERIFIED]
+
+### Checks run
+- `uv sync --group dev` — installed dev deps cleanly.
+- `uv run pytest -q` — **88 passed** in 3.53s, no failures/errors/skips.
+- `grep -n "^from storyforge\.\|^import storyforge\."` over every file in `src/storyforge/core/`
+  — found the one `core/state_manager.py` → `persistence`/`encounters`/`events` violation; all
+  other `core/` files clean.
+- Read `core/validators.py` in full (226 lines) and cross-referenced every `_filter_*` function
+  against `StateDiff`'s 5 fields in `core/models.py` — no whitelist drift.
+- Traced all 3 call sites of `StateManager.apply_diff()` (`routes_action.py:87`,
+  `routes_npc.py:181`, `routes_npc.py:256`) to confirm sanitize-before-apply discipline holds for
+  the one AI-fed call site and is N/A (Python-generated diffs) for the other two.
+- `grep -rn "get_current_user" src/` — confirmed dependency is defined once, never consumed;
+  cross-checked every router file's `Depends(...)` usage to confirm no route requires auth.
+- `grep -rn "@router.websocket\|@app.websocket" src/storyforge` — exactly one WS endpoint, and
+  it's the auth-gated one.
+- Read `ws_session.py`, `routes_auth.py` (cookie-setting + `/me` + `/logout`), `main.py`
+  (middleware stack) in full.
+- `git log --oneline -i --grep="XSS|security header|secure cookie|websocket auth" --all` plus
+  manual `git show <hash> --stat` on `fb64750` and `fefa047` to see exact diffs, then re-read the
+  current versions of every file each commit touched to confirm the fix is still present and not
+  since regressed.
+- `git ls-files | grep -iE "token\.json|\.env$|credentials|\.pem$|\.key$|id_rsa|\.db$|\.sqlite"` —
+  no hits.
+- `uvx trufflehog3 -f json --no-history -e "godot/.*" -e "standalone/.*" -e "current_backup/.*"
+  -s HIGH .` (v3.0.10, via `uvx`) — ran full scan, then Python-filtered results against
+  `git ls-files` and by rule-id to separate real secret patterns from lockfile-hash noise; 0 real
+  hits in tracked files.
+- `uvx pip-audit --local` (v2.10.1) — "No known vulnerabilities found."
+- `git ls-files | grep -iE "\.jpg$|\.jpeg$|uvicorn_output\.log"` + `git log --oneline --
+  <file>` + full read of `uvicorn_output.log` — confirmed tracked, benign content.
+- Spot-checked 3 `innerHTML` call sites across `main.js`/`inventory.js`/`lobby.js` for `_esc`/
+  `_escape` usage post-XSS-fix.
+
+### Checks skipped
+- **`gitleaks`** — not installed and no Go toolchain readily available in this sandbox to build
+  it; substituted `trufflehog3` (installable via `uvx`) as an equivalent secret scanner instead of
+  skipping entirely.
+- **Exhaustive line-by-line audit of all ~30 `innerHTML` interpolation sites in
+  `frontend/js/lobby.js`/`main.js`** — spot-checked 3 representative sites (all clean); a full
+  sweep for any interpolation that bypasses `_esc()`/`_escape()` is left for the stage 3 bug hunt
+  since it's a frontend-presentation-layer concern this stage's brief says to mostly skip.
+- **`npm audit`/frontend dependency scanning** — N/A, project has no `package.json` /npm
+  dependencies per CLAUDE.md ("No npm, no build step for the frontend").
+- **`cargo audit`** — N/A, no Rust code in the repo.
+- **Godot/GDScript client (`godot/scripts/*.gd`) and `standalone/`/`current_backup/` duplicate
+  trees** — excluded from this stage per recon's guidance that CLAUDE.md's FastAPI+vanilla-JS
+  description is ground truth; not exercised with tests since Godot isn't part of the Python test
+  suite and there's no headless way to run it in this sandbox.
+- **Live GitHub Actions/CI run status** — `gh` CLI not available in this sandbox (consistent with
+  recon's note); could not cross-check whether CI actually passes on the current HEAD vs. relying
+  on the local `pytest` run only.
 
 ## 03 — Bug Hunt
 (pending)
