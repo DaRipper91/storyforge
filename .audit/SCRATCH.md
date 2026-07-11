@@ -240,9 +240,248 @@ Godot client (`godot/scripts/*.gd`, ~16,113 lines total) and `frontend/js/*.js` 
   on the local `pytest` run only.
 
 ## 03 — Bug Hunt
-(pending)
+
+### Confirmed findings
+
+1. **Fake success / client-trusted currency check — Kodrik's gear repair never touches real
+   state.** `src/storyforge/api/routes_npc.py:697-741` (`RepairRequest` model + `POST
+   /api/kodrik/repair`). The request body is `{item_name: str, silver_available: int}` —
+   `silver_available` is supplied entirely by the client, not read from the character's actual
+   `CharacterSheet.silver` field (which exists and is the real source of truth per
+   `core/models.py:59`). `encounters/kodrik.py:103-119` (`repair_gear`) only compares
+   `silver_available < cost` (the client's own claimed number) and returns `success=True`/`False`
+   accordingly; on success it increments `self.encounter.repaired_items_count` but **never returns
+   or applies a `StateDiff`** to deduct the 10-silver cost, and the route never calls
+   `StateManager.apply_diff()` (confirmed: `routes_npc.py`'s `kodrik_repair` doesn't even take a
+   `StateManager` dependency, unlike `jon_buy` at `routes_npc.py:167-181` which correctly reads
+   `character.silver` server-side and returns a `StateDiff` deducting it — see
+   `encounters/shopkeeper_jon.py:277-312` for the correct pattern this endpoint should mirror). Net
+   effect: any client can repair gear for free by simply POSTing `silver_available: 999999`
+   regardless of the character's actual balance, and even a "successful" repair costs nothing.
+   `tests/test_routes_npc.py:321-346` (`test_kodrik_repair_success`,
+   `test_kodrik_repair_insufficient_silver`) only assert against the client-supplied
+   `silver_available` value and never assert any change to a character's real silver balance —
+   the test suite encodes the bug rather than catching it. Severity: high (game-economy integrity
+   bug / server trusting client-supplied state instead of authoritative data — the exact shape of
+   "fake success on stubbed logic"). [VERIFIED]
+
+2. **Silent `except Exception: pass` degrades JWT verification failures into unauthenticated
+   guest-mode silently, with no log line.** `src/storyforge/api/routes_lobby.py:151-155,
+   176-180, 201-205` (`join_lobby`, `leave_lobby`, `update_name` — identical pattern in all
+   three): `controller_id` starts as the client-supplied `req.controller_id`; if a session cookie
+   is present, the code tries to `jwt.decode()` it and overwrite `controller_id` with
+   `google::{sub}`, but wraps this in a bare `except Exception: pass` that swallows *any* decode
+   failure (expired token, tampered signature, malformed JWT, or an unrelated bug in `jwt.decode`
+   itself) and silently falls back to trusting the client-supplied `controller_id` from the request
+   body — with zero logging, so an attacker presenting a corrupted/expired session cookie
+   alongside a spoofed `controller_id` is indistinguishable from an intentional guest player, and
+   nobody would ever see a log line indicating the cookie was rejected. This is consistent with
+   the guest/local-play design noted in stage 2 finding #4, but the specific mechanism (broad
+   `except Exception`, no logging, identical fallback whether the cookie is simply absent or
+   actively malformed) is worth flagging on its own as a fragile security gate. Severity: medium
+   (design may be intentional for local/guest play, but the blanket silent catch removes any
+   signal that a real auth token is being rejected, and the fallback path is identical for "no
+   cookie" and "broken cookie"). [VERIFIED]
+
+3. **CI never runs the test suite — 88 passing tests are invisible to both GitHub Actions
+   workflows.** `.github/workflows/build.yml` (7 jobs: Godot export ×2, Python launcher build ×2,
+   package, GitHub release, itch.io publish) and `.github/workflows/windows-build.yml` (quick
+   Windows build + pre-release) both run `uv sync --group dev` and then go straight to
+   `uv run --python 3.12 python scripts/build.py` / `godot --headless --export-release` — neither
+   workflow contains a `pytest` step anywhere (`grep -n "pytest" .github/workflows/*.yml` →
+   zero matches). Every push to `main` and every PR triggers a full build+release pipeline with no
+   test gate at all; a commit that breaks `test_validators.py` or `test_routes_npc.py` would still
+   produce and (on a tag push) publish a release artifact. This directly matches the checklist's
+   "CI that doesn't actually test anything" — the 88 tests core-verifier ran and confirmed passing
+   locally (stage 2 finding #1) have no CI enforcement whatsoever. Severity: high (no regression
+   safety net on the only branch that ships releases). [VERIFIED]
+
+4. **Hardcoded personal machine path in a checked-in launch script.**
+   `scripts/launch.sh:4` — `PROJECT_ROOT="/home/daripper/Projects/storyforge"` followed by
+   `cd "$PROJECT_ROOT"`. This only works on the original author's exact machine/username; any
+   other contributor running `scripts/launch.sh` gets a `cd: no such file or directory` and the
+   script silently fails to launch anything useful (no error handling after the `cd`, so `uv run
+   python src/storyforge/gui.py` would then run from whatever directory `cd` left the shell in,
+   likely erroring on relative imports/paths). Contrast with the sibling script
+   `scripts/dev.fish:4`, which correctly derives its root via `set -l PROJECT_ROOT (status
+   dirname)/..` — the portability bug is specific to `launch.sh`, not systemic. Severity: medium
+   (portability/onboarding failure for anyone besides the original author using this exact
+   script; `dev.fish` is the documented/working entry point per CLAUDE.md so this is a secondary,
+   less-visible path). [VERIFIED]
+
+5. **`buildozer.spec` is a gitignored-pattern file that's nonetheless tracked, and references a
+   dead Kivy/Android toolchain with no other trace in the current codebase.** Root `.gitignore:8-9`
+   has `*.spec` / `!StoryForge.spec` — the negation only un-ignores `StoryForge.spec` (confirmed
+   via `git check-ignore`: a copy of `buildozer.spec` saved as an untracked file matches the
+   `*.spec` ignore rule and is reported ignored; the tracked original is a pre-existing-rule
+   holdover). Its contents (`requirements = python3,kivy,android`, `android.api`, `android.ndk`,
+   etc., `buildozer.spec:1-13`) describe a Kivy-based Android APK build that has zero other
+   references anywhere in the repo — `grep -rln "kivy\|buildozer"` across all `.md`/`.py`/`.toml`
+   files (excluding `.venv/`) returns nothing else. The actual current packaging story (per
+   `.github/workflows/*.yml` and `scripts/build.py`) is PyInstaller (Windows/Linux launcher) +
+   Godot export, with no Android/Kivy target anywhere in CI. This is stale tooling from an
+   apparently abandoned earlier approach, sitting in the tree matching its own ignore rule.
+   Severity: low (dead file, no functional impact, but doubles as both a gitignore-mismatch and a
+   stale-tool-reference finding — a new contributor grepping for "how do I build this" could be
+   misled into thinking Android/Kivy packaging is live). [VERIFIED]
+
+6. **`docs/README.md` advertises a stack, platform, and Python version that don't exist anywhere
+   else in the repo — a stale-tool-reference hazard for new contributors.** `docs/README.md:1-15`
+   badges/prose claim "Python 3.14," "Platform: Arch / Asahi / Termux," and being "a specialized
+   node within the Project Aether ecosystem." `pyproject.toml:5` actually requires
+   `python_requires = ">=3.12"`, both CI workflows pin `python-version: '3.12'`
+   (`.github/workflows/build.yml:58`, `windows-build.yml:22`), and there is no other reference to
+   "Termux," "Asahi," or "Project Aether" as a live dependency anywhere in `src/`. This was flagged
+   in stage 1 recon as one of three conflicting project descriptions; confirming here specifically
+   as a "stale tool/dependency reference" — a new contributor reading `docs/README.md` first would
+   be told to target a Python version and OS the project doesn't build or run on. Severity: low
+   (docs-only, but a real onboarding trap — `docs/README.md` is the first file a browsing
+   contributor is likely to open). [VERIFIED]
+
+7. **`.jules/palette.md` vs `.Jules/palette.md` — case-divergent duplicate persona/learning
+   files, both tracked, with different content.** `git ls-files | grep -i jules` shows both
+   `.jules/palette.md` and `.Jules/palette.md` are tracked as distinct paths (Linux/git is
+   case-sensitive; likely created on a case-insensitive filesystem where the author's tooling
+   silently forked instead of overwriting). `diff` between them shows genuinely different
+   accumulated "learnings" content (accessibility notes in one, focus-ring notes in the other) —
+   not a copy, an actual fork. Any automated agent honoring only one casing (e.g. always resolving
+   `.jules/`) silently loses whatever was appended to the other. Severity: low (repo hygiene /
+   tooling-consistency issue, not a functional bug in the shipped app). [VERIFIED]
+
+### Checklist items with no findings (checked, none found)
+
+- **Advertised-but-unreachable features (beyond stage 2's `npc_mykael.md`/`npc_yeldarb.md`
+  finding, which stands):** cross-checked the documented 7-feat list (Apex Predator, Hive Mind,
+  Regenerator, Phase Shift, Pack Tactics, Void Touched, Echo Memory) against
+  `core/character_factory.py`'s `FEATS` dict — all 7 present (`character_factory.py:510-540`).
+  Checked all `app.include_router(...)` calls in `main.py:67-73` — every router module
+  (`routes_auth`, `routes_state`, `routes_action`, `routes_lobby`, `routes_npc`, `routes_enemy`,
+  `ws_session`) is registered, no orphaned router file. Cross-checked every HTTP call the Godot
+  `PythonClient.gd` bridge makes (`/healthz`, `/state`, `/lobby/catalog`, `/campaigns`,
+  `/campaigns/new`, `/auth/desktop_login`) against Python route definitions — all exist and match.
+  The 12-step Character Forge order in `frontend/js/lobby.js:21` (`CREATION_ORDER`) is
+  client-side-only until the single `/api/character/create` POST, so there's no per-step dispatch
+  to check.
+- **Gitignored-but-tracked files (beyond `buildozer.spec`, finding #5 above):** ran
+  `git check-ignore` against every tracked file (`for f in $(git ls-files); do git check-ignore -q
+  "$f" && echo "$f"; done`) — only `buildozer.spec` (via a reconstructed untracked copy, since
+  `check-ignore` doesn't flag already-tracked paths against `*.spec`) matched an ignore pattern
+  originally intended to exclude it. `StoryForge.spec` is explicitly negated
+  (`!StoryForge.spec`) and is genuinely used by `scripts/build.py:24`. No `.env`, `token.json`,
+  `client_secret.json`, or `data/campaigns/*` files are tracked (all correctly excluded).
+- **Substring checks doing token/flag parsing:** grepped for `"x" in style_str`-shaped patterns
+  across `src/storyforge/**/*.py` and `frontend/js/*.js` — every `.includes()`/`.indexOf()` call in
+  the frontend operates on real arrays (`CREATION_ORDER.includes(...)`,
+  `draft.skillProficiencies.includes(...)`, etc.), not raw string substring scans; the one Python
+  `" in "` hit worth checking (`ai/interpreter.py:34`, `actor.feat in FEATS`) is a dict-key
+  membership check against an exact string, not a substring scan. `core/models.py:74`'s
+  `conditions: list[str]` is checked as list membership everywhere, never as a substring-in-string
+  test. No misfire-prone substring parsing found anywhere in gameplay-affecting code.
+- **Hardcoded personal/machine-specific values (beyond `scripts/launch.sh`, finding #4):**
+  grepped for home-directory paths, `192.168.*`/`10.*` IPs, and the repo owner's GitHub
+  handle/username across `src/`, `scripts/`, and root `*.md` files — only `scripts/launch.sh` and
+  benign, expected mentions (`README.md`'s `git clone` URL, `STORYFORGE_CODEX.md`'s explicit
+  "Real person: Cody (DaRipper)" lore-canon note, `scripts/package_release.py`'s release-notes URL)
+  turned up. No real API keys, account IDs, or non-localhost IPs found anywhere
+  (`AIza…`/`sk-…`/`ya29.…`-shaped strings: zero matches).
+- **Broken or fragile security/permission gates (beyond finding #2 above):** re-verified
+  `config.py`'s `jwt_algorithm = "HS256"` (no `alg:none` acceptance risk — `jwt.decode` always
+  passes an explicit `algorithms=[...]` allowlist at every call site checked:
+  `routes_lobby.py:150,175,200`, `api/deps.py`, `ws_session.py`). No literal password piped into a
+  shell command anywhere (`grep -rn "os.system\|subprocess" src/storyforge` turned up no
+  credential-bearing invocations). No near-miss regex used for auth/security decisions anywhere in
+  `src/storyforge` (the only compiled regex in the whole backend is dice-notation parsing in
+  `encounters/enemies.py:33`, unrelated to security).
+- **Silent `except: pass` / swallowed errors (beyond finding #2 above):** enumerated all 45
+  `except` blocks in `src/storyforge`. The ~20 bare `except Exception:` blocks in
+  `routes_npc.py` (one per NPC dialogue call) and the one in `routes_action.py:53` all fall back to
+  deterministic flavor text when `narrate_npc`/`narrator.narrate_movement` raises — traced into
+  `ai/client.py:51,101`, which already logs a `logger.warning`/`logger.error` before the exception
+  propagates, so these aren't fully silent (the underlying Gemini failure is logged once at the
+  client layer even though the route-level catch itself adds no additional context). The
+  `except (IndexError, KeyError): pass` in `state_manager.py:593` and `except Exception: pass` at
+  `state_manager.py:111` are both narrow, cosmetic grid-cleanup paths (clearing a stale
+  `occupant_id`) with no gameplay-correctness impact if skipped. `launcher.py:53-54`
+  (`except KeyboardInterrupt: pass`) is a normal Ctrl-C exit path.
+- **CI that doesn't actually test anything:** see finding #3 above (confirmed, not a "none found"
+  item — listed here only to make explicit this category was checked, in case of any ambiguity).
 
 ## 04 — Strengths
+
+1. **`core/validators.py:sanitize()` — "reject, don't repair" is a stated design philosophy with a
+   concrete anti-exploit mechanism behind it, not just a generic input-bounds check.** The module
+   docstring explicitly reasons about *why*: "Repairing (clamping HP to max, rounding teleports to
+   nearest legal cell) creates magic the AI then learns to exploit. Hard NO is teachable; soft maybe
+   is gameable." That philosophy is then backed by a specific, non-obvious number:
+   `_MAX_HP_DELTA_PER_TURN = 8` (`validators.py:30`) caps how much HP any single AI-proposed diff can
+   move a character, independent of the `hp_current > hp_max` bound — closing the specific "AI
+   narrates a healing fountain, silently grants +1000 HP" failure mode that a max-only clamp would
+   still allow (a clamp would just cap it at `hp_max`, still fully healing on demand). The lazy
+   version of this function would `min(value, hp_max)` and call it done; this one refuses anything
+   that moves HP too far in either direction in one turn, and rejects the whole field rather than
+   coercing it into range. `tests/test_validators.py::test_position_stripped_but_hp_passes` also
+   specifically tests the partial-rejection case (one field in a diff is illegal, a sibling field in
+   the same diff is legal) — the harder, more failure-prone path to get right versus testing only
+   fully-valid or fully-invalid diffs.
+
+2. **`core/character_factory.py:build_character()` enforces the standard-array constraint
+   server-side, at the one construction chokepoint, not just as an optional helper.**
+   `is_valid_standard_array()` (`character_factory.py:585`) checks that submitted ability scores are
+   exactly a permutation of `[15,14,13,12,10,8]` — but the important part isn't the check itself, it's
+   that `build_character()` calls it and raises before doing anything else (`character_factory.py:625`),
+   so there is no code path that constructs a `CharacterSheet` from client-submitted abilities without
+   going through this gate. Given that `routes_npc.py`'s Kodrik-repair bug (stage 3, finding #1) shows
+   this codebase does sometimes trust client-submitted numbers uncritically, this is a concrete
+   counterexample proving the "server is authoritative over client-claimed values" discipline exists
+   and is enforced correctly elsewhere — the inconsistency is a real bug, but it isn't from not
+   knowing the right pattern.
+
+3. **`encounters/shopkeeper_jon.py:buy_item()` is the correct version of the exact pattern
+   `routes_npc.py`'s Kodrik repair endpoint gets wrong.** It reads the authoritative
+   `character.silver` server-side (`shopkeeper_jon.py:295`, not a client-submitted
+   `silver_available` field), rejects the purchase with an in-character message if insufficient, and
+   on success returns a real `StateDiff` that decrements `character.silver` and adds the item
+   (`shopkeeper_jon.py:303-306`) for the caller to run through `apply_diff()`. Worth citing precisely
+   because it's the sibling implementation to the bug stage 3 flagged — the fix for the Kodrik repair
+   endpoint isn't a new pattern to invent, it's copying what Jon's shop already does correctly one
+   file over.
+
+4. **`core/state_manager.py:_commit()` — the write-order is deliberately sequenced and the
+   docstring says why, rather than firing persistence and broadcast in whatever order was
+   convenient.** `_commit()` (`state_manager.py:642-657`) always does, in this exact order: bump
+   `revision` → `snapshot.save()` to disk → `event_bus.publish()`. The comment spells out the
+   reasoning: "Persist to disk (so crashes after publish still recover)... Publish to bus (subscribers
+   fire after disk is durable)." The lazier, equally-easy-to-write alternative — publish first, save
+   after, since nothing else forces an order — would mean a crash between publish and save leaves
+   WebSocket clients holding a state update that was never actually durable, silently diverging from
+   what a reloading client would see. Sequencing it the other way costs nothing and closes that gap.
+
+5. **`core/state_manager.py:_do_interact()` quietly handles an old save-file format without
+   breaking on it.** Lines `558-561` strip a legacy `"npc_"` prefix from `cell.occupant_id` before
+   looking it up in `state.npcs` ("occupant_id may carry an `npc_` prefix in old saves"). This is the
+   shape of a fix for a real, previously-shipped data format change — the obvious lazy fix would be a
+   one-time migration script or just breaking old campaign saves; instead the lookup itself tolerates
+   both formats permanently, so old `state.json` files from before whatever refactor changed the
+   occupant-id convention keep working without a separate migration step anyone has to remember to run.
+
+6. **`ai/client.py:GeminiClient.generate_text()`/`generate_structured()` retry loop distinguishes
+   "will retry" from "giving up" and never swallows the final failure.** Both methods share the same
+   shape: 3 attempts with increasing backoff (`0.5s, 1.0s, 2.0s`), `logger.warning` on retryable
+   attempts vs. `logger.error` on the last one, and critically — after exhausting `max_attempts` — they
+   raise `RuntimeError(...) from last_exc` rather than returning `None`/an empty response and letting
+   the caller silently proceed with degraded state. A less careful version of this would either retry
+   forever, or catch-and-continue with a default value on final failure the way several downstream
+   `routes_npc.py` call sites do for *dialogue* fallback (which is a reasonable, deliberate choice
+   there) — here, at the client layer, failure is surfaced loudly with the causal chain intact
+   (`from last_exc`), which is the correct place to fail loud since every caller up the stack decides
+   independently whether a Gemini failure should be user-visible or masked with flavor text.
+
+Not manufacturing a sixth or seventh entry beyond this — the rest of the codebase (routes, NPC
+dialogue branching, frontend rendering) is competent CRUD-shaped code without another instance of
+this same "a lazier author would have done X, this one visibly chose not to" quality; the five above
+are the genuine standouts.
+
+## 05 — Critic Pass
 (pending)
 
 ## 05 — Critic Pass
