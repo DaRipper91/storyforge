@@ -32,3 +32,7 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+## 2025-02-24 - Path Traversal in File/Campaign Loading
+**Vulnerability:** Path traversal in `load_campaign` allowed users to provide a `campaign_id` like `../other_folder` which would resolve to a sibling directory while still technically passing the `is_relative_to` check if they navigated back up and down effectively inside the base directory logic, or if they navigated to a valid folder.
+**Learning:** Checking if a resolved path is relative to a base directory (`campaign_dir.is_relative_to(base_dir)`) is insufficient if the user input itself contains traversal characters, as it can still be tricked or lead to sibling directory access.
+**Prevention:** Explicitly reject path traversal characters (`/`, `\`, `..`) in user-provided identifiers before performing any path resolution.

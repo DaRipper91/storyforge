@@ -80,6 +80,9 @@ async def new_campaign(request: Request):
 
 @router.post("/campaigns/load")
 async def load_campaign(body: LoadCampaignRequest, request: Request):
+    if "/" in body.campaign_id or "\\" in body.campaign_id or ".." in body.campaign_id:
+        raise HTTPException(status_code=400, detail="Invalid campaign_id: characters not allowed.")
+
     base_dir = settings.campaign_path.parent.resolve()
     campaign_dir = (base_dir / body.campaign_id).resolve()
 
