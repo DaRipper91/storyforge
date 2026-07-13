@@ -727,6 +727,7 @@ export class GridCanvas {
 
   _renderCursor() {
     if (!this.state) {
+      if (this._cursorAnim) this._cursorAnim.stop();
       this.cursorLayer.hide();
       return;
     }
