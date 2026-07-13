@@ -306,12 +306,19 @@ body[data-phase="saves"] #game-view { display: none; }
   transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
 }
 
+.save-card:focus { outline: none; }
 .save-card:hover,
-.save-card.focused {
+.save-card.focused,
+.save-card:focus-visible {
   border-color: var(--ink-gilded);
   box-shadow: var(--glow-gold);
   transform: translateY(-2px);
   background: rgba(255, 245, 220, 0.8);
+}
+.save-card.focused,
+.save-card:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .save-title {
@@ -427,10 +434,17 @@ body[data-phase="saves"] #game-view { display: none; }
   gap: 0.2rem;
 }
 
+.option-card:focus { outline: none; }
 .option-card:hover,
-.option-card.focused {
+.option-card.focused,
+.option-card:focus-visible {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
+}
+.option-card.focused,
+.option-card:focus-visible {
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 
 .option-card.selected {
@@ -489,11 +503,18 @@ body[data-phase="saves"] #game-view { display: none; }
 .era-card--before .era-subtitle { color: #7a5200; }
 .era-card--before .era-detail   { color: #8b6914; }
 
+.era-card--before:focus { outline: none; }
 .era-card--before:hover,
-.era-card--before.focused {
+.era-card--before.focused,
+.era-card--before:focus-visible {
   border-color: #e0b030;
   box-shadow: 0 0 18px rgba(220, 170, 30, 0.55);
   background: rgba(255, 248, 200, 0.95);
+}
+.era-card--before.focused,
+.era-card--before:focus-visible {
+  outline: 2px solid #e0b030;
+  outline-offset: 2px;
 }
 .era-card--before.selected {
   border-color: #e0b030;
@@ -513,11 +534,18 @@ body[data-phase="saves"] #game-view { display: none; }
 .era-card--after .flavor         { color: #c8b0a0; opacity: 1; }
 .era-card--after .era-detail     { color: #a07060; }
 
+.era-card--after:focus { outline: none; }
 .era-card--after:hover,
-.era-card--after.focused {
+.era-card--after.focused,
+.era-card--after:focus-visible {
   border-color: #c0392b;
   box-shadow: 0 0 18px rgba(180, 40, 20, 0.6);
   background: rgba(40, 8, 8, 0.92);
+}
+.era-card--after.focused,
+.era-card--after:focus-visible {
+  outline: 2px solid #c0392b;
+  outline-offset: 2px;
 }
 .era-card--after.selected {
   border-color: #c0392b;
@@ -871,9 +899,12 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   white-space: nowrap;
 }
-.jon-item-buy:hover { filter: brightness(1.1); }
+.jon-item-buy:focus { outline: none; }
+.jon-item-buy:hover,
 .jon-item-buy:focus-visible {
   filter: brightness(1.1);
+}
+.jon-item-buy:focus-visible {
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
 }
@@ -899,6 +930,7 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
+.escape-btn:focus { outline: none; }
 .escape-btn:hover,
 .escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
@@ -946,7 +978,11 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
 }
-.btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:focus { outline: none; }
+.btn-danger:hover,
+.btn-danger:focus-visible {
+  background: rgba(157,34,53,0.2) !important;
+}
 .btn-danger:focus-visible {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
@@ -1305,6 +1341,10 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
 }
+.samael-consult-btns .escape-btn:focus-visible {
+  outline: 2px solid #9b4dca;
+  outline-offset: 2px;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    Madame Haylie overlay
@@ -1395,12 +1435,20 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
+.keeva-action-btns .escape-btn:focus-visible {
+  outline: 2px solid #daa520;
+  outline-offset: 2px;
+}
 
 .keeva-btn-risky:hover,
 .keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
+}
+.keeva-btn-risky:focus-visible {
+  outline: 2px solid #cc2222;
+  outline-offset: 2px;
 }
 
 
