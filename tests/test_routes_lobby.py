@@ -160,6 +160,7 @@ async def test_full_character_creation(client):
 
     payload = {
         "slot_index": 0,
+        "controller_id": "creator_01",
         "name": "Zyra",
         "race": "voidwraith",
         "evolution_state": "mimic",
@@ -231,6 +232,7 @@ async def test_character_creation_requires_creation_phase(client):
 
     payload = {
         "slot_index": 0,
+        "controller_id": "ctrl_01",
         "name": "Test",
         "race": "voidwraith",
         "evolution_state": "mimic",
@@ -254,6 +256,7 @@ async def test_character_creation_slot_must_be_claimed(client):
 
     payload = {
         "slot_index": 1,  # slot 1 was never claimed
+        "controller_id": "creator_01",
         "name": "Orphan",
         "race": "voidwraith",
         "evolution_state": "mimic",
