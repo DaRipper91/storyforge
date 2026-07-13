@@ -103,6 +103,9 @@ body {
   border-color: var(--ink-gilded);
   box-shadow: var(--glow-gold);
   transform: scale(1.05);
+}
+
+.portrait:focus {
   outline: none;
 }
 
@@ -347,6 +350,7 @@ body {
 }
 
 .btn:hover { transform: translateY(-2px); box-shadow: var(--glow-gold); }
+.btn:focus { outline: none; }
 .btn:focus-visible {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
