@@ -286,6 +286,7 @@ class LobbySlot(BaseModel):
 class CharacterCreationRequest(BaseModel):
     """POST body for /api/character/create."""
     slot_index: int = Field(ge=0, le=3)
+    controller_id: str | None = Field(default=None, min_length=1, max_length=200)
     name: str = Field(min_length=1, max_length=24)
     race: Race
     evolution_state: EvolutionaryState

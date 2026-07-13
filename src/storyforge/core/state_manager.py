@@ -364,7 +364,7 @@ class StateManager:
             raise StateError(f"no slot held by controller {controller_id}")
 
 
-    async def create_character(self, req: CharacterCreationRequest) -> dict:
+    async def create_character(self, req: CharacterCreationRequest, controller_id: str) -> dict:
         """
         Finalize a slot into a real CharacterSheet.
         """
@@ -381,6 +381,11 @@ class StateManager:
                     f"slot {req.slot_index} is {slot.status.value}, cannot create"
                 )
             
+            if slot.controller_id != controller_id:
+                raise StateError(
+                    f"controller {controller_id} cannot create character for slot {req.slot_index} owned by {slot.controller_id}"
+                )
+
             # Generate a unique character ID.
             existing_ids = set(self._state.characters.keys())
             char_id = generate_char_id(req.name, existing_ids)

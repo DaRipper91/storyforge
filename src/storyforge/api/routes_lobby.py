@@ -24,6 +24,25 @@ from storyforge.core.state_manager import StateError, StateManager
 
 router = APIRouter(prefix="/api", tags=["lobby"])
 
+def _get_controller_id(req_controller_id: str | None, request: Request | None) -> str:
+    """Safely extracts and validates controller_id."""
+    token = request.cookies.get("storyforge_session") if request else None
+
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            return f"google::{payload['sub']}"
+        except Exception:
+            pass
+
+    if req_controller_id and req_controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated controller_id")
+
+    if not req_controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
+    return req_controller_id
+
 
 # ───────────────────────── Request models ─────────────────────────
 
@@ -143,20 +162,7 @@ async def join_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    # Use Google ID if available, else fallback to provided controller_id (e.g. guest/local)
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-    
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = _get_controller_id(req.controller_id, request)
     try:
         return await state.claim_slot(controller_id=controller_id)
     except StateError as exc:
@@ -169,19 +175,7 @@ async def leave_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = _get_controller_id(req.controller_id, request)
     try:
         return await state.release_slot(controller_id=controller_id)
     except StateError as exc:
@@ -194,19 +188,7 @@ async def update_name(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = _get_controller_id(req.controller_id, request)
     try:
         return await state.update_slot_name(
             slot_index=req.slot_index,
@@ -221,10 +203,12 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    controller_id = _get_controller_id(req.controller_id, request)
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
@@ -244,9 +228,11 @@ async def set_phase(
 async def create_character(
     req: CharacterCreationRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    controller_id = _get_controller_id(req.controller_id, request)
     try:
-        return await state.create_character(req)
+        return await state.create_character(req, controller_id)
     except (StateError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

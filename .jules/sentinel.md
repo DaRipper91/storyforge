@@ -32,3 +32,8 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+
+## 2024-07-13 - Prevent IDOR on Character Creation and Draft Saving
+**Vulnerability:** The `/api/lobby/save_draft` and `/api/character/create` endpoints derived `controller_id` implicitly or trustingly from client requests, failing to verify slot ownership. An unauthenticated or unauthorized user could overwrite drafts or finalize characters in slots they did not claim.
+**Learning:** In a mixed-auth system (supporting both guest IDs and authenticated JWTs), helper functions must strictly validate the `controller_id` to prevent spoofing (e.g., rejecting guest IDs prefixed with `google::`). Route handlers must consistently use this validation and explicitly verify it against state ownership (e.g., `slot.controller_id == controller_id`).
+**Prevention:** Centralize controller ID extraction into a single verified utility (`_get_controller_id`). Always pass the validated ID deep into state mutators (`state.create_character`) to enforce resource ownership checks before executing destructive operations.
