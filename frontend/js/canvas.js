@@ -154,7 +154,6 @@ export class GridCanvas {
         }
       }
     }, this.lightLayer);
-    this._lightingAnim.start();
   }
 
   _startAmbientParticles() {
@@ -198,7 +197,6 @@ export class GridCanvas {
         }
       }
     }, this.fxLayer);
-    this._particleAnim.start();
   }
 
   spawnFloatingText(coord, text, color = "#ff4444") {
@@ -285,6 +283,17 @@ export class GridCanvas {
     this._fitAndRedraw();
     if (firstTime) {
       this._followCursor(true);
+    }
+
+    // ⚡ Bolt: Pause ambient animations when grid is inactive to save CPU cycles
+    if (this.state) {
+      if (this._lightingAnim) this._lightingAnim.start();
+      if (this._particleAnim) this._particleAnim.start();
+      if (this._cursorAnim) this._cursorAnim.start();
+    } else {
+      if (this._lightingAnim) this._lightingAnim.stop();
+      if (this._particleAnim) this._particleAnim.stop();
+      if (this._cursorAnim) this._cursorAnim.stop();
     }
   }
 
@@ -711,6 +720,11 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            // ⚡ Bolt: Prevent zombie animations if token node is destroyed
+            if (!diamond.parent) {
+              pulse.stop();
+              return;
+            }
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
