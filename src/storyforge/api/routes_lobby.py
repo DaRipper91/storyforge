@@ -75,6 +75,30 @@ class SaveDraftRequest(BaseModel):
 
 # ───────────────────────── Endpoints ─────────────────────────
 
+def resolve_controller_id(req_controller_id: str | None, request: Request | None) -> str:
+    """Resolve controller_id from session token, preventing unauthenticated spoofing."""
+    is_authenticated = False
+    controller_id = req_controller_id
+
+    if request:
+        token = request.cookies.get("storyforge_session")
+        if token:
+            try:
+                payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+                controller_id = f"google::{payload['sub']}"
+                is_authenticated = True
+            except Exception:
+                pass
+
+    if not is_authenticated and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated controller IDs")
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
+    return controller_id
+
+
 @router.get("/lobby/catalog")
 async def get_catalog() -> dict:
     """Static reference data for the creation UI. Cached client-side."""
@@ -143,20 +167,7 @@ async def join_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    # Use Google ID if available, else fallback to provided controller_id (e.g. guest/local)
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-    
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = resolve_controller_id(req.controller_id, request)
     try:
         return await state.claim_slot(controller_id=controller_id)
     except StateError as exc:
@@ -169,19 +180,7 @@ async def leave_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = resolve_controller_id(req.controller_id, request)
     try:
         return await state.release_slot(controller_id=controller_id)
     except StateError as exc:
@@ -194,19 +193,7 @@ async def update_name(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
-
+    controller_id = resolve_controller_id(req.controller_id, request)
     try:
         return await state.update_slot_name(
             slot_index=req.slot_index,
@@ -221,10 +208,12 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    controller_id = resolve_controller_id(req.controller_id, request)
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
