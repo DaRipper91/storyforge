@@ -209,6 +209,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .slot-name-input:focus {
   outline: none;
+}
+
+.slot-name-input:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
   box-shadow: 0 0 5px var(--ink-gilded);
 }
 
@@ -306,12 +311,25 @@ body[data-phase="saves"] #game-view { display: none; }
   transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
 }
 
+.save-card:focus {
+  outline: none;
+}
+
 .save-card:hover,
 .save-card.focused {
   border-color: var(--ink-gilded);
   box-shadow: var(--glow-gold);
   transform: translateY(-2px);
   background: rgba(255, 245, 220, 0.8);
+}
+
+.save-card:focus-visible {
+  border-color: var(--ink-gilded);
+  box-shadow: var(--glow-gold);
+  transform: translateY(-2px);
+  background: rgba(255, 245, 220, 0.8);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 
 .save-title {
@@ -427,10 +445,21 @@ body[data-phase="saves"] #game-view { display: none; }
   gap: 0.2rem;
 }
 
+.option-card:focus {
+  outline: none;
+}
+
 .option-card:hover,
 .option-card.focused {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
+}
+
+.option-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 
 .option-card.selected {
@@ -479,6 +508,10 @@ body[data-phase="saves"] #game-view { display: none; }
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
 }
 
+.era-card:focus {
+  outline: none;
+}
+
 /* Before — warm civilized gold */
 .era-card--before {
   border-color: #c9a84c;
@@ -494,6 +527,14 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #e0b030;
   box-shadow: 0 0 18px rgba(220, 170, 30, 0.55);
   background: rgba(255, 248, 200, 0.95);
+}
+
+.era-card--before:focus-visible {
+  border-color: #e0b030;
+  box-shadow: 0 0 18px rgba(220, 170, 30, 0.55);
+  background: rgba(255, 248, 200, 0.95);
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
 }
 .era-card--before.selected {
   border-color: #e0b030;
@@ -518,6 +559,14 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #c0392b;
   box-shadow: 0 0 18px rgba(180, 40, 20, 0.6);
   background: rgba(40, 8, 8, 0.92);
+}
+
+.era-card--after:focus-visible {
+  border-color: #c0392b;
+  box-shadow: 0 0 18px rgba(180, 40, 20, 0.6);
+  background: rgba(40, 8, 8, 0.92);
+  outline: 2px solid var(--ink-gilded);
+  outline-offset: 2px;
 }
 .era-card--after.selected {
   border-color: #c0392b;
@@ -629,6 +678,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .name-input:focus {
   outline: none;
+}
+
+.name-input:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
   box-shadow: var(--glow-gold);
 }
 
@@ -1697,6 +1751,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .identity-text-input:focus {
   outline: none;
+}
+
+.identity-text-input:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
   border-color: var(--ink-gilded);
 }
 
@@ -1785,6 +1844,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .story-textarea:focus {
   outline: none;
+}
+
+.story-textarea:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
   border-color: var(--ink-gilded);
 }
 
@@ -1800,6 +1864,11 @@ body[data-phase="saves"] #game-view { display: none; }
 
 .story-text-input:focus {
   outline: none;
+}
+
+.story-text-input:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
   border-color: var(--ink-gilded);
 }
 
