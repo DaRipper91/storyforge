@@ -265,11 +265,19 @@ body[data-phase="saves"] #game-view { display: none; }
   outline: none;
 }
 
+.menu-options button:hover,
 .menu-options button:focus-visible {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
   box-shadow: var(--glow-gold);
+}
+
+.menu-options button:focus {
+  outline: none;
+}
+
+.menu-options button:focus-visible {
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
 }
@@ -871,9 +879,10 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   white-space: nowrap;
 }
-.jon-item-buy:hover { filter: brightness(1.1); }
+.jon-item-buy:hover,
+.jon-item-buy:focus-visible { filter: brightness(1.1); }
+.jon-item-buy:focus { outline: none; }
 .jon-item-buy:focus-visible {
-  filter: brightness(1.1);
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
 }
@@ -903,6 +912,9 @@ body[data-phase="saves"] #game-view { display: none; }
 .escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
+}
+.escape-btn:focus {
+  outline: none;
 }
 .escape-btn:focus-visible {
   outline: 2px solid var(--ink-gilded);
@@ -946,10 +958,9 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
 }
-.btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:hover,
+.btn-danger:focus-visible { background: rgba(157,34,53,0.2) !important; }
 .btn-danger:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: var(--glow-gold);
   outline: 2px solid var(--ink-crimson);
   outline-offset: 2px;
 }
