@@ -711,6 +711,7 @@ export class GridCanvas {
         // Idle pulse animation for interactable NPCs
         if (npc.interactable) {
           const pulse = new Konva.Animation((frame) => {
+            if (!diamond.parent) { pulse.stop(); return; }
             const scale = 1 + 0.06 * Math.sin(frame.time / 600);
             diamond.scaleX(scale);
             diamond.scaleY(scale);
@@ -727,6 +728,7 @@ export class GridCanvas {
 
   _renderCursor() {
     if (!this.state) {
+      if (this._cursorAnim) this._cursorAnim.stop();
       this.cursorLayer.hide();
       return;
     }
