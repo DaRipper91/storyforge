@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-07-28 - Stop Detached Konva Animations
+**Learning:** Reusing `Konva.Animation` instances or attaching them to objects that get dynamically created/destroyed (like NPC tokens) can cause memory leaks and CPU waste if the animations aren't explicitly stopped when the nodes are destroyed or hidden. The animations continue running in the background, consuming CPU resources.
+**Action:** Always call `.stop()` on `Konva.Animation` instances when the associated graphics layer is hidden or when dynamically generated components are unmounted. Check for node destruction (e.g. `!node.parent`) inside the animation loop itself for nodes that may be dynamically destroyed.
