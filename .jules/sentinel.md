@@ -32,3 +32,8 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+
+## 2024-07-14 - [Add Rate Limiting to Auth Endpoints]
+**Vulnerability:** Missing rate limiting on sensitive authentication endpoints (`/desktop_login` and `/google`).
+**Learning:** Authentication endpoints are prime targets for brute-force attacks and credential stuffing if left unrestricted.
+**Prevention:** Always implement rate limiting on endpoints handling authentication or sensitive operations to mitigate automated abuse.
