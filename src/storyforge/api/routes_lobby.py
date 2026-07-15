@@ -73,6 +73,30 @@ class SaveDraftRequest(BaseModel):
     keepsake_name: str | None = None
 
 
+def _resolve_controller_id(provided_id: str | None, request: Request | None) -> str | None:
+    controller_id = provided_id
+    if request:
+        token = request.cookies.get("storyforge_session")
+        if token:
+            try:
+                payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+                controller_id = f"google::{payload['sub']}"
+            except Exception:
+                pass
+
+    if controller_id and controller_id.startswith("google::"):
+        if not request or not request.cookies.get("storyforge_session"):
+            raise HTTPException(status_code=403, detail="Spoofing authenticated users is not allowed.")
+        try:
+             payload = jwt.decode(request.cookies.get("storyforge_session"), settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+             if controller_id != f"google::{payload['sub']}":
+                 raise HTTPException(status_code=403, detail="Spoofing authenticated users is not allowed.")
+        except Exception:
+             raise HTTPException(status_code=403, detail="Spoofing authenticated users is not allowed.")
+
+    return controller_id
+
+
 # ───────────────────────── Endpoints ─────────────────────────
 
 @router.get("/lobby/catalog")
@@ -143,16 +167,7 @@ async def join_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    # Use Google ID if available, else fallback to provided controller_id (e.g. guest/local)
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-    
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
+    controller_id = _resolve_controller_id(req.controller_id, request)
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -169,15 +184,7 @@ async def leave_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
+    controller_id = _resolve_controller_id(req.controller_id, request)
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -194,15 +201,7 @@ async def update_name(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
+    controller_id = _resolve_controller_id(req.controller_id, request)
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -221,10 +220,12 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    controller_id = _resolve_controller_id(req.controller_id, request)
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
