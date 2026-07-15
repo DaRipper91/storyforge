@@ -158,43 +158,58 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    const MAX_PARTICLES = 30;
+    this._ambientParticles = [];
+
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      const p = new Konva.Circle({
+        radius: Math.random() * 2 + 1,
+        fill: '#ffaa00',
+        opacity: 0,
+        shadowColor: '#ff0000',
+        shadowBlur: 5,
+        listening: false,
+      });
+      p.driftX = 0;
+      p.speedY = 0;
+      p.life = 0;
+      p.active = false;
+      this.fxLayer.add(p);
+      this._ambientParticles.push(p);
+    }
+
     this._particleAnim = new Konva.Animation((frame) => {
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
-        const sx = this.stage.x();
-        const sy = this.stage.y();
-        const sw = this.stage.width();
-        const sh = this.stage.height();
+        const p = this._ambientParticles.find(part => !part.active);
+        if (p) {
+          const sx = this.stage.x();
+          const sy = this.stage.y();
+          const sw = this.stage.width();
+          const sh = this.stage.height();
 
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+          p.x((Math.random() * sw) - sx);
+          p.y((sh + 10) - sy);
+          p.opacity(0.6);
+          p.driftX = (Math.random() - 0.5) * 1.5;
+          p.speedY = Math.random() * 0.5 + 0.5;
+          p.life = 0;
+          p.active = true;
+        }
       }
 
       // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
-          node.y(node.y() - node.speedY);
-          node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
-          node.life++;
-          node.opacity(node.opacity() - 0.002);
-          
-          if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
-          }
+      for (const p of this._ambientParticles) {
+        if (!p.active) continue;
+
+        p.y(p.y() - p.speedY);
+        p.x(p.x() + p.driftX + Math.sin(p.life / 20) * 0.5);
+        p.life++;
+        p.opacity(p.opacity() - 0.002);
+
+        if (p.opacity() <= 0 || p.y() < -10) {
+          p.active = false;
+          p.opacity(0);
         }
       }
     }, this.fxLayer);
