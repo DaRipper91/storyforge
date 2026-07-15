@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-07-28 - Object Pooling for Canvas Effects
+**Learning:** Querying layer children dynamically (`getChildren()`) in high-frequency animation loops causes severe GC churn when creating/destroying nodes, and can inadvertently mutate other mixed-effect nodes (like dust puffs) in the same layer.
+**Action:** Always use pre-allocated Object Pools and maintain a dedicated array of references for high-frequency graphical particles, toggling an `active` state and opacity instead of destroying nodes.
