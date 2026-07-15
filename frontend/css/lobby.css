@@ -904,6 +904,9 @@ body[data-phase="saves"] #game-view { display: none; }
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
+.escape-btn:focus {
+  outline: none;
+}
 .escape-btn:focus-visible {
   outline: 2px solid var(--ink-gilded);
   outline-offset: 2px;
@@ -946,10 +949,16 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
 }
-.btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:hover,
 .btn-danger:focus-visible {
+  background: rgba(157,34,53,0.2) !important;
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
+}
+.btn-danger:focus {
+  outline: none;
+}
+.btn-danger:focus-visible {
   outline: 2px solid var(--ink-crimson);
   outline-offset: 2px;
 }
@@ -1305,6 +1314,13 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
 }
+.samael-consult-btns .escape-btn:focus {
+  outline: none;
+}
+.samael-consult-btns .escape-btn:focus-visible {
+  outline: 2px solid #9b4dca;
+  outline-offset: 2px;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    Madame Haylie overlay
@@ -1395,12 +1411,26 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
+.keeva-action-btns .escape-btn:focus {
+  outline: none;
+}
+.keeva-action-btns .escape-btn:focus-visible {
+  outline: 2px solid #daa520;
+  outline-offset: 2px;
+}
 
 .keeva-btn-risky:hover,
 .keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
   color: #ffaaaa;
+}
+.keeva-btn-risky:focus {
+  outline: none;
+}
+.keeva-btn-risky:focus-visible {
+  outline: 2px solid #cc2222;
+  outline-offset: 2px;
 }
 
 
