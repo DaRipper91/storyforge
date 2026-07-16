@@ -32,3 +32,8 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+
+## 2026-06-25 - Prevent Authentication Spoofing in Mixed-Auth Endpoints
+**Vulnerability:** Several lobby endpoints used "mixed-auth" logic where the `controller_id` could be sourced either from a verified JWT or directly from the client's request payload if unauthenticated. An attacker could spoof an authenticated user by providing a payload like `{"controller_id": "google::12345"}` when they did not possess a valid JWT cookie.
+**Learning:** Pydantic validators (`@field_validator`) operate blindly on the raw request payload before endpoint logic runs. Attempting to block `google::` spoofing at the schema level broke the application for legitimate users whose frontend sent their true `google::` ID alongside their valid session cookie.
+**Prevention:** Validation for mixed-auth fields must happen *inside* the endpoint (or via a dependency) where context about the actual authentication state (like the presence of a valid JWT) is available to differentiate between a legitimate user explicitly sending their ID and an attacker attempting to spoof one.
