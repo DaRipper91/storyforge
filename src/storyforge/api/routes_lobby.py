@@ -147,12 +147,17 @@ async def join_lobby(
     token = request.cookies.get("storyforge_session")
     controller_id = req.controller_id
     
+    is_authenticated = False
     if token:
         try:
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
+            is_authenticated = True
         except Exception:
             pass
+
+    if not is_authenticated and req.controller_id and req.controller_id.startswith("google::"):
+        raise HTTPException(status_code=401, detail="Spoofing authenticated controllers is forbidden")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -172,12 +177,17 @@ async def leave_lobby(
     token = request.cookies.get("storyforge_session")
     controller_id = req.controller_id
 
+    is_authenticated = False
     if token:
         try:
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
+            is_authenticated = True
         except Exception:
             pass
+
+    if not is_authenticated and req.controller_id and req.controller_id.startswith("google::"):
+        raise HTTPException(status_code=401, detail="Spoofing authenticated controllers is forbidden")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -197,12 +207,17 @@ async def update_name(
     token = request.cookies.get("storyforge_session")
     controller_id = req.controller_id
 
+    is_authenticated = False
     if token:
         try:
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
+            is_authenticated = True
         except Exception:
             pass
+
+    if not is_authenticated and req.controller_id and req.controller_id.startswith("google::"):
+        raise HTTPException(status_code=401, detail="Spoofing authenticated controllers is forbidden")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -221,10 +236,29 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    token = request.cookies.get("storyforge_session")
+    controller_id = req.controller_id
+
+    is_authenticated = False
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            controller_id = f"google::{payload['sub']}"
+            is_authenticated = True
+        except Exception:
+            pass
+
+    if not is_authenticated and req.controller_id and req.controller_id.startswith("google::"):
+        raise HTTPException(status_code=401, detail="Spoofing authenticated controllers is forbidden")
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
