@@ -633,6 +633,7 @@ body[data-phase="saves"] #game-view { display: none; }
 }
 
 .name-prompt {
+  display: block;
   font-size: var(--fs-xl);
   margin: 0 0 var(--space-2) 0;
   text-align: center;
