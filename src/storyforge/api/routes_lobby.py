@@ -137,25 +137,33 @@ async def get_catalog() -> dict:
     }
 
 
+def _get_secure_controller_id(request: Request, req_controller_id: str | None) -> str:
+    token = request.cookies.get("storyforge_session")
+    controller_id = req_controller_id
+    
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            return f"google::{payload['sub']}"
+        except Exception:
+            pass
+
+    if controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Spoofed controller_id not allowed")
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
+    return controller_id
+
+
 @router.post("/lobby/join")
 async def join_lobby(
     req: JoinRequest,
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    # Use Google ID if available, else fallback to provided controller_id (e.g. guest/local)
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-    
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+    controller_id = _get_secure_controller_id(request, req.controller_id)
 
     try:
         return await state.claim_slot(controller_id=controller_id)
@@ -169,18 +177,7 @@ async def leave_lobby(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+    controller_id = _get_secure_controller_id(request, req.controller_id)
 
     try:
         return await state.release_slot(controller_id=controller_id)
@@ -194,18 +191,7 @@ async def update_name(
     state: StateManager = Depends(get_state_manager),
     request: Request = None,
 ) -> dict:
-    token = request.cookies.get("storyforge_session")
-    controller_id = req.controller_id
-
-    if token:
-        try:
-            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
-            controller_id = f"google::{payload['sub']}"
-        except Exception:
-            pass
-
-    if not controller_id:
-        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+    controller_id = _get_secure_controller_id(request, req.controller_id)
 
     try:
         return await state.update_slot_name(
@@ -221,10 +207,12 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    controller_id = _get_secure_controller_id(request, req.controller_id)
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
