@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-07-17 - Cache Static API Responses
+**Learning:** In FastAPI, endpoints that return large, static dictionaries generated through complex nested loops and dictionary comprehensions (like `/api/lobby/catalog`) can incur significant compute and memory allocation overhead on every request.
+**Action:** Extract the static data generation into a synchronous helper function and memoize it using `@functools.lru_cache(maxsize=1)` to compute the dictionary only once per application lifecycle, drastically reducing response time.
