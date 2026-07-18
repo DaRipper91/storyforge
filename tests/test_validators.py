@@ -207,7 +207,7 @@ def test_cell_update_in_bounds():
     """A cell update within the current room at a valid coordinate passes."""
     gs, _ = _exploration_state()
     room_id = gs.current_room_id
-    room = gs.rooms[room_id]
+    gs.rooms[room_id]
     # Use a cell that's guaranteed in-bounds.
     coord = Coord(x=1, y=1)
     new_cell = Cell(terrain=TerrainKind.FLOOR)

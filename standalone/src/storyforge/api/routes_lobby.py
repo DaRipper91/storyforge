@@ -9,7 +9,7 @@ Endpoints:
     GET  /api/lobby/catalog   — race + class definitions for the UI
 """
 from __future__ import annotations
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from storyforge.api.deps import get_state_manager

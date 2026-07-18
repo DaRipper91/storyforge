@@ -4,7 +4,6 @@ Run:
     uv run uvicorn storyforge.main:app --reload --host 127.0.0.1 --port 8765
 """
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles

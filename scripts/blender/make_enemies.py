@@ -457,8 +457,8 @@ def make_shadow():
     # Shadow floats — use Z axis for hover, same keyframe_insert approach
     ob.animation_data_create()
     oz = ob.location.z
-    ox, oy = ob.location.x, ob.location.y
-    rx, ry, rz = ob.rotation_euler.x, ob.rotation_euler.y, ob.rotation_euler.z
+    _ox, _oy = ob.location.x, ob.location.y
+    rx, _ry, _rz = ob.rotation_euler.x, ob.rotation_euler.y, ob.rotation_euler.z
 
     def kl(f, z): ob.location.z = z; ob.keyframe_insert(data_path='location', frame=f)
     def kr(f, ex): ob.rotation_euler.x = ex; ob.keyframe_insert(data_path='rotation_euler', frame=f)
