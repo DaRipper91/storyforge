@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import zipfile
 import shutil
 import requests
@@ -60,7 +59,7 @@ def download_and_install(asset, target_root="godot"):
             # We look for 'addons/' folder primarily.
             
             members = z.namelist()
-            has_addons = any("/addons/" in m or m.startswith("addons/") for m in members)
+            any("/addons/" in m or m.startswith("addons/") for m in members)
             
             for member in members:
                 # If the zip contains an 'addons' folder, we extract its contents into godot/addons/

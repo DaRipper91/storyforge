@@ -119,7 +119,7 @@ async def interact_entity(
             detail=f"actions require EXPLORATION phase, currently {state.current.phase.value}",
         )
     
-    char = state.get_character(action.actor_id)
+    state.get_character(action.actor_id)
     target_id = action.target_id
     
     # Check if target is an NPC

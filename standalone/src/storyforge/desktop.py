@@ -1,4 +1,3 @@
-import sys
 import threading
 import time
 import uvicorn
@@ -24,7 +23,7 @@ def main():
     time.sleep(1.5)
 
     # Create and start the webview window
-    window = webview.create_window(
+    webview.create_window(
         title="StoryForge",
         url="http://127.0.0.1:8765",
         width=1280,

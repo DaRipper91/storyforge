@@ -235,7 +235,7 @@ def _bg_mechanical(accent, seed):
 
 
 def _bg_humanoid(accent, seed):
-    rng = np.random.default_rng(seed)
+    np.random.default_rng(seed)
     arr = np.zeros((H, W, 4), dtype=np.uint8)
     # Dark stone base
     v = 20
@@ -305,8 +305,8 @@ def _draw_volumetric_sphere(img, cx, cy, r, base_col, highlight_col, shadow_col,
     
     # 2. Shading layer
     # Center light slightly offset
-    lx = cx + r * light_offset[0]
-    ly = cy + r * light_offset[1]
+    cx + r * light_offset[0]
+    cy + r * light_offset[1]
     
     # Create a gradient from highlight to shadow
     grad = _radial_gradient((int(r*4), int(r*4)), highlight_col, shadow_col, 
@@ -340,7 +340,7 @@ def _draw_volumetric_capsule(img, x0, y0, x1, y1, width, base_col, highlight_col
     
     # Directional shading (linear-ish)
     # We'll use a linear gradient perpendicular to the capsule direction
-    perp_x, perp_y = -dy/dist, dx/dist
+    _perp_x, _perp_y = -dy/dist, dx/dist
     
     # Simple volumetric look: darker at the edges, lighter near the "light side"
     # For now, just draw spheres at ends and a shaded rectangle in middle
@@ -359,7 +359,7 @@ def _composite_character(bg, silhouette_fn, cx, cy, base, accent, extra):
       2. 3D Volumetric Shading pass
       3. Rim lighting
     """
-    group = extra.get("group", "Humanoid")
+    extra.get("group", "Humanoid")
     
     # 1. Aura
     aura_r = extra.get("aura_r", 180)
@@ -373,8 +373,8 @@ def _composite_character(bg, silhouette_fn, cx, cy, base, accent, extra):
     
     char_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     
-    highlight = _lighten(base, 40)
-    shadow = _darken(base, 50)
+    _lighten(base, 40)
+    _darken(base, 50)
     
     # Wrap drawing in a function that uses our 3D helpers
     def v_ell(d, cx2, cy2, rx, ry, col, a=255, expand=0):
