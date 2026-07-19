@@ -349,7 +349,9 @@ async function handleServerEvent(msg) {
     if (active) inventory?.setCharacter(active);
     
     // Calculate new log entries
-    const previousLogLength = document.querySelectorAll("#narrative-log li").length;
+    // ⚡ Bolt: Replaced expensive O(N) DOM query (querySelectorAll) with O(1) property access (children.length).
+    // This removes a full DOM traversal on every state update, reducing GC pressure and micro-stutters.
+    const previousLogLength = els.narrativeLog.children.length;
     const newEntries = appState.narrative_log.slice(previousLogLength);
     
     for (const entry of newEntries) {
