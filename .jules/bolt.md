@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-06-25 - Object Pooling Prevents Shared Layer Mutation Bugs
+**Learning:** Using `layer.getChildren()` in an animation loop to update particles inadvertently catches other transient graphics (like dust puffs) placed on the same layer. Because these other nodes lack custom properties (e.g., `speedY`), it causes `NaN` position mutations and potential errors.
+**Action:** Use isolated Object Pools (a pre-allocated array of graphics) instead of iterating over `layer.getChildren()`. This eliminates GC churn AND safely decouples the update logic from the layer's global child list.
