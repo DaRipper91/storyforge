@@ -5,7 +5,6 @@ Run headless:  blender --background --python scripts/blender/convert_quaternius.
 
 import bpy
 import os
-import sys
 
 # ─── Mapping: source blend → dest filename (relative to assets/models/) ──────
 

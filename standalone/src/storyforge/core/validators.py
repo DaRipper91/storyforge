@@ -10,7 +10,6 @@ Returns a tuple of (sanitized_diff, rejections) where rejections is a
 list of human-readable strings to append to the narrative log.
 """
 from __future__ import annotations
-from copy import deepcopy
 
 from storyforge.core import grid
 from storyforge.core.models import (

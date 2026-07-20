@@ -158,6 +158,25 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    // ⚡ Bolt Optimization: Use an object pool for ambient particles to prevent GC churn
+    // and avoid unintended mutations on other 'Circle' nodes in fxLayer (like dust puffs).
+    const MAX_PARTICLES = 40;
+    this._particlePool = [];
+
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      const p = new Konva.Circle({
+        radius: Math.random() * 2 + 1,
+        fill: '#ffaa00',
+        opacity: 0, // start hidden
+        shadowColor: '#ff0000',
+        shadowBlur: 5,
+        listening: false, // Performance boost
+      });
+      p.isActive = false;
+      this._particlePool.push(p);
+      this.fxLayer.add(p);
+    }
+
     this._particleAnim = new Konva.Animation((frame) => {
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
@@ -166,34 +185,33 @@ export class GridCanvas {
         const sw = this.stage.width();
         const sh = this.stage.height();
 
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+        // Find an inactive particle in the pool
+        for (let i = 0; i < MAX_PARTICLES; i++) {
+          const p = this._particlePool[i];
+          if (!p.isActive) {
+            p.isActive = true;
+            p.position({ x: (Math.random() * sw) - sx, y: (sh + 10) - sy });
+            p.opacity(0.6);
+            p.driftX = (Math.random() - 0.5) * 1.5;
+            p.speedY = Math.random() * 0.5 + 0.5;
+            p.life = 0;
+            break;
+          }
+        }
       }
 
-      // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
-          node.y(node.y() - node.speedY);
-          node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
-          node.life++;
-          node.opacity(node.opacity() - 0.002);
+      // Update active particles
+      for (let i = 0; i < MAX_PARTICLES; i++) {
+        const p = this._particlePool[i];
+        if (p.isActive) {
+          p.y(p.y() - p.speedY);
+          p.x(p.x() + p.driftX + Math.sin(p.life / 20) * 0.5);
+          p.life++;
+          p.opacity(p.opacity() - 0.002);
           
-          if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
+          if (p.opacity() <= 0 || p.y() < -10) {
+            p.isActive = false;
+            p.opacity(0); // hide it
           }
         }
       }
