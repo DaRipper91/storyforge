@@ -265,11 +265,17 @@ body[data-phase="saves"] #game-view { display: none; }
   outline: none;
 }
 
+.menu-options button:focus {
+  outline: none;
+}
+.menu-options button:hover,
 .menu-options button:focus-visible {
   background: var(--ink-gilded);
   color: var(--ink-midnight);
   transform: translateY(-3px);
   box-shadow: var(--glow-gold);
+}
+.menu-options button:focus-visible {
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
 }
@@ -899,6 +905,9 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
+.escape-btn:focus {
+  outline: none;
+}
 .escape-btn:hover,
 .escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
@@ -945,6 +954,9 @@ body[data-phase="saves"] #game-view { display: none; }
 .btn-danger {
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
+}
+.btn-danger:focus {
+  outline: none;
 }
 .btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
 .btn-danger:focus-visible {
