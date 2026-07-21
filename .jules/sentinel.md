@@ -32,3 +32,7 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+## 2024-05-27 - Flawed Exception Handling in Mixed-Auth Token Checks
+**Vulnerability:** An authorization bypass / spoofing vulnerability where unauthenticated users could act as authenticated users by providing a spoofed `controller_id` alongside a syntactically invalid JWT token.
+**Learning:** In Python, catching exceptions without explicitly resetting state can lead to variables remaining truthy despite failure. Specifically, `try: jwt.decode(token) except Exception: pass` leaves `token` as the truthy invalid string, which subsequently causes `if not token:` checks to fail and allows the bypass.
+**Prevention:** When validating tokens or security credentials in a `try...except` block, explicitly reset the credential variable (e.g., `token = None`) inside the `except` block so that subsequent failure checks evaluate correctly without relying on fallthrough.
