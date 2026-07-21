@@ -327,6 +327,10 @@ body {
   min-height: 8rem;
   user-select: text;     /* re-enable for input only */
 }
+#freeform-input:focus-visible {
+  border-color: var(--ink-gilded);
+  outline: none;
+}
 
 .modal-actions {
   display: flex;

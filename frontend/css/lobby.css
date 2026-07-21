@@ -1007,6 +1007,10 @@ body[data-phase="saves"] #game-view { display: none; }
 .settings-slider:hover::-webkit-slider-thumb {
   background: #e8c060;
 }
+.settings-slider:focus-visible {
+  outline: 2px solid var(--ink-midnight);
+  outline-offset: 2px;
+}
 
 /* ─────────────────────── Queen D.Anna Overlay ─────────────────────── */
 
