@@ -152,7 +152,10 @@ async def join_lobby(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated users")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -177,7 +180,10 @@ async def leave_lobby(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated users")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -202,7 +208,10 @@ async def update_name(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated users")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -221,10 +230,27 @@ async def update_name(
 async def save_draft(
     req: SaveDraftRequest,
     state: StateManager = Depends(get_state_manager),
+    request: Request = None,
 ) -> dict:
+    token = request.cookies.get("storyforge_session") if request else None
+    controller_id = req.controller_id
+
+    if token:
+        try:
+            payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+            controller_id = f"google::{payload['sub']}"
+        except Exception:
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated users")
+
+    if not controller_id:
+        raise HTTPException(status_code=401, detail="Authentication or controller_id required")
+
     patch = {k: v for k, v in req.model_dump().items() if k != "controller_id" and v is not None}
     try:
-        return await state.save_draft(controller_id=req.controller_id, patch=patch)
+        return await state.save_draft(controller_id=controller_id, patch=patch)
     except StateError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
