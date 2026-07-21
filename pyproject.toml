@@ -27,7 +27,7 @@ dev = [
     "httpx>=0.28",
     "ruff>=0.7",
     "pyinstaller>=6.10",
-    "pillow>=10.0",
+    "pillow>=12.3.0",
     "numpy>=2.4.6",
 ]
 
