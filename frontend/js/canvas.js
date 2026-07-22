@@ -158,6 +158,12 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    // ⚡ Bolt: Use a dedicated array for ambient particles instead of iterating over layer children.
+    // Iterating `this.fxLayer.getChildren()` during animation loops is dangerous because shared layers
+    // may contain mixed objects (like dust puffs) lacking expected custom properties (e.g., speedY),
+    // leading to NaN mutations.
+    this._ambientParticles = [];
+
     this._particleAnim = new Konva.Animation((frame) => {
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
@@ -174,6 +180,7 @@ export class GridCanvas {
           opacity: 0.6,
           shadowColor: '#ff0000',
           shadowBlur: 5,
+          listening: false, // ⚡ Bolt: Disable hit graph for background particles to improve performance
         });
         
         // Custom properties for drift
@@ -182,19 +189,20 @@ export class GridCanvas {
         p.life = 0;
         
         this.fxLayer.add(p);
+        this._ambientParticles.push(p);
       }
 
       // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
-          node.y(node.y() - node.speedY);
-          node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
-          node.life++;
-          node.opacity(node.opacity() - 0.002);
-          
-          if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
-          }
+      for (let i = this._ambientParticles.length - 1; i >= 0; i--) {
+        const node = this._ambientParticles[i];
+        node.y(node.y() - node.speedY);
+        node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
+        node.life++;
+        node.opacity(node.opacity() - 0.002);
+
+        if (node.opacity() <= 0 || node.y() < -10) {
+          node.destroy();
+          this._ambientParticles.splice(i, 1);
         }
       }
     }, this.fxLayer);
