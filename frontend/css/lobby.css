@@ -871,8 +871,8 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   white-space: nowrap;
 }
-.jon-item-buy:hover { filter: brightness(1.1); }
-.jon-item-buy:focus-visible {
+.jon-item-buy:hover:not(:disabled) { filter: brightness(1.1); }
+.jon-item-buy:focus-visible:not(:disabled) {
   filter: brightness(1.1);
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
@@ -899,14 +899,20 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover,
-.escape-btn:focus-visible {
+.escape-btn:hover:not(:disabled),
+.escape-btn:focus-visible:not(:disabled) {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
 .escape-btn:focus-visible {
   outline: 2px solid var(--ink-gilded);
   outline-offset: 2px;
+}
+.escape-btn:disabled, .jon-item-buy:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(100%);
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
