@@ -1,5 +1,4 @@
 import re
-import sys
 from pathlib import Path
 
 content = Path('docs/New_SetUp.md').read_text()
