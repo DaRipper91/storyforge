@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-10-27 - Isolate particle iteration in Konva canvas
+**Learning:** Iterating over generic layer children (like `this.fxLayer.getChildren()`) during animation loops is problematic because shared layers may contain transient mixed objects (like dust puffs) lacking expected custom properties, leading to `NaN` mutations. Additionally, `Konva.Circle` shapes that don't need hit detection add rendering overhead if `listening: false` is not set.
+**Action:** Use isolated arrays for loop iteration instead of `layer.getChildren()`, and explicitly set `listening: false` on background particles.
