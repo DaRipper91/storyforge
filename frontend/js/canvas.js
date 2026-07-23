@@ -158,44 +158,43 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
-    this._particleAnim = new Konva.Animation((frame) => {
-      // Spawn new particle occasionally
-      if (Math.random() < 0.05) {
-        const sx = this.stage.x();
-        const sy = this.stage.y();
-        const sw = this.stage.width();
-        const sh = this.stage.height();
+    // ⚡ Bolt: Pre-allocate Object Pool to prevent GC churn and skip generic layer iteration
+    const POOL_SIZE = 30;
+    this._particlePool = Array.from({ length: POOL_SIZE }, () => {
+      const p = new Konva.Circle({
+        fill: '#ffaa00', shadowColor: '#ff0000', shadowBlur: 5,
+        listening: false, visible: false // ⚡ Bolt: Disable hit graph for perf
+      });
+      this.fxLayer.add(p);
+      return p;
+    });
 
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+    this._particleAnim = new Konva.Animation((frame) => {
+      if (Math.random() < 0.05) {
+        const p = this._particlePool.find(node => !node.visible());
+        if (p) {
+          const sx = this.stage.x(), sy = this.stage.y();
+          p.setAttrs({
+            x: (Math.random() * this.stage.width()) - sx,
+            y: (this.stage.height() + 10) - sy,
+            radius: Math.random() * 2 + 1,
+            opacity: 0.6, visible: true
+          });
+          p.driftX = (Math.random() - 0.5) * 1.5;
+          p.speedY = Math.random() * 0.5 + 0.5;
+          p.life = 0;
+        }
       }
 
-      // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
-          node.y(node.y() - node.speedY);
-          node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
-          node.life++;
-          node.opacity(node.opacity() - 0.002);
-          
-          if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
-          }
-        }
+      for (let i = 0; i < POOL_SIZE; i++) {
+        const node = this._particlePool[i];
+        if (!node.visible()) continue;
+        node.y(node.y() - node.speedY);
+        node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
+        node.life++;
+        node.opacity(node.opacity() - 0.002);
+
+        if (node.opacity() <= 0 || node.y() < -10) node.visible(false);
       }
     }, this.fxLayer);
     this._particleAnim.start();
