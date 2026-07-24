@@ -87,15 +87,14 @@ The project includes an integrated launcher that spins up both the Python backen
 ---
 
 ◈ Acknowledgments ◈
-​A Dedication to Dee
+​A Dedication to Deanna, 
 ​Every world requires an architect, and every forge needs its spark. While the mechanics of StoryForge are built on code and logic, its soul belongs entirely to my anchor, my inspiration, and my Queen, Dee. Far beyond the visuals, she breathed actual life into this realm. The rich context, the intricate backstories, and the very essence of the NPCs that populate StoryForge exist because of her creativity, her guidance, and her incredible ideas.When the logic fails and the technical walls feel insurmountable, she is the clarity that pulls me through. Without her unwavering support and brilliant perspective, these worlds would be nothing more than empty text on a screen.
 ​StoryForge is a shared victory, but the magic within it is hers.
 ​Thank you, Dee.
 
 ## 📜 Credits
 - **Haley, John, & Jason**: For the constant support.
-
-- **Brad**: Our primary alpha tester.
-- **Google Gemini**: The silicon voice behind the Weaver's Paradox.
+- **Brad**: For being an amazing friend.
+- **Google Gemini**: The silicon voice behind the Weaver's Paradox.(What would have Been) 
 
 <p align="center"><i>"The dice determine the fate, but the Forge shapes the story."</i></p>
