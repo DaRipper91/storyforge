@@ -94,7 +94,7 @@ The project includes an integrated launcher that spins up both the Python backen
 
 ## 📜 Credits
 - **Haley, John, & Jason**: For the constant support.
-- **Brad**: For being an amazing friend.
+- **Brad**: For being an irreplaceable best friend.
 - **Google Gemini**: The silicon voice behind the Weaver's Paradox.(What would have Been) 
 
 <p align="center"><i>"The dice determine the fate, but the Forge shapes the story."</i></p>
