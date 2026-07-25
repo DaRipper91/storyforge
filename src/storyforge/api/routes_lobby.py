@@ -152,7 +152,10 @@ async def join_lobby(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated controller_id")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -177,7 +180,10 @@ async def leave_lobby(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated controller_id")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
@@ -202,7 +208,10 @@ async def update_name(
             payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
             controller_id = f"google::{payload['sub']}"
         except Exception:
-            pass
+            token = None
+
+    if not token and controller_id and controller_id.startswith("google::"):
+        raise HTTPException(status_code=403, detail="Cannot spoof authenticated controller_id")
 
     if not controller_id:
         raise HTTPException(status_code=401, detail="Authentication or controller_id required")
