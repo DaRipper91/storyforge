@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Canvas</title>
+    <script src="https://unpkg.com/konva@9.3.16/konva.min.js"></script>
+</head>
+<body>
+    <div id="mount" style="width: 800px; height: 600px; background: black;"></div>
+    <script type="module">
+        import { GridCanvas } from './js/canvas.js';
+
+        const container = document.getElementById('mount');
+        const canvas = new GridCanvas({ mountEl: container });
+
+        canvas.setState({
+            current_room_id: "room1",
+            rooms: {
+                "room1": {
+                    width: 10,
+                    height: 10,
+                    cells: Array(100).fill({ terrain: "floor" })
+                }
+            },
+            characters: {},
+            npcs: {}
+        });
+
+        window.__canvas = canvas;
+    </script>
+</body>
+</html>
