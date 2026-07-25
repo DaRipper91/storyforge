@@ -899,14 +899,18 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover,
-.escape-btn:focus-visible {
+.escape-btn:hover:not(:disabled),
+.escape-btn:focus-visible:not(:disabled) {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
-.escape-btn:focus-visible {
+.escape-btn:focus-visible:not(:disabled) {
   outline: 2px solid var(--ink-gilded);
   outline-offset: 2px;
+}
+.escape-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
@@ -946,8 +950,8 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
 }
-.btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
-.btn-danger:focus-visible {
+.btn-danger:hover:not(:disabled) { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:focus-visible:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
   outline: 2px solid var(--ink-crimson);
