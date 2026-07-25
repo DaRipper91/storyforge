@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Dict, Any, List
+from typing import Dict, Any
 from contextlib import asynccontextmanager
 
 # --- Lifecycle Management ---

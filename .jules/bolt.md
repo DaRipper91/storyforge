@@ -7,3 +7,7 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+
+## 2025-05-25 - Konva Layer Iteration Mutation Bug
+**Learning:** Iterating over `layer.getChildren()` during animation loops is dangerous when the layer is shared with other transient objects (e.g., dust puffs). It can cause objects lacking expected custom properties to be mutated, leading to `NaN` errors.
+**Action:** Iterate over isolated object pools (pre-allocated arrays) instead of generic layer children.

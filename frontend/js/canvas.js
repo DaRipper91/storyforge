@@ -158,42 +158,47 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    // ⚡ Bolt: Pre-allocate an Object Pool for ambient particles to prevent GC churn,
+    // explicitly set listening: false, and avoid iterating over generic layer children.
+    const MAX_PARTICLES = 50;
+    this._particlePool = Array.from({ length: MAX_PARTICLES }, () => {
+      const p = new Konva.Circle({
+        fill: '#ffaa00', shadowColor: '#ff0000', shadowBlur: 5,
+        listening: false, visible: false
+      });
+      this.fxLayer.add(p);
+      return p;
+    });
+
     this._particleAnim = new Konva.Animation((frame) => {
       // Spawn new particle occasionally
       if (Math.random() < 0.05) {
-        const sx = this.stage.x();
-        const sy = this.stage.y();
-        const sw = this.stage.width();
-        const sh = this.stage.height();
-
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+        const p = this._particlePool.find(node => !node.visible());
+        if (p) {
+          const sw = this.stage.width(), sh = this.stage.height();
+          p.setAttrs({
+            x: (Math.random() * sw) - this.stage.x(),
+            y: (sh + 10) - this.stage.y(),
+            radius: Math.random() * 2 + 1,
+            opacity: 0.6,
+            visible: true
+          });
+          p.driftX = (Math.random() - 0.5) * 1.5;
+          p.speedY = Math.random() * 0.5 + 0.5;
+          p.life = 0;
+        }
       }
 
       // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
+      for (const node of this._particlePool) {
+        if (node.visible()) {
           node.y(node.y() - node.speedY);
           node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
           node.life++;
           node.opacity(node.opacity() - 0.002);
           
           if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
+            node.visible(false); // ⚡ Bolt: Hide instead of destroy for pool reuse
           }
         }
       }
