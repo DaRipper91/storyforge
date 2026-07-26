@@ -226,13 +226,6 @@ body[data-phase="saves"] #game-view { display: none; }
   min-width: 320px;
 }
 
-#start-game-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
 .lobby-hint {
   font-size: var(--fs-xs);
   opacity: 0.7;

@@ -346,12 +346,26 @@ body {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.btn:hover { transform: translateY(-2px); box-shadow: var(--glow-gold); }
-.btn:focus-visible {
+.btn:hover:not(:disabled),
+.btn:focus-visible:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.btn:focus-visible:not(:disabled) {
   outline: 2px solid var(--ink-midnight);
   outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 .btn-primary { background: var(--ink-gilded); color: #1a1428; }
 
