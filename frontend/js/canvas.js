@@ -158,42 +158,65 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    // ⚡ Bolt: Pre-allocate particle pool to prevent GC churn during animation loops
+    this._particlePool = [];
+    for (let i = 0; i < 30; i++) {
+      const p = new Konva.Circle({
+        radius: 0,
+        fill: '#ffaa00',
+        opacity: 0,
+        shadowColor: '#ff0000',
+        shadowBlur: 5,
+        listening: false, // ⚡ Bolt: Exclude from hit graph for performance
+        visible: false
+      });
+      p.driftX = 0;
+      p.speedY = 0;
+      p.life = 0;
+      p.active = false;
+      this._particlePool.push(p);
+      this.fxLayer.add(p);
+    }
+
     this._particleAnim = new Konva.Animation((frame) => {
-      // Spawn new particle occasionally
+      // Spawn new particle occasionally from pool
       if (Math.random() < 0.05) {
         const sx = this.stage.x();
         const sy = this.stage.y();
         const sw = this.stage.width();
         const sh = this.stage.height();
 
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+        // Find inactive particle
+        for (let i = 0; i < this._particlePool.length; i++) {
+          const p = this._particlePool[i];
+          if (!p.active) {
+            p.radius(Math.random() * 2 + 1);
+            p.x((Math.random() * sw) - sx);
+            p.y((sh + 10) - sy);
+            p.opacity(0.6);
+            p.visible(true);
+            p.active = true;
+            p.driftX = (Math.random() - 0.5) * 1.5;
+            p.speedY = Math.random() * 0.5 + 0.5;
+            p.life = 0;
+            break; // Only spawn one per frame
+          }
+        }
       }
 
-      // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
+      // Update active particles directly from pool array
+      // ⚡ Bolt: Avoids iterating over all fxLayer children (which might include dust puffs)
+      for (let i = 0; i < this._particlePool.length; i++) {
+        const node = this._particlePool[i];
+        if (node.active) {
           node.y(node.y() - node.speedY);
           node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
           node.life++;
           node.opacity(node.opacity() - 0.002);
           
           if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
+            node.active = false;
+            node.visible(false); // ⚡ Bolt: Hide instead of destroy()
           }
         }
       }
