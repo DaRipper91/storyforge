@@ -32,3 +32,7 @@
 **Vulnerability:** The FastAPI application was missing essential security headers in HTTP responses. This increased the risk of Cross-Site Scripting (XSS), mime-sniffing, clickjacking, and man-in-the-middle attacks.
 **Learning:** Frameworks like FastAPI do not include HTTP security headers by default. A permissive application without these headers is an easier target for client-side attacks.
 **Prevention:** Always implement a dedicated security headers middleware or configuration that sets baseline headers like `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, and a baseline `Content-Security-Policy`.
+## 2025-05-24 - JWT Decode Fallback Spoofing
+**Vulnerability:** A malicious client could spoof an authenticated user by setting `controller_id` to "google::[sub]" when no valid JWT token was present.
+**Learning:** If a JWT decode fails and the `except` block uses `pass`, the `controller_id` variable from the user payload remains intact, effectively bypassing the security check in a mixed-auth endpoint.
+**Prevention:** Always explicitly set variables derived from tokens to `None` in the `except` block of JWT validation, and add an explicit check to reject client-provided IDs that match the protected prefix when no token is present.
