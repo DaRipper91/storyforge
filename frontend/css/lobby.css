@@ -899,14 +899,19 @@ body[data-phase="saves"] #game-view { display: none; }
   font-family: inherit;
   font-size: var(--fs-sm);
 }
-.escape-btn:hover,
+.escape-btn:hover:not(:disabled),
 .escape-btn:focus-visible {
   background: rgba(139,69,19,0.25);
   border-color: var(--ink-gilded);
 }
+.escape-btn:focus { outline: none; }
 .escape-btn:focus-visible {
   outline: 2px solid var(--ink-gilded);
   outline-offset: 2px;
+}
+.escape-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .escape-method-name { font-size: var(--fs-sm); }
 .escape-method-stat {
@@ -946,7 +951,8 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: var(--ink-crimson) !important;
   color: var(--ink-crimson);
 }
-.btn-danger:hover { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:hover:not(:disabled) { background: rgba(157,34,53,0.2) !important; }
+.btn-danger:focus { outline: none; }
 .btn-danger:focus-visible {
   transform: translateY(-2px);
   box-shadow: var(--glow-gold);
@@ -1300,7 +1306,7 @@ body[data-phase="saves"] #game-view { display: none; }
   border-color: rgba(75, 0, 130, 0.4);
 }
 
-.samael-consult-btns .escape-btn:hover,
+.samael-consult-btns .escape-btn:hover:not(:disabled),
 .samael-consult-btns .escape-btn:focus-visible {
   border-color: #9b4dca;
   background: rgba(155, 77, 202, 0.15);
@@ -1390,13 +1396,13 @@ body[data-phase="saves"] #game-view { display: none; }
   line-height: 1.6;
 }
 
-.keeva-action-btns .escape-btn:hover,
+.keeva-action-btns .escape-btn:hover:not(:disabled),
 .keeva-action-btns .escape-btn:focus-visible {
   border-color: #daa520;
   background: rgba(218, 165, 32, 0.15);
 }
 
-.keeva-btn-risky:hover,
+.keeva-btn-risky:hover:not(:disabled),
 .keeva-btn-risky:focus-visible {
   border-color: #cc2222 !important;
   background: rgba(204, 34, 34, 0.15) !important;
