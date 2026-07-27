@@ -158,43 +158,41 @@ export class GridCanvas {
   }
 
   _startAmbientParticles() {
+    // ⚡ Bolt: Use an object pool for ambient particles to eliminate GC churn from
+    // constant node creation/destruction, and avoid iterating over mixed layer children.
+    const MAX_PARTICLES = 40;
+    this._particlePool = Array.from({ length: MAX_PARTICLES }, () => {
+      const p = new Konva.Circle({
+        fill: '#ffaa00', shadowColor: '#ff0000', shadowBlur: 5,
+        listening: false, visible: false
+      });
+      this.fxLayer.add(p);
+      return { node: p, driftX: 0, speedY: 0, life: 0, active: false };
+    });
+
     this._particleAnim = new Konva.Animation((frame) => {
-      // Spawn new particle occasionally
       if (Math.random() < 0.05) {
-        const sx = this.stage.x();
-        const sy = this.stage.y();
-        const sw = this.stage.width();
-        const sh = this.stage.height();
-
-        const p = new Konva.Circle({
-          x: (Math.random() * sw) - sx,
-          y: (sh + 10) - sy,
-          radius: Math.random() * 2 + 1,
-          fill: '#ffaa00',
-          opacity: 0.6,
-          shadowColor: '#ff0000',
-          shadowBlur: 5,
-        });
-        
-        // Custom properties for drift
-        p.driftX = (Math.random() - 0.5) * 1.5;
-        p.speedY = Math.random() * 0.5 + 0.5;
-        p.life = 0;
-        
-        this.fxLayer.add(p);
+        const p = this._particlePool.find(p => !p.active);
+        if (p) {
+          p.node.setAttrs({
+            x: (Math.random() * this.stage.width()) - this.stage.x(),
+            y: (this.stage.height() + 10) - this.stage.y(),
+            radius: Math.random() * 2 + 1, opacity: 0.6, visible: true
+          });
+          p.driftX = (Math.random() - 0.5) * 1.5;
+          p.speedY = Math.random() * 0.5 + 0.5;
+          p.life = 0; p.active = true;
+        }
       }
-
-      // Update existing particles
-      for (const node of this.fxLayer.getChildren()) {
-        if (node.getClassName() === 'Circle') {
-          node.y(node.y() - node.speedY);
-          node.x(node.x() + node.driftX + Math.sin(node.life / 20) * 0.5);
-          node.life++;
-          node.opacity(node.opacity() - 0.002);
-          
-          if (node.opacity() <= 0 || node.y() < -10) {
-            node.destroy();
-          }
+      for (const p of this._particlePool) {
+        if (!p.active) continue;
+        const node = p.node;
+        node.y(node.y() - p.speedY);
+        node.x(node.x() + p.driftX + Math.sin(p.life / 20) * 0.5);
+        p.life++;
+        node.opacity(node.opacity() - 0.002);
+        if (node.opacity() <= 0 || node.y() < -10) {
+          node.visible(false); p.active = false;
         }
       }
     }, this.fxLayer);
