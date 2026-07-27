@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-07-27 - Object Pools for Konva Layer Animations
+**Learning:** In the StoryForge frontend (`canvas.js`), iterating over generic layer children (like `this.fxLayer.getChildren()`) during animation loops is dangerous. Shared layers often contain transient mixed objects (like dust puffs) lacking expected custom properties (e.g., `speedY`), leading to `NaN` mutations and bugs. Furthermore, constantly calling `.destroy()` and `new Konva.Circle()` causes significant garbage collection churn.
+**Action:** Use isolated Object Pools (pre-allocated arrays) for high-frequency loop iterations. Reuse nodes by toggling `visible: false` when they become inactive rather than destroying them, and explicitly set `listening: false` to keep them out of the hit graph.
