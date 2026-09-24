@@ -143,19 +143,10 @@ func _handle_ws_message(json_str: String):
 			"phase_changed":
 				phase_changed.emit(json.get("phase", ""))
 			"npc_event":
-				_handle_npc_event(json)
 				npc_event_received.emit(json)
 			"particle_event":
 				particle_event_received.emit(json)
 
-
-func _handle_npc_event(ev: Dictionary):
-	var npc    = ev.get("npc", "")
-	var action = ev.get("action", "")
-	var mood   = ev.get("mood", "warm")
-	if npc == "redvelvet" and action == "perform":
-		var path = "res://assets/audio/performance_%s.wav" % mood
-		AudioManager.play_npc_performance(path, mood)
 
 # ─── REST helpers ──────────────────────────────────────────────────
 

@@ -1159,7 +1159,6 @@ const NPC_COLORS: Dictionary = {
 	"npc_samael":   Color(0.55, 0.20, 0.90),   # deep violet — demigod
 	"npc_haylie":   Color(0.85, 0.45, 0.75),   # rose pink — innkeeper
 	"npc_danna":    Color(0.90, 0.85, 0.30),   # royal gold — queen
-	"npc_redvelvet":Color(0.95, 0.20, 0.30),   # red — performer
 	"npc_kodrik":   Color(0.30, 0.65, 0.95),   # steel blue — guildmaster
 	"npc_bryne":    Color(0.45, 0.75, 0.55),   # muted green — warden
 	"npc_nathis":   Color(0.85, 0.55, 0.20),   # amber — front man
@@ -1485,12 +1484,6 @@ func _npc_actions_for(encounter_id: String) -> Array:
 			return [
 				{"label": "Address Queen",  "method": "POST", "path": "/npc/danna/address",  "body": {"form": "formal"}},
 				{"label": "File Petition",  "method": "POST", "path": "/npc/danna/petition", "body": {"type": "request"}},
-			]
-		"redvelvet_performance":
-			return [
-				{"label": "Watch Performance", "method": "POST", "path": "/npc/redvelvet/perform"},
-				{"label": "Tip RedVelvet",      "method": "POST", "path": "/npc/redvelvet/tip", "body": {"amount": 5}},
-				{"label": "Request Song",       "method": "POST", "path": "/npc/redvelvet/request-song", "body": {"song": "something haunting"}},
 			]
 		"kodrik_guild":
 			return [

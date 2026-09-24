@@ -10,7 +10,6 @@ NPCs:
   /api/npc/samael/*    — Samael the Ascended (cryptic lore hints)
   /api/npc/haylie/*    — Madame Haylie (bailout from Jon's conversational trap)
   /api/npc/danna/*     — Queen D.Anna (Royal Address, Petitions, Boons)
-  /api/npc/redvelvet/* — Firey RedVelvet (Performances, Tips, Song Requests)
 """
 from __future__ import annotations
 
@@ -56,11 +55,6 @@ from storyforge.encounters.bryne import (
 from storyforge.encounters.nathis import (
     NathisEncounterState,
     FrontManNathis,
-)
-from storyforge.encounters.redvelvet import (
-    FireyRedVelvet,
-    RedVelvetEncounterState,
-    SongRequest,
 )
 
 router = APIRouter(prefix="/api/npc", tags=["npc"])
@@ -534,160 +528,6 @@ async def danna_state(request: Request):
         "standing": danna.standing_label,
     }
 
-
-# ═══════════════════════════════════════════════════════════════════
-# FIREY REDVELVET helpers & endpoints
-# ═══════════════════════════════════════════════════════════════════
-
-def _get_redvelvet(request: Request) -> FireyRedVelvet:
-    if not hasattr(request.app.state, "redvelvet_encounter"):
-        request.app.state.redvelvet_encounter = RedVelvetEncounterState(active=True)
-    return FireyRedVelvet(request.app.state.redvelvet_encounter)
-
-
-def _save_redvelvet(request: Request, rv: FireyRedVelvet) -> None:
-    request.app.state.redvelvet_encounter = rv.encounter
-
-
-@router.post("/redvelvet/perform")
-async def redvelvet_perform(request: Request):
-    """Watch Firey RedVelvet perform. At BLAZING mood, the party gains Inspiration."""
-    rv = _get_redvelvet(request)
-    result = rv.perform()
-    _save_redvelvet(request, rv)
-
-    situation = (
-        f"Firey RedVelvet is performing at {result.mood.name} mood (performance #{rv.encounter.performances_given}). "
-        f"COLD = technically perfect but going through motions; WARM = locked in, genuinely good; "
-        f"HOT = something real is happening here, the room feels it; "
-        f"BLAZING = transcendent — the fire performs with her, it is finished and perfect, the room goes quiet. "
-        f"{'BLAZING: this moment is complete. Write it that way.' if result.grants_boon else ''} "
-        f"Write her performance text for exactly this mood. Match the energy precisely. No hedging."
-    )
-    try:
-        perf_text = await narrate_npc("redvelvet", situation)
-    except Exception:
-        perf_text = result.performance_text
-
-    mood_name = result.mood.name.lower()
-    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "perform", "mood": mood_name})
-    if result.grants_boon:
-        await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "boon_granted"})
-
-    return {
-        "performance_text": perf_text,
-        "mood": result.mood.name,
-        "mood_value": int(result.mood),
-        "grants_boon": result.grants_boon,
-        "boon_description": result.boon_description,
-        "performances_given": rv.encounter.performances_given,
-    }
-
-
-class TipRequest(BaseModel):
-    silver: int = 5
-
-
-@router.post("/redvelvet/tip")
-async def redvelvet_tip(body: TipRequest, request: Request):
-    """Tip Firey RedVelvet. Every 5 silver raises her mood by one step."""
-    if body.silver <= 0:
-        raise HTTPException(status_code=400, detail="silver must be positive")
-    rv = _get_redvelvet(request)
-    result = rv.tip(body.silver)
-    _save_redvelvet(request, rv)
-
-    situation = (
-        f"Someone tipped Firey RedVelvet {body.silver} silver. "
-        f"Mood moved from {result.mood_before.name} to {result.mood_after.name}. "
-        f"{'Mood improved one step.' if result.mood_changed else 'Already at peak mood — she acknowledges it anyway.'} "
-        f"She never stops the performance for a tip — she acknowledges it in character, mid-movement. "
-        f"Write her response in one sentence. Stylish. In character."
-    )
-    try:
-        response_text = await narrate_npc("redvelvet", situation)
-    except Exception:
-        response_text = result.response
-
-    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "tip"})
-    return {
-        "response": response_text,
-        "silver_spent": result.silver_spent,
-        "mood_before": result.mood_before.name,
-        "mood_after": result.mood_after.name,
-        "mood_changed": result.mood_changed,
-        "total_tips": rv.encounter.total_tips_silver,
-    }
-
-
-@router.post("/redvelvet/heckle")
-async def redvelvet_heckle(request: Request):
-    """Heckle Firey RedVelvet. She handles it. Mood drops one step."""
-    rv = _get_redvelvet(request)
-    result = rv.heckle()
-    _save_redvelvet(request, rv)
-
-    situation = (
-        f"Someone heckled Firey RedVelvet. Heckle #{rv.encounter.heckles_received}. "
-        f"Mood dropped from {result.mood_before.name} to {result.mood_after.name}. "
-        f"She finishes the phrase first. Then she addresses it — with the calm of someone who has "
-        f"already composed the response and is deciding whether to use the polite version. "
-        f"She is never rattled. The fire does not agree with the heckler. "
-        f"Two sentences max: finish the phrase, then the address."
-    )
-    try:
-        response_text = await narrate_npc("redvelvet", situation)
-    except Exception:
-        response_text = result.response
-
-    await event_bus.publish({"type": "npc_event", "npc": "redvelvet", "action": "heckle"})
-    return {
-        "response": response_text,
-        "mood_before": result.mood_before.name,
-        "mood_after": result.mood_after.name,
-        "heckles_received": rv.encounter.heckles_received,
-    }
-
-
-class SongRequestBody(BaseModel):
-    song_type: SongRequest = SongRequest.MYSTERY
-
-
-@router.post("/redvelvet/request-song")
-async def redvelvet_request_song(body: SongRequestBody, request: Request):
-    """Request a song from Firey RedVelvet. She picks the right one."""
-    rv = _get_redvelvet(request)
-    result = rv.request_song(body.song_type)
-    _save_redvelvet(request, rv)
-
-    situation = (
-        f"Someone requested a {body.song_type.value} song from Firey RedVelvet. "
-        f"Her current mood is {result.mood.name}. "
-        f"Song types: MYSTERY=haunting/atmospheric, BATTLE=driving/fierce, BALLAD=slow/emotional, "
-        f"COMEDY=light/crowd-pleasing, EPIC=sweeping/legendary. "
-        f"She does not announce the song — she just begins it. Write the performance for this song type, "
-        f"colored by her current mood. Two to four sentences."
-    )
-    try:
-        perf_text = await narrate_npc("redvelvet", situation)
-    except Exception:
-        perf_text = result.performance_text
-
-    return {
-        "song_type": result.song_type,
-        "performance_text": perf_text,
-        "mood": result.mood.name,
-    }
-
-
-@router.get("/redvelvet/state")
-async def redvelvet_state(request: Request):
-    """Return Firey RedVelvet's current encounter state."""
-    rv = _get_redvelvet(request)
-    return {
-        **rv.encounter.model_dump(),
-        "mood_label": rv.mood_label,
-    }
 
 # ═══════════════════════════════════════════════════════════════════
 # KODRIK endpoints

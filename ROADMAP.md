@@ -35,8 +35,8 @@ The Godot 4 3D tabletop client is complete. The Python backend remains the autho
 - [x] Dynamic 3D lighting — WorldEnvironment, candlelit OmniLight with flicker, bloom + SSAO.
 - [x] Godot Particle effects — ParadoxParticles (chromatic burst) + MagicBurst (golden sparkle).
 - [x] Gimbal Camera — orbit (right-drag), zoom (scroll), DoF (CameraAttributesPractical), R to reset.
-- [x] Audio infrastructure — AudioManager autoload, Music/SFX buses, play_ambient/sfx/npc_performance.
-- [x] Synthesized placeholder audio assets — 27 .wav files (6 ambient, 5 RedVelvet performances, 16 SFX).
+- [x] Audio infrastructure — AudioManager autoload, Music/SFX buses, play_ambient/sfx.
+- [x] Synthesized placeholder audio assets — 22 .wav files (6 ambient, 16 SFX).
 - [x] Particle triggers wired to all game events (freeform actions, Paradox phase change, NPC entrances, 8 NPC event SFX).
 
 ### 🚀 Milestone 4: Final Release - IN PROGRESS

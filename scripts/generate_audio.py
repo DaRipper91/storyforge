@@ -1,6 +1,6 @@
 """
 StoryForge placeholder audio generator.
-Produces 27 synthesized .wav files in godot/assets/audio/.
+Produces 22 synthesized .wav files in godot/assets/audio/.
 All files are real, playable audio — swap in final assets by replacing the files.
 
 Run:  uv run python scripts/generate_audio.py
@@ -201,77 +201,6 @@ def gen_ambient_paradox():
     sig     = vibrato(base + glitch + beating, rate=1.8, depth=0.006)
     sig     = loop_seamless(sig)
     save("ambient_paradox.wav", sig)
-
-
-# ─── 7–11. Firey RedVelvet performance tracks ─────────────────────────────────
-
-def _perf_base(fund, harmonics, dur, vib_rate, vib_depth, trem_rate, trem_depth):
-    freqs_amps = [(fund * h, a) for h, a in harmonics]
-    sig = harmony(freqs_amps, dur)
-    sig = vibrato(sig, rate=vib_rate, depth=vib_depth)
-    sig = tremolo(sig, rate=trem_rate, depth=trem_depth)
-    return fade(sig, in_dur=0.4, out_dur=0.8)
-
-
-def gen_perf_cold():
-    # Sparse, technically correct, going through the motions
-    dur = 8.0
-    sig = _perf_base(220, [(1, 0.6), (2, 0.12), (3, 0.05)], dur,
-                     vib_rate=3.5, vib_depth=0.002, trem_rate=0.8, trem_depth=0.04)
-    sig = env(sig, a=0.6, d=0.3, s=0.55, r=1.2)
-    save("performance_cold.wav", sig, peak=0.45)
-
-
-def gen_perf_warm():
-    # Locked in — genuinely good
-    dur = 8.0
-    sig = _perf_base(220, [(1, 0.5), (2, 0.3), (3, 0.18), (4, 0.08), (5, 0.04)], dur,
-                     vib_rate=5.2, vib_depth=0.004, trem_rate=1.2, trem_depth=0.06)
-    chord = harmony([(261.6, 0.12), (329.6, 0.1), (392, 0.08)], dur)
-    sig   = env(sig + chord, a=0.3, d=0.2, s=0.72, r=0.9)
-    save("performance_warm.wav", sig, peak=0.58)
-
-
-def gen_perf_hot():
-    # Something real is happening — the room feels it
-    dur = 8.0
-    sig = _perf_base(220, [(1, 0.45), (2, 0.32), (3, 0.22), (4, 0.15), (5, 0.08), (6, 0.04)], dur,
-                     vib_rate=6.5, vib_depth=0.006, trem_rate=2.0, trem_depth=0.09)
-    upper = harmony([(440, 0.1), (550, 0.06), (660, 0.04)], dur)
-    sweep_in = sweep(200, 220, dur) * 0.08
-    sig = env(sig + upper + sweep_in, a=0.2, d=0.15, s=0.82, r=0.6)
-    save("performance_hot.wav", sig, peak=0.68)
-
-
-def gen_perf_blazing():
-    # Transcendent — the fire performs with her. The room goes quiet.
-    dur = 8.0
-    fund = 220
-    harmonics = [(h, a) for h, a in zip(
-        range(1, 12),
-        [0.4, 0.3, 0.22, 0.18, 0.14, 0.10, 0.07, 0.05, 0.04, 0.03, 0.02]
-    )]
-    sig  = harmony([(fund * h, a) for h, a in harmonics], dur)
-    sig  = vibrato(sig, rate=7.0, depth=0.007)
-    sig  = tremolo(sig, rate=3.0, depth=0.10)
-    glow = harmony([(880, 0.06), (1100, 0.04), (1320, 0.03)], dur)
-    sig  = env(sig + glow, a=0.1, d=0.1, s=0.92, r=0.4)
-    # Stereo: slight width difference for "fills the room" feel
-    l    = sig
-    r    = vibrato(sig, rate=6.8, depth=0.006)
-    n    = min(len(l), len(r))
-    save("performance_blazing.wav", stereo(l[:n], r[:n], width=0.4), peak=0.75)
-
-
-def gen_perf_mystery():
-    # Haunting — let her decide what the room needs
-    dur = 8.0
-    # Dorian feel: minor with raised 6th
-    sig = _perf_base(196, [(1, 0.5), (2, 0.22), (3, 0.15), (4, 0.07)], dur,
-                     vib_rate=3.8, vib_depth=0.003, trem_rate=0.6, trem_depth=0.05)
-    echo = np.roll(sig, int(0.42 * SR)) * 0.2
-    sig  = env(sig + echo, a=0.5, d=0.3, s=0.62, r=1.5)
-    save("performance_mystery.wav", sig, peak=0.52)
 
 
 # ─── 12. sfx_move.wav ────────────────────────────────────────────────────────
@@ -479,8 +408,6 @@ def gen_sfx_cyrus():
 GENERATORS = [
     ("Ambient (6)",          [gen_ambient_keep, gen_ambient_throne_room, gen_ambient_store,
                                gen_ambient_inn, gen_ambient_wilderness, gen_ambient_paradox]),
-    ("RedVelvet Performance (5)", [gen_perf_cold, gen_perf_warm, gen_perf_hot,
-                                    gen_perf_blazing, gen_perf_mystery]),
     ("Game SFX (8)",         [gen_sfx_move, gen_sfx_paradox, gen_sfx_magic_burst,
                                gen_sfx_cactus, gen_sfx_tip_silver, gen_sfx_heckle,
                                gen_sfx_boon, gen_sfx_haylie]),

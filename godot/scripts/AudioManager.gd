@@ -8,7 +8,6 @@
 ## Usage:
 ##   AudioManager.play_ambient("res://assets/audio/ambient_keep.ogg")
 ##   AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
-##   AudioManager.play_npc_performance()   # triggers Firey RedVelvet audio
 ##   AudioManager.stop_ambient()
 ##   AudioManager.set_music_volume(0.8)    # 0.0 – 1.0
 
@@ -19,8 +18,7 @@ const _BUS_MUSIC = "Music"
 const _BUS_SFX   = "SFX"
 
 # ─── Players ────────────────────────────────────────────────────────
-var _ambient_player:     AudioStreamPlayer
-var _performance_player: AudioStreamPlayer
+var _ambient_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 const _SFX_POOL_SIZE = 6
 
@@ -35,7 +33,6 @@ func _ready():
 	_ensure_buses()
 
 	_ambient_player = _make_player(_BUS_MUSIC)
-	_performance_player = _make_player(_BUS_MUSIC)
 
 	for i in _SFX_POOL_SIZE:
 		_sfx_pool.append(_make_player(_BUS_SFX))
@@ -98,26 +95,6 @@ func stop_ambient(fade_out: float = 2.0):
 		fade_out
 	).set_trans(Tween.TRANS_SINE)
 	tween.tween_callback(_ambient_player.stop)
-
-
-# ─── NPC performance (Firey RedVelvet) ──────────────────────────────
-
-func play_npc_performance(path: String = "", mood: String = "warm"):
-	# Mood adjusts volume and pitch to match RedVelvet's state
-	var pitch_scale = { "cold": 0.95, "warm": 1.0, "hot": 1.02, "blazing": 1.05 }
-	var vol_scale   = { "cold": 0.6,  "warm": 0.75, "hot": 0.85, "blazing": 1.0  }
-
-	if path.is_empty() or not ResourceLoader.exists(path):
-		return
-
-	_performance_player.stream = load(path)
-	_performance_player.pitch_scale = pitch_scale.get(mood, 1.0)
-	_performance_player.volume_db   = linear_to_db(vol_scale.get(mood, 0.75))
-	_performance_player.play()
-
-
-func stop_npc_performance():
-	_performance_player.stop()
 
 
 # ─── SFX (pooled) ───────────────────────────────────────────────────

@@ -32,7 +32,6 @@ CHARACTER_MAP = {
     "King.blend":       "humanoid/npc_royal.glb",
     "Adventurer.blend": "humanoid/npc_warrior.glb",
     "Suit.blend":       "humanoid/npc_mage.glb",
-    "Punk.blend":       "humanoid/npc_performer.glb",
     # Player race group models
     "Farmer.blend":     "player/humanoid.glb",
     "Swat.blend":       "player/primal.glb",

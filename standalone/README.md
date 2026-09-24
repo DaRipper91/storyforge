@@ -47,10 +47,6 @@ uv sync
 uv run uvicorn storyforge.main:app --reload --port 8765
 ```
 
-## 📜 Acknowledgments
-
-A special and heartfelt thank you to **RedVelvet** for their inspiration and support in making this project a reality.
-
 ---
 
 <p align="center">

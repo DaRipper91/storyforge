@@ -146,20 +146,6 @@
       "blocks_movement": false,
       "description": "A young Divine Hound. Granddaughter of Cyrus and Keeva. Living continuation of Keeva's light. Learning the ways of the Heavenly Protector."
     },
-    "redvelvet": {
-      "id": "redvelvet",
-      "name": "Firey RedVelvet",
-      "position": {
-        "x": 8,
-        "y": 2
-      },
-      "room_id": "tavern_01",
-      "sprite_key": "npc_redvelvet",
-      "interactable": true,
-      "encounter_id": "redvelvet_performance",
-      "blocks_movement": true,
-      "description": "The tavern's mood-setter. Delivers performances at twice the expected intensity. Emotional hub of the Crooked Tankard."
-    },
     "bryne": {
       "id": "bryne",
       "name": "Bryne",
@@ -685,7 +671,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": "npc_redvelvet"
+          "occupant_id": null
         },
         {
           "terrain": "wall",

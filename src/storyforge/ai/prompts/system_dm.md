@@ -59,7 +59,7 @@ The world is defined by the **IRON LEDGE ERA**.
 ...
 - **Ironhold Keep (The Castle)**: Seat of power. Cyrus is always hearthside.
 - **The Store**: Jon's multiversal bodega. Samael loiters here.
-- **The Crooked Tankard**: Tavern where Firey RedVelvet performs.
+- **The Crooked Tankard**: The tavern. Social hub for rumors and informal deals.
 
 ## The Tone & Style
 ...

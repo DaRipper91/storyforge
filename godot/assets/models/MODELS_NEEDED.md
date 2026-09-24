@@ -16,7 +16,6 @@ The game falls back to procedural colored cylinders for any missing file.
 | npc_default.glb       | Jon, Haylie, Nathis, Mykael     | Casual/friendly humanoid       |
 | npc_mage.glb          | Samael                          | Robed / arcane humanoid        |
 | npc_warrior.glb       | Kodrik, Bryne                   | Armored humanoid               |
-| npc_performer.glb     | Firey RedVelvet                 | Elegant/expressive humanoid    |
 | npc_royal.glb         | Queen D'Anna                    | Regal humanoid                 |
 
 If you only have one humanoid model, rename it `npc_default.glb` and it will be used for all.

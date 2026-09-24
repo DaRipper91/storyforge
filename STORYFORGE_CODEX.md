@@ -120,11 +120,6 @@ Ancient. Detached. Occasionally useful. He does not go to The Store — he simpl
 
 ---
 
-### FIREY REDVELVET
-**Role:** Bard at The Crooked Tankard
-
----
-
 ### YELDARB
 **Real person: Bradley** *(Yeldarb = Bradley backwards — the Easter egg is baked into the name)*
 **Role:** Kodrik's best friend · Easter egg
@@ -250,7 +245,7 @@ Teddy & Tyty           — Best friends. Teddy holds. Tyty announces.
 **Ironhold Keep** — D.Anna's seat. Bink Bink's domain. Teddy's home base.
 **The Guild** — Kodrik's operation. Central Dispatch. Where things get decided.
 **The Store** — Jon and Haylie's. Coco's territory. Samael loiters here.
-**The Crooked Tankard** — Where Firey RedVelvet plays.
+**The Crooked Tankard** — The tavern. Where rumors travel.
 **Sunless Canyon** — A deep, iridescent rift where heat mirages distort reality. Habitat of the Shimmering Thresher.
 **The Iron Ledge** — The precipice of the world, where the gravity of the old world meets the chaos of the Feral.
 

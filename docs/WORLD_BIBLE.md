@@ -112,12 +112,6 @@ This arrangement is stable because both understand their respective domains.
 - **DM Mechanic**: Roll d100 at scene start. On 1–5, the form activates once during the scene. Duration: 1d4 seconds. Describe it simply, don't over-explain. He does not comment unless asked. If asked, he shrugs.
 - **Hard Rule**: Never weaponized. Never evil. Never used as a threat against players. The power is a chaos variable, not a story obstacle.
 
-### 🍻 The Crooked Tankard
-
-#### FIREY REDVELVET
-- **Role**: Bard, Tavern Performer
-- **Personality**: Delivers what the room needs at twice the expected intensity. Emotional mood-setter. When she is playing, the room's emotional temperature is hers.
-
 ---
 
 ## 🐾 Section 4 — Beasts & Companions
@@ -263,7 +257,7 @@ Character creation uses the standard D&D 5e array — **[15, 14, 13, 12, 10, 8]*
 ## 📍 Section 6 — Locations
 - **Ironhold Keep**: Political seat/Guild HQ. Residents: Kodrik, D.Anna, Bryne (forthcoming), Cyrus, Keeva (presence), Teddy, Bink Bink, Snowie.
 - **The Store**: Multiversal bodega. Residents: Jon, Haylie, Coco, Samael. Cole will join when Bryne arrives.
-- **The Crooked Tankard**: Social hub. Resident: Firey RedVelvet.
+- **The Crooked Tankard**: Social hub.
 
 ---
 

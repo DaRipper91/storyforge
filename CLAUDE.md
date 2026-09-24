@@ -107,7 +107,7 @@ Each named NPC lives in `src/storyforge/encounters/<name>.py` and follows this p
 - `<Name>` service class — pure logic, never touches `GameState` directly; mutations return a `StateDiff` for the caller to apply.
 - State is stored on `app.state.<npc>_encounter` (session-level; resets when app restarts, not persisted to the campaign snapshot).
 
-Current NPCs: `ShopkeeperJon`, `SamaelTheDemigod`, `MadameHaylie`, `QueenDAnna`, `FireyRedVelvet`, `GuildmasterKodrik`, `WardenApprenticeBryne`, `FrontManNathis`.
+Current NPCs: `ShopkeeperJon`, `SamaelTheDemigod`, `MadameHaylie`, `QueenDAnna`, `GuildmasterKodrik`, `WardenApprenticeBryne`, `FrontManNathis`.
 
 Jon's "Haylie bailout" is a cross-NPC dependency: a critical escape fail on Jon sets `jon.encounter.bailout_available = True`, which `POST /api/npc/haylie/bailout` checks before triggering Haylie's intervention.
 
