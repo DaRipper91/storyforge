@@ -7,3 +7,6 @@
 ## 2024-06-16 - Throttle High-Frequency Events
 **Learning:** High-frequency DOM events (like `mousemove`) that continuously trigger timer operations (`clearTimeout` and `setTimeout`) cause unnecessary micro-allocations and severe Garbage Collection churn. Throttling these resets significantly reduces CPU overhead.
 **Action:** When throttling high-frequency events in JavaScript to prevent GC churn, prefer a timestamp-based approach (e.g., using `Date.now()`) over creating additional timers with `setTimeout`, as `setTimeout` still inherently allocates memory for callbacks and internal V8 structures.
+## 2024-10-15 - Object Pools for Continuous Animations
+**Learning:** Rapidly instantiating and destroying Konva.js objects (like floating particles) inside a high-frequency animation loop (via `Konva.Animation`) causes severe garbage collection churn and memory bloat. Furthermore, iterating over `layer.getChildren()` during these updates mistakenly affects mixed child types (like transient dust puffs) leading to broken behavior or NaNs.
+**Action:** Pre-allocate a fixed array (Object Pool) of Konva elements during initialization. Reuse them by toggling `active` and `visible: false` rather than calling `destroy()`. Always iterate over this dedicated array instead of `layer.getChildren()` for loop updates.
