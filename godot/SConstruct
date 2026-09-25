@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+import os
+import sys
+
+# Call SConscript from the cloned godot-cpp bindings
+env = SConscript("godot-cpp/SConstruct")
+
+# Tweak compilation flags and includes
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+
+# Output to bin/ directory relative to godot/
+if env["platform"] == "macos":
+    library = env.SharedLibrary(
+        "bin/libd2_engine.{}.{}.framework/libd2_engine.{}.{}".format(
+            env["platform"], env["target"], env["platform"], env["target"]
+        ),
+        source=sources,
+    )
+elif env["platform"] == "ios":
+    if env["ios_simulator"]:
+        library = env.StaticLibrary(
+            "bin/libd2_engine.{}.{}.simulator.a".format(env["platform"], env["target"]),
+            source=sources,
+        )
+    else:
+        library = env.StaticLibrary(
+            "bin/libd2_engine.{}.{}.a".format(env["platform"], env["target"]),
+            source=sources,
+        )
+else:
+    library = env.SharedLibrary(
+        "bin/libd2_engine{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+        source=sources,
+    )
+
+env.NoCache(library)
+Default(library)

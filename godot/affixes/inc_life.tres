@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="IncLifeAffix" format=3]
+
+[ext_resource type="Script" path="res://scripts/itemization/affixes/inc_life.gd" id="1_inc_life"]
+
+[resource]
+script = ExtResource("1_inc_life")
+enabled = true
+hidden = false
+id = "inc_life"
+description = "+#% Increased Life"
+weight = 100
+price_multiplier = 1.2

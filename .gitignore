@@ -35,3 +35,10 @@ token.json
 # Git Worktrees
 .worktrees/
 
+
+# GDExtension build output
+godot/bin/
+godot/.sconsign.dblite
+godot/src/*.os
+# Duplicate source art (identical copies live in godot/assets/characters)
+Charaters/
