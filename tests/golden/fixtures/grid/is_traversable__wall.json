@@ -1,0 +1,1 @@
+{"case": "is_traversable__wall", "expected": false, "function": "is_traversable", "inputs": {"cell": {"occupant_id": null, "terrain": "wall"}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

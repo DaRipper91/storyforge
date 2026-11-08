@@ -1,0 +1,8 @@
+{
+  "case": "find_starting_position__all_tables",
+  "expected": {"message_contains": "no traversable cells", "raises": "RuntimeError"},
+  "function": "find_starting_position",
+  "inputs": {"state": {"campaign_id": "mini", "current_room_id": "mini", "phase": "exploration", "revision": 0, "rooms": {"mini": {"cells": [{"occupant_id": null, "terrain": "table"}, {"occupant_id": null, "terrain": "table"}, {"occupant_id": null, "terrain": "table"}, {"occupant_id": null, "terrain": "table"}], "description": "test room", "exits": {}, "height": 2, "id": "mini", "name": "Mini", "width": 2}}}},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

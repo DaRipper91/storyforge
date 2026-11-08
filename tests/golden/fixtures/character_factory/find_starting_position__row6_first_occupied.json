@@ -1,0 +1,59 @@
+{
+  "case": "find_starting_position__row6_first_occupied",
+  "expected": {"x": 2, "y": 6},
+  "function": "find_starting_position",
+  "inputs": {
+    "state": {
+      "campaign_id": "mini",
+      "current_room_id": "mini",
+      "phase": "exploration",
+      "revision": 0,
+      "rooms": {
+        "mini": {
+          "cells": [
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": "x", "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}
+          ],
+          "description": "test room",
+          "exits": {},
+          "height": 8,
+          "id": "mini",
+          "name": "Mini",
+          "width": 8
+        }
+      }
+    }
+  },
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

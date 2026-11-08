@@ -1,0 +1,1 @@
+{"case": "chebyshev_distance__same", "expected": 0, "function": "chebyshev_distance", "inputs": {"a": {"x": 2, "y": 2}, "b": {"x": 2, "y": 2}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

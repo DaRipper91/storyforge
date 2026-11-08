@@ -36,10 +36,96 @@ signal particle_event_received(ev: Dictionary)
 var ws_client: WebSocketPeer = WebSocketPeer.new()
 var is_connected: bool = false
 
+# ─── Backend mode (remote FastAPI server vs in-process LocalBackend) ─
+# Priority: --backend=local|remote user arg, STORYFORGE_BACKEND env,
+# user://backend.cfg [backend] mode=..., default "remote".
+# STORYFORGE_SAVE_DIR env / --save-dir=<dir> override the local save dir
+# (default user://campaigns/); used by the smoke tests.
+
+const _BackendHttp = preload("res://scripts/backend/backend_http.gd")
+const _LocalBackend = preload("res://scripts/backend/local_backend.gd")
+const BACKEND_CONFIG_PATH = "user://backend.cfg"
+const MODE_LOCAL = "local"
+const MODE_REMOTE = "remote"
+const DEFAULT_LOCAL_SAVE_DIR = "user://campaigns/"
+
+var backend_mode: String = MODE_REMOTE
+var _local_backend = null  # LocalBackend in local mode, else null
+var _local_boot_signalled: bool = false
+
+func is_local() -> bool:
+	return backend_mode == MODE_LOCAL
+
+func get_local_backend():
+	return _local_backend
+
+## Factory for every request node in the project: a real HTTPRequest in remote
+## mode, a BackendHttp bound to the shared LocalBackend in local mode.
+func new_http() -> Node:
+	if is_local() and _local_backend != null:
+		var shim = _BackendHttp.new()
+		shim.backend = _local_backend
+		return shim
+	return HTTPRequest.new()
+
+static func _valid_mode(m: String) -> bool:
+	return m == MODE_LOCAL or m == MODE_REMOTE
+
+func _resolve_mode() -> String:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--backend="):
+			var m = arg.substr(10).strip_edges().to_lower()
+			if _valid_mode(m):
+				return m
+	var env = OS.get_environment("STORYFORGE_BACKEND").strip_edges().to_lower()
+	if _valid_mode(env):
+		return env
+	var cfg = ConfigFile.new()
+	if cfg.load(BACKEND_CONFIG_PATH) == OK:
+		var m2 = str(cfg.get_value("backend", "mode", "")).strip_edges().to_lower()
+		if _valid_mode(m2):
+			return m2
+	# No android-hosted server to talk to: phones default to the in-process backend.
+	return MODE_LOCAL if OS.has_feature("android") else MODE_REMOTE
+
+func _resolve_save_dir() -> String:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--save-dir="):
+			var d = arg.substr(11)
+			if not d.is_empty():
+				return d
+	var env = OS.get_environment("STORYFORGE_SAVE_DIR")
+	if not env.is_empty():
+		return env
+	return DEFAULT_LOCAL_SAVE_DIR
+
+func _setup_local_backend() -> void:
+	# Live rolls, system clock, bundled seed; boots like main.lifespan
+	# (saved family_campaign_01 if present, else the seed).
+	_local_backend = _LocalBackend.new(_resolve_save_dir())
+	# ws "state_diff" equivalent: the client only refetches the full state.
+	_local_backend.state_changed.connect(_on_local_state_changed)
+	_signal_local_boot()
+
+func _on_local_state_changed(_state: Dictionary) -> void:
+	fetch_full_state()
+
+func _signal_local_boot() -> void:
+	# First frame: BootManager (and anything else) has connected by now.
+	await get_tree().process_frame
+	if _local_boot_signalled:
+		return
+	_local_boot_signalled = true
+	is_connected = true
+	connection_status_changed.emit(true)
+
 # ─── Called by BootManager once the URL is confirmed ───────────────
 
 func _ready() -> void:
 	_setup_input_map()
+	backend_mode = _resolve_mode()
+	if is_local():
+		_setup_local_backend()
 
 func _setup_input_map() -> void:
 	var actions = {
@@ -82,6 +168,10 @@ func _setup_input_map() -> void:
 				InputMap.action_add_event(action, event)
 
 func start_connection(url: String) -> void:
+	if is_local():
+		# No server: BootManager is released by the first-frame signal.
+		_signal_local_boot()
+		return
 	server_url = url.rstrip("/")
 	_save_url(server_url)
 	check_python_server()
@@ -101,7 +191,7 @@ func _save_url(url: String) -> void:
 # ─── Connection ────────────────────────────────────────────────────
 
 func check_python_server():
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_health_check_completed)
 	http.request(_base_url + "/healthz")
@@ -121,6 +211,8 @@ func connect_websocket():
 	ws_client.connect_to_url(_ws_url)
 
 func _process(_delta):
+	if is_local():
+		return
 	ws_client.poll()
 	var state = ws_client.get_ready_state()
 	if state == WebSocketPeer.STATE_OPEN:
@@ -160,7 +252,7 @@ func _handle_npc_event(ev: Dictionary):
 # ─── REST helpers ──────────────────────────────────────────────────
 
 func fetch_full_state():
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_state_fetched)
 	http.request(_base_url + "/state")
@@ -170,16 +262,16 @@ func _on_state_fetched(_result, _response_code, _headers, body):
 	if json:
 		state_updated.emit(json)
 
-func post_request(endpoint: String, data: Dictionary) -> HTTPRequest:
-	var http = HTTPRequest.new()
+func post_request(endpoint: String, data: Dictionary) -> Node:
+	var http = new_http()
 	add_child(http)
 	var json_data = JSON.stringify(data)
 	var headers = ["Content-Type: application/json"]
 	http.request(_base_url + endpoint, headers, HTTPClient.METHOD_POST, json_data)
 	return http
 
-func get_request(endpoint: String) -> HTTPRequest:
-	var http = HTTPRequest.new()
+func get_request(endpoint: String) -> Node:
+	var http = new_http()
 	add_child(http)
 	http.request(_base_url + endpoint)
 	return http
@@ -190,7 +282,7 @@ signal auth_completed(success: bool, user_info: Dictionary)
 
 func trigger_desktop_login():
 	print("Triggering Desktop Auth flow...")
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_auth_completed)
 	http.request(_base_url + "/auth/desktop_login", [], HTTPClient.METHOD_POST, "")
@@ -209,7 +301,7 @@ func _on_auth_completed(_result, response_code, _headers, body):
 signal catalog_received(catalog_data: Dictionary)
 
 func fetch_catalog():
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_catalog_fetched)
 	http.request(_base_url + "/lobby/catalog")
@@ -228,7 +320,7 @@ signal new_campaign_ready(state: Dictionary)
 signal campaign_loaded(state: Dictionary)
 
 func fetch_campaigns() -> void:
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_campaigns_fetched)
 	http.request(_base_url + "/campaigns")
@@ -242,7 +334,7 @@ func _on_campaigns_fetched(_result, response_code, _headers, body):
 			campaigns_received.emit([])
 
 func new_campaign() -> void:
-	var http = HTTPRequest.new()
+	var http = new_http()
 	add_child(http)
 	http.request_completed.connect(_on_new_campaign_ready)
 	http.request(_base_url + "/campaigns/new", [], HTTPClient.METHOD_POST, "")

@@ -1,0 +1,1 @@
+{"case": "generate_char_id__collision_appends_token", "expected": "rook_a1b2", "function": "generate_char_id", "inputs": {"existing": ["rook"], "name": "Rook"}, "module": "character_factory", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": ["a1b2"]}}

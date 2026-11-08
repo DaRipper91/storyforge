@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__fallenlight_swarm_host",
+  "expected": {"alive": true, "armor_class": 16, "attack_bonus": 3, "damage_dice": "1d6", "description": "A hostile Halo. Wields Severed-Halo Blade. Aasimars whose divine connection severed; they still glow, but nothing answers when they call.", "hp_current": 10, "hp_max": 10, "id": "e_fallenlight", "loot": [], "name": "Halo", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 7},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_fallenlight", "ev_state": "swarm_host", "name_override": "Halo", "position": {"x": 3, "y": 3}, "race": "fallenlight", "room_id": "mini", "xp_reward": 7},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

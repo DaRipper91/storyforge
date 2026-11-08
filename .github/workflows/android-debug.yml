@@ -1,0 +1,201 @@
+name: Android Debug APK
+
+# Builds an offline-mode debug APK for sideloading (adb install). Dev laptop is
+# aarch64 and cannot build Android, so this runs on an x86-64 runner.
+# No releases are published; the APK is only a 14-day workflow artifact.
+
+on:
+  push:
+    branches: [ offline-port ]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/android-debug.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-debug-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.6.2"
+  GODOT_TAG: "4.6.2-stable"
+  # Versions per https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html
+  # and platform/android/java/app/config.gradle @ 4.6.2-stable
+  # (buildTools 35.0.1, compileSdk/targetSdk 35, ndkVersion 28.1.13356709).
+  ANDROID_PLATFORM: "platforms;android-35"
+  ANDROID_BUILD_TOOLS: "35.0.1"
+  ANDROID_NDK: "28.1.13356709"
+  ANDROID_CMAKE: "3.10.2.4988404"
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download Godot editor and export templates (SHA512 verified)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot-dl"
+          cd "$RUNNER_TEMP/godot-dl"
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_TAG}"
+          editor="Godot_v${GODOT_TAG}_linux.x86_64.zip"
+          templates="Godot_v${GODOT_TAG}_export_templates.tpz"
+          curl -fsSL --retry 3 -O "$base/SHA512-SUMS.txt"
+          curl -fsSL --retry 3 -O "$base/$editor"
+          curl -fsSL --retry 3 -O "$base/$templates"
+          # Match on exact file names; fail if either line is absent.
+          grep -E "  (${editor}|${templates})\$" SHA512-SUMS.txt > wanted.sha512
+          test "$(wc -l < wanted.sha512)" -eq 2
+          sha512sum -c wanted.sha512
+
+          unzip -q "$editor"
+          mv "Godot_v${GODOT_TAG}_linux.x86_64" "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot" >> "$GITHUB_ENV"
+
+          tdir="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$tdir"
+          unzip -q "$templates" -d tpl
+          mv tpl/templates/* "$tdir/"
+          ls "$tdir" | head -50
+          test -f "$tdir/android_debug.apk"
+          "$RUNNER_TEMP/godot" --headless --version
+
+      - name: Install Android SDK components
+        run: |
+          set -euo pipefail
+          : "${ANDROID_HOME:?ANDROID_HOME not set on runner}"
+          sdkm="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$sdkm" ]; then
+            sdkm="$(find "$ANDROID_HOME" -name sdkmanager -type f | head -1)"
+          fi
+          echo "sdkmanager: $sdkm"
+          # `yes` gets SIGPIPE when sdkmanager exits; don't let pipefail trip on it.
+          set +o pipefail
+          yes | "$sdkm" --sdk_root="$ANDROID_HOME" --licenses > /dev/null
+          set -o pipefail
+          "$sdkm" --sdk_root="$ANDROID_HOME" \
+            "platform-tools" \
+            "build-tools;${ANDROID_BUILD_TOOLS}" \
+            "$ANDROID_PLATFORM" \
+            "cmdline-tools;latest" \
+            "cmake;${ANDROID_CMAKE}" \
+            "ndk;${ANDROID_NDK}"
+          test -d "$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}"
+
+      - name: Configure Godot editor settings
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.config/godot"
+          cat > "$HOME/.config/godot/editor_settings-4.6.tres" <<TRES
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "${ANDROID_HOME}"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          TRES
+          cat "$HOME/.config/godot/editor_settings-4.6.tres"
+
+      - name: Generate throwaway debug keystore
+        run: |
+          set -euo pipefail
+          ks="$RUNNER_TEMP/debug.keystore"
+          keytool -genkeypair -v -keystore "$ks" -storepass android -keypass android \
+            -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          {
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$ks"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android"
+          } >> "$GITHUB_ENV"
+
+      - name: GDScript regression suites (function fixtures)
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-tests" bash tools/golden/run_gd_tests.sh
+
+      - name: GDScript regression suites (route fixtures)
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-routes" bash tools/golden/run_gd_routes.sh
+
+      - name: Import project
+        run: |
+          set -uo pipefail
+          "$GODOT_BIN" --headless --path godot --import 2>&1 | tee "$RUNNER_TEMP/import.log"
+          rc=${PIPESTATUS[0]}
+          # Errors that originate in a vendored addon (res://addons/...) are reported
+          # but do not block the build: PushDownAutomata is a Godot 3 addon that still
+          # uses the removed `tool` keyword and nothing in the game references it, and
+          # phantom_camera logs singleton errors in headless mode. Godot prints the
+          # offending file on the line after each SCRIPT ERROR ("at: ... (res://...)"),
+          # so classify by that line. Any error from game code (res://scripts, scenes,
+          # assets, tests) is a real failure.
+          addon_errs="$(awk '/SCRIPT ERROR|Parse Error/ { h=$0; if ((getline n) > 0 && n ~ /res:\/\/addons\//) print h " | " n }' "$RUNNER_TEMP/import.log" || true)"
+          if [ -n "$addon_errs" ]; then
+            echo "::warning::Ignoring script errors that originate in vendored addons:"
+            echo "$addon_errs"
+          fi
+          real="$(awk '/SCRIPT ERROR|Parse Error/ { h=$0; if ((getline n) > 0 && n !~ /res:\/\/addons\//) print h " | " n }' "$RUNNER_TEMP/import.log" | grep -viE 'phantom_?camera' || true)"
+          if [ -n "$real" ]; then
+            echo "::error::Script errors from game code during import:"
+            echo "$real"
+            exit 1
+          fi
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::godot --import exited $rc (continuing; export decides)"
+          fi
+
+      - name: Export debug APK
+        run: |
+          set -euo pipefail
+          mkdir -p build/android
+          "$GODOT_BIN" --headless --path godot --export-debug "Android" ../build/android/storyforge-debug.apk
+          apk=build/android/storyforge-debug.apk
+          test -f "$apk" || { echo "::error::APK missing"; exit 1; }
+          size=$(stat -c %s "$apk")
+          echo "APK size: $size bytes"
+          if [ "$size" -lt 5242880 ]; then
+            echo "::error::APK smaller than 5 MB ($size)"
+            exit 1
+          fi
+
+      - name: Inspect APK
+        run: |
+          set -uo pipefail
+          apk=build/android/storyforge-debug.apk
+          # Write the listing to a file first: `unzip -l | grep -q` under pipefail makes
+          # unzip die of SIGPIPE when grep exits early, which reads as a false failure.
+          lst="$RUNNER_TEMP/apk.lst"
+          unzip -l "$apk" > "$lst"
+          grep -E 'AndroidManifest.xml|lib/arm64-v8a/' "$lst" | head -10 || true
+          grep -qE 'lib/arm64-v8a/.*\.so' "$lst" || { echo "::error::arm64 lib missing"; exit 1; }
+          grep -q 'AndroidManifest.xml' "$lst" || { echo "::error::manifest missing"; exit 1; }
+          apksigner="$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}/apksigner"
+          if [ -x "$apksigner" ]; then
+            "$apksigner" verify --verbose --print-certs "$apk" || echo "::warning::apksigner verify failed"
+          else
+            echo "apksigner not found; skipping verify"
+          fi
+          sha256sum "$apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storyforge-debug-apk
+          path: build/android/storyforge-debug.apk
+          retention-days: 14
+          if-no-files-found: error

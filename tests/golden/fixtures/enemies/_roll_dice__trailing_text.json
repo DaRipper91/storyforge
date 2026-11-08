@@ -1,0 +1,1 @@
+{"case": "_roll_dice__trailing_text", "expected": 2, "function": "_roll_dice", "inputs": {"notation": "1d8 slashing"}, "module": "enemies", "rng_script": {"choice_index": [], "randint": [2], "randint_bounds": [[1, 8]], "random": [], "token_hex": []}}

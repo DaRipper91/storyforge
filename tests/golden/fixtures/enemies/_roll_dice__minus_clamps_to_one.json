@@ -1,0 +1,1 @@
+{"case": "_roll_dice__minus_clamps_to_one", "expected": 1, "function": "_roll_dice", "inputs": {"notation": "1d4-9"}, "module": "enemies", "rng_script": {"choice_index": [], "randint": [2], "randint_bounds": [[1, 4]], "random": [], "token_hex": []}}

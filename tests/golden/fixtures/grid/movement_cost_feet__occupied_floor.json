@@ -1,0 +1,1 @@
+{"case": "movement_cost_feet__occupied_floor", "expected": 5, "function": "movement_cost_feet", "inputs": {"cell": {"occupant_id": "bob", "terrain": "floor"}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

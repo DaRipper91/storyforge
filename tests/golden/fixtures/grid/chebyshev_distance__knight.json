@@ -1,0 +1,1 @@
+{"case": "chebyshev_distance__knight", "expected": 5, "function": "chebyshev_distance", "inputs": {"a": {"x": 1, "y": 1}, "b": {"x": 3, "y": 6}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

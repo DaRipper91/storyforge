@@ -1,0 +1,1 @@
+{"case": "generate_char_id__no_collision_consumes_no_rng", "expected": "rook", "function": "generate_char_id", "inputs": {"existing": ["alpha", "beta"], "name": "Rook"}, "module": "character_factory", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

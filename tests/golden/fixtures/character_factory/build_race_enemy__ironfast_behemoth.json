@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__ironfast_behemoth",
+  "expected": {"alive": true, "armor_class": 18, "attack_bonus": 4, "damage_dice": "1d10", "description": "A hostile Ironfast. Wields Stone-Crusher Maul. Dwarves whose bones calcified past stone; they are slower, denser, and nearly impossible to put down.", "hp_current": 15, "hp_max": 15, "id": "e_ironfast", "loot": [], "name": "Ironfast", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 162},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_ironfast", "ev_state": "behemoth", "position": {"x": 3, "y": 3}, "race": "ironfast", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

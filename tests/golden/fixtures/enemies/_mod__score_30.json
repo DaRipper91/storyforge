@@ -1,0 +1,1 @@
+{"case": "_mod__score_30", "expected": 10, "function": "_mod", "inputs": {"score": 30}, "module": "enemies", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}
