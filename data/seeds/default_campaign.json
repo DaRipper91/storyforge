@@ -216,6 +216,20 @@
       "blocks_movement": false,
       "description": "The household's sentinel. A white cat with blue eyes who watches the front gate from the highest point."
     },
+    "bink_bink": {
+      "id": "bink_bink",
+      "name": "Bink Bink",
+      "position": {
+        "x": 7,
+        "y": 1
+      },
+      "room_id": "ironhold_keep",
+      "sprite_key": "npc_cat_black",
+      "interactable": true,
+      "encounter_id": "pet_bink_bink",
+      "blocks_movement": false,
+      "description": "D.Anna's cat. Black, with green eyes. Interior guardian of Ironhold Keep. Every 8-12 minutes something in the castle falls off a shelf: Quality Control. Never explained. Snowie's best friend and opposite."
+    },
     "mykael": {
       "id": "mykael",
       "name": "Mykael Greenwood",
@@ -973,7 +987,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "npc_bink_bink"
         },
         {
           "terrain": "floor",
