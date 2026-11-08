@@ -1174,6 +1174,10 @@ func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
 
 
 func _update_narrative(state: Dictionary):
+	# _narrative_box is only built inside _load_level(), which nothing calls; a real state
+	# with narrative_log entries (seed / offline) would otherwise assign .text on null.
+	if _narrative_box == null:
+		return
 	var log_entries = state.get("narrative_log", [])
 	if log_entries.is_empty():
 		return
@@ -1515,7 +1519,7 @@ func _npc_do_action(act: Dictionary) -> void:
 		return
 	_npc_dialog_resp.text = "[color=#888888][i]...[/i][/color]"
 
-	var http: HTTPRequest
+	var http: Node
 	if act.get("method", "GET") == "GET":
 		http = pc.get_request(act["path"])
 	else:
@@ -2032,6 +2036,13 @@ func _on_freeform_submitted(text: String) -> void:
 				var nar: String = resp.get("narrative", "")
 				if not nar.is_empty():
 					_narrative_box.append_text("\n[color=#e8d9b0]%s[/color]" % nar)
+		elif _narrative_box:
+			# Offline (501) / server error: surface the backend's message instead of failing silently.
+			var err = JSON.parse_string(body.get_string_from_utf8())
+			var msg: String = str(err.get("detail", "")) if err is Dictionary else ""
+			if msg.is_empty():
+				msg = "That action is unavailable right now."
+			_narrative_box.append_text("\n[color=#c08060]%s[/color]" % msg)
 		http.queue_free()
 	)
 
