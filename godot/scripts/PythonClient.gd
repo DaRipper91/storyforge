@@ -85,7 +85,8 @@ func _resolve_mode() -> String:
 		var m2 = str(cfg.get_value("backend", "mode", "")).strip_edges().to_lower()
 		if _valid_mode(m2):
 			return m2
-	return MODE_REMOTE
+	# No android-hosted server to talk to: phones default to the in-process backend.
+	return MODE_LOCAL if OS.has_feature("android") else MODE_REMOTE
 
 func _resolve_save_dir() -> String:
 	for arg in OS.get_cmdline_user_args():
