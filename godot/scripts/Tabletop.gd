@@ -1029,54 +1029,20 @@ func _update_enemy_tokens(state: Dictionary) -> void:
 				_enemy_tokens.erase(eid)
 
 
-const _ENEMY_MODEL_DIR := "res://assets/models/enemies/"
-const _DRAGON_MODEL_DIR := "res://assets/models/dragons/"
-
-# sprite_key → model file (without dir prefix and .glb)
-const _ENEMY_SPRITE_MAP: Dictionary = {
-	"skeleton":       "enemies/skeleton",
-	"ghoul":          "enemies/ghoul",
-	"bandit":         "enemies/bandit",
-	"thug":           "enemies/thug",
-	"animated_armor": "enemies/animated_armor",
-	"shadow":         "enemies/shadow",
-	"race_enemy":     "enemies/race_enemy",
-	"dragon_red":     "dragons/dragon_red",
-	"dragon_green":   "dragons/dragon_green",
-	"dragon_blue":    "dragons/dragon_blue",
-	"dragon_black":   "dragons/dragon_black",
-	"dragon_white":   "dragons/dragon_white",
-	"dragon_gold":    "dragons/dragon_gold",
-	"dragon_whelp":   "dragons/dragon_whelp",
-}
-
 func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 	var pos = data.get("position", {"x": 0, "y": 0})
 	var root := Node3D.new()
 	root.name = "Enemy_" + enemy_id
 	root.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
 
-	# Try to load a .glb model based on sprite_key
+	# Model lookup: characters/<id> → enemy kind from id stem ("ghoul_01") →
+	# sprite_key. Height, grounding and idle clip are handled by ModelLibrary.
 	var sprite_key: String = data.get("sprite_key", "")
 	var model_loaded := false
-	if not sprite_key.is_empty() and sprite_key in _ENEMY_SPRITE_MAP:
-		var rel_path: String = _ENEMY_SPRITE_MAP[sprite_key]
-		var glb_path: String = "res://assets/models/" + rel_path + ".glb"
-		if ResourceLoader.exists(glb_path):
-			var scene := load(glb_path) as PackedScene
-			if scene:
-				var inst := scene.instantiate()
-				var is_dragon := rel_path.begins_with("dragons/")
-				inst.scale = Vector3(0.9, 0.9, 0.9) if is_dragon else Vector3(0.55, 0.55, 0.55)
-				# Animate idle if AnimationPlayer present
-				var ap := _find_anim_player_in(inst)
-				if ap:
-					for n in ["Idle", "Idle_A", "idle"]:
-						if ap.has_animation(n):
-							ap.play(n)
-							break
-				root.add_child(inst)
-				model_loaded = true
+	var inst := ModelLibrary.instantiate_for_key(sprite_key, enemy_id)
+	if inst:
+		root.add_child(inst)
+		model_loaded = true
 
 	if not model_loaded:
 		# Use RaceMini for dynamic 3D shapes based on enemy type
@@ -1170,6 +1136,9 @@ const NPC_COLORS: Dictionary = {
 	"npc_cat_white":Color(0.95, 0.95, 1.0),    # white — cat
 	"npc_dog":      Color(0.70, 0.55, 0.35),   # brown — dog
 	"npc_dog_black":Color(0.20, 0.18, 0.22),   # dark — black dog
+	"npc_cat_black":Color(0.37, 0.82, 0.48),   # green-eyed black cat (Bink Bink)
+	"npc_teddy":    Color(0.95, 0.87, 0.69),   # golden cream — Teddy
+	"npc_mykael":   Color(0.70, 0.45, 0.20),   # brown — Mykael
 }
 
 func _npc_color(sprite_key: String) -> Color:
@@ -1187,6 +1156,14 @@ func _spawn_npc_token(npc_id: String, data: Dictionary) -> void:
 	mini.position = _grid_to_world(Vector2(pos.get("x", 0), pos.get("y", 0)))
 	add_child(mini)
 	mini.setup(sprite_key, display_name, false)
+	# Beasts are never targeted or rolled for, so they get no identity ring.
+	var is_beast: bool = sprite_key.begins_with("npc_dog") or sprite_key.begins_with("npc_cat") \
+		or sprite_key in ["npc_wolf", "npc_teddy"]
+	var model := ModelLibrary.instantiate_for_key(sprite_key, npc_id)
+	if model:
+		mini.use_model(model, _npc_color(sprite_key), not is_beast)
+	else:
+		mini.set_tint(_npc_color(sprite_key))
 	_npc_tokens[npc_id] = mini
 	NpcManager.register_npc(npc_id, mini)
 	
@@ -1221,6 +1198,9 @@ func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, c
 	root.position = _grid_to_world(grid_pos)
 	add_child(root)          # add first so @onready vars resolve before setup()
 	root.setup(race_id, char_name)
+	var model := ModelLibrary.instantiate_for_race(character_id, race_id)
+	if model:
+		root.use_model(model, RaceMini.RACE_COLORS.get(race_id, Color(0.3, 0.5, 0.8)))
 	_miniatures[character_id] = root
 	return root
 
@@ -1363,10 +1343,7 @@ func _do_attack_enemy(enemy_id: String, actor_id: String) -> void:
 					if resp.get("enemy_died", false):
 						var ap := _find_anim_player_in(etok)
 						if ap:
-							for n in ["Death", "Die", "Fall", "death"]:
-								if ap.has_animation(n):
-									ap.play(n)
-									break
+							ModelLibrary.play_role(ap, "death")
 						var bar := etok.get_node_or_null("HPBar")
 						if bar:
 							bar.visible = false
