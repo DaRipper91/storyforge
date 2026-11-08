@@ -177,9 +177,13 @@ jobs:
         run: |
           set -uo pipefail
           apk=build/android/storyforge-debug.apk
-          unzip -l "$apk" | grep -E 'AndroidManifest.xml|lib/arm64-v8a/|assets/' | head -30
-          unzip -l "$apk" | grep -qE 'lib/arm64-v8a/.*\.so' || { echo "::error::arm64 lib missing"; exit 1; }
-          unzip -l "$apk" | grep -q 'AndroidManifest.xml' || { echo "::error::manifest missing"; exit 1; }
+          # Write the listing to a file first: `unzip -l | grep -q` under pipefail makes
+          # unzip die of SIGPIPE when grep exits early, which reads as a false failure.
+          lst="$RUNNER_TEMP/apk.lst"
+          unzip -l "$apk" > "$lst"
+          grep -E 'AndroidManifest.xml|lib/arm64-v8a/' "$lst" | head -10 || true
+          grep -qE 'lib/arm64-v8a/.*\.so' "$lst" || { echo "::error::arm64 lib missing"; exit 1; }
+          grep -q 'AndroidManifest.xml' "$lst" || { echo "::error::manifest missing"; exit 1; }
           apksigner="$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}/apksigner"
           if [ -x "$apksigner" ]; then
             "$apksigner" verify --verbose --print-certs "$apk" || echo "::warning::apksigner verify failed"
