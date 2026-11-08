@@ -27,6 +27,7 @@ TimeManager="*res://scripts/TimeManager.gd"
 NpcManager="*res://scripts/NpcManager.gd"
 InventorySystem="*res://scenes/ui/inventory_system.tscn"
 ItemTooltip="*res://scenes/ui/item_tooltip.tscn"
+AffixPool="*res://scripts/itemization/AffixPool.gd"
 
 [display]
 

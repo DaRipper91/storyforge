@@ -96,18 +96,18 @@ var _world_map_visible: bool       = false
 
 # World map layout: room_id → {label, pos (pixels), connections}
 const WORLD_MAP_NODES: Dictionary = {
-    "crossroads":       {"label": "The Crossroads",    "pos": Vector2(340, 280)},
-    "ironhold_keep":    {"label": "Ironhold Keep",     "pos": Vector2(340, 100)},
-    "keep_courtyard":   {"label": "Keep Courtyard",    "pos": Vector2(340, 180)},
-    "keep_barracks":    {"label": "Keep Barracks",     "pos": Vector2(220, 100)},
-    "market_square":    {"label": "Market Square",     "pos": Vector2(530, 200)},
-    "store_01":         {"label": "The Store",         "pos": Vector2(530, 100)},
-    "back_alley":       {"label": "Back Alley",        "pos": Vector2(650, 200)},
-    "nightside_square": {"label": "Nightside Square",  "pos": Vector2(340, 380)},
-    "tavern_01":        {"label": "Crooked Tankard",   "pos": Vector2(530, 380)},
-    "cellar_depths":    {"label": "Cellar Depths",     "pos": Vector2(180, 380)},
-    "forest_edge":      {"label": "The Wild Reaches",  "pos": Vector2(140, 280)},
-    "ancient_ruins":    {"label": "Ancient Ruins",     "pos": Vector2(30,  280)},
+	"crossroads":       {"label": "The Crossroads",    "pos": Vector2(340, 280)},
+	"ironhold_keep":    {"label": "Ironhold Keep",     "pos": Vector2(340, 100)},
+	"keep_courtyard":   {"label": "Keep Courtyard",    "pos": Vector2(340, 180)},
+	"keep_barracks":    {"label": "Keep Barracks",     "pos": Vector2(220, 100)},
+	"market_square":    {"label": "Market Square",     "pos": Vector2(530, 200)},
+	"store_01":         {"label": "The Store",         "pos": Vector2(530, 100)},
+	"back_alley":       {"label": "Back Alley",        "pos": Vector2(650, 200)},
+	"nightside_square": {"label": "Nightside Square",  "pos": Vector2(340, 380)},
+	"tavern_01":        {"label": "Crooked Tankard",   "pos": Vector2(530, 380)},
+	"cellar_depths":    {"label": "Cellar Depths",     "pos": Vector2(180, 380)},
+	"forest_edge":      {"label": "The Wild Reaches",  "pos": Vector2(140, 280)},
+	"ancient_ruins":    {"label": "Ancient Ruins",     "pos": Vector2(30,  280)},
 }
 
 # ─── Selection ───────────────────────────────────────────────────────

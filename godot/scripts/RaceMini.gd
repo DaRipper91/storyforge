@@ -28,10 +28,10 @@ var _selected: bool = false
 var _phantom_cam: Node3D = null
 
 func _process(delta: float) -> void:
-    if _selected and _material:
-        _pulse_time += delta * 4.0
-        var pulse = (sin(_pulse_time) + 1.0) * 0.5
-        _material.set_shader_parameter("rim_width", lerp(4.0, 12.0, pulse))
+	if _selected and _material:
+		_pulse_time += delta * 4.0
+		var pulse = (sin(_pulse_time) + 1.0) * 0.5
+		_material.set_shader_parameter("rim_width", lerp(4.0, 12.0, pulse))
 
 # ─── DATA-DRIVEN SILHOUETTES ───
 const RACE_RECIPES: Dictionary = {
@@ -243,41 +243,41 @@ const RACE_COLORS: Dictionary = {
 }
 
 func _ready() -> void:
-    _init_material()
-    _setup_phantom_camera()
-    if Engine.is_editor_hint():
-        setup(editor_race_id, "", editor_is_enemy)
+	_init_material()
+	_setup_phantom_camera()
+	if Engine.is_editor_hint():
+		setup(editor_race_id, "", editor_is_enemy)
 
 func _setup_phantom_camera() -> void:
-    if Engine.is_editor_hint(): return
-    # Create a PhantomCamera3D node
-    _phantom_cam = Node3D.new()
-    _phantom_cam.set_script(load("res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd"))
-    _phantom_cam.name = "SelectionPhantomCamera"
-    add_child(_phantom_cam)
+	if Engine.is_editor_hint(): return
+	# Create a PhantomCamera3D node
+	_phantom_cam = Node3D.new()
+	_phantom_cam.set_script(load("res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_3d.gd"))
+	_phantom_cam.name = "SelectionPhantomCamera"
+	add_child(_phantom_cam)
 
-    # Configure it
-    _phantom_cam.set("priority", 0)
-    _phantom_cam.set("follow_mode", 2) # Third Person
-    _phantom_cam.set("look_at_mode", 1) # Simple
-    _phantom_cam.set("follow_target", self)
-    _phantom_cam.set("look_at_target", self)
+	# Configure it
+	_phantom_cam.set("priority", 0)
+	_phantom_cam.set("follow_mode", 2) # Third Person
+	_phantom_cam.set("look_at_mode", 1) # Simple
+	_phantom_cam.set("follow_target", self)
+	_phantom_cam.set("look_at_target", self)
 
-    # Nice cinematic offset
-    _phantom_cam.set("third_person_distance", 4.0)
-    _phantom_cam.set("third_person_tilt", -20.0)
+	# Nice cinematic offset
+	_phantom_cam.set("third_person_distance", 4.0)
+	_phantom_cam.set("third_person_tilt", -20.0)
 func _init_material() -> void:
-    if _material: return
-    _material = ShaderMaterial.new()
-    _material.shader = FlexibleToonShader
-    _material.set_shader_parameter("albedo", Color(1.0, 1.0, 1.0))
-    _material.set_shader_parameter("rim_color", Color(1.0, 1.0, 1.0))
-    _material.set_shader_parameter("rim_width", 2.0)
-    _material.set_shader_parameter("cuts", 3)
-    _material.set_shader_parameter("steepness", 1.5)
-    _material.set_shader_parameter("use_rim", true)
-    if mesh_instance:
-        mesh_instance.material_override = _material
+	if _material: return
+	_material = ShaderMaterial.new()
+	_material.shader = FlexibleToonShader
+	_material.set_shader_parameter("albedo", Color(1.0, 1.0, 1.0))
+	_material.set_shader_parameter("rim_color", Color(1.0, 1.0, 1.0))
+	_material.set_shader_parameter("rim_width", 2.0)
+	_material.set_shader_parameter("cuts", 3)
+	_material.set_shader_parameter("steepness", 1.5)
+	_material.set_shader_parameter("use_rim", true)
+	if mesh_instance:
+		mesh_instance.material_override = _material
 func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) -> void:
 	if not mesh_instance: 
 		mesh_instance = get_node_or_null("MeshInstance3D")
@@ -296,9 +296,9 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 	if is_enemy and not race_id in RACE_COLORS: color = Color(0.8, 0.2, 0.2)
 	
 	if _material:
-	    _material.set_shader_parameter("albedo", color)
-	    _material.set_shader_parameter("rim_color", color * 1.2)
-	    _material.set_shader_parameter("rim_width", 2.0)
+		_material.set_shader_parameter("albedo", color)
+		_material.set_shader_parameter("rim_color", color * 1.2)
+		_material.set_shader_parameter("rim_width", 2.0)
 func _add_recipe_part(data: Dictionary) -> void:
 	var mesh: Mesh
 	match data.get("type", "box"):
@@ -321,22 +321,22 @@ func _add_recipe_part(data: Dictionary) -> void:
 		mesh_instance.add_child(mi)
 
 func select() -> void:
-    _selected = true
-    if _phantom_cam:
-        _phantom_cam.set("priority", 20)
-    if _material:
-        _material.set_shader_parameter("rim_color", Color(1.0, 0.9, 0.3))
-        _material.set_shader_parameter("rim_width", 8.0)
+	_selected = true
+	if _phantom_cam:
+		_phantom_cam.set("priority", 20)
+	if _material:
+		_material.set_shader_parameter("rim_color", Color(1.0, 0.9, 0.3))
+		_material.set_shader_parameter("rim_width", 8.0)
 
 func deselect() -> void:
-    _selected = false
-    if _phantom_cam:
-        _phantom_cam.set("priority", 0)
-    if _material:
-        _material.set_shader_parameter("rim_width", 2.0)
-        var base_color = _material.get_shader_parameter("albedo")
-        if base_color:
-            _material.set_shader_parameter("rim_color", base_color * 1.2)
+	_selected = false
+	if _phantom_cam:
+		_phantom_cam.set("priority", 0)
+	if _material:
+		_material.set_shader_parameter("rim_width", 2.0)
+		var base_color = _material.get_shader_parameter("albedo")
+		if base_color:
+			_material.set_shader_parameter("rim_color", base_color * 1.2)
 func play_walk() -> void:
 	if _is_walking: return
 	_is_walking = true

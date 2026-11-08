@@ -1,7 +1,7 @@
 extends Node
 ## A pool of affix definitions to roll from.
 
-@export var affixes_path: String = "res://affixes/"
+@export var affixes_path: String = "res://scripts/itemization/affixes/"
 
 var _affixes: Dictionary[String, AffixDefinition] = {}
 
