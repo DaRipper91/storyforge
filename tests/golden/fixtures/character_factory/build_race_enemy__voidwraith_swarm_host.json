@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__voidwraith_swarm_host",
+  "expected": {"alive": true, "armor_class": 15, "attack_bonus": 4, "damage_dice": "1d8", "description": "A hostile Voidwraith. Wields Void-Shard Blade. Stellar scavengers that feast on dying magic and the bones of dead worlds.", "hp_current": 11, "hp_max": 11, "id": "e_voidwraith", "loot": [], "name": "Voidwraith", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 126},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_voidwraith", "ev_state": "swarm_host", "position": {"x": 3, "y": 3}, "race": "voidwraith", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

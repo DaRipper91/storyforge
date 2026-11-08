@@ -1,0 +1,16 @@
+{
+  "case": "find_starting_position__no_traversable_cells",
+  "expected": {"message_contains": "no traversable cells", "raises": "RuntimeError"},
+  "function": "find_starting_position",
+  "inputs": {
+    "state": {
+      "campaign_id": "mini",
+      "current_room_id": "mini",
+      "phase": "exploration",
+      "revision": 0,
+      "rooms": {"mini": {"cells": [{"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}], "description": "test room", "exits": {}, "height": 3, "id": "mini", "name": "Mini", "width": 4}}
+    }
+  },
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

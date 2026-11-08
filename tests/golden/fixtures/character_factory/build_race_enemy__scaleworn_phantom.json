@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__scaleworn_phantom",
+  "expected": {"alive": true, "armor_class": 15, "attack_bonus": 5, "damage_dice": "1d8", "description": "A hostile Scaleworn. Wields Collapsed-Fang Spear. Dragonborn whose draconic heritage collapsed inward; the fire is still there, the bloodline is not.", "hp_current": 7, "hp_max": 7, "id": "e_scaleworn", "loot": [], "name": "Scaleworn", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 400},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_scaleworn", "ev_state": "phantom", "position": {"x": 3, "y": 3}, "race": "scaleworn", "room_id": "mini", "xp_reward": 400},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

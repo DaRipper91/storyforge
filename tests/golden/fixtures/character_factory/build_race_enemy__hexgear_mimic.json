@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__hexgear_mimic",
+  "expected": {"alive": true, "armor_class": 16, "attack_bonus": 4, "damage_dice": "1d6", "description": "A hostile Hexgear. Wields Reconfigured Blade. Six-sided modular beings that reconfigure their body layout mid-combat. No consistent face, no consistent silhouette.", "hp_current": 8, "hp_max": 8, "id": "e_hexgear", "loot": [], "name": "Hexgear", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 112},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_hexgear", "ev_state": "mimic", "position": {"x": 3, "y": 3}, "race": "hexgear", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

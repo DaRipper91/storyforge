@@ -1,0 +1,1 @@
+{"case": "is_traversable__pillar", "expected": false, "function": "is_traversable", "inputs": {"cell": {"occupant_id": null, "terrain": "pillar"}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

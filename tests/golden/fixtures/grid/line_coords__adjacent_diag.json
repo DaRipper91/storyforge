@@ -1,0 +1,1 @@
+{"case": "line_coords__adjacent_diag", "expected": [{"x": 2, "y": 2}, {"x": 3, "y": 3}], "function": "line_coords", "inputs": {"a": {"x": 2, "y": 2}, "b": {"x": 3, "y": 3}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

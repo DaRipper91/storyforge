@@ -1,0 +1,68 @@
+{
+  "case": "set_cell__floor_to_wall",
+  "expected": {
+    "room": {
+      "cells": [
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "table"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "difficult"}, {"occupant_id": null, "terrain": "pillar"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "hazard"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "door"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": "npc_x", "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}
+      ],
+      "description": "test room",
+      "exits": {"0,3": "b"},
+      "height": 5,
+      "id": "a",
+      "name": "A",
+      "width": 7
+    }
+  },
+  "function": "set_cell",
+  "inputs": {
+    "cell": {"occupant_id": null, "terrain": "wall"},
+    "coord": {"x": 1, "y": 1},
+    "room": {
+      "cells": [
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "table"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "difficult"}, {"occupant_id": null, "terrain": "pillar"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "hazard"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "door"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": "npc_x", "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+        {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+        {"occupant_id": null, "terrain": "wall"}
+      ],
+      "description": "test room",
+      "exits": {"0,3": "b"},
+      "height": 5,
+      "id": "a",
+      "name": "A",
+      "width": 7
+    }
+  },
+  "module": "grid",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

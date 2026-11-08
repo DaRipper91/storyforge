@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__veilborn_phantom",
+  "expected": {"alive": true, "armor_class": 16, "attack_bonus": 5, "damage_dice": "1d6", "description": "A hostile Veilborn. Wields Shadow-Blade. Dark elves who were already living in the dark when the Paradox hit; they adapted faster than anyone and trust no one.", "hp_current": 7, "hp_max": 7, "id": "e_veilborn", "loot": [], "name": "Veilborn", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 106},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_veilborn", "ev_state": "phantom", "position": {"x": 3, "y": 3}, "race": "veilborn", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

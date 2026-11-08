@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__forgespawn_behemoth",
+  "expected": {"alive": true, "armor_class": 18, "attack_bonus": 5, "damage_dice": "1d8", "description": "A hostile Rusty. Wields Molten Fist. Liquid-metal organisms that cool into whatever shape the battlefield demands. Born in furnaces, comfortable in fire.", "hp_current": 14, "hp_max": 14, "id": "e_forgespawn", "loot": [], "name": "Rusty", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 156},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_forgespawn", "ev_state": "behemoth", "name_override": "Rusty", "position": {"x": 3, "y": 3}, "race": "forgespawn", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

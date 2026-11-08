@@ -1,0 +1,43 @@
+{
+  "case": "find_starting_position__scan_wraps_to_row_zero",
+  "expected": {"x": 0, "y": 0},
+  "function": "find_starting_position",
+  "inputs": {
+    "state": {
+      "campaign_id": "mini",
+      "current_room_id": "mini",
+      "phase": "exploration",
+      "revision": 0,
+      "rooms": {
+        "mini": {
+          "cells": [
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}
+          ],
+          "description": "test room",
+          "exits": {},
+          "height": 8,
+          "id": "mini",
+          "name": "Mini",
+          "width": 4
+        }
+      }
+    }
+  },
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

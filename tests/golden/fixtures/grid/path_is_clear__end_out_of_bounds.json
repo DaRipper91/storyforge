@@ -1,0 +1,8 @@
+{
+  "case": "path_is_clear__end_out_of_bounds",
+  "expected": {"message_contains": "out of bounds", "raises": "IndexError"},
+  "function": "path_is_clear",
+  "inputs": {"end": {"x": 5, "y": 0}, "room": {"cells": [{"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"}], "description": "test room", "exits": {}, "height": 3, "id": "b", "name": "B", "width": 3}, "start": {"x": 0, "y": 0}},
+  "module": "grid",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

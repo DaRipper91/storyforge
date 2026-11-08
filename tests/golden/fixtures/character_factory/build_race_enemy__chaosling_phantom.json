@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__chaosling_phantom",
+  "expected": {"alive": true, "armor_class": 16, "attack_bonus": 5, "damage_dice": "1d6", "description": "A hostile Chaosling. Wields Entropy Bolt. Twitching fragments of unraveled reality stitched into borrowed flesh.", "hp_current": 6, "hp_max": 6, "id": "e_chaosling", "loot": [], "name": "Chaosling", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 100},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_chaosling", "ev_state": "phantom", "position": {"x": 3, "y": 3}, "race": "chaosling", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

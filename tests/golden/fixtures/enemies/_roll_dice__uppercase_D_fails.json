@@ -1,0 +1,1 @@
+{"case": "_roll_dice__uppercase_D_fails", "expected": 1, "function": "_roll_dice", "inputs": {"notation": "1D8"}, "module": "enemies", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

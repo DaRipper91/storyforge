@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__cinderplate_behemoth",
+  "expected": {"alive": true, "armor_class": 17, "attack_bonus": 5, "damage_dice": "1d10", "description": "A hostile Cinderplate. Wields Forge-Hammer. Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch.", "hp_current": 14, "hp_max": 14, "id": "e_cinderplate", "loot": [], "name": "Cinderplate", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 152},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_cinderplate", "ev_state": "behemoth", "position": {"x": 3, "y": 3}, "race": "cinderplate", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

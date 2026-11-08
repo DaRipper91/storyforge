@@ -1,0 +1,1 @@
+{"case": "chebyshev_distance__horizontal", "expected": 5, "function": "chebyshev_distance", "inputs": {"a": {"x": 0, "y": 0}, "b": {"x": 5, "y": 0}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

@@ -1,0 +1,66 @@
+{
+  "case": "build_character__bad_array_point_buy",
+  "expected": {"message_contains": "standard array", "raises": "ValueError"},
+  "function": "build_character",
+  "inputs": {
+    "abilities": {"CHA": 8, "CON": 13, "DEX": 14, "INT": 12, "STR": 16, "WIS": 10},
+    "char_id": "x",
+    "game_state": {
+      "campaign_id": "mini",
+      "current_room_id": "mini",
+      "phase": "exploration",
+      "revision": 0,
+      "rooms": {
+        "mini": {
+          "cells": [
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "floor"},
+            {"occupant_id": null, "terrain": "floor"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"},
+            {"occupant_id": null, "terrain": "wall"}, {"occupant_id": null, "terrain": "wall"}
+          ],
+          "description": "test room",
+          "exits": {},
+          "height": 8,
+          "id": "mini",
+          "name": "Mini",
+          "width": 8
+        }
+      }
+    },
+    "name": "X",
+    "player": "p",
+    "race": "voidwraith",
+    "role": "stalker",
+    "state": "mimic"
+  },
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}

@@ -1,0 +1,1 @@
+{"case": "line_coords__horizontal", "expected": [{"x": 0, "y": 1}, {"x": 1, "y": 1}, {"x": 2, "y": 1}, {"x": 3, "y": 1}, {"x": 4, "y": 1}, {"x": 5, "y": 1}], "function": "line_coords", "inputs": {"a": {"x": 0, "y": 1}, "b": {"x": 5, "y": 1}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

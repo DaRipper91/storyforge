@@ -1,0 +1,1 @@
+{"case": "is_traversable__difficult", "expected": true, "function": "is_traversable", "inputs": {"cell": {"occupant_id": null, "terrain": "difficult"}}, "module": "grid", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

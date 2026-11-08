@@ -1,0 +1,1 @@
+{"case": "_roll_dice__no_count_d6", "expected": 1, "function": "_roll_dice", "inputs": {"notation": "d6"}, "module": "enemies", "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}}

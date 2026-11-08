@@ -1,0 +1,8 @@
+{
+  "case": "build_race_enemy__grimcrow_mimic",
+  "expected": {"alive": true, "armor_class": 15, "attack_bonus": 3, "damage_dice": "1d4", "description": "A hostile Grimcrow. Wields Fate-Talon. Obsidian-feathered oracles who steal living magic and bind it to bone.", "hp_current": 8, "hp_max": 8, "id": "e_grimcrow", "loot": [], "name": "Grimcrow", "position": {"x": 3, "y": 3}, "room_id": "mini", "sprite_key": "enemy_race", "xp_reward": 108},
+  "function": "build_race_enemy",
+  "inputs": {"enemy_id": "e_grimcrow", "ev_state": "mimic", "position": {"x": 3, "y": 3}, "race": "grimcrow", "room_id": "mini"},
+  "module": "character_factory",
+  "rng_script": {"choice_index": [], "randint": [], "randint_bounds": [], "random": [], "token_hex": []}
+}
