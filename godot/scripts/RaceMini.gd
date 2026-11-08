@@ -26,6 +26,9 @@ var _is_walking: bool = false
 var _pulse_time: float = 0.0
 var _selected: bool = false
 var _phantom_cam: Node3D = null
+var _model: Node3D = null            # GLB from ModelLibrary; null = primitive recipe
+var _anim: AnimationPlayer = null
+var _ring_mat: StandardMaterial3D = null
 
 func _process(delta: float) -> void:
 	if _selected and _material:
@@ -288,6 +291,12 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 	race_id = race_id.to_lower().replace(" ", "_")
 	mesh_instance.mesh = null
 	for child in mesh_instance.get_children(): child.queue_free()
+	_model = null
+	_anim = null
+	var old_ring := get_node_or_null("IdentityRing")
+	if old_ring:
+		old_ring.queue_free()
+		_ring_mat = null
 	
 	var recipe: Array = RACE_RECIPES.get(race_id, RACE_RECIPES["humanoid_default"])
 	for part in recipe: _add_recipe_part(part)
@@ -299,6 +308,60 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 		_material.set_shader_parameter("albedo", color)
 		_material.set_shader_parameter("rim_color", color * 1.2)
 		_material.set_shader_parameter("rim_width", 2.0)
+
+## Recolors the primitive recipe (used for NPCs, whose sprite_key isn't a race).
+func set_tint(color: Color) -> void:
+	if _material:
+		_material.set_shader_parameter("albedo", color)
+		_material.set_shader_parameter("rim_color", color * 1.2)
+	if _ring_mat:
+		_ring_mat.emission = color
+
+## Swaps the primitive recipe for a GLB from ModelLibrary. The token keeps its
+## collision, navigation, Interactable and camera; only the visuals change.
+## A thin ring in `identity_color` stands in for the toon rim, which GLBs lack.
+func use_model(model: Node3D, identity_color: Color, show_ring: bool = true) -> void:
+	if not mesh_instance or model == null:
+		return
+	for child in mesh_instance.get_children(): child.queue_free()
+	mesh_instance.add_child(model)
+	_model = model
+	_anim = ModelLibrary.find_anim_player(model)
+	if show_ring:
+		_add_identity_ring(identity_color)
+	play_idle()
+
+func has_model() -> bool:
+	return _model != null
+
+func play_idle() -> void:
+	if _anim:
+		ModelLibrary.play_role(_anim, "idle")
+
+func play_talk() -> void:
+	if _anim and not ModelLibrary.play_role(_anim, "talk"):
+		play_idle()
+
+func _add_identity_ring(color: Color) -> void:
+	var old := get_node_or_null("IdentityRing")
+	if old:
+		old.queue_free()
+	var ring := MeshInstance3D.new()
+	ring.name = "IdentityRing"
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.30
+	torus.outer_radius = 0.34
+	ring.mesh = torus
+	_ring_mat = StandardMaterial3D.new()
+	_ring_mat.albedo_color = color
+	_ring_mat.emission_enabled = true
+	_ring_mat.emission = color
+	_ring_mat.emission_energy_multiplier = 0.6
+	ring.material_override = _ring_mat
+	ring.position = Vector3(0, 0.02, 0)
+	ring.scale = Vector3(1, 0.25, 1)
+	add_child(ring)
+
 func _add_recipe_part(data: Dictionary) -> void:
 	var mesh: Mesh
 	match data.get("type", "box"):
@@ -327,6 +390,8 @@ func select() -> void:
 	if _material:
 		_material.set_shader_parameter("rim_color", Color(1.0, 0.9, 0.3))
 		_material.set_shader_parameter("rim_width", 8.0)
+	if _ring_mat:
+		_ring_mat.emission_energy_multiplier = 2.5
 
 func deselect() -> void:
 	_selected = false
@@ -337,7 +402,12 @@ func deselect() -> void:
 		var base_color = _material.get_shader_parameter("albedo")
 		if base_color:
 			_material.set_shader_parameter("rim_color", base_color * 1.2)
+	if _ring_mat:
+		_ring_mat.emission_energy_multiplier = 0.6
+
 func play_walk() -> void:
+	if _anim and ModelLibrary.play_role(_anim, "walk"):
+		return
 	if _is_walking: return
 	_is_walking = true
 	var tw := create_tween()
@@ -362,6 +432,7 @@ func move_with_input(input_dir: Vector3, delta: float, look_at_pos: Vector3 = Ve
 		play_walk()
 	else:
 		velocity = velocity.move_toward(Vector3.ZERO, move_speed * 10.0 * delta)
+		play_idle()
 		if look_at_pos != Vector3.ZERO:
 			var dir_to_target = global_position.direction_to(look_at_pos)
 			dir_to_target.y = 0
@@ -373,6 +444,7 @@ func move_with_input(input_dir: Vector3, delta: float, look_at_pos: Vector3 = Ve
 func move_towards_target(delta: float) -> void:
 	if nav_agent.is_navigation_finished():
 		velocity = velocity.move_toward(Vector3.ZERO, move_speed * 10.0 * delta)
+		play_idle()
 		move_and_slide()
 		return
 	var next_path_pos = nav_agent.get_next_path_position()
