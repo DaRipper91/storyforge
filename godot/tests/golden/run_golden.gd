@@ -7,8 +7,8 @@ extends SceneTree
 ## Error convention: a Python exception is a CoreError dictionary
 ## {"__error__": <ExceptionClass>, "message": ...}. A fixture whose expected
 ## value is {"raises", "message_contains"} must produce a matching CoreError.
-## Modules without a port yet (character_factory, state_manager) are reported
-## as NOT PORTED and do not count as failures.
+## Modules without a port are reported as NOT PORTED and do not count as
+## failures (none remain: all six modules are ported).
 ##
 ## Exit code 0 only if every non-allowlisted, ported fixture passes.
 
@@ -17,8 +17,10 @@ const Rules := preload("res://scripts/core/rules.gd")
 const Validators := preload("res://scripts/core/validators.gd")
 const Enemies := preload("res://scripts/core/enemies.gd")
 const Roll := preload("res://scripts/core/roll_provider.gd")
+const StateMgr := preload("res://scripts/core/state_manager.gd")
+const Factory := preload("res://scripts/core/character_factory.gd")
 const ALLOWLIST_PATH := "res://tests/golden/known_divergences.json"
-const PORTED := ["grid", "rules", "validators", "enemies"]
+const PORTED := ["grid", "rules", "validators", "enemies", "character_factory", "state_manager"]
 const MAX_FAILURE_REPORTS := 10
 
 var _verbose := false
@@ -201,7 +203,57 @@ func _dispatch(module: String, fn: String, i: Dictionary, rolls: CoreRollProvide
 				"_roll_dice": return Enemies._roll_dice(i["notation"], rolls)
 				"_mod": return Enemies._mod(int(i["score"]))
 				"_weapon_dice": return Enemies._weapon_dice(i["char"])
+		"character_factory":
+			match fn:
+				"build_character": return Factory.build_character(i)
+				"is_valid_standard_array": return Factory.is_valid_standard_array(i["abilities"])
+				"generate_char_id": return Factory.generate_char_id(str(i["name"]), i["existing"], rolls)
+				"find_starting_position": return Factory.find_starting_position(i["state"])
+				"build_race_enemy":
+					return Factory.build_race_enemy(str(i["enemy_id"]), str(i["race"]), str(i["ev_state"]),
+						str(i["room_id"]), i["position"], i.get("name_override", null), i.get("xp_reward", null))
+		"state_manager":
+			return _dispatch_state_manager(fn, i, rolls)
 	return "__nodispatch__ no handler for %s.%s" % [module, fn]
+
+const FIXED_CLOCK := "2026-01-01T12:00:00+00:00"
+
+
+## Mirrors tools/golden/golden_lib.py::_h_state_manager. Returns
+## {"result": ..., "state": ...} or a CoreError.
+func _dispatch_state_manager(fn: String, i: Dictionary, rolls: CoreRollProvider) -> Variant:
+	var args: Dictionary = i["args"]
+	var st: Dictionary = i["state"]
+	var mgr := StateMgr.new(st, rolls, Callable(self, "_clock_cb"))
+	var ret: Variant = null
+	match fn:
+		"set_phase": ret = mgr.set_phase(str(args["phase"]))
+		"attack_enemy": ret = mgr.attack_enemy(str(args["attacker_id"]), str(args["enemy_id"]))
+		"fast_travel": ret = mgr.fast_travel(str(args["room_id"]))
+		"transition_room": ret = mgr.transition_room(str(args["target_room_id"]))
+		"apply_grid_action":
+			var ch: Variant = mgr.get_character(str(args["char_id"]))
+			if CoreError.is_error(ch):
+				return ch
+			ret = mgr.apply_grid_action(ch, args["action"])
+		"apply_diff": ret = mgr.apply_diff(args["diff"])
+		"append_narration": ret = mgr.append_narration(args["actor_id"], str(args["kind"]), str(args["text"]))
+		"claim_slot": ret = mgr.claim_slot(str(args["controller_id"]))
+		"update_slot_name": ret = mgr.update_slot_name(int(args["slot_index"]), str(args["name"]), str(args["controller_id"]))
+		"save_draft": ret = mgr.save_draft(str(args["controller_id"]), args["patch"])
+		"release_slot": ret = mgr.release_slot(str(args["controller_id"]))
+		"create_character": ret = mgr.create_character(args["request"])
+		"start_exploration": ret = mgr.start_exploration()
+		"trigger_paradox": ret = mgr.trigger_paradox()
+		"get_character": ret = mgr.get_character(str(args["char_id"]))
+		_: return "__nodispatch__ no handler for state_manager.%s" % fn
+	if CoreError.is_error(ret):
+		return ret
+	return {"result": ret, "state": st}
+
+
+func _clock_cb() -> String:
+	return FIXED_CLOCK
 
 
 # ─────────────────────── Comparison ───────────────────────
