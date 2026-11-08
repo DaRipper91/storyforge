@@ -120,7 +120,7 @@ Ancient. Detached. Occasionally useful. He does not go to The Store — he simpl
 
 ---
 
-### FIREY REDVELVET
+### CINDER VALE
 **Role:** Bard at The Crooked Tankard
 
 ---
@@ -250,7 +250,7 @@ Teddy & Tyty           — Best friends. Teddy holds. Tyty announces.
 **Ironhold Keep** — D.Anna's seat. Bink Bink's domain. Teddy's home base.
 **The Guild** — Kodrik's operation. Central Dispatch. Where things get decided.
 **The Store** — Jon and Haylie's. Coco's territory. Samael loiters here.
-**The Crooked Tankard** — Where Firey RedVelvet plays.
+**The Crooked Tankard** — Where Cinder Vale plays.
 **Sunless Canyon** — A deep, iridescent rift where heat mirages distort reality. Habitat of the Shimmering Thresher.
 **The Iron Ledge** — The precipice of the world, where the gravity of the old world meets the chaos of the Feral.
 

@@ -153,7 +153,7 @@ func _handle_npc_event(ev: Dictionary):
 	var npc    = ev.get("npc", "")
 	var action = ev.get("action", "")
 	var mood   = ev.get("mood", "warm")
-	if npc == "redvelvet" and action == "perform":
+	if npc == "cinder" and action == "perform":
 		var path = "res://assets/audio/performance_%s.wav" % mood
 		AudioManager.play_npc_performance(path, mood)
 

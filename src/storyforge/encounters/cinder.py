@@ -1,8 +1,8 @@
 """
-FireyRedVelvet — encounter logic for Firey RedVelvet (The Tavern Performer).
+CinderVale — encounter logic for Cinder Vale (The Tavern Performer).
 
 Architecture:
-  - FireyRedVelvet is a pure service class. No direct GameState mutations.
+  - CinderVale is a pure service class. No direct GameState mutations.
   - Primary mechanic: perform() — she puts on a show; party can watch, tip, or heckle.
   - Mood escalates with tips and craters with heckles.
   - At BLAZING mood, her performance grants a real mechanical boon.
@@ -103,8 +103,8 @@ _SONG_DIRGE: list[str] = [
 
 # ─────────────────────── Encounter state ───────────────────────
 
-class RedVelvetEncounterState(BaseModel):
-    """Session-level state for Firey RedVelvet's presence in the tavern."""
+class CinderEncounterState(BaseModel):
+    """Session-level state for Cinder Vale's presence in the tavern."""
     active: bool = True
     current_mood: int = Mood.WARM          # starts at WARM — she's already been here a while
     performances_given: int = 0
@@ -147,9 +147,9 @@ class SongResult:
 
 # ─────────────────────── Service class ───────────────────────
 
-class FireyRedVelvet:
+class CinderVale:
     """
-    Pure service layer for Firey RedVelvet.
+    Pure service layer for Cinder Vale.
 
     perform() → watch her show.
     tip(silver) → improve her mood.
@@ -157,8 +157,8 @@ class FireyRedVelvet:
     request_song(type) → she picks the right one.
     """
 
-    def __init__(self, state: RedVelvetEncounterState | None = None) -> None:
-        self.encounter = state or RedVelvetEncounterState()
+    def __init__(self, state: CinderEncounterState | None = None) -> None:
+        self.encounter = state or CinderEncounterState()
 
     @property
     def mood(self) -> Mood:

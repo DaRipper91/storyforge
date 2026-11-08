@@ -8,7 +8,7 @@
 ## Usage:
 ##   AudioManager.play_ambient("res://assets/audio/ambient_keep.ogg")
 ##   AudioManager.play_sfx("res://assets/audio/sfx_move.wav")
-##   AudioManager.play_npc_performance()   # triggers Firey RedVelvet audio
+##   AudioManager.play_npc_performance()   # triggers Cinder Vale audio
 ##   AudioManager.stop_ambient()
 ##   AudioManager.set_music_volume(0.8)    # 0.0 – 1.0
 
@@ -100,10 +100,10 @@ func stop_ambient(fade_out: float = 2.0):
 	tween.tween_callback(_ambient_player.stop)
 
 
-# ─── NPC performance (Firey RedVelvet) ──────────────────────────────
+# ─── NPC performance (Cinder Vale) ──────────────────────────────
 
 func play_npc_performance(path: String = "", mood: String = "warm"):
-	# Mood adjusts volume and pitch to match RedVelvet's state
+	# Mood adjusts volume and pitch to match Cinder's state
 	var pitch_scale = { "cold": 0.95, "warm": 1.0, "hot": 1.02, "blazing": 1.05 }
 	var vol_scale   = { "cold": 0.6,  "warm": 0.75, "hot": 0.85, "blazing": 1.0  }
 

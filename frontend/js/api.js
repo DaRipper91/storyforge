@@ -288,15 +288,15 @@ export async function dannaGetState() {
   return jsonOrThrow(res);
 }
 
-// ── Firey RedVelvet ───────────────────────────────────────────────
+// ── Cinder Vale ───────────────────────────────────────────────
 
 export async function rvPerform() {
-  const res = await fetch(`${API_BASE}/api/npc/redvelvet/perform`, { method: "POST" });
+  const res = await fetch(`${API_BASE}/api/npc/cinder/perform`, { method: "POST" });
   return jsonOrThrow(res);
 }
 
 export async function rvTip(silver = 5) {
-  const res = await fetch(`${API_BASE}/api/npc/redvelvet/tip`, {
+  const res = await fetch(`${API_BASE}/api/npc/cinder/tip`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ silver }),
@@ -305,12 +305,12 @@ export async function rvTip(silver = 5) {
 }
 
 export async function rvHeckle() {
-  const res = await fetch(`${API_BASE}/api/npc/redvelvet/heckle`, { method: "POST" });
+  const res = await fetch(`${API_BASE}/api/npc/cinder/heckle`, { method: "POST" });
   return jsonOrThrow(res);
 }
 
 export async function rvRequestSong(songType = "mystery") {
-  const res = await fetch(`${API_BASE}/api/npc/redvelvet/request-song`, {
+  const res = await fetch(`${API_BASE}/api/npc/cinder/request-song`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ song_type: songType }),
@@ -319,7 +319,7 @@ export async function rvRequestSong(songType = "mystery") {
 }
 
 export async function rvGetState() {
-  const res = await fetch(`${API_BASE}/api/npc/redvelvet/state`);
+  const res = await fetch(`${API_BASE}/api/npc/cinder/state`);
   return jsonOrThrow(res);
 }
 

@@ -693,7 +693,7 @@ function openNpcOverlay(encounterData) {
   const id = encounterData.encounter_id;
   if      (id === "jon_shop")              openShopOverlay(encounterData);
   else if (id === "danna_audience")        openDannaOverlay();
-  else if (id === "redvelvet_performance") openRedVelvetOverlay();
+  else if (id === "cinder_performance") openCinderOverlay();
   else if (id === "samael_lore")           openSamaelOverlay();
   else if (id === "haylie_inn")            openHaylieOverlay();
   else if (id === "keeva_divine")          openKeevaOverlay();
@@ -957,10 +957,10 @@ function wireDannaButtons() {
   });
 }
 
-// ─────────────────────── Firey RedVelvet Encounter ────────────────
+// ─────────────────────── Cinder Vale Encounter ────────────────
 
 const rvEls = {
-  overlay:    document.getElementById("redvelvet-overlay"),
+  overlay:    document.getElementById("cinder-overlay"),
   tagline:    document.getElementById("rv-tagline"),
   message:    document.getElementById("rv-message"),
   moodLabel:  document.getElementById("rv-mood-label"),
@@ -973,7 +973,7 @@ const rvEls = {
 const _MOOD_NAMES  = ["Cold", "Warm", "Hot", "Blazing"];
 const _MOOD_COLORS = ["#aaa", "#e8a040", "#ff6820", "#ff2200"];
 
-function openRedVelvetOverlay() {
+function openCinderOverlay() {
   rvEls.overlay.classList.remove("hidden");
   rvEls.message.classList.add("hidden");
   _refreshRvState();
@@ -981,14 +981,14 @@ function openRedVelvetOverlay() {
   audio.playPageTurn();
 }
 
-function closeRedVelvetOverlay() {
+function closeCinderOverlay() {
   rvEls.overlay.classList.add("hidden");
   rvEls.message.classList.add("hidden");
 }
 
 async function _refreshRvState() {
   try {
-    const s = await (await fetch("/api/npc/redvelvet/state")).json();
+    const s = await (await fetch("/api/npc/cinder/state")).json();
     _updateRvMood(s.current_mood);
   } catch (_) {}
 }
@@ -1078,15 +1078,15 @@ function wireRvButtons() {
     }
   };
 
-  rvEls.leaveBtn.onclick = closeRedVelvetOverlay;
+  rvEls.leaveBtn.onclick = closeCinderOverlay;
 
   rvEls.overlay.addEventListener("click", (e) => {
-    if (e.target === rvEls.overlay) closeRedVelvetOverlay();
+    if (e.target === rvEls.overlay) closeCinderOverlay();
   });
 
   document.addEventListener("keydown", function rvEsc(e) {
     if (e.key === "Escape" && !rvEls.overlay.classList.contains("hidden")) {
-      closeRedVelvetOverlay();
+      closeCinderOverlay();
       document.removeEventListener("keydown", rvEsc);
     }
   });

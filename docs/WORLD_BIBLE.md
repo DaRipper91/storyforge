@@ -114,7 +114,7 @@ This arrangement is stable because both understand their respective domains.
 
 ### 🍻 The Crooked Tankard
 
-#### FIREY REDVELVET
+#### CINDER VALE
 - **Role**: Bard, Tavern Performer
 - **Personality**: Delivers what the room needs at twice the expected intensity. Emotional mood-setter. When she is playing, the room's emotional temperature is hers.
 
@@ -263,7 +263,7 @@ Character creation uses the standard D&D 5e array — **[15, 14, 13, 12, 10, 8]*
 ## 📍 Section 6 — Locations
 - **Ironhold Keep**: Political seat/Guild HQ. Residents: Kodrik, D.Anna, Bryne (forthcoming), Cyrus, Keeva (presence), Teddy, Bink Bink, Snowie.
 - **The Store**: Multiversal bodega. Residents: Jon, Haylie, Coco, Samael. Cole will join when Bryne arrives.
-- **The Crooked Tankard**: Social hub. Resident: Firey RedVelvet.
+- **The Crooked Tankard**: Social hub. Resident: Cinder Vale.
 
 ---
 

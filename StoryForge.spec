@@ -46,7 +46,7 @@ hiddenimports = [
     'storyforge.encounters.samael',
     'storyforge.encounters.haylie',
     'storyforge.encounters.queen_danna',
-    'storyforge.encounters.redvelvet',
+    'storyforge.encounters.cinder',
     'storyforge.encounters.kodrik',
     'storyforge.encounters.bryne',
     'storyforge.encounters.nathis',

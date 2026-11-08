@@ -203,7 +203,7 @@ def gen_ambient_paradox():
     save("ambient_paradox.wav", sig)
 
 
-# ─── 7–11. Firey RedVelvet performance tracks ─────────────────────────────────
+# ─── 7–11. Cinder Vale performance tracks ─────────────────────────────────
 
 def _perf_base(fund, harmonics, dur, vib_rate, vib_depth, trem_rate, trem_depth):
     freqs_amps = [(fund * h, a) for h, a in harmonics]
@@ -479,7 +479,7 @@ def gen_sfx_cyrus():
 GENERATORS = [
     ("Ambient (6)",          [gen_ambient_keep, gen_ambient_throne_room, gen_ambient_store,
                                gen_ambient_inn, gen_ambient_wilderness, gen_ambient_paradox]),
-    ("RedVelvet Performance (5)", [gen_perf_cold, gen_perf_warm, gen_perf_hot,
+    ("Cinder Performance (5)", [gen_perf_cold, gen_perf_warm, gen_perf_hot,
                                     gen_perf_blazing, gen_perf_mystery]),
     ("Game SFX (8)",         [gen_sfx_move, gen_sfx_paradox, gen_sfx_magic_burst,
                                gen_sfx_cactus, gen_sfx_tip_silver, gen_sfx_heckle,

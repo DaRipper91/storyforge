@@ -1052,9 +1052,9 @@ body[data-phase="saves"] #game-view { display: none; }
   color: #c8a0e8;
 }
 
-/* ─────────────────────── Firey RedVelvet Overlay ─────────────────── */
+/* ─────────────────────── Cinder Vale Overlay ─────────────────── */
 
-.redvelvet-card {
+.cinder-card {
   width: min(96vw, 1000px);
   max-height: 88vh;
   overflow-y: auto;
@@ -1063,7 +1063,7 @@ body[data-phase="saves"] #game-view { display: none; }
   gap: var(--space-2);
 }
 
-.redvelvet-portrait {
+.cinder-portrait {
   background: #8B1a1a !important;
   border-color: #ff6820 !important;
 }

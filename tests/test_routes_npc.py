@@ -22,7 +22,7 @@ def clear_npc_state():
     """Reset all NPC encounter state on app.state before each test."""
     for attr in (
         "jon_encounter", "samael_encounter", "haylie_encounter",
-        "danna_encounter", "redvelvet_encounter", "kodrik_encounter",
+        "danna_encounter", "cinder_encounter", "kodrik_encounter",
         "bryne_encounter", "nathis_encounter",
     ):
         if hasattr(app.state, attr):
@@ -233,13 +233,13 @@ async def test_danna_state(client):
     assert "favor" in resp.json()
 
 
-# ─── Firey RedVelvet ──────────────────────────────────────────────────────────
+# ─── Cinder Vale ──────────────────────────────────────────────────────────
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_perform(client):
+async def test_cinder_perform(client):
     with _mock_narrate():
-        resp = await client.post("/api/npc/redvelvet/perform")
+        resp = await client.post("/api/npc/cinder/perform")
     assert resp.status_code == 200
     data = resp.json()
     assert data["performance_text"] == MOCK_NARRATION
@@ -248,9 +248,9 @@ async def test_redvelvet_perform(client):
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_tip_raises_mood(client):
+async def test_cinder_tip_raises_mood(client):
     with _mock_narrate():
-        resp = await client.post("/api/npc/redvelvet/tip", json={"silver": 5})
+        resp = await client.post("/api/npc/cinder/tip", json={"silver": 5})
     assert resp.status_code == 200
     data = resp.json()
     assert data["response"] == MOCK_NARRATION
@@ -259,15 +259,15 @@ async def test_redvelvet_tip_raises_mood(client):
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_tip_zero_rejected(client):
-    resp = await client.post("/api/npc/redvelvet/tip", json={"silver": 0})
+async def test_cinder_tip_zero_rejected(client):
+    resp = await client.post("/api/npc/cinder/tip", json={"silver": 0})
     assert resp.status_code == 400
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_heckle_drops_mood(client):
+async def test_cinder_heckle_drops_mood(client):
     with _mock_narrate():
-        resp = await client.post("/api/npc/redvelvet/heckle")
+        resp = await client.post("/api/npc/cinder/heckle")
     assert resp.status_code == 200
     data = resp.json()
     assert data["response"] == MOCK_NARRATION
@@ -275,10 +275,10 @@ async def test_redvelvet_heckle_drops_mood(client):
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_request_song(client):
+async def test_cinder_request_song(client):
     with _mock_narrate():
         resp = await client.post(
-            "/api/npc/redvelvet/request-song", json={"song_type": "mystery"}
+            "/api/npc/cinder/request-song", json={"song_type": "mystery"}
         )
     assert resp.status_code == 200
     data = resp.json()
@@ -289,16 +289,16 @@ async def test_redvelvet_request_song(client):
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_gemini_fallback(client):
+async def test_cinder_gemini_fallback(client):
     with patch(_NPC_PATCH, new=AsyncMock(side_effect=RuntimeError("Gemini down"))):
-        resp = await client.post("/api/npc/redvelvet/perform")
+        resp = await client.post("/api/npc/cinder/perform")
     assert resp.status_code == 200
     assert isinstance(resp.json()["performance_text"], str)
 
 
 @pytest.mark.asyncio
-async def test_redvelvet_state(client):
-    resp = await client.get("/api/npc/redvelvet/state")
+async def test_cinder_state(client):
+    resp = await client.get("/api/npc/cinder/state")
     assert resp.status_code == 200
     assert "mood_label" in resp.json()
 

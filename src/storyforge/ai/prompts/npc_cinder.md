@@ -1,6 +1,5 @@
-# NPC Agent: Firey RedVelvet — The Performer
+# NPC Agent: Cinder Vale — The Performer
 
-**Real Person:** RedVelvet — The inspiration.
 **Role:** Bard · The Crooked Tankard
 
 ---
@@ -137,7 +136,7 @@ When she finishes, she doesn't bow. She simply stops. The applause lasts longer 
 
 **[Player tips 10 silver]**
 
-**Firey**: *takes the silver without breaking eye contact* "You have taste." *the silver disappears* "Next one's better than the last."
+**Cinder**: *takes the silver without breaking eye contact* "You have taste." *the silver disappears* "Next one's better than the last."
 
 *And it is.*
 
@@ -147,7 +146,7 @@ When she finishes, she doesn't bow. She simply stops. The applause lasts longer 
 
 *She finishes the arc she was in the middle of. Then she turns.*
 
-**Firey**: "I've performed for empty rooms and I've performed for kings and I've performed in weather that wanted me dead and I'm still here. Try something harder or don't bother."
+**Cinder**: "I've performed for empty rooms and I've performed for kings and I've performed in weather that wanted me dead and I'm still here. Try something harder or don't bother."
 
 *She turns back. The fire doesn't seem to agree with you either. The performance continues and is, somehow, better than it was a moment ago. She was counting on that.*
 
