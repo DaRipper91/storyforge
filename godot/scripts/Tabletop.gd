@@ -1684,23 +1684,21 @@ func _open_jon_shop() -> void:
 
 	# Determine genre from current room
 	var genre := "fantasy"
-	if _game_state.has("current_room"):
-		var room_id: String = str(_game_state["current_room"])
-		if "sci" in room_id or "space" in room_id:
-			genre = "sci_fi"
-		elif "western" in room_id or "frontier" in room_id:
-			genre = "western"
+	# _current_room_id is kept in sync from the backend's current_room_id
+	if "sci" in _current_room_id or "space" in _current_room_id:
+		genre = "sci_fi"
+	elif "western" in _current_room_id or "frontier" in _current_room_id:
+		genre = "western"
 
-	# Get selected character's gold from inventory
+	# Get selected character's gold from inventory.
+	# _character_data is cid -> character dict from the last state update.
 	var gold := 0
-	if _selected_cid != "":
-		for ch in _game_state.get("characters", []):
-			if ch.get("id", "") == _selected_cid:
-				for it in ch.get("inventory", []):
-					var iname: String = it.get("id", "") + it.get("name", "")
-					if "gold" in iname.to_lower():
-						gold += it.get("quantity", 1) * it.get("value", 1)
-				break
+	if _selected_cid != "" and _character_data.has(_selected_cid):
+		var ch: Dictionary = _character_data[_selected_cid]
+		for it in ch.get("inventory", []):
+			var iname: String = it.get("id", "") + it.get("name", "")
+			if "gold" in iname.to_lower():
+				gold += it.get("quantity", 1) * it.get("value", 1)
 
 	_jon_shop.open(_selected_cid, genre, gold)
 
