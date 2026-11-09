@@ -6,7 +6,7 @@
 # Env:   GD_ROUTES_DIR (default tests/golden/routes), GD_SCRATCH, GODOT_BIN
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SCRATCH="${GD_SCRATCH:-/tmp/claude-1000/-home-daripper/6af3c5e8-f54c-42c7-bb38-55d615da2a13/scratchpad/gd-run-routes}"
+SCRATCH="${GD_SCRATCH:-${TMPDIR:-/tmp}/storyforge-gd-run-routes}"
 GODOT="${GODOT_BIN:-/usr/bin/godot}"
 
 rm -rf "$SCRATCH"

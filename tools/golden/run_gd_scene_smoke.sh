@@ -9,7 +9,7 @@
 # Usage: tools/golden/run_gd_scene_smoke.sh
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BASE_DIR="${GD_SCRATCH:-/tmp/claude-1000/-home-daripper/6af3c5e8-f54c-42c7-bb38-55d615da2a13/scratchpad/gd-scene-smoke}"
+BASE_DIR="${GD_SCRATCH:-${TMPDIR:-/tmp}/storyforge-gd-scene-smoke}"
 GODOT="${GODOT_BIN:-/usr/bin/godot}"
 PAT='SCRIPT ERROR|Parse Error|Compile Error|Invalid call|Invalid access|Nil'
 SCENES=(res://scenes/UI_Overlay.tscn res://scenes/Creation.tscn res://scenes/Tabletop.tscn)
