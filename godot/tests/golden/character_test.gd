@@ -341,6 +341,47 @@ func _run() -> void:
 	_check("voidwraith has its bespoke parts (%d Hero_* meshes)" % void_parts, void_parts >= 20)
 	void_w.free()
 
+	print("-- every bespoke hero GLB (data-driven: new heroes are covered automatically)")
+	var hero_ids: Array[String] = []
+	var hdir := DirAccess.open("res://assets/models/heroes")
+	if hdir != null:
+		for f in hdir.get_files():
+			if f.ends_with(".glb"):
+				hero_ids.append(f.get_basename())
+	hero_ids.sort()
+	_check("at least the pilot heroes are present (%d)" % hero_ids.size(), hero_ids.size() >= 4)
+	for hid in hero_ids:
+		_check("%s: is a known race id" % hid, CharacterModel.is_known_race(hid))
+		var hcm := CharacterModel.new()
+		get_root().add_child(hcm)
+		var humanoid := hcm.setup(hid)
+		var root_node: Node = hcm if humanoid else ModelLibrary.instantiate_hero(hid, 0.62)
+		if not humanoid:
+			hcm.free()
+		_check("%s: loads (humanoid skeleton or creature with clips)" % hid, root_node != null)
+		if root_node == null:
+			continue
+		var tris := 0
+		for mnode in root_node.find_children("*", "MeshInstance3D", true, false):
+			var hmi := mnode as MeshInstance3D
+			if hmi.mesh != null:
+				tris += hmi.mesh.get_faces().size() / 3
+		_check("%s: triangle budget %d <= 26000" % [hid, tris], tris <= 26000)
+		var parts := root_node.find_children("Hero_*", "MeshInstance3D", true, false)
+		_check("%s: bespoke parts present (%d)" % [hid, parts.size()], parts.size() >= 10)
+		var mirrored_parts := 0
+		for pnode in parts:
+			if String(pnode.name).ends_with("_Mirrored"):
+				mirrored_parts += 1
+		_check("%s: bespoke parts are never mirrored" % hid, mirrored_parts == 0)
+		if humanoid:
+			hcm.play(&"Walk")
+			_check("%s: plays the shared Walk clip" % hid, hcm.current_clip() == &"Walk")
+		else:
+			var hap := ModelLibrary.find_anim_player(root_node)
+			_check("%s: creature has idle/walk/hit/death clips" % hid, hap != null and not ModelLibrary.find_clip(hap, "idle").is_empty() and not ModelLibrary.find_clip(hap, "walk").is_empty() and not ModelLibrary.find_clip(hap, "hit").is_empty() and not ModelLibrary.find_clip(hap, "death").is_empty())
+		root_node.free()
+
 	print("-- bespoke creature (own skeleton and clips)")
 	_check("ironlocust has a hero GLB", not CharacterModel.hero_path("ironlocust").is_empty())
 	var cm_creature := CharacterModel.new()
