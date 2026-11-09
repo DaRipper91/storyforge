@@ -62,13 +62,23 @@ def skinned(arm, name, bm, material, weight_fn):
     return o
 
 
+def assign_uv(bm, uvmap):
+    """uvmap: {BMVert: (u, v)} -> writes the 'UVMap' layer for every face loop."""
+    layer = bm.loops.layers.uv.get("UVMap") or bm.loops.layers.uv.new("UVMap")
+    for f in bm.faces:
+        for loop in f.loops:
+            if loop.vert in uvmap:
+                loop[layer].uv = uvmap[loop.vert]
+
+
 def strip(rows, cols, fn):
-    """Quad grid; fn(row_frac, col_frac) -> Vector."""
+    """Quad grid with UVs (u = column fraction, v = 1 - row fraction); fn(row_frac, col_frac) -> Vector."""
     bm = bmesh.new()
     vs = [[bm.verts.new(fn(r / (rows - 1), c / (cols - 1))) for c in range(cols)] for r in range(rows)]
     for r in range(rows - 1):
         for c in range(cols - 1):
             bm.faces.new((vs[r][c], vs[r][c + 1], vs[r + 1][c + 1], vs[r + 1][c]))
+    assign_uv(bm, {vs[r][c]: (c / (cols - 1), 1.0 - r / (rows - 1)) for r in range(rows) for c in range(cols)})
     return bm
 
 

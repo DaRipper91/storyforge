@@ -3,7 +3,7 @@ extends SceneTree
 ## Needs a window (not --headless).
 ##
 ##   godot --path godot --resolution 1800x700 -s res://tests/visual/hero_sheet.gd -- \
-##       --race=ironlocust --out=/abs/sheet.png [--yaw=35] [--height=0.62]
+##       --race=ironlocust --out=/abs/sheet.png [--yaw=35] [--height=0.62] [--focus=<camera y>]
 ##
 ## Humanoid heroes go through CharacterModel (shared clips); creatures use their own clips. One row of frames:
 ## Idle, Walk at 4 phases, Hit peak, Death end. Writes <out>_0.png ... <out>_N.png.
@@ -75,8 +75,9 @@ func _run() -> void:
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.size = height * 2.0
 	stage.add_child(cam)
-	cam.position = Vector3(0, height * 0.55, 4)
-	cam.look_at(Vector3(0, height * 0.5, 0))
+	var focus := float(_arg("focus", str(height * 0.5)))
+	cam.position = Vector3(0, focus, 4)
+	cam.look_at(Vector3(0, focus, 0))
 
 	var frames: Array[Image] = []
 	var plan := [["idle", 0.3], ["walk", 0.0], ["walk", 0.25], ["walk", 0.5], ["walk", 0.75], ["hit", 0.12], ["death", 1.0]]
