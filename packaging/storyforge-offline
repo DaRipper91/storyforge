@@ -1,0 +1,9 @@
+#!/bin/sh
+# StoryForge offline client: Godot client with the in-process local backend.
+# Arguments you pass are forwarded as Godot engine arguments (--headless,
+# --version, --fullscreen, ...). We append `-- --backend=local` so the game
+# (which reads OS.get_cmdline_user_args() and takes the FIRST --backend=) runs
+# without a server or API key. To pass your own game arguments, put them after
+# a literal `--`; they land before ours, so they win:
+#   storyforge-offline --fullscreen -- --save-dir=/path --backend=remote
+exec /usr/lib/storyforge/storyforge-client "$@" -- --backend=local

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=StoryForge (offline)
+GenericName=AI Dungeon Master
+Comment=StoryForge with the built-in local backend: no server and no API key needed
+Exec=storyforge-offline
+Icon=storyforge-offline
+Terminal=false
+Categories=Game;RolePlaying;
+Keywords=dnd;rpg;dungeon master;tabletop;offline;
