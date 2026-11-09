@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 28" width="960" height="28" role="img" aria-labelledby="t d">
+<title id="t">Divider</title>
+<desc id="d">Survey-line divider with a centre mark.</desc>
+<style>
+.f-bg{fill:#14100d}
+.s-bg{stroke:#14100d}
+.f-surface{fill:#2b211a}
+.s-surface{stroke:#2b211a}
+.f-border{fill:#8a6a3b}
+.s-border{stroke:#8a6a3b}
+.f-accent{fill:#dca331}
+.s-accent{stroke:#dca331}
+.f-highlight{fill:#ffe699}
+.s-highlight{stroke:#ffe699}
+.f-text{fill:#f1e4c3}
+.s-text{stroke:#f1e4c3}
+.f-muted{fill:#8d7f6a}
+.s-muted{stroke:#8d7f6a}
+.nofill{fill:none}
+.disp{font-family:Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif}
+.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+@media (prefers-color-scheme: light){
+.f-bg{fill:#f3ead2}
+.s-bg{stroke:#f3ead2}
+.f-surface{fill:#e4d5ad}
+.s-surface{stroke:#e4d5ad}
+.f-border{fill:#7a5a2b}
+.s-border{stroke:#7a5a2b}
+.f-accent{fill:#8a5a0a}
+.s-accent{stroke:#8a5a0a}
+.f-highlight{fill:#5c3a06}
+.s-highlight{stroke:#5c3a06}
+.f-text{fill:#2b211a}
+.s-text{stroke:#2b211a}
+.f-muted{fill:#66563f}
+.s-muted{stroke:#66563f}
+}
+</style>
+<line x1="30" y1="14" x2="450.0" y2="14" class="s-border" stroke-width="1"/>
+<line x1="510.0" y1="14" x2="930" y2="14" class="s-border" stroke-width="1"/>
+<line x1="398" y1="10.5" x2="398" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="562" y1="10.5" x2="562" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="346" y1="8" x2="346" y2="20" class="s-border" stroke-width="1"/>
+<line x1="614" y1="8" x2="614" y2="20" class="s-border" stroke-width="1"/>
+<line x1="294" y1="10.5" x2="294" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="666" y1="10.5" x2="666" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="242" y1="8" x2="242" y2="20" class="s-border" stroke-width="1"/>
+<line x1="718" y1="8" x2="718" y2="20" class="s-border" stroke-width="1"/>
+<line x1="190" y1="10.5" x2="190" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="770" y1="10.5" x2="770" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="138" y1="8" x2="138" y2="20" class="s-border" stroke-width="1"/>
+<line x1="822" y1="8" x2="822" y2="20" class="s-border" stroke-width="1"/>
+<line x1="86" y1="10.5" x2="86" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="874" y1="10.5" x2="874" y2="17.5" class="s-border" stroke-width="1"/>
+<line x1="34" y1="8" x2="34" y2="20" class="s-border" stroke-width="1"/>
+<line x1="926" y1="8" x2="926" y2="20" class="s-border" stroke-width="1"/>
+<circle cx="480.0" cy="14" r="13" class="nofill s-border" stroke-width=".8"/>
+<polygon points="480.0,3.0 481.6,10.1 487.8,6.2 483.9,12.4 491.0,14.0 483.9,15.6 487.8,21.8 481.6,17.9 480.0,25.0 478.4,17.9 472.2,21.8 476.1,15.6 469.0,14.0 476.1,12.4 472.2,6.2 478.4,10.1" class="f-accent"/>
+<circle cx="480.0" cy="14" r="2" class="f-bg"/>
+</svg>
