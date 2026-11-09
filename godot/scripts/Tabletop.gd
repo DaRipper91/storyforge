@@ -1231,6 +1231,8 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	var mini = _miniatures[character_id]
 	var target = _grid_to_world(grid_pos)
 	# Start walk animation
+	if mini.has_method("face_direction"):
+		mini.face_direction(target - mini.position)
 	if mini.has_method("play_walk"):
 		mini.play_walk()
 	var tween = create_tween()
