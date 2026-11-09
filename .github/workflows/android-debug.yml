@@ -2,11 +2,20 @@ name: Android Debug APK
 
 # Builds an offline-mode debug APK for sideloading (adb install). Dev laptop is
 # aarch64 and cannot build Android, so this runs on an x86-64 runner.
-# No releases are published; the APK is only a 14-day workflow artifact.
+# Runs on every push to main that touches the game, and on demand
+# (Actions tab, or `gh workflow run android-debug.yml --ref main`).
+# The workflow never publishes a release: the APK is a 14-day workflow artifact
+# (`gh run download <run-id> -n storyforge-debug-apk`). The apk-latest release is
+# updated by hand.
+#
+# Signing: if the repo secrets ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD
+# exist, the APK is signed with the project's own debug key, so every build
+# installs over the previous one. Without them it falls back to a throwaway key
+# (each build then has a different signature and must be uninstalled first).
 
 on:
   push:
-    branches: [ offline-port ]
+    branches: [ main ]
     paths:
       - 'godot/**'
       - '.github/workflows/android-debug.yml'
@@ -109,17 +118,36 @@ jobs:
           TRES
           cat "$HOME/.config/godot/editor_settings-4.6.tres"
 
-      - name: Generate throwaway debug keystore
+      - name: Debug keystore (project key if configured, else throwaway)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           set -euo pipefail
           ks="$RUNNER_TEMP/debug.keystore"
-          keytool -genkeypair -v -keystore "$ks" -storepass android -keypass android \
-            -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          if [ -n "${KS_B64:-}" ] && [ -n "${KS_PASS:-}" ]; then
+            echo "::add-mask::$KS_PASS"
+            printf '%s' "$KS_B64" | base64 -d > "$ks"
+            alias_name="storyforge-debug"
+            pass="$KS_PASS"
+            echo "KEY_SOURCE=project key (repo secrets)" >> "$GITHUB_ENV"
+          else
+            keytool -genkeypair -keystore "$ks" -storepass android -keypass android \
+              -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US" > /dev/null 2>&1
+            alias_name="androiddebugkey"
+            pass="android"
+            echo "KEY_SOURCE=throwaway key (secrets not configured)" >> "$GITHUB_ENV"
+            echo "::warning::ANDROID_KEYSTORE_* secrets not set: signing with a throwaway key; this APK will not install over a build signed with a different key."
+          fi
+          # Fail early if the alias/password do not match the keystore; print the public fingerprint.
+          printf '%s' "$pass" > "$RUNNER_TEMP/ks.pass"
+          keytool -list -keystore "$ks" -storepass:file "$RUNNER_TEMP/ks.pass" -alias "$alias_name" | grep -E "SHA-256"
+          rm -f "$RUNNER_TEMP/ks.pass"
           {
             echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$ks"
-            echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey"
-            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=$alias_name"
+            echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=$pass"
           } >> "$GITHUB_ENV"
 
       - name: GDScript regression suites (function fixtures)
@@ -196,6 +224,23 @@ jobs:
             echo "apksigner not found; skipping verify"
           fi
           sha256sum "$apk"
+          {
+            echo "### StoryForge debug APK"
+            echo
+            echo "- Commit: \`${GITHUB_SHA::7}\`"
+            echo "- Size: $(stat -c %s "$apk") bytes"
+            echo "- SHA-256: \`$(sha256sum "$apk" | cut -d' ' -f1)\`"
+            echo "- Signed with: ${KEY_SOURCE:-unknown}"
+            echo
+            echo "Download and install:"
+            echo
+            echo '```'
+            echo "gh run download ${GITHUB_RUN_ID} -R ${GITHUB_REPOSITORY} -n storyforge-debug-apk -D ./apk"
+            echo "adb install -r ./apk/storyforge-debug.apk"
+            echo '```'
+            echo
+            echo "If the key changed since the build you have installed: \`adb uninstall com.daripper91.storyforge\` first."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
