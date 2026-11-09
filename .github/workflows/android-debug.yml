@@ -132,6 +132,11 @@ jobs:
           set -euo pipefail
           GD_SCRATCH="$RUNNER_TEMP/gd-run-routes" bash tools/golden/run_gd_routes.sh
 
+      - name: GDScript touch-controls test
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-touch" bash tools/golden/run_gd_touch.sh
+
       - name: Import project
         run: |
           set -uo pipefail
