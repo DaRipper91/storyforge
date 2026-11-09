@@ -1,14 +1,14 @@
 class_name RaceCarousel
 extends Control
 ## Horizontally swipeable carousel of cards. The centre slot is a caller-supplied live card
-## (set_center), neighbours show dimmed card art (res://assets/characters/<id>.png) and peek in
+## (set_center), neighbours show dimmed card art (res://assets/characters/<id>.jpg) and peek in
 ## from the sides. Mouse/touch drag with inertia + snap, wheel, ui_left/ui_right, tap a peeking
 ## card to select it. Mouse events only: Android emulates them from touch.
 ## Emits index_changed(i) whenever the centred item changes (live, also while dragging).
 
 signal index_changed(index: int)
 
-const ART_PATH := "res://assets/characters/%s.png"
+const ART_PATH := "res://assets/characters/%s.jpg"
 const ART_ASPECT := 800.0 / 1120.0
 const DRAG_THRESHOLD := 18.0
 const PEEK_GAP := 16.0

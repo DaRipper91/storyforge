@@ -23,7 +23,7 @@ def main() -> None:
     for group, races in groups.items():
         files = []
         for r in races:
-            f = CARDS / f"{r}.png"
+            f = CARDS / f"{r}.jpg"
             if not f.exists():
                 raise SystemExit(f"missing card {f}")
             files.append(str(f))
