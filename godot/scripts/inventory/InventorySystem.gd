@@ -60,32 +60,18 @@ func get_player_inventory() -> InventoryModel:
 
 ## Loads all ItemBase resources from the items_path directory.
 func _load_items():
-	var dir = DirAccess.open(items_path)
-	if not dir:
-		push_error("Failed to open items directory.")
-		return
-	
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while not file_name.is_empty():
-		if dir.current_is_dir():
-			file_name = dir.get_next()
-			continue
-
-		if file_name.ends_with(".tres") or file_name.ends_with(".res"):
-			var item_path = items_path + file_name
-			var item_resource = ResourceLoader.load(item_path)
-			if item_resource and item_resource is ItemBase:
-				if item_resource.is_valid():
-					_items[item_resource.id] = item_resource
-				else:
-					push_warning("Invalid ItemBase in %s" % item_path)
+	# ResourceListing strips the ".remap" suffix exported builds add, so this also works in a
+	# packaged game (a plain ends_with(".tres") filter finds nothing there).
+	for file_name in ResourceListing.list_resources(items_path):
+		var item_path = items_path + file_name
+		var item_resource = ResourceLoader.load(item_path)
+		if item_resource and item_resource is ItemBase:
+			if item_resource.is_valid():
+				_items[item_resource.id] = item_resource
 			else:
-				push_warning("Failed to load ItemBase from %s" % item_path)
-
-		file_name = dir.get_next()
-
-	dir.list_dir_end()
+				push_warning("Invalid ItemBase in %s" % item_path)
+		else:
+			push_warning("Failed to load ItemBase from %s" % item_path)
 	print("Loaded %d base items." % _items.size())
 
 ## Picks up an item to be held by the cursor.

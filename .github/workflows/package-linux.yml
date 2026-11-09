@@ -225,6 +225,25 @@ jobs:
             echo "$f needs glibc <= $(objdump -T "$f" 2>/dev/null | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)  (declared floor ${GLIBC_MIN})"
           done
 
+      - name: Boot the exported client headless (offline) and check game data loaded
+        run: |
+          set -uo pipefail
+          saves="$(mktemp -d)"
+          log="$RUNNER_TEMP/exported-boot.log"
+          # --backend=local: no server. --quit-after: exit by itself after a few frames.
+          timeout 120 dist/storyforge-client --headless --quit-after 240 -- --backend=local "--save-dir=$saves" 2>&1 | tee "$log"
+          # An export stores resources as "<name>.tres.remap". A loader that filters DirAccess names
+          # with ends_with(".tres") finds nothing and logs "Loaded 0 base items." (editor runs log 5).
+          if ! grep -q '^Loaded 5 base items\.$' "$log"; then
+            echo "::error::exported client did not load the 5 base items (export-only .remap bug?)"
+            grep -E '^Loaded [0-9]+ ' "$log" || true
+            exit 1
+          fi
+          if grep -E 'SCRIPT ERROR|Parse Error' "$log"; then
+            echo "::error::script errors while booting the exported client"
+            exit 1
+          fi
+
       - name: Download nfpm (sha256 verified)
         env:
           NFPM_ASSET: ${{ matrix.nfpm_asset }}

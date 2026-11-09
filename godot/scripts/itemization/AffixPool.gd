@@ -10,29 +10,15 @@ func _enter_tree():
 
 ## Loads all AffixDefinition resources from the items_path + "/affixes/" directory.
 func _load_affixes():
-	var dir = DirAccess.open(affixes_path)
-	if not dir:
-		push_error("Failed to open affixes directory.")
-		return
+	# See ResourceListing: exported builds list ".tres.remap", not ".tres".
+	for file_name in ResourceListing.list_resources(affixes_path):
+		var affix_path = affixes_path + file_name
+		var affix_resource = ResourceLoader.load(affix_path)
+		if affix_resource and affix_resource is AffixDefinition:
+			_affixes[affix_resource.id] = affix_resource
+		else:
+			push_warning("Failed to load AffixDefinition from %s" % affix_path)
 
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while not file_name.is_empty():
-		if dir.current_is_dir():
-			file_name = dir.get_next()
-			continue
-
-		if file_name.ends_with(".tres") or file_name.ends_with(".res"):
-			var affix_path = affixes_path + file_name
-			var affix_resource = ResourceLoader.load(affix_path)
-			if affix_resource and affix_resource is AffixDefinition:
-				_affixes[affix_resource.id] = affix_resource
-			else:
-				push_warning("Failed to load AffixDefinition from %s" % affix_path)
-
-		file_name = dir.get_next()
-
-	dir.list_dir_end()
 	print("Loaded %d affixes." % _affixes.size())
 
 ## Rolls an affix for the given item, returning an AffixInstance or null if none can be applied.
