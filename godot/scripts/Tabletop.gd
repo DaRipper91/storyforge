@@ -152,10 +152,17 @@ var _npc_active_data:  Dictionary    = {}  # encounter data from server
 const JON_SHOP_SCENE := preload("res://scenes/JonShopPanel.tscn")
 var _jon_shop: Control = null
 
+# ─── Touch controls (phones; only built when TouchControls.should_show()) ──
+var _touch_controls: TouchControls = null
+
 
 # ─── Lifecycle ──────────────────────────────────────────────────────
 
 func _ready():
+	if TouchControls.should_show():
+		_touch_controls = TouchControls.new()
+		_touch_controls.overlay_provider = _touch_overlay_state
+		add_child(_touch_controls)
 	_build_materials()
 	_setup_ui()
 	_setup_environment()
@@ -324,16 +331,27 @@ func _load_level(level_name: String):
 	center.add_child(_controller_label)
 
 
+func _touch_overlay_state() -> int:
+	if _world_map_visible:
+		return TouchControls.OVERLAY_MAP_ONLY
+	if (_freeform_bar and _freeform_bar.visible) or (_npc_dialog and _npc_dialog.visible) \
+			or (_combat_overlay and _combat_overlay.visible) or (_jon_shop and _jon_shop.visible):
+		return TouchControls.OVERLAY_HIDDEN
+	return TouchControls.OVERLAY_NONE
+
+
 func _on_joy_connection_changed(_device: int, _connected: bool):
 	_update_controller_status()
 
 func _update_controller_status():
 	var connected = Input.get_connected_joypads().size() > 0
 	if _waiting_screen:
-		_waiting_screen.visible = not connected
+		_waiting_screen.visible = not (connected or _touch_controls != null)
 	
 	if _keyhint_label:
-		if connected:
+		if _touch_controls != null:
+			_keyhint_label.text = ""
+		elif connected:
 			_keyhint_label.text = "L-Stick: Move   R-Stick: Camera   A: Interact   LT: Lock-On   RT: Freeform   D-Pad: Character   Back: Map   Start: Menu"
 		else:
 			_keyhint_label.text = "WASD: Move   Mouse: Camera   E: Interact   Q: Lock-On   F: Freeform action   1-4: Select   Tab: Cycle   M: Map"
