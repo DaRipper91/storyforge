@@ -34,7 +34,7 @@ def triplanar_uv(bm, scale=3.5):
         if all(abs(lp[uv].uv[0]) + abs(lp[uv].uv[1]) < 1e-9 for lp in f.loops):
             n = f.normal; ax = max(range(3), key=lambda i: abs(n[i])); a, b = [i for i in range(3) if i != ax]
             for lp in f.loops:
-                lp[uv].uv = (lp.vert.co[a] * scale % 1.0, lp.vert.co[b] * scale % 1.0)
+                lp[uv].uv = (lp.vert.co[a] * scale, lp.vert.co[b] * scale)
 
 
 # ------------------------------------------------------------------ geometry
@@ -300,6 +300,38 @@ def blob_sw(bm, sw, rows=10, n=14, pw=4.0):
     """Closed rounded body along an existing Sweep (radii multiplied by a cap profile so both ends close)."""
     sw2 = Sweep(sw.p0, sw.p1, sw.u, sw.v, lambda t: sw.rx(t) * capfn(t, pw), lambda t: sw.ry(t) * capfn(t, pw))
     ring_tube(bm, sw2, 0.0, 1.0, rows, n, 0.0)
+
+
+def slab(bm, c, axes, size, q=0.008, rivet=0.0):
+    """Chamfered plate: width along axes[0], height along axes[1], thickness (outward) along axes[2]."""
+    tx, dy, oz = [Vector(a) for a in axes]; w, h, th = size; c = Vector(c); pts = []
+    for sx in (1, -1):
+        for sy in (1, -1):
+            for (kx, ky, kz) in ((w / 2 - q, h / 2 - q, th / 2), (w / 2, h / 2, th / 2 - q), (w / 2, h / 2, -th / 2)):
+                pts.append(c + tx * sx * kx + dy * sy * ky + oz * kz)
+    hull(bm, pts)
+    if rivet > 0:
+        for sx in (1, -1):
+            for sy in (1, -1):
+                cone(bm, c + tx * sx * (w / 2 - q - rivet * 2.4) + dy * sy * (h / 2 - q - rivet * 2.4) + oz * (th / 2 - 0.001), oz, rivet, rivet * 0.8, seg=6, r2=rivet * 0.45)
+
+
+def slab_e(bm, c, size, rot=(0, 0, 0), q=0.008, rivet=0.0):
+    m = Euler(rot).to_matrix()
+    slab(bm, c, (m @ Vector((1, 0, 0)), m @ Vector((0, 1, 0)), m @ Vector((0, 0, 1))), size, q, rivet)
+
+
+def plates_around(bm, sw, t, angles, w, h, th, l=0.0, q=0.008, tilt=0.0, rivet=0.0):
+    """Chamfered plates standing on a Sweep at parameter t, one per angle, facing outward."""
+    e = 0.01
+    for a in angles:
+        c = sw.P(t, a, l)
+        d = (sw.P(min(t + e, 1.0), a, l) - sw.P(max(t - e, 0.0), a, l)).normalized()
+        cen = sw.p0 + (sw.p1 - sw.p0) * t
+        o = (c - cen); o = (o - d * o.dot(d)).normalized()
+        tx = d.cross(o).normalized()
+        d2 = (d * math.cos(tilt) + o * math.sin(tilt)).normalized(); o2 = tx.cross(d2).normalized() * -1
+        slab(bm, c + o * th * 0.5, (tx, d2, o), (w, h, th), q, rivet)
 
 
 def bone_pt(arm, bone, head=True):
