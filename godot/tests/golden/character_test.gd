@@ -220,8 +220,10 @@ func _run() -> void:
 	var tint_b := CharacterModel.new()
 	get_root().add_child(tint_a)
 	get_root().add_child(tint_b)
-	tint_a.setup("ashenborn")
-	tint_b.setup("emberpact")
+	# Exercise tinting on the group base even after every real race has authored art.
+	# Heroes deliberately preserve their own materials (checked separately below).
+	tint_a.setup(CharacterModel.NEUTRAL_ID, {"tint": CharacterModel.colours_for("ashenborn")["tint"]})
+	tint_b.setup(CharacterModel.NEUTRAL_ID, {"tint": CharacterModel.colours_for("emberpact")["tint"]})
 	var col_a := _first_albedo(tint_a)
 	var col_b := _first_albedo(tint_b)
 	_check("races of one group are tinted differently", not col_a.is_equal_approx(col_b), "%s vs %s" % [col_a, col_b])
@@ -307,7 +309,7 @@ func _run() -> void:
 
 	print("-- bespoke hero models")
 	_check("bloodweaver has a hero GLB", not CharacterModel.hero_path("bloodweaver").is_empty())
-	_check("a race without one falls back to its group base", CharacterModel.hero_path("veilborn").is_empty())
+	_check("an id without a hero has no bespoke GLB", CharacterModel.hero_path("not_a_race").is_empty())
 	var hero := CharacterModel.new()
 	get_root().add_child(hero)
 	_check("hero model sets up on the shared skeleton", hero.setup("bloodweaver"))
