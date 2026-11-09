@@ -212,7 +212,9 @@ func _run() -> void:
 		_check("%s: feet on the ground (lowest y %.3f)" % [id, lowest], absf(lowest) < 0.03 * cm.body_height)
 		_check("%s: height %.2f matches body_height %.2f" % [id, highest - lowest, cm.body_height],
 			absf((highest - lowest) - cm.body_height) < 0.02)
-		_check("%s: missing right leg/foot meshes were mirrored in" % id, mirrored == 2, str(mirrored))
+		# Bespoke heroes replace the one-sided shoes with their own boots/talons, so only the legs mirror.
+		var expected_mirrors := 2 if CharacterModel.hero_path(id).is_empty() else 1
+		_check("%s: missing right leg/foot meshes were mirrored in" % id, mirrored == expected_mirrors, str(mirrored))
 		cm.free()
 	var tint_a := CharacterModel.new()
 	var tint_b := CharacterModel.new()
