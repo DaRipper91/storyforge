@@ -126,6 +126,133 @@ Every character also picks one of four **evolutionary states** (Behemoth, Phanto
 
 The cards are the current in-repo art (800x1120 originals, downscaled and palette-reduced for the sheets). Treat them as placeholders for final art.
 
+<h3 id="concept-sheets">Concept sheets</h3>
+
+Design reference for the move from placeholder minis to bespoke 3D heroes: front, side and back turnarounds with face, material and equipment studies. These are AI-generated concept art (not in-game models); the 3D builds are being modelled in Blender, pilot heroes first. Click a sheet for the full view.
+
+<img src="docs/assets/concept-reel.webp" alt="Animated reel cycling through all 35 species concept sheets" width="100%">
+
+<details>
+<summary><b>Cosmic</b> (5)</summary>
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/voidwraith.webp"><img src="docs/assets/concepts/voidwraith.webp" alt="Concept sheet: Voidwraith" width="100%"></a><br><sub>Voidwraith</sub></td>
+<td width="50%"><a href="docs/assets/concepts/nullshade.webp"><img src="docs/assets/concepts/nullshade.webp" alt="Concept sheet: Nullshade" width="100%"></a><br><sub>Nullshade</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/iron-locust.webp"><img src="docs/assets/concepts/iron-locust.webp" alt="Concept sheet: Iron-Locust" width="100%"></a><br><sub>Iron-Locust</sub></td>
+<td width="50%"><a href="docs/assets/concepts/embervein.webp"><img src="docs/assets/concepts/embervein.webp" alt="Concept sheet: Embervein" width="100%"></a><br><sub>Embervein</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/riftwalker.webp"><img src="docs/assets/concepts/riftwalker.webp" alt="Concept sheet: Riftwalker" width="100%"></a><br><sub>Riftwalker</sub></td>
+<td></td>
+</tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>Primal</b> (5)</summary>
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/solar-lord.webp"><img src="docs/assets/concepts/solar-lord.webp" alt="Concept sheet: Solar-Lord" width="100%"></a><br><sub>Solar-Lord</sub></td>
+<td width="50%"><a href="docs/assets/concepts/thornmimic.webp"><img src="docs/assets/concepts/thornmimic.webp" alt="Concept sheet: Thornmimic" width="100%"></a><br><sub>Thornmimic</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/cinderkin.webp"><img src="docs/assets/concepts/cinderkin.webp" alt="Concept sheet: Cinderkin" width="100%"></a><br><sub>Cinderkin</sub></td>
+<td width="50%"><a href="docs/assets/concepts/deep-tyrant.webp"><img src="docs/assets/concepts/deep-tyrant.webp" alt="Concept sheet: Deep-Tyrant" width="100%"></a><br><sub>Deep-Tyrant</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/grimcrow.webp"><img src="docs/assets/concepts/grimcrow.webp" alt="Concept sheet: Grimcrow" width="100%"></a><br><sub>Grimcrow</sub></td>
+<td></td>
+</tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>Eldritch</b> (5)</summary>
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/bloodweaver.webp"><img src="docs/assets/concepts/bloodweaver.webp" alt="Concept sheet: Bloodweaver" width="100%"></a><br><sub>Bloodweaver</sub></td>
+<td width="50%"><a href="docs/assets/concepts/dreamhusk.webp"><img src="docs/assets/concepts/dreamhusk.webp" alt="Concept sheet: Dreamhusk" width="100%"></a><br><sub>Dreamhusk</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/bonedrifter.webp"><img src="docs/assets/concepts/bonedrifter.webp" alt="Concept sheet: Bonedrifter" width="100%"></a><br><sub>Bonedrifter</sub></td>
+<td width="50%"><a href="docs/assets/concepts/mindspider.webp"><img src="docs/assets/concepts/mindspider.webp" alt="Concept sheet: Mindspider" width="100%"></a><br><sub>Mindspider</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/chaosling.webp"><img src="docs/assets/concepts/chaosling.webp" alt="Concept sheet: Chaosling" width="100%"></a><br><sub>Chaosling</sub></td>
+<td></td>
+</tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>Mechanical</b> (5)</summary>
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/ironveil.webp"><img src="docs/assets/concepts/ironveil.webp" alt="Concept sheet: Ironveil" width="100%"></a><br><sub>Ironveil</sub></td>
+<td width="50%"><a href="docs/assets/concepts/forgespawn.webp"><img src="docs/assets/concepts/forgespawn.webp" alt="Concept sheet: Forgespawn" width="100%"></a><br><sub>Forgespawn</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/cinderplate.webp"><img src="docs/assets/concepts/cinderplate.webp" alt="Concept sheet: Cinderplate" width="100%"></a><br><sub>Cinderplate</sub></td>
+<td width="50%"><a href="docs/assets/concepts/hexgear.webp"><img src="docs/assets/concepts/hexgear.webp" alt="Concept sheet: Hexgear" width="100%"></a><br><sub>Hexgear</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/wirewraith.webp"><img src="docs/assets/concepts/wirewraith.webp" alt="Concept sheet: Wirewraith" width="100%"></a><br><sub>Wirewraith</sub></td>
+<td></td>
+</tr>
+</table>
+
+</details>
+
+<details>
+<summary><b>Humanoid</b> (15)</summary>
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/ashenborn.webp"><img src="docs/assets/concepts/ashenborn.webp" alt="Concept sheet: Ashenborn" width="100%"></a><br><sub>Ashenborn</sub></td>
+<td width="50%"><a href="docs/assets/concepts/hollowsong.webp"><img src="docs/assets/concepts/hollowsong.webp" alt="Concept sheet: Hollowsong" width="100%"></a><br><sub>Hollowsong</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/veilborn.webp"><img src="docs/assets/concepts/veilborn.webp" alt="Concept sheet: Veilborn" width="100%"></a><br><sub>Veilborn</sub></td>
+<td width="50%"><a href="docs/assets/concepts/thornweft.webp"><img src="docs/assets/concepts/thornweft.webp" alt="Concept sheet: Thornweft" width="100%"></a><br><sub>Thornweft</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/ashcrown.webp"><img src="docs/assets/concepts/ashcrown.webp" alt="Concept sheet: Ashcrown" width="100%"></a><br><sub>Ashcrown</sub></td>
+<td width="50%"><a href="docs/assets/concepts/ironfast.webp"><img src="docs/assets/concepts/ironfast.webp" alt="Concept sheet: Ironfast" width="100%"></a><br><sub>Ironfast</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/coreborn.webp"><img src="docs/assets/concepts/coreborn.webp" alt="Concept sheet: Coreborn" width="100%"></a><br><sub>Coreborn</sub></td>
+<td width="50%"><a href="docs/assets/concepts/warpbred.webp"><img src="docs/assets/concepts/warpbred.webp" alt="Concept sheet: Warpbred" width="100%"></a><br><sub>Warpbred</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/splitblood.webp"><img src="docs/assets/concepts/splitblood.webp" alt="Concept sheet: Splitblood" width="100%"></a><br><sub>Splitblood</sub></td>
+<td width="50%"><a href="docs/assets/concepts/duskweft.webp"><img src="docs/assets/concepts/duskweft.webp" alt="Concept sheet: Duskweft" width="100%"></a><br><sub>Duskweft</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/glitchkin.webp"><img src="docs/assets/concepts/glitchkin.webp" alt="Concept sheet: Glitchkin" width="100%"></a><br><sub>Glitchkin</sub></td>
+<td width="50%"><a href="docs/assets/concepts/fractureline.webp"><img src="docs/assets/concepts/fractureline.webp" alt="Concept sheet: Fractureline" width="100%"></a><br><sub>Fractureline</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/emberpact.webp"><img src="docs/assets/concepts/emberpact.webp" alt="Concept sheet: Emberpact" width="100%"></a><br><sub>Emberpact</sub></td>
+<td width="50%"><a href="docs/assets/concepts/fallenlight.webp"><img src="docs/assets/concepts/fallenlight.webp" alt="Concept sheet: Fallenlight" width="100%"></a><br><sub>Fallenlight</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/concepts/scaleworn.webp"><img src="docs/assets/concepts/scaleworn.webp" alt="Concept sheet: Scaleworn" width="100%"></a><br><sub>Scaleworn</sub></td>
+<td></td>
+</tr>
+</table>
+
+</details>
+
+
 <img src="docs/assets/divider.svg" alt="" width="100%">
 
 <h2 id="how-a-turn-works"><img src="docs/assets/section-turn.svg" alt="Plate IV: How a Turn Works" width="100%"></h2>
