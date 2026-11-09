@@ -170,6 +170,11 @@ jobs:
           set -euo pipefail
           GD_SCRATCH="$RUNNER_TEMP/gd-run-listing" bash tools/golden/run_gd_listing.sh
 
+      - name: GDScript save-menu layout test (Continue Journey list)
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-menu" bash tools/golden/run_gd_menu.sh
+
       - name: Import project
         run: |
           set -uo pipefail

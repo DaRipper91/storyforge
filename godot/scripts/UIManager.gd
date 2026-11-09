@@ -99,6 +99,7 @@ func _on_campaigns_received(campaigns: Array):
 		if not phase.is_empty():
 			label_text += "  (" + phase + ")"
 		btn.text = label_text
+		btn.custom_minimum_size = Vector2(0, 96)  # touch-sized row (>= ~9 mm on a phone)
 		btn.pressed.connect(func(): _on_save_selected(campaign_id))
 		save_list.add_child(btn)
 

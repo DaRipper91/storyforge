@@ -110,10 +110,12 @@ theme_override_constants/separation = 20
 
 [node name="NewGameBtn" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 96)
 text = "New Adventure"
 
 [node name="LoadGameBtn" type="Button" parent="MainMenu/VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 96)
 text = "Continue Journey"
 
 [node name="SaveGameMenu" type="PanelContainer" parent="."]
@@ -124,12 +126,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -200.0
-offset_right = 250.0
-offset_bottom = 200.0
+offset_left = -320.0
+offset_top = -300.0
+offset_right = 320.0
+offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_1")
 
 [node name="MarginContainer" type="MarginContainer" parent="SaveGameMenu"]
 layout_mode = 2
@@ -149,14 +152,15 @@ horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="SaveGameMenu/MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_hint_vertical = 3
+size_flags_vertical = 3
 
 [node name="SaveList" type="VBoxContainer" parent="SaveGameMenu/MarginContainer/VBoxContainer/ScrollContainer"]
 layout_mode = 2
-size_hint_horizontal = 3
+size_flags_horizontal = 3
 
 [node name="SaveBackBtn" type="Button" parent="SaveGameMenu/MarginContainer/VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 96)
 theme = SubResource("Theme_1")
 text = "Back"
 
