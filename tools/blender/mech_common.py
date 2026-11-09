@@ -10,20 +10,20 @@ import hero_textures as T
 
 # ------------------------------------------------------------------ bmesh collector
 class Parts:
-    """Collects geometry per (material, bone) and attaches one Hero_* object per bucket on flush()."""
+    """Collects geometry per (material, bone, smooth) and attaches one Hero_* object per bucket on flush()."""
     def __init__(self, arm):
         self.arm = arm; self.b = {}
-    def bm(self, material, bone):
-        k = (material.name, bone)
+    def bm(self, material, bone, smooth=False):
+        k = (material.name, bone, smooth)
         if k not in self.b: self.b[k] = (bmesh.new(), material)
         return self.b[k][0]
-    def flush(self, tag="", smooth_keys=()):
-        for (mn, bone), (bm, material) in self.b.items():
+    def flush(self, tag=""):
+        for (mn, bone, smooth), (bm, material) in self.b.items():
             if not bm.verts: bm.free(); continue
             bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
             triplanar_uv(bm)
-            name = "Hero_%s%s_%s" % (tag, mn, bone.replace(".", "_"))
-            attach(self.arm, name, bm, material, bone, smooth=(mn in smooth_keys))
+            name = "Hero_%s%s%s_%s" % (tag, mn, "_s" if smooth else "", bone.replace(".", "_"))
+            attach(self.arm, name, bm, material, bone, smooth=smooth)
         self.b = {}
 
 
@@ -271,6 +271,35 @@ def ring_tube(bm, sw, t0, t1, rows, n, l=0.0, cap=False):
         for ring in (vs[0], vs[-1]):
             try: bm.faces.new(ring)
             except ValueError: pass
+
+
+def frame(p0, p1):
+    d = (Vector(p1) - Vector(p0)).normalized()
+    u = d.cross(Vector((0, 0, 1)))
+    if u.length < 1e-3: u = d.cross(Vector((0, 1, 0)))
+    u.normalize(); v = d.cross(u).normalized()
+    return u, v
+
+
+def capfn(t, pw=4.0):
+    return max(1e-3, (1.0 - abs(2 * t - 1) ** pw)) ** 0.5
+
+
+def blob(bm, p0, p1, r0, r1=None, sy=1.0, rows=8, n=12, pw=4.0, mid=1.0, up=None):
+    """Rounded capsule/ellipsoid from p0 to p1 (radius r0 -> r1, optionally flattened by sy in the 2nd axis, bulged by mid)."""
+    r1 = r0 if r1 is None else r1
+    u, v = frame(p0, p1)
+    if up is not None:
+        v = Vector(up); u = (Vector(p1) - Vector(p0)).cross(v).normalized(); v = (Vector(p1) - Vector(p0)).normalized().cross(u).normalized() * -1
+    rf = lambda t, k=1.0: (r0 + (r1 - r0) * t) * (1 + (mid - 1) * math.sin(math.pi * t)) * capfn(t, pw) * k
+    sw = Sweep(p0, p1, u, v, lambda t: rf(t), lambda t: rf(t, sy))
+    ring_tube(bm, sw, 0.0, 1.0, rows, n, 0.0)
+
+
+def blob_sw(bm, sw, rows=10, n=14, pw=4.0):
+    """Closed rounded body along an existing Sweep (radii multiplied by a cap profile so both ends close)."""
+    sw2 = Sweep(sw.p0, sw.p1, sw.u, sw.v, lambda t: sw.rx(t) * capfn(t, pw), lambda t: sw.ry(t) * capfn(t, pw))
+    ring_tube(bm, sw2, 0.0, 1.0, rows, n, 0.0)
 
 
 def bone_pt(arm, bone, head=True):
