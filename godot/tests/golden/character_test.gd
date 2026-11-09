@@ -299,6 +299,28 @@ func _run() -> void:
 	for n in held:
 		n.free()
 
+	print("-- bespoke hero models")
+	_check("bloodweaver has a hero GLB", not CharacterModel.hero_path("bloodweaver").is_empty())
+	_check("a race without one falls back to its group base", CharacterModel.hero_path("voidwraith").is_empty())
+	var hero := CharacterModel.new()
+	get_root().add_child(hero)
+	_check("hero model sets up on the shared skeleton", hero.setup("bloodweaver"))
+	var hero_sk := hero.get_skeleton()
+	var hero_parts := 0
+	var mirrored_hero_parts := 0
+	for node in hero.find_children("Hero_*", "MeshInstance3D", true, false):
+		hero_parts += 1
+		if String(node.name).ends_with("_Mirrored"):
+			mirrored_hero_parts += 1
+	_check("hero attachments are present (%d Hero_* meshes)" % hero_parts, hero_parts >= 6)
+	_check("Hero_* parts are never mirrored", mirrored_hero_parts == 0)
+	var base_before := _first_albedo(hero)
+	hero.tint = Color(0.1, 0.9, 0.1)
+	_check("race tint does not recolour an authored hero", _first_albedo(hero).is_equal_approx(base_before))
+	hero.play(&"Walk")
+	_check("hero plays the shared Walk clip", hero.current_clip() == &"Walk")
+	hero.free()
+
 	print("")
 	print("%d checks, %d failed" % [_checks, _fails])
 	print("RESULT: OK" if _fails == 0 else "RESULT: FAILED")
