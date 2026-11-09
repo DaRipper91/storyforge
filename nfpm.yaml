@@ -1,8 +1,20 @@
+# nfpm config for the StoryForge Linux packages (deb / rpm / archlinux).
+# Driven by the environment (nfpm expands ${VAR} in this file):
+#   PKG_ARCH   amd64 | arm64   (nfpm maps it to x86_64 / aarch64 for rpm and pacman)
+#   VERSION    full version incl. test marker, e.g. 0.2.0.dev12.gabc1234
+#              (alnum and dots only: valid for deb, rpm and pacman pkgver)
+#   RELEASE    package revision, a plain integer (nfpm's pacman packager
+#              ignores non-numeric values), e.g. 1
+#   GLIBC_MIN  oldest glibc the PyInstaller launcher was built against, e.g. 2.35
+# Inputs expected in the repo root (CI builds them; see
+# .github/workflows/package-linux.yml and docs/packaging.md):
+#   dist/StoryForge         PyInstaller launcher (scripts/build.py)
+#   dist/storyforge-client  Godot Linux export for the matching arch
 name: "storyforge"
-arch: "amd64"
+arch: "${PKG_ARCH}"
 platform: "linux"
 version: "${VERSION}"
-release: 1
+release: "${RELEASE}"
 section: "games"
 priority: "extra"
 maintainer: "StoryForge Maintainer"
@@ -11,16 +23,85 @@ vendor: "StoryForge"
 homepage: "https://github.com/daripper/storyforge"
 license: "MIT"
 contents:
+  # Web/server launcher (FastAPI + spawns the Godot client with --local-server).
   - src: "dist/StoryForge"
     dst: "/usr/bin/storyforge"
+    file_info:
+      mode: 0755
+  # Godot cinematic client (single self-contained binary, embed_pck=true).
+  - src: "dist/storyforge-client"
+    dst: "/usr/lib/storyforge/storyforge-client"
+    file_info:
+      mode: 0755
+  # launcher.py looks for "StoryForge_client" next to its own executable
+  # (Path(sys.executable).parent), i.e. /usr/bin. Without this link the launcher
+  # silently falls back to "headless mode" with no client.
+  - src: "/usr/lib/storyforge/storyforge-client"
+    dst: "/usr/bin/StoryForge_client"
+    type: symlink
+  # Offline wrapper: client + `-- --backend=local` (no server, no API key).
+  - src: "packaging/storyforge-offline"
+    dst: "/usr/bin/storyforge-offline"
+    file_info:
+      mode: 0755
+  - src: "packaging/storyforge.desktop"
+    dst: "/usr/share/applications/storyforge.desktop"
+    file_info:
+      mode: 0644
+  - src: "packaging/storyforge-offline.desktop"
+    dst: "/usr/share/applications/storyforge-offline.desktop"
+    file_info:
+      mode: 0644
   - src: "frontend/icon.svg"
     dst: "/usr/share/icons/hicolor/scalable/apps/storyforge.svg"
+    file_info:
+      mode: 0644
+  - src: "godot/icon.svg"
+    dst: "/usr/share/icons/hicolor/scalable/apps/storyforge-offline.svg"
+    file_info:
+      mode: 0644
+# Dependencies, from evidence (see docs/packaging.md "Dependencies"):
+#  - The launcher excludes PyQt6/pywebview (StoryForge.spec) and only spawns the
+#    Godot client, so the old GTK3/WebKit2GTK dependencies were not needed.
+#  - The Godot export links only libc; X11, GL/Vulkan, audio, udev, fontconfig
+#    are dlopen()ed at runtime, so they are recommends (deb/rpm) rather than hard
+#    depends. pacman has no weak deps in nfpm, so they are listed there.
 overrides:
   deb:
     depends:
-      - libgtk-3-0
-      - libwebkit2gtk-4.1-0
+      - "libc6 (>= ${GLIBC_MIN})"
+    recommends:
+      - libgl1
+      - libx11-6
+      - libxcursor1
+      - libxi6
+      - libxinerama1
+      - libxrandr2
+      - libxkbcommon0
+      - libfontconfig1
+      - libudev1
   rpm:
     depends:
-      - gtk3
-      - webkit2gtk3
+      - "glibc >= ${GLIBC_MIN}"
+    recommends:
+      - mesa-libGL
+      - libX11
+      - libXcursor
+      - libXi
+      - libXinerama
+      - libXrandr
+      - libxkbcommon
+      - fontconfig
+      - systemd-libs
+  archlinux:
+    depends:
+      - glibc
+      - libgl
+      - libx11
+      - libxcursor
+      - libxi
+      - libxinerama
+      - libxrandr
+      - libxkbcommon
+      - fontconfig
+      - systemd-libs

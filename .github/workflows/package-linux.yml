@@ -1,0 +1,364 @@
+name: Package Linux (test)
+
+# TEST-ONLY packaging workflow: builds .deb, .rpm, Arch .pkg.tar.zst and an
+# AppImage for amd64 and arm64, smoke-installs each in a container, and uploads
+# them as 14-day workflow artifacts (storyforge-linux-<arch>).
+# Nothing is published: no tags, no GitHub release, no itch.io, no secrets.
+# Packaging inputs live in nfpm.yaml and packaging/; see docs/packaging.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Base version override, e.g. 0.3.0 (default: version from pyproject.toml). A .dev<run>.g<sha> test marker is always appended."
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - 'nfpm.yaml'
+      - 'packaging/**'
+      - '.github/workflows/package-linux.yml'
+      - 'scripts/build.py'
+      - 'StoryForge.spec'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: package-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.6.2"
+  GODOT_TAG: "4.6.2-stable"
+  NFPM_VERSION: "2.48.0"
+  # appimagetool is the tagged 1.9.1 release (not the rolling `continuous` tag).
+  # It would otherwise download the type2 runtime from the rolling `continuous`
+  # tag at build time, so the runtime is pinned too (tag 20251108) and passed in
+  # with --runtime-file. SHA256s are the release asset digests, verified below.
+  APPIMAGETOOL_VERSION: "1.9.1"
+  APPIMAGE_RUNTIME_TAG: "20251108"
+
+jobs:
+  package:
+    name: Package (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            # ubuntu-22.04 keeps the PyInstaller bundle's glibc floor at 2.35.
+            # (uv.lock's pyqt6-webengine-qt6 wheel needs >= 2.34, so 22.04 still works.)
+            runner: ubuntu-22.04
+            experimental: false
+            glibc_min: "2.35"
+            godot_preset: "Linux/X11"
+            godot_zip: "Godot_v4.6.2-stable_linux.x86_64.zip"
+            godot_bin: "Godot_v4.6.2-stable_linux.x86_64"
+            nfpm_asset: "nfpm_2.48.0_Linux_x86_64.tar.gz"
+            appimage_arch: "x86_64"
+            appimagetool_sha256: "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0"
+            appimage_runtime_sha256: "2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d"
+          - arch: arm64
+            # Free arm64 runner for public repos. 24.04 is the oldest image, so the
+            # arm64 packages require glibc >= 2.39 (also what the arm64 PyQt6
+            # WebEngine wheel in uv.lock needs: manylinux_2_39_aarch64).
+            runner: ubuntu-24.04-arm
+            experimental: true
+            glibc_min: "2.39"
+            godot_preset: "Linux/ARM64"
+            godot_zip: "Godot_v4.6.2-stable_linux.arm64.zip"
+            godot_bin: "Godot_v4.6.2-stable_linux.arm64"
+            nfpm_asset: "nfpm_2.48.0_Linux_arm64.tar.gz"
+            appimage_arch: "aarch64"
+            appimagetool_sha256: "f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158"
+            appimage_runtime_sha256: "00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444"
+    env:
+      PKG_ARCH: ${{ matrix.arch }}
+      GLIBC_MIN: ${{ matrix.glibc_min }}
+      RELEASE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install system dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          # libffi-dev: cryptography wheel (as in build.yml); squashfs-tools: appimagetool;
+          # desktop-file-utils: validate .desktop files; rpm: inspect the rpm.
+          sudo apt-get install -y -qq libffi-dev squashfs-tools desktop-file-utils rpm file
+
+      - name: Compute package version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -euo pipefail
+          base="${INPUT_VERSION:-}"
+          if [ -z "$base" ]; then
+            base="$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")"
+          fi
+          # Digits and dots only: valid in deb, rpm and pacman versions, and safe to
+          # put on a command line / in a file name.
+          if ! printf '%s' "$base" | grep -Eq '^[0-9]+(\.[0-9]+){1,3}$'; then
+            echo "::error::Invalid base version '$base' (expected e.g. 0.2.0)"
+            exit 1
+          fi
+          # Test marker is always appended so a CI package never looks like a final one.
+          # e.g. 0.2.0.dev57.g50ab6fd  (alnum + dots: valid for deb, rpm, pacman pkgver)
+          ver="${base}.dev${GITHUB_RUN_NUMBER}.g${GITHUB_SHA::7}"
+          echo "VERSION=$ver" >> "$GITHUB_ENV"
+          echo "Package version: $ver (release ${RELEASE})"
+
+      - name: Install Python dependencies
+        run: uv sync --group dev --python 3.12
+
+      - name: Build launcher (PyInstaller, native ${{ matrix.arch }})
+        run: |
+          set -euo pipefail
+          uv run --python 3.12 python scripts/build.py
+          test -x dist/StoryForge
+          file dist/StoryForge
+          ls -l dist/StoryForge
+
+      - name: Download Godot editor and export templates (SHA512 verified)
+        env:
+          GODOT_ZIP: ${{ matrix.godot_zip }}
+          GODOT_BIN_NAME: ${{ matrix.godot_bin }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/godot-dl"
+          cd "$RUNNER_TEMP/godot-dl"
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_TAG}"
+          editor="$GODOT_ZIP"
+          templates="Godot_v${GODOT_TAG}_export_templates.tpz"
+          curl -fsSL --retry 3 -O "$base/SHA512-SUMS.txt"
+          curl -fsSL --retry 3 -O "$base/$editor"
+          curl -fsSL --retry 3 -O "$base/$templates"
+          # Match on exact file names; fail if either line is absent.
+          grep -E "  (${editor}|${templates})\$" SHA512-SUMS.txt > wanted.sha512
+          test "$(wc -l < wanted.sha512)" -eq 2
+          sha512sum -c wanted.sha512
+
+          unzip -q "$editor"
+          mv "$GODOT_BIN_NAME" "$RUNNER_TEMP/godot"
+          chmod +x "$RUNNER_TEMP/godot"
+          echo "GODOT_BIN=$RUNNER_TEMP/godot" >> "$GITHUB_ENV"
+
+          tdir="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$tdir"
+          unzip -q "$templates" -d tpl
+          mv tpl/templates/* "$tdir/"
+          ls "$tdir" | head -50
+          "$RUNNER_TEMP/godot" --headless --version
+
+      - name: Import Godot project
+        run: |
+          set -uo pipefail
+          "$GODOT_BIN" --headless --path godot --import 2>&1 | tee "$RUNNER_TEMP/import.log"
+          rc=${PIPESTATUS[0]}
+          # Same classification as android-debug.yml: errors that originate in a
+          # vendored addon (res://addons/...) are reported but do not block (Godot 3
+          # PushDownAutomata addon, phantom_camera singleton noise in headless mode);
+          # any error from game code is a real failure.
+          addon_errs="$(awk '/SCRIPT ERROR|Parse Error/ { h=$0; if ((getline n) > 0 && n ~ /res:\/\/addons\//) print h " | " n }' "$RUNNER_TEMP/import.log" || true)"
+          if [ -n "$addon_errs" ]; then
+            echo "::warning::Ignoring script errors that originate in vendored addons:"
+            echo "$addon_errs"
+          fi
+          real="$(awk '/SCRIPT ERROR|Parse Error/ { h=$0; if ((getline n) > 0 && n !~ /res:\/\/addons\//) print h " | " n }' "$RUNNER_TEMP/import.log" | grep -viE 'phantom_?camera' || true)"
+          if [ -n "$real" ]; then
+            echo "::error::Script errors from game code during import:"
+            echo "$real"
+            exit 1
+          fi
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::godot --import exited $rc (continuing; export decides)"
+          fi
+
+      - name: Export Godot client (${{ matrix.godot_preset }})
+        env:
+          GODOT_PRESET: ${{ matrix.godot_preset }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          "$GODOT_BIN" --headless --path godot --export-release "$GODOT_PRESET" "$GITHUB_WORKSPACE/dist/storyforge-client"
+          test -f dist/storyforge-client || { echo "::error::client export missing"; exit 1; }
+          chmod +x dist/storyforge-client
+          size=$(stat -c %s dist/storyforge-client)
+          echo "client size: $size bytes"
+          if [ "$size" -lt 10485760 ]; then
+            echo "::error::client smaller than 10 MB ($size): export looks broken"
+            exit 1
+          fi
+          file dist/storyforge-client
+
+      - name: Smoke-run client and inspect shared libraries
+        run: |
+          set -uo pipefail
+          out="$(dist/storyforge-client --headless --version)" || { echo "::error::client --headless --version failed"; exit 1; }
+          echo "client version: $out"
+          printf '%s' "$out" | grep -Eq "^${GODOT_VERSION}\.stable" || { echo "::error::unexpected client version '$out'"; exit 1; }
+          for f in dist/StoryForge dist/storyforge-client; do
+            echo "::group::ldd $f"
+            ldd "$f" || true
+            echo "::endgroup::"
+            if ldd "$f" 2>&1 | grep -q "not found"; then
+              echo "::warning::$f has unresolved shared libraries on this runner (see ldd output)"
+            fi
+          done
+          # Highest GLIBC symbol version each binary needs vs the declared floor.
+          for f in dist/StoryForge dist/storyforge-client; do
+            echo "$f needs glibc <= $(objdump -T "$f" 2>/dev/null | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)  (declared floor ${GLIBC_MIN})"
+          done
+
+      - name: Download nfpm (sha256 verified)
+        env:
+          NFPM_ASSET: ${{ matrix.nfpm_asset }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/nfpm"
+          cd "$RUNNER_TEMP/nfpm"
+          base="https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}"
+          curl -fsSL --retry 3 -O "$base/checksums.txt"
+          curl -fsSL --retry 3 -O "$base/$NFPM_ASSET"
+          grep -E "  ${NFPM_ASSET}\$" checksums.txt > wanted.sha256
+          test "$(wc -l < wanted.sha256)" -eq 1
+          sha256sum -c wanted.sha256
+          tar -xzf "$NFPM_ASSET" nfpm
+          chmod +x nfpm
+          ./nfpm --version | head -3
+          echo "NFPM_BIN=$RUNNER_TEMP/nfpm/nfpm" >> "$GITHUB_ENV"
+
+      - name: Build deb, rpm and Arch packages (nfpm)
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for fmt in deb rpm archlinux; do
+            "$NFPM_BIN" package -p "$fmt" -f nfpm.yaml -t out/
+          done
+          for f in packaging/*.desktop; do desktop-file-validate "$f"; done
+          ls -l out
+          echo "::group::package metadata"
+          rpm -qip out/*.rpm || true
+          rpm -qpl out/*.rpm || true
+          ar t out/*.deb
+          tar --zstd -xOf out/*.pkg.tar.zst .PKGINFO
+          echo "::endgroup::"
+
+      - name: Build AppImage
+        env:
+          APPIMAGE_ARCH: ${{ matrix.appimage_arch }}
+          APPIMAGETOOL_SHA256: ${{ matrix.appimagetool_sha256 }}
+          APPIMAGE_RUNTIME_SHA256: ${{ matrix.appimage_runtime_sha256 }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/appimage"
+          cd "$RUNNER_TEMP/appimage"
+          curl -fsSL --retry 3 -o appimagetool \
+            "https://github.com/AppImage/appimagetool/releases/download/${APPIMAGETOOL_VERSION}/appimagetool-${APPIMAGE_ARCH}.AppImage"
+          curl -fsSL --retry 3 -o runtime \
+            "https://github.com/AppImage/type2-runtime/releases/download/${APPIMAGE_RUNTIME_TAG}/runtime-${APPIMAGE_ARCH}"
+          printf '%s  appimagetool\n%s  runtime\n' "$APPIMAGETOOL_SHA256" "$APPIMAGE_RUNTIME_SHA256" | sha256sum -c -
+          chmod +x appimagetool
+          cd "$GITHUB_WORKSPACE"
+          APPIMAGETOOL="$RUNNER_TEMP/appimage/appimagetool" \
+          APPIMAGE_RUNTIME="$RUNNER_TEMP/appimage/runtime" \
+            packaging/build-appimage.sh "$APPIMAGE_ARCH" "$VERSION" out
+          ls -l out
+
+      - name: Test AppImage (extract, structure, version flag)
+        run: |
+          set -euo pipefail
+          img="$(ls out/StoryForge-*.AppImage)"
+          rm -rf "$RUNNER_TEMP/ai-extract" && mkdir -p "$RUNNER_TEMP/ai-extract"
+          (cd "$RUNNER_TEMP/ai-extract" && APPIMAGE_EXTRACT_AND_RUN=1 "$GITHUB_WORKSPACE/$img" --appimage-extract > /dev/null)
+          root="$RUNNER_TEMP/ai-extract/squashfs-root"
+          for p in AppRun storyforge-offline.desktop storyforge-offline.svg usr/bin/storyforge usr/bin/storyforge-client; do
+            test -e "$root/$p" || { echo "::error::AppImage missing $p"; exit 1; }
+          done
+          test -x "$root/AppRun"
+          test -x "$root/usr/bin/storyforge"
+          test -x "$root/usr/bin/storyforge-client"
+          desktop-file-validate "$root/storyforge-offline.desktop"
+          # Default mode is the offline client; engine args go through AppRun.
+          out="$(APPIMAGE_EXTRACT_AND_RUN=1 "./$img" --headless --version)"
+          echo "AppImage client version: $out"
+          printf '%s' "$out" | grep -Eq "^${GODOT_VERSION}\.stable"
+
+      - name: Install test - deb (ubuntu:24.04)
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD/out:/pkgs:ro" ubuntu:24.04 bash -euxc '
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq
+            apt-get install -y ./pkgs/*.deb
+            dpkg -s storyforge | sed -n "1,6p"
+            for f in /usr/bin/storyforge /usr/bin/storyforge-offline /usr/bin/StoryForge_client /usr/lib/storyforge/storyforge-client; do test -x "$f"; done
+            for f in /usr/share/applications/storyforge.desktop /usr/share/applications/storyforge-offline.desktop /usr/share/icons/hicolor/scalable/apps/storyforge.svg /usr/share/icons/hicolor/scalable/apps/storyforge-offline.svg; do test -f "$f"; done
+            ldd /usr/bin/storyforge || true
+            v="$(storyforge-offline --headless --version)"; echo "$v"
+            echo "$v" | grep -Eq "^4\.6\.2\.stable"
+          '
+
+      - name: Install test - rpm (fedora:latest)
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD/out:/pkgs:ro" fedora:latest bash -euxc '
+            dnf -y install /pkgs/*.rpm
+            rpm -qi storyforge | sed -n "1,8p"
+            for f in /usr/bin/storyforge /usr/bin/storyforge-offline /usr/bin/StoryForge_client /usr/lib/storyforge/storyforge-client; do test -x "$f"; done
+            for f in /usr/share/applications/storyforge.desktop /usr/share/applications/storyforge-offline.desktop /usr/share/icons/hicolor/scalable/apps/storyforge.svg /usr/share/icons/hicolor/scalable/apps/storyforge-offline.svg; do test -f "$f"; done
+            ldd /usr/bin/storyforge || true
+            v="$(storyforge-offline --headless --version)"; echo "$v"
+            echo "$v" | grep -Eq "^4\.6\.2\.stable"
+          '
+
+      - name: Install test - Arch package (archlinux:latest, amd64 only)
+        run: |
+          set -euo pipefail
+          if [ "$PKG_ARCH" != "amd64" ]; then
+            echo "::notice::Skipping pacman install test: there is no arm64 Arch Linux image (Arch Linux ARM is a separate distro). The aarch64 package was only built and inspected."
+            exit 0
+          fi
+          docker run --rm -v "$PWD/out:/pkgs:ro" archlinux:latest bash -euxc '
+            # pacman >= 7 sandboxes downloads with Landlock, which docker may block.
+            opt=""; pacman --help | grep -q disable-sandbox && opt="--disable-sandbox"
+            pacman $opt -Syu --noconfirm
+            pacman $opt -U --noconfirm /pkgs/*.pkg.tar.zst
+            pacman -Qi storyforge | sed -n "1,8p"
+            for f in /usr/bin/storyforge /usr/bin/storyforge-offline /usr/bin/StoryForge_client /usr/lib/storyforge/storyforge-client; do test -x "$f"; done
+            for f in /usr/share/applications/storyforge.desktop /usr/share/applications/storyforge-offline.desktop /usr/share/icons/hicolor/scalable/apps/storyforge.svg /usr/share/icons/hicolor/scalable/apps/storyforge-offline.svg; do test -f "$f"; done
+            v="$(storyforge-offline --headless --version)"; echo "$v"
+            echo "$v" | grep -Eq "^4\.6\.2\.stable"
+          '
+
+      - name: Write SHA256SUMS.txt
+        run: |
+          set -euo pipefail
+          cd out
+          sha256sum -- * | grep -v ' SHA256SUMS.txt$' > ../SHA256SUMS.txt
+          mv ../SHA256SUMS.txt SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          test "$(wc -l < SHA256SUMS.txt)" -eq 4
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: storyforge-linux-${{ matrix.arch }}
+          path: out/*
+          retention-days: 14
+          if-no-files-found: error

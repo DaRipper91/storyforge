@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=StoryForge
+GenericName=AI Dungeon Master
+Comment=Hybrid VTT + AI Dungeon Master for family D&D 5e (server + client)
+Exec=storyforge
+Icon=storyforge
+Terminal=false
+Categories=Game;RolePlaying;
+Keywords=dnd;rpg;dungeon master;tabletop;
