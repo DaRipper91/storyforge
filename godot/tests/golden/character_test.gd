@@ -325,6 +325,13 @@ func _run() -> void:
 	_check("hero plays the shared Walk clip", hero.current_clip() == &"Walk")
 	hero.free()
 
+	var grim := CharacterModel.new()
+	get_root().add_child(grim)
+	_check("grimcrow hero sets up on the shared skeleton", not CharacterModel.hero_path("grimcrow").is_empty() and grim.setup("grimcrow"))
+	var grim_parts := grim.find_children("Hero_*", "MeshInstance3D", true, false).size()
+	_check("grimcrow has its bespoke parts (%d Hero_* meshes)" % grim_parts, grim_parts >= 12)
+	grim.free()
+
 	print("-- bespoke creature (own skeleton and clips)")
 	_check("ironlocust has a hero GLB", not CharacterModel.hero_path("ironlocust").is_empty())
 	var cm_creature := CharacterModel.new()

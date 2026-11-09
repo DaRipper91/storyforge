@@ -68,6 +68,7 @@ func _run() -> void:
 		"hit": ModelLibrary.find_clip(ap, "hit"), "death": ModelLibrary.find_clip(ap, "death")}
 	if is_char:   # shared library names
 		clips = {"idle": "Idle", "walk": "Walk", "hit": "Hit", "death": "Death"}
+	ap.playback_default_blend_time = 0.0   # a blend from the previous clip would hide the pose we seek
 	print("HERO clips ", clips)
 
 	var cam := Camera3D.new()
@@ -84,9 +85,10 @@ func _run() -> void:
 		if clip.is_empty() or not ap.has_animation(clip):
 			continue
 		var anim := ap.get_animation(clip)
+		var t: float = float(step[1]) * anim.length if step[0] == "walk" else minf(float(step[1]), anim.length)
 		ap.play(clip)
-		ap.seek(float(step[1]) * anim.length if step[0] == "walk" else minf(float(step[1]), anim.length), true)
 		ap.pause()
+		ap.seek(t, true)
 		for _i in 3:
 			await process_frame
 		frames.append(root.get_texture().get_image())
