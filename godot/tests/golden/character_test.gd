@@ -307,7 +307,7 @@ func _run() -> void:
 
 	print("-- bespoke hero models")
 	_check("bloodweaver has a hero GLB", not CharacterModel.hero_path("bloodweaver").is_empty())
-	_check("a race without one falls back to its group base", CharacterModel.hero_path("voidwraith").is_empty())
+	_check("a race without one falls back to its group base", CharacterModel.hero_path("veilborn").is_empty())
 	var hero := CharacterModel.new()
 	get_root().add_child(hero)
 	_check("hero model sets up on the shared skeleton", hero.setup("bloodweaver"))
@@ -333,6 +333,13 @@ func _run() -> void:
 	var grim_parts := grim.find_children("Hero_*", "MeshInstance3D", true, false).size()
 	_check("grimcrow has its bespoke parts (%d Hero_* meshes)" % grim_parts, grim_parts >= 12)
 	grim.free()
+
+	var void_w := CharacterModel.new()
+	get_root().add_child(void_w)
+	_check("voidwraith hero sets up on the shared skeleton", not CharacterModel.hero_path("voidwraith").is_empty() and void_w.setup("voidwraith"))
+	var void_parts := void_w.find_children("Hero_*", "MeshInstance3D", true, false).size()
+	_check("voidwraith has its bespoke parts (%d Hero_* meshes)" % void_parts, void_parts >= 20)
+	void_w.free()
 
 	print("-- bespoke creature (own skeleton and clips)")
 	_check("ironlocust has a hero GLB", not CharacterModel.hero_path("ironlocust").is_empty())
