@@ -332,6 +332,9 @@ func _on_campaigns_fetched(_result, response_code, _headers, body):
 			campaigns_received.emit(json.get("campaigns", []))
 		else:
 			campaigns_received.emit([])
+	else:
+		# Never leave the save menu stuck on "Loading saved chronicles...".
+		campaigns_received.emit([])
 
 func new_campaign() -> void:
 	var http = new_http()
