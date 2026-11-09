@@ -206,7 +206,7 @@ Bindings are registered in `PythonClient._setup_input_map()` and `Tabletop.gd`.
 | Orbit / zoom camera | Right-drag / mouse wheel | Right stick (look) |
 | Close overlay | Esc | |
 
-There are no touch controls yet.
+**Touch (phones).** On Android, or on desktop with `--touch` or `STORYFORGE_TOUCH=1`, an on-screen layer is added: a floating joystick in the left zone (move), a one-finger drag in the right zone (orbit the camera), a two-finger pinch (zoom), and buttons for use, previous/next character, map, camera reset and the freeform bar. It is covered by a 114-check headless test and has not been used on a real phone yet. Details and tuning constants: [docs/offline/TOUCH_CONTROLS.md](docs/offline/TOUCH_CONTROLS.md).
 
 ### Testing
 
@@ -226,16 +226,16 @@ At this commit that is 458 tests (character factory, validators, lobby and NPC r
 - The FastAPI server: 55 documented paths, WebSocket fan-out, atomic snapshots.
 - Validator-gated freeform play and eight NPC encounter services.
 - Offline backend merged to `main`: the core and the CORE routes ported to GDScript and replayed against recorded Python behaviour (358 function fixtures and 141 route steps, golden files in [tests/golden/](tests/golden/)). Android defaults to this backend.
+- On-screen touch controls for phones (joystick, camera drag, pinch, buttons), headless-tested only.
 
 **In progress**
 
-- Touch controls for phones ([PR #270](https://github.com/DaRipper91/storyforge/pull/270), under review).
 - Running the offline build on a real display and a real phone.
 
 **Known gaps**
 
 - Offline, `/api/npc/**` returns 503 and freeform text returns 501; both need the AI narrator.
-- No touch controls: input is keyboard, mouse and gamepad. Android only has emulated mouse.
+- Touch controls have never been used on a real phone. Known rough edges: the creation screens still have buttons under 9 mm, and a 20:9 phone letterboxes to 16:9.
 - No display-verified build of either backend. Everything above is headless evidence.
 - Combat is deferred: the validator rejects AI-proposed phase changes to `COMBAT`.
 - CI builds of the Android APK are signed with a throwaway key; the APK on the Releases page is signed with the project's own debug key, so only that one updates in place.
