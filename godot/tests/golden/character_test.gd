@@ -165,6 +165,10 @@ func _run() -> void:
 	var failed: Array = []
 	var by_group := {}
 	for id in ids:
+		var creature_probe := ModelLibrary.instantiate_hero(id, 0.9)
+		if creature_probe != null:
+			creature_probe.free()
+			continue   # bespoke creature with its own skeleton: covered by the creature checks below
 		var cm := CharacterModel.new()
 		get_root().add_child(cm)
 		var ok := cm.setup(id) and cm.is_ready()
@@ -178,7 +182,7 @@ func _run() -> void:
 			setup_ok = false
 			failed.append(id)
 		cm.free()
-	_check("CharacterModel.setup succeeds for all 35 races", setup_ok, str(failed))
+	_check("CharacterModel.setup succeeds for every humanoid-skeleton race (creatures use their own clips)", setup_ok, str(failed))
 	_check("five groups covered", by_group.size() == 5, str(by_group))
 	var neutral := CharacterModel.new()
 	get_root().add_child(neutral)
@@ -320,6 +324,28 @@ func _run() -> void:
 	hero.play(&"Walk")
 	_check("hero plays the shared Walk clip", hero.current_clip() == &"Walk")
 	hero.free()
+
+	print("-- bespoke creature (own skeleton and clips)")
+	_check("ironlocust has a hero GLB", not CharacterModel.hero_path("ironlocust").is_empty())
+	var cm_creature := CharacterModel.new()
+	get_root().add_child(cm_creature)
+	_check("CharacterModel refuses a non-humanoid skeleton (falls through to the creature path)", not cm_creature.setup("ironlocust"))
+	cm_creature.free()
+	var creature := ModelLibrary.instantiate_hero("ironlocust", 0.62)
+	_check("ModelLibrary instantiates the creature", creature != null)
+	if creature != null:
+		var cap := ModelLibrary.find_anim_player(creature)
+		_check("creature ships an AnimationPlayer", cap != null)
+		for role in ["idle", "walk", "hit", "death"]:
+			_check("creature has a %s clip" % role, cap != null and not ModelLibrary.find_clip(cap, role).is_empty())
+		var cbox := {"found": false, "box": AABB()}
+		ModelLibrary._accumulate_aabb(creature, Transform3D.IDENTITY, cbox)
+		_check("creature stands at the requested height (%.2f)" % cbox["box"].size.y, absf(cbox["box"].size.y - 0.62) < 0.05)
+		creature.free()
+	var plain := ModelLibrary.instantiate_hero("ashenborn", 0.9)
+	_check("no creature model for a plain humanoid race", plain == null)
+	if plain != null:
+		plain.free()
 
 	print("")
 	print("%d checks, %d failed" % [_checks, _fails])

@@ -56,7 +56,7 @@ def to_obj(name, bm, material, bone, smooth=True):
     me.materials.append(material)
     for p in me.polygons: p.use_smooth = smooth
     o.parent = arm; o.parent_type = 'BONE'; o.parent_bone = bone
-    o.matrix_parent_inverse = (arm.matrix_world @ arm.data.bones[bone].matrix_local).inverted()
+    o.matrix_parent_inverse = (arm.matrix_world @ arm.data.bones[bone].matrix_local @ Matrix.Translation((0, arm.data.bones[bone].length, 0))).inverted()  # Blender parents bone children at the bone TAIL
     return o
 
 def strip(rows, cols, fn, close=False):
