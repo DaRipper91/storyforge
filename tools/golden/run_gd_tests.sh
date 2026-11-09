@@ -5,7 +5,7 @@
 # Usage: tools/golden/run_gd_tests.sh [--module=grid] [--verbose]
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SCRATCH="${GD_SCRATCH:-/tmp/claude-1000/-home-daripper/6af3c5e8-f54c-42c7-bb38-55d615da2a13/scratchpad/gd-run}"
+SCRATCH="${GD_SCRATCH:-${TMPDIR:-/tmp}/storyforge-gd-run}"
 GODOT="${GODOT_BIN:-/usr/bin/godot}"
 
 rm -rf "$SCRATCH"

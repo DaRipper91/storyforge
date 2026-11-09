@@ -67,7 +67,15 @@ const RACE_GROUP: Dictionary = {
 # ─── Camera gimbal ──────────────────────────────────────────────────
 var _cam_yaw:      float = 0.0
 var _cam_pitch:    float = -45.0
-var _cam_distance: float = 14.14
+# The Tabletop camera is ORTHOGRAPHIC: moving it further away does not make anything smaller, only
+# Camera3D.size does. _cam_distance is kept as the single zoom value (wheel, pinch, reset) and is
+# converted to the camera's ortho size in _update_camera(). 14.14 distance == size 20 (the old fixed
+# value); the default is much closer so a 0.9 m mini is ~85 px tall on a phone.
+const CAM_SIZE_PER_DISTANCE := 1.41421356
+const CAM_DISTANCE_DEFAULT  := 5.66   # ortho size ~8
+const CAM_DISTANCE_MIN      := 3.5    # ortho size ~5
+const CAM_DISTANCE_MAX      := 21.0   # ortho size ~30
+var _cam_distance: float = CAM_DISTANCE_DEFAULT
 var _cam_target:   Vector3 = Vector3.ZERO
 var _is_orbiting:  bool = false
 var _last_mouse:   Vector2 = Vector2.ZERO
@@ -635,10 +643,10 @@ func _input(event: InputEvent):
 				if event.pressed:
 					_last_mouse = event.position
 			MOUSE_BUTTON_WHEEL_UP:
-				_cam_distance = max(5.0, _cam_distance - 1.2)
+				_cam_distance = max(CAM_DISTANCE_MIN, _cam_distance - 1.0)
 				_update_camera()
 			MOUSE_BUTTON_WHEEL_DOWN:
-				_cam_distance = min(30.0, _cam_distance + 1.2)
+				_cam_distance = min(CAM_DISTANCE_MAX, _cam_distance + 1.0)
 				_update_camera()
 
 	if event is InputEventMouseMotion and _is_orbiting:
@@ -668,7 +676,7 @@ func _input(event: InputEvent):
 	if Input.is_action_just_pressed("reset_cam"):
 		_cam_yaw      = 0.0
 		_cam_pitch    = -45.0
-		_cam_distance = 14.14
+		_cam_distance = CAM_DISTANCE_DEFAULT
 		_update_camera()
 	elif Input.is_action_just_pressed("map"):
 		_toggle_world_map()
@@ -783,6 +791,8 @@ func _update_camera():
 	)
 	camera.position = _cam_target + offset
 	camera.look_at(_cam_target, Vector3.UP)
+	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
+		camera.size = _cam_distance * CAM_SIZE_PER_DISTANCE
 
 
 # ─── Dungeon geometry ───────────────────────────────────────────────
@@ -960,7 +970,9 @@ func _rebuild_room(state: Dictionary):
 
 	# Center camera on room
 	_cam_target = Vector3((w - 1) * CELL_SIZE * 0.5, 0.0, (h - 1) * CELL_SIZE * 0.5)
-	_cam_distance = max(w, h) * 0.9 + 4.0
+	# Fixed comfortable zoom (the old 'frame the whole room' value had no effect on an ortho camera,
+	# and framing a big room would make the minis tiny anyway). The camera follows the leader.
+	_cam_distance = CAM_DISTANCE_DEFAULT
 	_update_camera()
 
 	_build_void_floor(w, h)
@@ -1231,6 +1243,8 @@ func _move_miniature(character_id: String, grid_pos: Vector2):
 	var mini = _miniatures[character_id]
 	var target = _grid_to_world(grid_pos)
 	# Start walk animation
+	if mini.has_method("face_direction"):
+		mini.face_direction(target - mini.position)
 	if mini.has_method("play_walk"):
 		mini.play_walk()
 	var tween = create_tween()

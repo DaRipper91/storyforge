@@ -35,10 +35,17 @@ const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]
 @onready var next_btn         = $MarginContainer/VBoxContainer/Footer/NextBtn
 @onready var back_btn         = $MarginContainer/VBoxContainer/Footer/BackBtn
 
+## Preview framing: the whole body plus this much slack, seen from a slight downward angle.
+const PREVIEW_MARGIN := 1.22
+const PREVIEW_PITCH_DEG := 9.0
+const PREVIEW_TURN_SPEED := 0.55   # rad/s turntable
+
 var catalog:      Dictionary = {}
 var current_step: int        = 0
 var slot_index:   int        = 0
 var _submitting:  bool       = false
+var _preview_cam: Camera3D       = null
+var _preview_vp:  SubViewport    = null
 
 var selection: Dictionary = {
 	"starting_era":    "after",
@@ -58,8 +65,7 @@ var _focused_ability: String = ""   # which ability row is selected for assignme
 func _ready():
 	next_btn.disabled = true
 
-	if race_mini:
-		race_mini.scale = Vector3(1.7, 1.7, 1.7)
+	_setup_preview()
 
 	# Wrap RaceList in a ScrollContainer at runtime.
 	# Doing this in code (not .tscn) so layout flags are set after the node
@@ -85,6 +91,55 @@ func _ready():
 	else:
 		_setup_mock_catalog()
 		_render_step()
+
+## The preview is framed from the model's own bounds (see _frame_preview), so the mini
+## keeps scale 1 and the camera moves instead.
+func _setup_preview() -> void:
+	if race_mini == null:
+		return
+	_preview_vp = race_mini.get_parent() as SubViewport
+	if _preview_vp == null:
+		return
+	_preview_cam = _preview_vp.get_node_or_null("Camera3D") as Camera3D
+	if _preview_cam:
+		_preview_cam.fov = 40.0
+		_preview_cam.current = true
+	_preview_vp.size_changed.connect(_frame_preview)
+	# The preview shares the main world, which has no ambient light: add a soft fill.
+	var fill := DirectionalLight3D.new()
+	fill.name = "FillLight"
+	fill.light_energy = 0.55
+	fill.rotation_degrees = Vector3(-15.0, 165.0, 0.0)
+	_preview_vp.add_child(fill)
+
+func _process(delta: float) -> void:
+	if race_mini and race_mini.visible:
+		race_mini.rotation.y = wrapf(race_mini.rotation.y + delta * PREVIEW_TURN_SPEED, -PI, PI)
+
+## Shows `race_key` (or a neutral humanoid when empty / unknown) and frames it.
+func _show_preview(race_key) -> void:
+	if race_mini == null:
+		return
+	var key: String = race_key if race_key is String and not (race_key as String).is_empty() else CharacterModel.NEUTRAL_ID
+	race_mini.visible = true
+	race_mini.setup(key)
+	_frame_preview()
+
+## Places the preview camera so the whole body, from the AABB, fits with a margin.
+func _frame_preview() -> void:
+	if race_mini == null or _preview_cam == null or _preview_vp == null:
+		return
+	var box: AABB = race_mini.get_visual_aabb()
+	var aspect := float(maxi(_preview_vp.size.x, 1)) / float(maxi(_preview_vp.size.y, 1))
+	var tan_half := tan(deg_to_rad(_preview_cam.fov) * 0.5)
+	var radius := maxf(box.size.x, box.size.z) * 0.5
+	var half_h := box.size.y * 0.5 * PREVIEW_MARGIN
+	var half_w := radius * PREVIEW_MARGIN
+	var dist := maxf(half_h / tan_half, half_w / (tan_half * aspect)) + radius
+	var centre: Vector3 = race_mini.position + box.get_center()
+	var pitch := deg_to_rad(PREVIEW_PITCH_DEG)
+	_preview_cam.position = centre + Vector3(0.0, sin(pitch) * dist, cos(pitch) * dist)
+	_preview_cam.look_at(centre, Vector3.UP)
 
 func _on_state_updated(state: Dictionary):
 	for slot in state.get("lobby_slots", []):
@@ -112,6 +167,8 @@ func _render_step():
 		3: _render_choice_step(catalog.get("roles",  {}), "predator_role",   "Choose your predator role…")
 		4: _render_abilities_step()
 		5: _render_name_step()
+	if current_step != 1 or selection["race"] == null:
+		_show_preview(selection["race"])
 
 func _clear_list():
 	for child in race_list.get_children():
@@ -203,17 +260,17 @@ func _render_race_step():
 			if selection["race"] == key:
 				btn.set_pressed_no_signal(true)
 				next_btn.disabled = false
-				_preview_race(data, is_before)
-			btn.mouse_entered.connect(func(): AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav"); _preview_race(data, is_before))
-			btn.focus_entered.connect(func(): _preview_race(data, is_before))
+				_preview_race(data, is_before, key)
+			btn.mouse_entered.connect(func(): AudioManager.play_sfx("res://assets/audio/sfx_ui_hover.wav"); _preview_race(data, is_before, key))
+			btn.focus_entered.connect(func(): _preview_race(data, is_before, key))
 			btn.pressed.connect(func():
 				selection["race"] = key
 				next_btn.disabled = false
-				_preview_race(data, is_before)
+				_preview_race(data, is_before, key)
 			)
 			race_list.add_child(btn)
 
-func _preview_race(data: Dictionary, is_before: bool):
+func _preview_race(data: Dictionary, is_before: bool, race_key: String):
 	var name_str   = data.get("name", "")
 	var before_str = data.get("before", "")
 	var flavor     = data.get("flavor", "")
@@ -242,10 +299,8 @@ func _preview_race(data: Dictionary, is_before: bool):
 
 	description_label.text = "\n".join(lines)
 
-	var portrait_key = name_str.to_lower().replace(" ", "_").replace("-", "_")
-	if race_mini:
-		race_mini.visible = true
-		race_mini.setup(portrait_key)
+	# The catalog key, not the display name: "Deep-Tyrant" is not the id "deeptyrant".
+	_show_preview(race_key)
 
 # ── Step 2/3: Generic choice (state / role) ────────────────────────
 
@@ -281,9 +336,6 @@ func _preview_item(data: Dictionary):
 	if flavor:
 		text += "\n\n%s" % flavor
 	description_label.text = text
-
-	if race_mini:
-		race_mini.visible = false
 
 # ── Step 4: Abilities ──────────────────────────────────────────────
 

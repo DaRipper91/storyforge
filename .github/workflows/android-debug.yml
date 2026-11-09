@@ -165,6 +165,16 @@ jobs:
           set -euo pipefail
           GD_SCRATCH="$RUNNER_TEMP/gd-run-touch" bash tools/golden/run_gd_touch.sh
 
+      - name: GDScript character test
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-character" bash tools/golden/run_gd_character.sh
+
+      - name: GDScript Tabletop zoom test
+        run: |
+          set -euo pipefail
+          GD_SCRATCH="$RUNNER_TEMP/gd-run-zoom" bash tools/golden/run_gd_zoom.sh
+
       - name: GDScript resource-listing test (export-only item loading bug)
         run: |
           set -euo pipefail

@@ -14,6 +14,10 @@ class_name RaceMini
 		if Engine.is_editor_hint():
 			setup(editor_race_id, "", val)
 
+## Player species render as a rigged CharacterModel when its base GLB loads; the primitive
+## RACE_RECIPES below stay as the fallback (and as the look of anything that is not a race).
+@export var use_character_models: bool = true
+
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 
@@ -28,6 +32,7 @@ var _selected: bool = false
 var _phantom_cam: Node3D = null
 var _model: Node3D = null            # GLB from ModelLibrary; null = primitive recipe
 var _anim: AnimationPlayer = null
+var _character: CharacterModel = null  # rigged species body; null = primitive recipe or ModelLibrary GLB
 var _ring_mat: StandardMaterial3D = null
 
 func _process(delta: float) -> void:
@@ -289,28 +294,98 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 	_init_material()
 	
 	race_id = race_id.to_lower().replace(" ", "_")
+	if _character != null and is_instance_valid(_character) and _character.race_id == race_id \
+			and _character.get_parent() == mesh_instance:
+		return  # same species already showing (the creation preview re-selects on every hover)
 	mesh_instance.mesh = null
 	for child in mesh_instance.get_children(): child.queue_free()
 	_model = null
 	_anim = null
+	_character = null
 	var old_ring := get_node_or_null("IdentityRing")
 	if old_ring:
 		old_ring.queue_free()
 		_ring_mat = null
 	
-	var recipe: Array = RACE_RECIPES.get(race_id, RACE_RECIPES["humanoid_default"])
-	for part in recipe: _add_recipe_part(part)
-	
 	var color: Color = RACE_COLORS.get(race_id, Color(0.3, 0.5, 0.8))
 	if is_enemy and not race_id in RACE_COLORS: color = Color(0.8, 0.2, 0.2)
+
+	if _try_character(race_id, color, is_enemy):
+		return
+
+	var recipe: Array = RACE_RECIPES.get(race_id, RACE_RECIPES["humanoid_default"])
+	for part in recipe: _add_recipe_part(part)
 	
 	if _material:
 		_material.set_shader_parameter("albedo", color)
 		_material.set_shader_parameter("rim_color", color * 1.2)
 		_material.set_shader_parameter("rim_width", 2.0)
 
+## Swaps in the rigged species body. Returns false (primitives stay) for ids that are not
+## player species, in the editor, or when the base GLB cannot be loaded.
+func _try_character(race_id: String, color: Color, is_enemy: bool) -> bool:
+	if not use_character_models or Engine.is_editor_hint():
+		return false
+	if not CharacterModel.is_known_race(race_id):
+		return false
+	var cm := CharacterModel.new()
+	cm.name = "Character"
+	if not cm.setup(race_id):
+		cm.free()
+		return false
+	mesh_instance.add_child(cm)
+	_character = cm
+	_model = cm
+	if not is_enemy:
+		# The group glow colour (blended with the race colour): bright enough to read on a dark floor.
+		_add_identity_ring(CharacterModel.colours_for(race_id)["accent"])
+	# RaceMini's own movement code looks along -Z; a fresh token faces the default camera (+Z side).
+	if transform.basis.is_equal_approx(Basis.IDENTITY):
+		rotation.y = PI
+	return true
+
+func has_character() -> bool:
+	return _character != null
+
+## Turns a character-model token to face `dir` (ground-plane direction). No-op for primitives.
+func face_direction(dir: Vector3) -> void:
+	if _character == null:
+		return
+	dir.y = 0.0
+	if dir.length_squared() < 0.0001:
+		return
+	quaternion = Quaternion(Basis.looking_at(dir.normalized()))
+
+## Bounds of the visible token in this node's local space (feet at y = 0 for characters),
+## used to auto-frame previews. Characters report a standing-body box, not the T-pose mesh box.
+func get_visual_aabb() -> AABB:
+	if _character != null:
+		return _character.get_body_aabb()
+	var acc := {"found": false, "box": AABB()}
+	if mesh_instance:
+		_accumulate_aabb(mesh_instance, Transform3D.IDENTITY, acc)
+	if not acc["found"]:
+		return AABB(Vector3(-0.4, 0.0, -0.4), Vector3(0.8, 1.6, 0.8))
+	return acc["box"]
+
+static func _accumulate_aabb(node: Node, parent_xform: Transform3D, acc: Dictionary) -> void:
+	for child in node.get_children():
+		var xform := parent_xform
+		if child is Node3D:
+			xform = parent_xform * (child as Node3D).transform
+		if child is VisualInstance3D:
+			var b: AABB = xform * (child as VisualInstance3D).get_aabb()
+			if acc["found"]:
+				acc["box"] = (acc["box"] as AABB).merge(b)
+			else:
+				acc["box"] = b
+				acc["found"] = true
+		_accumulate_aabb(child, xform, acc)
+
 ## Recolors the primitive recipe (used for NPCs, whose sprite_key isn't a race).
 func set_tint(color: Color) -> void:
+	if _character:
+		_character.tint = color
 	if _material:
 		_material.set_shader_parameter("albedo", color)
 		_material.set_shader_parameter("rim_color", color * 1.2)
@@ -326,6 +401,7 @@ func use_model(model: Node3D, identity_color: Color, show_ring: bool = true) -> 
 	for child in mesh_instance.get_children(): child.queue_free()
 	mesh_instance.add_child(model)
 	_model = model
+	_character = null
 	_anim = ModelLibrary.find_anim_player(model)
 	if show_ring:
 		_add_identity_ring(identity_color)
@@ -335,12 +411,26 @@ func has_model() -> bool:
 	return _model != null
 
 func play_idle() -> void:
+	if _character:
+		_character.set_walking(false)
+		return
 	if _anim:
 		ModelLibrary.play_role(_anim, "idle")
 
 func play_talk() -> void:
+	if _character:
+		_character.play(HumanoidAnimLibrary.CLIP_INTERACT)
+		return
 	if _anim and not ModelLibrary.play_role(_anim, "talk"):
 		play_idle()
+
+func play_hit() -> void:
+	if _character:
+		_character.play(HumanoidAnimLibrary.CLIP_HIT)
+
+func play_death() -> void:
+	if _character:
+		_character.play(HumanoidAnimLibrary.CLIP_DEATH)
 
 func _add_identity_ring(color: Color) -> void:
 	var old := get_node_or_null("IdentityRing")
@@ -385,6 +475,8 @@ func _add_recipe_part(data: Dictionary) -> void:
 
 func select() -> void:
 	_selected = true
+	if _character:
+		_character.highlighted = true
 	if _phantom_cam:
 		_phantom_cam.set("priority", 20)
 	if _material:
@@ -395,6 +487,8 @@ func select() -> void:
 
 func deselect() -> void:
 	_selected = false
+	if _character:
+		_character.highlighted = false
 	if _phantom_cam:
 		_phantom_cam.set("priority", 0)
 	if _material:
@@ -406,6 +500,9 @@ func deselect() -> void:
 		_ring_mat.emission_energy_multiplier = 0.6
 
 func play_walk() -> void:
+	if _character:
+		_character.set_walking(true)
+		return
 	if _anim and ModelLibrary.play_role(_anim, "walk"):
 		return
 	if _is_walking: return
