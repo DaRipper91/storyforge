@@ -18,7 +18,7 @@ Android build-tools). Triggers: push to `offline-port` touching `godot/**` or th
 3. Write `~/.config/godot/editor_settings-4.6.tres` (SDK and JDK paths) and generate a throwaway debug keystore
    (alias `androiddebugkey`, password `android`), passed via `GODOT_ANDROID_KEYSTORE_DEBUG_*`. The keystore is
    never committed or uploaded, so every build is signed with a different key (see known gaps).
-4. Run the GDScript suites (`run_gd_tests.sh`, `run_gd_routes.sh`) on the pinned 4.6.2 binary (`GODOT_BIN`).
+4. Run the GDScript suites (`run_gd_tests.sh`, `run_gd_routes.sh`, `run_gd_touch.sh`) on the pinned 4.6.2 binary (`GODOT_BIN`).
 5. `--import`, then `--export-debug "Android"` (preset in `godot/export_presets.cfg`: no Gradle, arm64-v8a only,
    `com.daripper91.storyforge`, version `0.1.0-offline`, INTERNET permission kept).
 6. Fail if the APK is missing or under 5 MB; print the APK contents and `apksigner verify`; upload artifact
@@ -51,10 +51,13 @@ Saves live in the app's `user://` dir, not shared storage.
 
 ## Known gaps
 
-- **No touch controls.** Input is WASD/arrows, gamepad sticks, E/Q/F/M/R/Tab and mouse. Android emulates mouse
-  from touch; `input_devices/pointing/emulate_mouse_from_touch` is not set in `godot/project.godot`, so the engine
-  default (`true`) applies. Taps work as clicks on UI, but movement and camera that rely on keys or sticks
-  cannot be driven on a bare phone. Use a Bluetooth gamepad/keyboard for now.
+- **Touch controls are new and unverified on a device.** `TouchControls` (see `TOUCH_CONTROLS.md`) draws a floating
+  joystick, a camera-drag area with pinch zoom and six buttons when running on Android/iOS (or with `--touch`).
+  Headless tests cover the logic; feel, sizing and the mouse-from-touch suppression have not been tried on a phone.
+  Still missing: lock-on (`lock_on`/Q) has no button, number-key character select (1-4), the `I` stat-panel toggle,
+  Esc/back handling (freeform is cancelled by submitting an empty line), controller hints are replaced by a blank hint
+  line, and creation/lobby screens are the original mouse layouts (some buttons are below 9 mm, see TOUCH_CONTROLS.md).
+  A Bluetooth gamepad still works and is still the better way to play.
 - **Renderer.** Project is tagged "Forward Plus", but `rendering/renderer/rendering_method.mobile` is not set in
   `project.godot`; Godot's default for the mobile override is `mobile`, so Android should run the Mobile
   renderer, not Forward+. Unverified on device; not changed in this step. Plugins (toon shader, multimesh scatter)
