@@ -347,7 +347,10 @@ func _try_character(race_id: String, color: Color, is_enemy: bool) -> bool:
 	return true
 
 ## Standing height of non-humanoid heroes (length is whatever the model's proportions give).
-const CREATURE_HEIGHTS := {"ironlocust": 0.62}
+const CREATURE_HEIGHTS := {
+	"ironlocust": 0.62,
+	"mindspider": 0.62,
+}
 
 ## Swaps in a hand-modelled creature that brings its own skeleton and Idle/Walk/Hit/Death clips.
 func _try_creature(race_id: String, is_enemy: bool) -> bool:
