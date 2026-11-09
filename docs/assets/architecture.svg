@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 520" width="1280" height="520" role="img" aria-labelledby="t d">
+<title id="t">StoryForge architecture plate</title>
+<desc id="d">Territories: Godot client, FastAPI server (api, ai, encounters, pure-logic core behind a validator gate), remote Gemini, and on-disk snapshots.</desc>
+<style>
+.f-bg{fill:#14100d}
+.s-bg{stroke:#14100d}
+.f-surface{fill:#2b211a}
+.s-surface{stroke:#2b211a}
+.f-border{fill:#8a6a3b}
+.s-border{stroke:#8a6a3b}
+.f-accent{fill:#dca331}
+.s-accent{stroke:#dca331}
+.f-highlight{fill:#ffe699}
+.s-highlight{stroke:#ffe699}
+.f-text{fill:#f1e4c3}
+.s-text{stroke:#f1e4c3}
+.f-muted{fill:#8d7f6a}
+.s-muted{stroke:#8d7f6a}
+.nofill{fill:none}
+.disp{font-family:Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif}
+.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+@media (prefers-color-scheme: light){
+.f-bg{fill:#f3ead2}
+.s-bg{stroke:#f3ead2}
+.f-surface{fill:#e4d5ad}
+.s-surface{stroke:#e4d5ad}
+.f-border{fill:#7a5a2b}
+.s-border{stroke:#7a5a2b}
+.f-accent{fill:#8a5a0a}
+.s-accent{stroke:#8a5a0a}
+.f-highlight{fill:#5c3a06}
+.s-highlight{stroke:#5c3a06}
+.f-text{fill:#2b211a}
+.s-text{stroke:#2b211a}
+.f-muted{fill:#66563f}
+.s-muted{stroke:#66563f}
+}
+@media (prefers-reduced-motion: no-preference){
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 3.2s ease-out infinite}
+.march{animation:march 2.4s linear infinite}
+.twinkle{animation:twinkle 5s ease-in-out infinite}
+.ink{animation:ink 7s ease-in-out infinite}
+}
+@media (prefers-reduced-motion: reduce){
+.pulse,.march,.twinkle,.ink{animation:none}
+}
+@keyframes pulse{0%{transform:scale(.8);opacity:.85}70%{transform:scale(2.1);opacity:0}100%{transform:scale(2.1);opacity:0}}
+@keyframes march{to{stroke-dashoffset:-18}}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.75}}
+@keyframes ink{0%,100%{opacity:.55}50%{opacity:.9}}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="f-accent"/></marker>
+<marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="f-highlight"/></marker>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="s-border" stroke-width="1" opacity=".55"/></pattern>
+<pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".9" class="f-muted" opacity=".3"/></pattern>
+</defs>
+<rect width="1280" height="520" class="f-bg"/>
+<rect x="4" y="4" width="1272" height="512" class="nofill s-border" stroke-width="1.2"/>
+<g class="ink">
+<path d="M315 281 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M342 132 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M960 304 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M394 35 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1082 496 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1087 483 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1079 495 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1102 41 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1112 491 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M764 35 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M315 165 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M700 25 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M48 49 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M331 239 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M978 33 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1020 422 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1004 150 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M26 473 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1111 494 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M302 53 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1025 42 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1166 450 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M333 434 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1163 407 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M1041 24 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/><path d="M353 273 q6 -5 12 0 t12 0" class="nofill s-muted" stroke-width=".9" opacity=".5"/>
+</g>
+<polygon points="34,100 274,72 292,210 274,392 70,420 30,268" class="f-surface s-border" fill-opacity=".55" stroke-width="1.6" stroke-linejoin="round"/>
+<text x="54" y="112" font-size="13" class="disp f-highlight" text-anchor="start" font-weight="bold" letter-spacing="2">GODOT 4.6 CLIENT</text>
+<text x="54" y="130" font-size="10" class="mono f-muted" text-anchor="start" >godot/  (GDScript)</text>
+<text x="54" y="168" font-size="10.5" class="mono f-text" text-anchor="start" >Tabletop.gd: board + camera</text>
+<text x="54" y="188" font-size="10.5" class="mono f-text" text-anchor="start" >PythonClient.gd: HTTP + WS</text>
+<text x="54" y="208" font-size="10.5" class="mono f-text" text-anchor="start" >UI, NPC dialogs, audio</text>
+<text x="54" y="228" font-size="10.5" class="mono f-muted" text-anchor="start" ></text>
+<text x="54" y="248" font-size="10.5" class="mono f-muted" text-anchor="start" >Renders state. Owns no rules.</text>
+<text x="54" y="300" font-size="10" class="mono f-accent" text-anchor="start" >--backend=local swaps the</text>
+<text x="54" y="316" font-size="10" class="mono f-accent" text-anchor="start" >server for an in-process</text>
+<text x="54" y="332" font-size="10" class="mono f-accent" text-anchor="start" >GDScript LocalBackend.</text>
+<text x="54" y="348" font-size="10" class="mono f-muted" text-anchor="start" >Default: remote (this plate).</text>
+<polygon points="384,70 944,56 966,290 936,430 396,444 372,250" class="f-surface s-border" fill-opacity=".45" stroke-width="1.6" stroke-linejoin="round"/>
+<text x="404" y="90" font-size="13" class="disp f-highlight" text-anchor="start" font-weight="bold" letter-spacing="2">FASTAPI SERVER</text>
+<text x="404" y="106" font-size="10" class="mono f-muted" text-anchor="start" >src/storyforge/  (Python 3.12)</text>
+<rect x="404" y="120" width="526" height="36" rx="3" class="f-surface s-accent" stroke-width="1"/>
+<text x="417" y="143" font-size="10.5" class="mono f-text" text-anchor="start" >api/  action - lobby - npc - state - auth - ws_session</text>
+<rect x="404" y="190" width="236" height="190" class="f-surface s-border" stroke-width="3"/>
+<rect x="404" y="190" width="236" height="190" fill="url(#hatch)" opacity=".6"/>
+<rect x="418" y="204" width="208" height="162" class="f-bg s-border" stroke-width="1"/>
+<text x="428" y="226" font-size="12" class="disp f-highlight" text-anchor="start" font-weight="bold" letter-spacing="1.5">core/  THE KEEP</text>
+<text x="428" y="248" font-size="10.5" class="mono f-muted" text-anchor="start" >pure logic, no I/O</text>
+<text x="428" y="266" font-size="10.5" class="mono f-text" text-anchor="start" >models  rules  grid</text>
+<text x="428" y="284" font-size="10.5" class="mono f-text" text-anchor="start" >character_factory</text>
+<text x="428" y="302" font-size="10.5" class="mono f-text" text-anchor="start" >state_manager (Lock)</text>
+<text x="428" y="320" font-size="10.5" class="mono f-text" text-anchor="start" >-&gt; _commit()</text>
+<text x="428" y="338" font-size="10.5" class="mono f-muted" text-anchor="start" >source of truth</text>
+<rect x="656" y="250" width="40" height="64" rx="3" class="f-surface s-highlight" stroke-width="2.4"/>
+<path d="M660 250 v-8 h8 v8 M672 250 v-8 h8 v8 M684 250 v-8 h8 v8" class="nofill s-highlight" stroke-width="1.6"/>
+<text x="676" y="330" font-size="9.5" class="mono f-highlight" text-anchor="middle" font-weight="bold">validators.</text>
+<text x="676" y="342" font-size="9.5" class="mono f-highlight" text-anchor="middle" font-weight="bold">sanitize()</text>
+<text x="676" y="358" font-size="9" class="mono f-muted" text-anchor="middle" >reject,</text>
+<text x="676" y="369" font-size="9" class="mono f-muted" text-anchor="middle" >don't repair</text>
+<rect x="716" y="190" width="214" height="100" rx="3" class="f-surface s-accent" stroke-width="1"/>
+<text x="728" y="212" font-size="11" class="mono f-highlight" text-anchor="start" font-weight="bold">ai/  narrator + proposer</text>
+<text x="728" y="234" font-size="10.5" class="mono f-text" text-anchor="start" >client.py  interpreter.py</text>
+<text x="728" y="251" font-size="10.5" class="mono f-text" text-anchor="start" >narrator.py</text>
+<text x="728" y="268" font-size="10.5" class="mono f-text" text-anchor="start" >prompts/*.md (Markdown)</text>
+<rect x="716" y="308" width="214" height="72" rx="3" class="f-surface s-accent" stroke-width="1"/>
+<text x="728" y="330" font-size="11" class="mono f-highlight" text-anchor="start" font-weight="bold">encounters/  NPC services</text>
+<text x="728" y="350" font-size="10.5" class="mono f-text" text-anchor="start" >pure logic, session state,</text>
+<text x="728" y="366" font-size="10.5" class="mono f-text" text-anchor="start" >return StateDiff to caller</text>
+<polygon points="1034,90 1246,76 1256,250 1236,390 1040,404 1020,240" class="f-surface s-border" fill-opacity=".55" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="6 4"/>
+<text x="1050" y="112" font-size="13" class="disp f-highlight" text-anchor="start" font-weight="bold" letter-spacing="2">GEMINI (remote)</text>
+<text x="1050" y="150" font-size="10.5" class="mono f-muted" text-anchor="start" >narrative renderer</text>
+<text x="1050" y="168" font-size="10.5" class="mono f-muted" text-anchor="start" ></text>
+<text x="1050" y="186" font-size="10.5" class="mono f-text" text-anchor="start" >gemini-3.5-flash</text>
+<text x="1050" y="204" font-size="10.5" class="mono f-text" text-anchor="start" >gemini-3.1-pro-preview</text>
+<text x="1050" y="222" font-size="10.5" class="mono f-muted" text-anchor="start" ></text>
+<text x="1050" y="240" font-size="10.5" class="mono f-muted" text-anchor="start" >needs STORYFORGE_</text>
+<text x="1050" y="258" font-size="10.5" class="mono f-muted" text-anchor="start" >GEMINI_API_KEY</text>
+<rect x="404" y="446" width="526" height="58" rx="3" class="f-surface s-border" stroke-width="1.2"/>
+<rect x="404" y="446" width="526" height="58" rx="3" fill="url(#dots)"/>
+<text x="418" y="468" font-size="11" class="mono f-highlight" text-anchor="start" font-weight="bold">DISK  data/campaigns/&lt;id&gt;/state.json</text>
+<text x="418" y="488" font-size="10" class="mono f-text" text-anchor="start" >atomic JSON snapshot, local-first.  Seed: data/seeds/default_campaign.json</text>
+<path d="M290 128 H400" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="345" y="120" font-size="10" class="mono f-accent" text-anchor="middle" >HTTP /api/*</text>
+<path d="M400 168 H290" class="nofill s-accent" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<text x="345" y="183" font-size="9.5" class="mono f-accent" text-anchor="middle" >WS</text>
+<text x="345" y="194" font-size="8.5" class="mono f-accent" text-anchor="middle" >/ws/session/{room_id}</text>
+<path d="M520 156 V188" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M820 156 V188" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M716 282 H700" class="nofill s-highlight" stroke-width="1.6" marker-end="url(#ahr)"/>
+<path d="M652 282 H642" class="nofill s-highlight" stroke-width="1.6" marker-end="url(#ahr)"/>
+<path d="M930 240 H1030" class="nofill s-accent" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<text x="980" y="232" font-size="9.5" class="mono f-accent" text-anchor="middle" >google-genai</text>
+<path d="M520 380 V442" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="530" y="416" font-size="10" class="mono f-accent" text-anchor="start" >snapshot.save()</text>
+</svg>

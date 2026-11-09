@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 560" width="1280" height="560" role="img" aria-labelledby="t d">
+<title id="t">StoryForge action pipeline</title>
+<desc id="d">How a player action becomes validated state: grid actions pass rules.check_grid_action; freeform actions pass a Gemini proposal then validators.sanitize; both commit through StateManager._commit and fan out over the WebSocket.</desc>
+<style>
+.f-bg{fill:#14100d}
+.s-bg{stroke:#14100d}
+.f-surface{fill:#2b211a}
+.s-surface{stroke:#2b211a}
+.f-border{fill:#8a6a3b}
+.s-border{stroke:#8a6a3b}
+.f-accent{fill:#dca331}
+.s-accent{stroke:#dca331}
+.f-highlight{fill:#ffe699}
+.s-highlight{stroke:#ffe699}
+.f-text{fill:#f1e4c3}
+.s-text{stroke:#f1e4c3}
+.f-muted{fill:#8d7f6a}
+.s-muted{stroke:#8d7f6a}
+.nofill{fill:none}
+.disp{font-family:Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif}
+.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+@media (prefers-color-scheme: light){
+.f-bg{fill:#f3ead2}
+.s-bg{stroke:#f3ead2}
+.f-surface{fill:#e4d5ad}
+.s-surface{stroke:#e4d5ad}
+.f-border{fill:#7a5a2b}
+.s-border{stroke:#7a5a2b}
+.f-accent{fill:#8a5a0a}
+.s-accent{stroke:#8a5a0a}
+.f-highlight{fill:#5c3a06}
+.s-highlight{stroke:#5c3a06}
+.f-text{fill:#2b211a}
+.s-text{stroke:#2b211a}
+.f-muted{fill:#66563f}
+.s-muted{stroke:#66563f}
+}
+@media (prefers-reduced-motion: no-preference){
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 3.2s ease-out infinite}
+.march{animation:march 2.4s linear infinite}
+.twinkle{animation:twinkle 5s ease-in-out infinite}
+.ink{animation:ink 7s ease-in-out infinite}
+}
+@media (prefers-reduced-motion: reduce){
+.pulse,.march,.twinkle,.ink{animation:none}
+}
+@keyframes pulse{0%{transform:scale(.8);opacity:.85}70%{transform:scale(2.1);opacity:0}100%{transform:scale(2.1);opacity:0}}
+@keyframes march{to{stroke-dashoffset:-18}}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.75}}
+@keyframes ink{0%,100%{opacity:.55}50%{opacity:.9}}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="f-accent"/></marker>
+<marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="f-highlight"/></marker>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="s-border" stroke-width="1" opacity=".55"/></pattern>
+<pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".9" class="f-muted" opacity=".3"/></pattern>
+</defs>
+<rect width="1280" height="560" class="f-bg"/>
+<rect x="4" y="4" width="1272" height="552" class="nofill s-border" stroke-width="1.2"/>
+<text x="40" y="40" font-size="11" class="mono f-accent" text-anchor="start" letter-spacing="2">A  GRID ACTION  (deterministic, Python decides)</text>
+<rect x="40" y="52" width="210" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="52" y="74" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">Player picks a cell</text>
+<text x="52" y="93" font-size="10.5" class="mono f-text" text-anchor="start" >POST /api/action/grid</text>
+
+<rect x="290" y="52" width="240" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="302" y="74" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">rules.check_grid_action()</text>
+<text x="302" y="93" font-size="10.5" class="mono f-text" text-anchor="start" >legal move / interact?</text>
+<text x="302" y="108" font-size="10.5" class="mono f-muted" text-anchor="start" >illegal: HTTP 400 + reason</text>
+
+<rect x="570" y="52" width="250" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="582" y="74" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">apply_grid_action()</text>
+<text x="582" y="93" font-size="10.5" class="mono f-text" text-anchor="start" >move / interact / room</text>
+<text x="582" y="108" font-size="10.5" class="mono f-text" text-anchor="start" >transition via StateManager</text>
+
+<path d="M250 93 H286" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M530 93 H566" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="570" y="160" width="250" height="62" rx="4" class="f-surface s-border" stroke-width="1.2" stroke-dasharray="5 4"/><text x="582" y="182" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">narrator (Gemini)</text>
+<text x="582" y="201" font-size="10.5" class="mono f-text" text-anchor="start" >flavor text only, no StateDiff</text>
+
+<path d="M695 134 V156" class="nofill s-accent" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<text x="40" y="262" font-size="11" class="mono f-accent" text-anchor="start" letter-spacing="2">B  FREEFORM ACTION  (Gemini proposes, Python disposes)</text>
+<rect x="40" y="274" width="210" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="52" y="296" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">Player types text</text>
+<text x="52" y="315" font-size="10.5" class="mono f-text" text-anchor="start" >POST /api/action/freeform</text>
+
+<rect x="290" y="274" width="240" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="302" y="296" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">interpret_freeform()</text>
+<text x="302" y="315" font-size="10.5" class="mono f-text" text-anchor="start" >Gemini returns narrative</text>
+<text x="302" y="330" font-size="10.5" class="mono f-text" text-anchor="start" >+ a proposed StateDiff</text>
+
+<rect x="570" y="274" width="250" height="82" rx="4" class="f-surface s-highlight" stroke-width="2"/><text x="582" y="296" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">validators.sanitize()</text>
+<text x="582" y="315" font-size="10.5" class="mono f-text" text-anchor="start" >reject, don't repair</text>
+<text x="582" y="330" font-size="10.5" class="mono f-text" text-anchor="start" >returns (safe_diff, rejections)</text>
+
+<rect x="880" y="274" width="120" height="82" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="892" y="296" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">apply_diff()</text>
+<text x="892" y="315" font-size="10.5" class="mono f-text" text-anchor="start" >safe_diff only</text>
+
+<path d="M250 315 H286" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M530 315 H566" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M820 315 H876" class="nofill s-highlight" stroke-width="1.6" marker-end="url(#ahr)"/>
+<text x="848" y="306" font-size="10" class="mono f-highlight" text-anchor="middle" >accept</text>
+<path d="M695 356 V392" class="nofill s-highlight" stroke-width="1.6" marker-end="url(#ahr)"/>
+<text x="703" y="378" font-size="10" class="mono f-highlight" text-anchor="start" >reject</text>
+<rect x="40" y="394" width="960" height="140" rx="4" class="f-surface s-border" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="54" y="416" font-size="11" class="mono f-highlight" text-anchor="start" font-weight="bold">REJECTED, NOT REPAIRED. Each rejection is logged as [ref] &lt;reason&gt;. Real strings from validators.py:</text>
+<text x="66" y="442" font-size="11" class="mono f-text" text-anchor="start" >"AI tried to modify forbidden field 'hp_max' on &lt;char_id&gt;"</text>
+<text x="66" y="462" font-size="11" class="mono f-text" text-anchor="start" >"refused inventory add: quantity 999 &gt; 10 (Healing Potion)"</text>
+<text x="66" y="482" font-size="11" class="mono f-text" text-anchor="start" >"phase change to combat is deferred to v0.2"</text>
+<text x="66" y="502" font-size="11" class="mono f-text" text-anchor="start" >"AI diffs are not accepted during lobby phase"</text>
+<text x="54" y="524" font-size="9.5" class="mono f-muted" text-anchor="start" >values in &lt;&gt; and the potion name are placeholders; the sentence templates are verbatim.</text>
+<rect x="1040" y="52" width="210" height="304" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="1052" y="74" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">StateManager._commit()</text>
+<text x="1052" y="93" font-size="10.5" class="mono f-text" text-anchor="start" >1. revision += 1</text>
+<text x="1052" y="108" font-size="10.5" class="mono f-text" text-anchor="start" >2. snapshot.save()</text>
+<text x="1052" y="123" font-size="10.5" class="mono f-muted" text-anchor="start" >   temp file + os.replace</text>
+<text x="1052" y="138" font-size="10.5" class="mono f-text" text-anchor="start" >3. event_bus.publish()</text>
+<text x="1052" y="153" font-size="10.5" class="mono f-muted" text-anchor="start" >   one queue per subscriber</text>
+<text x="1052" y="168" font-size="10.5" class="mono f-text" text-anchor="start" ></text>
+<text x="1052" y="183" font-size="10.5" class="mono f-muted" text-anchor="start" >All mutations pass here,</text>
+<text x="1052" y="198" font-size="10.5" class="mono f-muted" text-anchor="start" >serialized by asyncio.Lock.</text>
+
+<path d="M820 93 H1036" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M1000 315 H1036" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M1145 356 V390" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="1040" y="394" width="210" height="56" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="1052" y="416" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">WebSocket fan-out</text>
+<text x="1052" y="435" font-size="10.5" class="mono f-text" text-anchor="start" >/ws/session/{room_id}</text>
+
+<path d="M1145 450 V478" class="nofill s-accent" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="1040" y="482" width="210" height="56" rx="4" class="f-surface s-border" stroke-width="1.2"/><text x="1052" y="504" font-size="12" class="mono f-highlight" text-anchor="start" font-weight="bold">Godot client</text>
+<text x="1052" y="523" font-size="10.5" class="mono f-text" text-anchor="start" >PythonClient.gd signals</text>
+
+</svg>

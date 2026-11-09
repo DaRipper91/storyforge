@@ -1,0 +1,25 @@
+{
+  "_comment": "Atlas Plate palette. Dark vellum is the default; light values are applied via prefers-color-scheme: light inside each SVG.",
+  "dark": {
+    "bg": "#14100d",
+    "surface": "#2b211a",
+    "border": "#8a6a3b",
+    "accent": "#dca331",
+    "highlight": "#ffe699",
+    "text": "#f1e4c3",
+    "muted": "#8d7f6a"
+  },
+  "light": {
+    "bg": "#f3ead2",
+    "surface": "#e4d5ad",
+    "border": "#7a5a2b",
+    "accent": "#8a5a0a",
+    "highlight": "#5c3a06",
+    "text": "#2b211a",
+    "muted": "#66563f"
+  },
+  "fonts": {
+    "display": "Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif",
+    "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+  }
+}

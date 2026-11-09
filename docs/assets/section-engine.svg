@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 56" width="960" height="56" role="img" aria-labelledby="t d">
+<title id="t">PLATE V: The Engine</title>
+<desc id="d">Section header: PLATE V, The Engine.</desc>
+<style>
+.f-bg{fill:#14100d}
+.s-bg{stroke:#14100d}
+.f-surface{fill:#2b211a}
+.s-surface{stroke:#2b211a}
+.f-border{fill:#8a6a3b}
+.s-border{stroke:#8a6a3b}
+.f-accent{fill:#dca331}
+.s-accent{stroke:#dca331}
+.f-highlight{fill:#ffe699}
+.s-highlight{stroke:#ffe699}
+.f-text{fill:#f1e4c3}
+.s-text{stroke:#f1e4c3}
+.f-muted{fill:#8d7f6a}
+.s-muted{stroke:#8d7f6a}
+.nofill{fill:none}
+.disp{font-family:Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif}
+.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+@media (prefers-color-scheme: light){
+.f-bg{fill:#f3ead2}
+.s-bg{stroke:#f3ead2}
+.f-surface{fill:#e4d5ad}
+.s-surface{stroke:#e4d5ad}
+.f-border{fill:#7a5a2b}
+.s-border{stroke:#7a5a2b}
+.f-accent{fill:#8a5a0a}
+.s-accent{stroke:#8a5a0a}
+.f-highlight{fill:#5c3a06}
+.s-highlight{stroke:#5c3a06}
+.f-text{fill:#2b211a}
+.s-text{stroke:#2b211a}
+.f-muted{fill:#66563f}
+.s-muted{stroke:#66563f}
+}
+</style>
+<rect width="960" height="56" class="f-bg"/>
+<rect x="2" y="2" width="956" height="52" class="nofill s-border" stroke-width="1.2"/>
+<rect x="2" y="2" width="150" height="52" class="f-surface s-border" stroke-width="1.2"/>
+<text x="79" y="35" font-size="19" class="disp f-highlight" text-anchor="middle" font-weight="bold" letter-spacing="3">PLATE V</text>
+<text x="178" y="36" font-size="24" class="disp f-text" text-anchor="start" style="font-variant:small-caps" letter-spacing="3">The Engine</text>
+<text x="944" y="33" font-size="10" class="mono f-muted" text-anchor="end" letter-spacing="1.5">SURVEY 04 / TERRITORIES</text>
+<line x1="160" y1="54" x2="160" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="184" y1="54" x2="184" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="208" y1="54" x2="208" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="232" y1="54" x2="232" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="256" y1="54" x2="256" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="280" y1="54" x2="280" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="304" y1="54" x2="304" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="328" y1="54" x2="328" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="352" y1="54" x2="352" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="376" y1="54" x2="376" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="400" y1="54" x2="400" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="424" y1="54" x2="424" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="448" y1="54" x2="448" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="472" y1="54" x2="472" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="496" y1="54" x2="496" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="520" y1="54" x2="520" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="544" y1="54" x2="544" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="568" y1="54" x2="568" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="592" y1="54" x2="592" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="616" y1="54" x2="616" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="640" y1="54" x2="640" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="664" y1="54" x2="664" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="688" y1="54" x2="688" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="712" y1="54" x2="712" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="736" y1="54" x2="736" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="760" y1="54" x2="760" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="784" y1="54" x2="784" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="808" y1="54" x2="808" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="832" y1="54" x2="832" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="856" y1="54" x2="856" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="880" y1="54" x2="880" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="904" y1="54" x2="904" y2="50" class="s-border" stroke-width=".8"/>
+<line x1="928" y1="54" x2="928" y2="50" class="s-border" stroke-width=".8"/>
+</svg>
