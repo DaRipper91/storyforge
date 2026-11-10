@@ -120,13 +120,16 @@ def elf_hero(src, out, slug, cfg):
         skinned(arm,'Hero_Harness'+str(side),strip(18,3,strap),leather,nearest_w(TORSO_BONES,.04))
     # Long mantles sweep around the shoulders in overlapping scalloped panels.
     if cfg.get('mantle'):
+        mantle = mat(slug+'_mantle', cfg['overlay'], .82, alpha=.7)
+        T.bind(mantle, tex_alpha_cloth(tex, slug+'_mantle', cfg['overlay'], cfg['seed']+5,
+                                       n=1024, alpha_lo=.32, alpha_hi=.62))
         for j in range(5):
             a0=lerp(.6,5.7,j/4)
             def cloak(r,c,a0=a0,j=j):
                 a=a0+(c-.5)*1.2; z=lerp(1.49,cfg['mantle']+.10*math.cos(c*math.pi*2+j),r)
                 rad=lerp(.18,.29,r)+.012*math.sin(c*math.pi*6+r*4+j)*r
                 return Vector((rad*math.sin(a),-.026-rad*.76*math.cos(a),z))
-            skinned(arm,f'Hero_MantleLayer{j}',strip(17,12,cloak),overlay,nearest_w(TORSO_BONES+['UpperLeg.L','UpperLeg.R','LowerLeg.L','LowerLeg.R'],.065))
+            skinned(arm,f'Hero_MantleLayer{j}',strip(17,12,cloak),mantle,nearest_w(TORSO_BONES+['UpperLeg.L','UpperLeg.R','LowerLeg.L','LowerLeg.R'],.065))
             bm=bmesh.new()
             for cc in (0,1): sweep(bm,[cloak(k/16,cc) for k in range(17)],.0025,sides=4)
             sweep(bm,[cloak(1,k/11) for k in range(12)],.0025,sides=4)

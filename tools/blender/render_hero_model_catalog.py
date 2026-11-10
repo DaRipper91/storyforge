@@ -50,7 +50,7 @@ label_mat.diffuse_color = (0.9, 0.88, 0.79, 1)
 label_mat.use_nodes = True
 label_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.9, 0.88, 0.79, 1)
 
-columns, spacing = 5, 3.45
+columns, spacing = 2, 3.45
 rows = math.ceil(len(FILES) / columns)
 gap_z = 3.0
 sc.render.resolution_x = 2100
@@ -86,7 +86,7 @@ for index, path in enumerate(FILES):
     label_data.align_x = "CENTER"
     label = bpy.data.objects.new(path.stem + " label", label_data)
     sc.collection.objects.link(label)
-    label.location = (gx, -1.35, gz - 1.18)
+    label.location = (gx, -1.35, gz - 0.24)
     label.rotation_euler.x = math.radians(90)
     label.data.materials.append(label_mat)
 
@@ -102,12 +102,14 @@ panel.data.materials.append(backdrop)
 cam_data = bpy.data.cameras.new("Catalog camera")
 cam = bpy.data.objects.new("Catalog camera", cam_data)
 sc.collection.objects.link(cam)
-target_z = (rows - 1) * gap_z * 0.5 + 1.25
+target_z = (rows - 1) * gap_z * 0.5 + 2.25
 cam.location = (0, -31, target_z)
 cam.rotation_euler = (Vector((0, 0, target_z)) - cam.location).to_track_quat("-Z", "Y").to_euler()
 cam.data.type = "ORTHO"
 aspect = sc.render.resolution_x / sc.render.resolution_y
-cam.data.ortho_scale = max(columns * spacing + 0.7, (rows * gap_z + 1.0) * aspect)
+# Blender's orthographic scale is the vertical camera span; fit both the row
+# stack and its width after accounting for the render aspect ratio.
+cam.data.ortho_scale = max(rows * gap_z + 0.8, (columns * spacing + 0.7) / aspect)
 sc.camera = cam
 for name, location, energy, size in (
     ("Key", (-5, -9, 13), 2300, 8),

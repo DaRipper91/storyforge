@@ -467,14 +467,19 @@ def tex_alpha_cloth(outdir, name, base, seed, n=512, alpha_lo=0.25, alpha_hi=0.7
 
 
 def finish(out, slug):
-    # Keep full-resolution albedo; fine normal detail exceeds the game camera's
-    # sampling frequency, so use a separate 512 normal-map budget.
-    for image in bpy.data.images:
-        if image.colorspace_settings.name == 'Non-Color':
-            size = 512 if 'linen' in image.name else 256
-            if max(image.size) > size: image.scale(size,size); image.pack()
+    # Preserve authored normal-map detail in both the standalone GLB and source .blend.
     for obj in bpy.data.objects:
-        if obj.type == 'MESH': obj.data.validate(clean_customdata=True)
+        if obj.type != 'MESH':
+            continue
+        obj.data.validate(clean_customdata=True)
+        if obj.name.startswith('Hero_') and not obj.data.uv_layers:
+            bpy.ops.object.select_all(action='DESELECT')
+            obj.select_set(True)
+            bpy.context.view_layer.objects.active = obj
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.uv.smart_project(island_margin=0.02, area_weight=0.0)
+            bpy.ops.object.mode_set(mode='OBJECT')
     print(slug.upper() + "_TOTAL_TRIS", tri_count())
     bpy.ops.wm.save_as_mainfile(filepath=f"{out}/{slug}.blend")
     bpy.ops.export_scene.gltf(filepath=f"{out}/{slug}.glb", export_format='GLB', export_apply=True,

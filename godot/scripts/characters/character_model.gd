@@ -113,6 +113,9 @@ var _hero := false
 var _emissive := false
 var _mats: Array[StandardMaterial3D] = []
 var _base_albedo: Array[Color] = []
+var _base_emission_enabled := PackedByteArray()
+var _base_emission_color: Array[Color] = []
+var _base_emission_energy := PackedFloat32Array()
 var _is_head: Array[bool] = []
 var _part_weight := PackedFloat32Array()
 var _body_aabb := AABB()
@@ -303,6 +306,9 @@ func _clear() -> void:
 	_anim = null
 	_mats.clear()
 	_base_albedo.clear()
+	_base_emission_enabled.clear()
+	_base_emission_color.clear()
+	_base_emission_energy.clear()
 	_is_head.clear()
 	_part_weight.clear()
 
@@ -454,6 +460,9 @@ func _collect_materials() -> void:
 			mi.set_surface_override_material(surface, own)
 			_mats.append(own)
 			_base_albedo.append(own.albedo_color)
+			_base_emission_enabled.append(1 if own.emission_enabled else 0)
+			_base_emission_color.append(own.emission)
+			_base_emission_energy.append(own.emission_energy_multiplier)
 			_is_head.append(head)
 			_part_weight.append(0.0 if _hero else PART_TINT[part])
 
@@ -506,21 +515,22 @@ static func _hero_texture_files(id: String) -> Dictionary:
 	if _hero_texture_file_cache.has(id):
 		return _hero_texture_file_cache[id]
 	var maps := {"diffuse": {}, "normal": {}, "emission": {}}
-	var dir := DirAccess.open(HERO_DIR)
-	if dir == null:
-		_hero_texture_file_cache[id] = maps
-		return maps
+	var roots := [HERO_DIR, HERO_DIR + "tex/"]
 	var prefix := id.to_lower() + "_"
-	for file_name in dir.get_files():
-		var lower := file_name.to_lower()
-		if not lower.begins_with(prefix) or not lower.ends_with(".png"):
+	for root in roots:
+		var dir := DirAccess.open(root)
+		if dir == null:
 			continue
-		var stem := lower.trim_suffix(".png").trim_prefix(prefix)
-		for kind in maps:
-			var suffix: String = "_" + str(kind)
-			if stem.ends_with(suffix):
-				maps[kind][stem.trim_suffix(suffix)] = HERO_DIR + file_name
-				break
+		for file_name in dir.get_files():
+			var lower := file_name.to_lower()
+			if not lower.begins_with(prefix) or not lower.ends_with(".png"):
+				continue
+			var stem := lower.trim_suffix(".png").trim_prefix(prefix)
+			for kind in maps:
+				var suffix: String = "_" + str(kind)
+				if stem.ends_with(suffix):
+					maps[kind][stem.trim_suffix(suffix)] = root + file_name
+					break
 	_hero_texture_file_cache[id] = maps
 	return maps
 
@@ -545,9 +555,14 @@ func _apply_colours() -> void:
 		m.albedo_color = _base_albedo[i] * Color.WHITE.lerp(full, _part_weight[i])
 		if _hero:
 			var has_detail_emission := m.emission_texture != null
-			m.emission_enabled = highlighted or has_detail_emission
-			m.emission = Color.WHITE
-			m.emission_energy_multiplier = (0.75 if has_detail_emission else 0.0) + boost
+			var has_authored_emission := _base_emission_enabled[i] != 0
+			m.emission_enabled = highlighted or has_detail_emission or has_authored_emission
+			if has_detail_emission:
+				m.emission = Color.WHITE
+				m.emission_energy_multiplier = maxf(0.75, _base_emission_energy[i]) + boost
+			else:
+				m.emission = _base_emission_color[i]
+				m.emission_energy_multiplier = _base_emission_energy[i] + boost
 		elif _emissive:
 			m.emission_enabled = true
 			m.emission = accent
