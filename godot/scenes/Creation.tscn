@@ -1,28 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://c7r8e9f0g1h2"]
 
 [ext_resource type="Script" path="res://scripts/CreationManager.gd" id="1_creation"]
-[ext_resource type="Shader" path="res://assets/shaders/parchment.gdshader" id="2_parchment"]
 [ext_resource type="PackedScene" uid="uid://cx6y8l8" path="res://scenes/RaceMini.tscn" id="3_racemini"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
-shader = ExtResource("2_parchment")
-shader_parameter/base_color = Color(0.8, 0.75, 0.65, 1)
-shader_parameter/ink_color = Color(0.1, 0.08, 0.1, 1)
-shader_parameter/roughness = 0.9
-shader_parameter/noise_scale = 300.0
-shader_parameter/noise_intensity = 0.02
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0, 0, 0, 0.25)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.1, 0.08, 0.1, 0.7)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+[ext_resource type="Script" path="res://scripts/ui/step_dots.gd" id="4_dots"]
 
 [node name="Creation" type="Control"]
 layout_mode = 3
@@ -34,117 +14,149 @@ grow_vertical = 2
 script = ExtResource("1_creation")
 
 [node name="Background" type="ColorRect" parent="."]
-material = SubResource("ShaderMaterial_bg")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0784314, 0.0627451, 0.0509804, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="Safe" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 40
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="Root" type="VBoxContainer" parent="Safe"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 8
 
-[node name="Header" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="HeaderRow" type="HBoxContainer" parent="Safe/Root"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 0.08, 0.1, 1)
-theme_override_font_sizes/font_size = 48
-text = "The Character Forge"
-horizontal_alignment = 1
+theme_override_constants/separation = 16
 
-[node name="StepLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="Safe/Root/HeaderRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.3, 0.25, 1)
-theme_override_font_sizes/font_size = 18
-text = "Step 1 / 6  —  Era"
-horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_type_variation = &"TitleLabel"
+text = "Era"
+clip_text = true
 
-[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
+[node name="StepLabel" type="Label" parent="Safe/Root/HeaderRow"]
 layout_mode = 2
-size_hint_vertical = 3
-split_offset = 300
+theme_type_variation = &"MutedLabel"
+text = "Step 1 / 6"
 
-[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+[node name="StepDots" type="Control" parent="Safe/Root/HeaderRow"]
+custom_minimum_size = Vector2(240, 40)
 layout_mode = 2
-theme_override_constants/separation = 15
+script = ExtResource("4_dots")
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
-layout_mode = 2
-text = "Choose Your Ancestry:"
-theme_override_colors/font_color = Color(0.1, 0.08, 0.1, 1)
-
-[node name="RaceList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
-layout_mode = 2
-size_hint_vertical = 3
-
-[node name="RightPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer"]
+[node name="ChipRow" type="HBoxContainer" parent="Safe/Root"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="PortraitViewport" type="SubViewportContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
+[node name="Content" type="HBoxContainer" parent="Safe/Root"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 320)
-size_hint_vertical = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="PreviewSlot" type="Control" parent="Safe/Root/Content"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Main" type="VBoxContainer" parent="Safe/Root/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="OptionHost" type="VBoxContainer" parent="Safe/Root/Content/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="DescPanel" type="PanelContainer" parent="Safe/Root/Content/Main"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="DescScroll" type="ScrollContainer" parent="Safe/Root/Content/Main/DescPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="DescriptionLabel" type="RichTextLabel" parent="Safe/Root/Content/Main/DescPanel/DescScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+bbcode_enabled = true
+text = "Select an ancestry to learn its story..."
+fit_content = true
+scroll_active = false
+
+[node name="PreviewPanel" type="PanelContainer" parent="Safe/Root/Content"]
+top_level = true
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 300.0
+mouse_filter = 2
+theme_type_variation = &"DarkPanel"
+
+[node name="PortraitViewport" type="SubViewportContainer" parent="Safe/Root/Content/PreviewPanel"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport"]
+[node name="SubViewport" type="SubViewport" parent="Safe/Root/Content/PreviewPanel/PortraitViewport"]
 transparent_bg = true
 handle_input_locally = false
 size = Vector2i(2, 2)
 render_target_update_mode = 4
 
-[node name="Camera3D" type="Camera3D" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport"]
+[node name="Camera3D" type="Camera3D" parent="Safe/Root/Content/PreviewPanel/PortraitViewport/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.2, 2.5)
 
-[node name="RaceMini" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport" instance=ExtResource("3_racemini")]
+[node name="RaceMini" parent="Safe/Root/Content/PreviewPanel/PortraitViewport/SubViewport" instance=ExtResource("3_racemini")]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer/PortraitViewport/SubViewport"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Safe/Root/Content/PreviewPanel/PortraitViewport/SubViewport"]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 5, 0)
 
-[node name="DescriptionLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/MarginContainer/VBoxContainer"]
+[node name="IndexLabel" type="Label" parent="Safe/Root"]
 layout_mode = 2
-size_hint_vertical = 1
-bbcode_enabled = true
-scroll_active = false
-text = "Select an ancestry to learn its story..."
-fit_content = true
+theme_type_variation = &"AccentLabel"
+text = "1 / 35"
+horizontal_alignment = 1
 
-[node name="Footer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Footer" type="HBoxContainer" parent="Safe/Root"]
 layout_mode = 2
-alignment = 2
+theme_override_constants/separation = 16
 
-[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer/Footer"]
+[node name="BackBtn" type="Button" parent="Safe/Root/Footer"]
+custom_minimum_size = Vector2(240, 96)
 layout_mode = 2
-text = "Back to Menu"
+text = "Menu"
 
-[node name="NextBtn" type="Button" parent="MarginContainer/VBoxContainer/Footer"]
+[node name="Spacer" type="Control" parent="Safe/Root/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="NextBtn" type="Button" parent="Safe/Root/Footer"]
+custom_minimum_size = Vector2(320, 96)
 layout_mode = 2
 disabled = true
 text = "Continue"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/Footer/BackBtn" to="." method="_on_back_btn_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/Footer/NextBtn" to="." method="_on_next_btn_pressed"]
+[connection signal="pressed" from="Safe/Root/Footer/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="Safe/Root/Footer/NextBtn" to="." method="_on_next_btn_pressed"]

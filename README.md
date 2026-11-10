@@ -9,7 +9,7 @@
 
 StoryForge is a hybrid virtual tabletop and AI dungeon master for the *Weaver's Paradox* ("The Feral World") setting. A Godot 4.6 client draws the board. Game state lives in Python (or, offline, in a GDScript port of the same logic) and is saved as local JSON snapshots. Gemini writes the narration and proposes freeform outcomes; it never owns the rules or the state.
 
-> **Screenshots:** pending a live capture. The plate above is drawn from `data/seeds/default_campaign.json`, not from a running game.
+> **Screenshots:** the plate above is drawn from `data/seeds/default_campaign.json`, not from a running game. Hero turnarounds below are Blender renders of the model assets, not screenshots of gameplay.
 
 <img src="docs/assets/divider.svg" alt="" width="100%">
 
@@ -18,7 +18,7 @@ StoryForge is a hybrid virtual tabletop and AI dungeon master for the *Weaver's 
 - **Not standard SRD D&D.** The setting uses 35 custom species in five groups, 4 evolutionary states and 4 predator roles (4 x 4 = 560 build combinations before species choice). It borrows 5e's d20 core, not its character catalogue.
 - **Not an AI that runs the game.** Every AI-proposed `StateDiff` goes through `validators.sanitize()` before `apply_diff()`. The policy is *reject, don't repair*: an illegal proposal is dropped and logged, never clamped into something legal.
 - **Not standalone by default.** On desktop the default backend is `remote`: the Godot client needs the Python server running, and the server refuses to start without `STORYFORGE_GEMINI_API_KEY`. An in-process offline backend is merged (`--backend=local`) but only verified headless; see [Status](#status).
-- **Not display-verified.** Nothing in this repository has been run on a screen or a phone yet. The test evidence below is headless.
+- **Not gameplay-verified on a display.** The hero assets have Blender renders and headless Godot import/character checks. The full game and phone controls have not been playtested on a display or device.
 
 ## Core pillars
 
@@ -252,6 +252,25 @@ Design reference for the move from placeholder minis to bespoke 3D heroes: front
 
 </details>
 
+<h3 id="bespoke-heroes">Bespoke 3D heroes</h3>
+
+The Godot project now contains 23 bespoke, rigged hero models across the five species groups. The sheets below show Blender front, side and back renders; they are asset previews, not in-game screenshots. Click any preview for the full-size image. Twelve species still use the existing character-card art while their 3D models are pending.
+
+<table>
+<tr>
+<td width="50%"><a href="docs/assets/heroes/ashenborn.webp"><img src="docs/assets/heroes/ashenborn.webp" alt="Ashenborn bespoke 3D hero, front, side and back Blender renders" width="100%"></a><br><sub>Ashenborn</sub></td>
+<td width="50%"><a href="docs/assets/heroes/ironfast.webp"><img src="docs/assets/heroes/ironfast.webp" alt="Ironfast bespoke 3D hero, front, side and back Blender renders" width="100%"></a><br><sub>Ironfast</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/heroes/glitchkin.webp"><img src="docs/assets/heroes/glitchkin.webp" alt="Glitchkin bespoke 3D hero, front, side and back Blender renders" width="100%"></a><br><sub>Glitchkin</sub></td>
+<td width="50%"><a href="docs/assets/heroes/forgespawn.webp"><img src="docs/assets/heroes/forgespawn.webp" alt="Forgespawn bespoke 3D hero, front, side and back Blender renders" width="100%"></a><br><sub>Forgespawn</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="docs/assets/heroes/ironveil.webp"><img src="docs/assets/heroes/ironveil.webp" alt="Ironveil bespoke 3D hero, front, side and back Blender renders" width="100%"></a><br><sub>Ironveil</sub></td>
+<td></td>
+</tr>
+</table>
+
 
 <img src="docs/assets/divider.svg" alt="" width="100%">
 
@@ -357,13 +376,14 @@ At this commit that is 458 tests (character factory, validators, lobby and NPC r
 
 **In progress**
 
+- Completing bespoke 3D heroes for the remaining 12 species.
 - Running the offline build on a real display and a real phone.
 
 **Known gaps**
 
 - Offline, `/api/npc/**` returns 503 and freeform text returns 501; both need the AI narrator.
 - Touch controls have never been used on a real phone. Known rough edges: the creation screens still have buttons under 9 mm, and a 20:9 phone letterboxes to 16:9.
-- No display-verified build of either backend. Everything above is headless evidence.
+- The full game and either backend have not been playtested on a display. Hero model previews and headless character checks do not verify gameplay or phone controls.
 - Combat is deferred: the validator rejects AI-proposed phase changes to `COMBAT`.
 - CI builds of the Android APK are signed with a throwaway key; the APK on the Releases page is signed with the project's own debug key, so only that one updates in place.
 - No `LICENSE` file yet.

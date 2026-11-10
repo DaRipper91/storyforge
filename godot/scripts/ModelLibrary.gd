@@ -83,6 +83,7 @@ const CLIP_ALIASES := {
 	"talk":   ["interact", "talk", "wave", "pickup", "idle_2"],
 	"attack": ["attack", "slash", "attack_a", "attack_headbutt"],
 	"death":  ["death", "die", "fall"],
+	"hit":    ["hit", "hurt", "hit_react", "gethit"],
 }
 
 const LOOPING_ROLES := ["idle", "walk", "talk"]
@@ -115,6 +116,13 @@ static func instantiate_for_race(character_id: String, race_id: String) -> Node3
 	if not group.is_empty():
 		candidates.append({"path": "player/" + group, "height": DEFAULT_HEIGHT})
 	return _first_usable(candidates)
+
+
+## Hand-modelled non-humanoid hero (own skeleton and clips) for a race, or null when there is none.
+## Humanoid heroes go through CharacterModel instead; this is for creatures such as the Iron-Locust.
+static func instantiate_hero(race_id: String, height: float) -> Node3D:
+	race_id = race_id.to_lower().replace(" ", "_").replace("-", "")
+	return _instantiate("heroes/" + race_id, height)
 
 
 static func race_group(race_id: String) -> String:
