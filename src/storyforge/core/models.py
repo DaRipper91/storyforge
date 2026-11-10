@@ -177,6 +177,20 @@ class CombatState(BaseModel):
     round_number: int = 1
 
 
+class QuestStatus(StrEnum):
+    AVAILABLE = "available"
+    ACTIVE = "active"
+    READY_TO_TURN_IN = "ready_to_turn_in"
+    COMPLETED = "completed"
+
+
+class QuestProgress(BaseModel):
+    """Campaign-persistent state for an authored quest."""
+    status: QuestStatus = QuestStatus.AVAILABLE
+    accepted_by: str | None = None
+    completed_by: str | None = None
+
+
 class NarrativeEntry(BaseModel):
     revision: int                    # state revision at time of event
     actor_id: str | None             # None for DM narration
@@ -325,6 +339,7 @@ class GameState(BaseModel):
     enemies: dict[str, EnemySheet] = Field(default_factory=dict)
     rooms: dict[str, Room]
     combat: CombatState | None = None
+    quest_progress: dict[str, QuestProgress] = Field(default_factory=dict)
     
     lobby_slots: list[LobbySlot] = Field(
         default_factory=lambda: [LobbySlot(slot_index=i) for i in range(4)]

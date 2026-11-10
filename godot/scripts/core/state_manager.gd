@@ -149,6 +149,17 @@ func attack_enemy(attacker_id: String, enemy_id: String) -> Variant:
 		char["evolution_points"] = int(char["evolution_points"]) + int(enemy["xp_reward"])
 		result["enemy_died"] = true
 		result["xp_reward"] = enemy["xp_reward"]
+		var quest_progress: Dictionary = state.get("quest_progress", {})
+		var watch: Dictionary = quest_progress.get("wolfguard_watch", {})
+		if enemy_id == "echo_hound_01" and str(watch.get("status", "available")) == "active":
+			watch["status"] = "ready_to_turn_in"
+			quest_progress["wolfguard_watch"] = watch
+			state["quest_progress"] = quest_progress
+			result["quest_update"] = {
+				"quest_id": "wolfguard_watch",
+				"status": "ready_to_turn_in",
+				"message": "The echo hound falls silent. Return to Bryttan Wolfholt to complete the watch.",
+			}
 	else:
 		var counter := _Enemies.resolve_enemy_attack(enemy, char, rolls)
 		if counter["hit"]:
@@ -159,6 +170,94 @@ func attack_enemy(attacker_id: String, enemy_id: String) -> Variant:
 		}
 		result["player_hp"] = char["hp_current"]
 
+	_commit(result)
+	return result
+
+
+func interact_quest(actor_id: String, quest_id: String, npc_id: String) -> Variant:
+	if quest_id != "wolfguard_watch":
+		return _err("StateError", "unknown quest: %s" % quest_id)
+	if str(state["phase"]) != "exploration":
+		return _err("StateError", "quests can only be advanced during exploration")
+	var chars: Dictionary = state["characters"]
+	if not chars.has(actor_id):
+		return _err("StateError", "unknown character: %s" % actor_id)
+	var npcs: Dictionary = state["npcs"]
+	if not npcs.has(npc_id) or not npcs[npc_id].get("interactable", true):
+		return _err("StateError", "unknown or non-interactable NPC: %s" % npc_id)
+	var npc: Dictionary = npcs[npc_id]
+	if str(npc.get("room_id", "")) != str(state["current_room_id"]):
+		return _err("StateError", "%s is not in the current room" % str(npc["name"]))
+	if _Grid.feet_between(chars[actor_id]["position"], npc["position"]) > 5:
+		return _err("StateError", "%s is too far away to speak with" % str(npc["name"]))
+	if npc_id != "evangeline_wolfholt" and npc_id != "bryttan_wolfholt":
+		return _err("StateError", "%s is not part of this quest" % str(npc["name"]))
+
+	var progress_by_id: Dictionary = state.get("quest_progress", {})
+	var progress: Dictionary = progress_by_id.get(quest_id, {
+		"status": "available", "accepted_by": null, "completed_by": null,
+	})
+	var status := str(progress.get("status", "available"))
+	var result: Dictionary
+	if npc_id == "evangeline_wolfholt":
+		if status == "available":
+			progress["status"] = "active"
+			progress["accepted_by"] = actor_id
+			result = {
+				"type": "quest_accepted", "quest_id": quest_id, "status": "active",
+				"objective": "Defeat the echo hound in Keep Courtyard, then report to Bryttan.",
+				"message": "Evangeline points toward the courtyard. An echo hound has been circling the signal bell. Clear the yard, then bring word to Bryttan.",
+			}
+			progress_by_id[quest_id] = progress
+			state["quest_progress"] = progress_by_id
+			_commit(result)
+			return result
+		if status == "active":
+			return {
+				"type": "quest_update", "quest_id": quest_id, "status": status,
+				"objective": "Defeat the echo hound in Keep Courtyard, then report to Bryttan.",
+				"message": "The echo hound is still in Keep Courtyard. Bryttan is waiting for your report.",
+			}
+		if status == "ready_to_turn_in":
+			return {
+				"type": "quest_update", "quest_id": quest_id, "status": status,
+				"objective": "Return to Bryttan Wolfholt in Ironhold Keep.",
+				"message": "The courtyard has gone quiet. Bryttan is expecting you back at the keep.",
+			}
+		return {"type": "quest_update", "quest_id": quest_id, "status": status,
+			"message": "The watch is quiet again. Evangeline gives you a grateful nod."}
+
+	if status == "active":
+		return {
+			"type": "quest_update", "quest_id": quest_id, "status": status,
+			"objective": "Defeat the echo hound in Keep Courtyard, then report to Bryttan.",
+			"message": "Bryttan listens, then shakes her head. The echo hound still prowls the courtyard.",
+		}
+	if status == "available":
+		return {"type": "quest_update", "quest_id": quest_id, "status": status,
+			"message": "Bryttan says Evangeline can brief you on the broken courtyard watch."}
+	if status == "completed":
+		return {"type": "quest_update", "quest_id": quest_id, "status": status,
+			"message": "The watch mark is yours. Bryttan returns to her patrol."}
+
+	var char: Dictionary = chars[actor_id]
+	char["evolution_points"] = int(char["evolution_points"]) + 75
+	var reward := _norm_item({
+		"id": "wolfguard_watch_mark", "name": "Wolfguard Watch Mark", "quantity": 1,
+		"equipped": false, "value": 0,
+		"notes": "A cobalt enamel mark awarded for restoring the courtyard watch.",
+		"damage_dice": null, "armor_ac_bonus": 0,
+	})
+	(char["inventory"] as Array).append(reward)
+	progress["status"] = "completed"
+	progress["completed_by"] = actor_id
+	progress_by_id[quest_id] = progress
+	state["quest_progress"] = progress_by_id
+	result = {
+		"type": "quest_completed", "quest_id": quest_id, "status": "completed",
+		"reward_xp": 75, "reward_item": reward,
+		"message": "Bryttan resets the signal bell. The Wolfguard Watch Mark is yours, along with 75 XP.",
+	}
 	_commit(result)
 	return result
 

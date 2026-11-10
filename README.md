@@ -27,6 +27,10 @@ The setting has 35 custom species across five groups. These realistic race-card 
 
 The Godot project contains 23 bespoke, rigged hero models across the five species groups. These five sheets show Blender turnarounds; twelve species still use the shared character-card art while their bespoke models are pending. The hero system also uses a shared procedural humanoid animation set.
 
+The catalog below shows every bespoke hero mesh in the current roster.
+
+<p align="center"><a href="docs/assets/heroes/model_catalog.png"><img src="docs/assets/heroes/model_catalog.png" alt="Labeled Blender catalog of all 23 bespoke hero models" width="100%"></a></p>
+
 | Ashenborn | Ironfast | Glitchkin |
 |---|---|---|
 | <a href="docs/assets/heroes/ashenborn.webp"><img src="docs/assets/heroes/ashenborn.webp" alt="Ashenborn bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/ironfast.webp"><img src="docs/assets/heroes/ironfast.webp" alt="Ironfast bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/glitchkin.webp"><img src="docs/assets/heroes/glitchkin.webp" alt="Glitchkin bespoke 3D hero, front, side and back Blender renders" width="100%"></a> |
@@ -63,11 +67,37 @@ These additional turnarounds extend the seeded cast beyond the five characters i
 |---|---|
 | <a href="docs/assets/npcs/nathis-front-man.png"><img src="docs/assets/npcs/nathis-front-man.png" alt="Nathis in front, side and back views in age-appropriate scout clothing" width="100%"></a> | <a href="docs/assets/npcs/tyty-wandering-herald.png"><img src="docs/assets/npcs/tyty-wandering-herald.png" alt="Tyty, a shaggy long-eared hound companion, shown from front, side and back" width="100%"></a> |
 
+### Queen D.Anna model reference
+
+This separate rendering follows the Gemini reference for Queen D.Anna as an ascended Bloodweaver / Solar-Lord sovereign in crimson and gold, carrying a light-focusing scepter. It is concept art for the in-game model pass, not a replacement for the written character brief.
+
+<p align="center"><a href="docs/assets/npcs/danna-dee-sovereign-v2.png"><img src="docs/assets/npcs/danna-dee-sovereign-v2.png" alt="Queen D.Anna in crimson and gold sovereign regalia, shown in front, side and back views holding a light-focused scepter" width="100%"></a></p>
+
 ### New NPC: Bryttan Wolfholt
 
 Bryttan is the Wolfguard, a vigilant shieldwarden at Ironhold Keep. Her seeded look is built from the shared rigged warrior model with cobalt wolf insignia, a power-core pack, a blue shard pendant, and a rune-etched survival dagger. She is an interactable named NPC, paired in the setting with Evangeline Wolfholt.
 
 Her Godot appearance is assembled from mesh details and material overrides without modifying the shared source model. It interprets the PDF's text description; it is not presented as a recreation of missing reference art.
+
+### First playable quest: The Quiet Watch
+
+In Ironhold's Keep Courtyard, Evangeline Wolfholt asks the party to investigate an echo near the signal bell. Defeat the seeded Echo Hound, then return to Bryttan at the keep to receive 75 XP and the Wolfguard Watch Mark. Quest progress, completion, XP, and the item reward are saved with the campaign snapshot. This slice uses StoryForge's existing player attack and enemy counterattack flow; initiative and a full turn-based combat system remain in progress.
+
+The courtyard now uses textured stone and timber surfaces, with a bronze signal bell, wall lantern, supply crates, and training dummy placed along the yard's edges. These props are decorative and leave the grid movement rules unchanged. Named NPCs use role-specific material palettes; D.Anna, Evangeline, and Bryttan also receive per-instance equipment details on the shared rig. See the [NPC visual bible](docs/NPC_VISUAL_BIBLE.md).
+
+### Iron Ledge equipment and wilds
+
+Five low-poly weapon concepts have been modelled and rendered in Blender. Editable sources and GLB exports are linked in the [weapon concept sheet](docs/WEAPON_CONCEPTS.md). Proposed damage and prices are design notes; the assets are not yet connected to inventory or combat.
+
+| Gateward sword | Wolfguard Reach spear | Greenwood Longbow |
+|---|---|---|
+| <img src="docs/assets/weapons/gateward_sword.png" alt="Blender render of the Gateward arming sword" width="100%"> | <img src="docs/assets/weapons/wolfguard_reach_spear.png" alt="Blender render of the Wolfguard Reach patrol spear" width="100%"> | <img src="docs/assets/weapons/greenwood_longbow.png" alt="Blender render of the Greenwood field longbow" width="100%"> |
+
+| Briarhook field knife | Bellfound Maul | Forest edge prop kit |
+|---|---|---|
+| <img src="docs/assets/weapons/briarhook_field_knife.png" alt="Blender render of the Briarhook brush knife" width="100%"> | <img src="docs/assets/weapons/bellfound_maul.png" alt="Blender render of the Bellfound two-handed maul" width="100%"> | <img src="docs/assets/world/forest_edge_kit.png" alt="Blender render of a low-poly oak, spruce, stump, fallen log and woodland rocks" width="100%"> |
+
+The [forest kit's editable Blender file](godot/assets/models/props/forest_edge_kit/forest_edge_kit.blend) and [Godot GLB export](godot/assets/models/props/forest_edge_kit/forest_edge_kit.glb) contain reusable oak, spruce, stump, fallen log, and boulder meshes. The repository also includes [deer](godot/assets/models/animals/deer.glb), [fox](godot/assets/models/animals/fox.glb), and [stag](godot/assets/models/animals/stag.glb) models for ambient wildlife; ordinary animals remain outside the combat roster, in keeping with the world rules. These assets are previews and building blocks; the forest kit and wildlife are not yet placed in a playable forest encounter.
 
 ## Play locally
 
@@ -121,9 +151,9 @@ The Python suite covers character creation, validators, routes, and golden behav
 
 ### Current status
 
-- **Available:** 35-species character creation, 23 bespoke hero models, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, and NPC encounters.
+- **Available:** 35-species character creation, 23 bespoke hero models, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, NPC encounters, and the first authored quest loop in Ironhold.
 - **NPC update:** Bryttan Wolfholt is seeded in Ironhold Keep and uses the existing rigged character pipeline with a composed appearance.
-- **In progress:** bespoke models for the remaining 12 species, real-device verification for the offline Android build and touch controls; combat remains deferred.
+- **In progress:** bespoke models for the remaining 12 species, real-device verification for the offline Android build and touch controls, and a complete turn-based combat system. The current quest uses a basic attack/counterattack encounter.
 - **Offline limits:** NPC encounter routes return 503 and freeform text returns 501 because those features require the AI narrator.
 
 Read the [project docs](docs/README.md) and [roadmap](ROADMAP.md) for more detail.

@@ -22,10 +22,11 @@ from storyforge.core.character_factory import (
     build_character, find_starting_position, generate_char_id,
 )
 from storyforge.core.models import (
-    CharacterSheet, Coord, GameState, GridAction,
+    CharacterSheet, Coord, GameState, GridAction, InventoryItem, QuestProgress, QuestStatus,
     NarrativeEntry, StateDiff, TurnPhase, Era,
     CharacterCreationRequest, SlotStatus,
 )
+from storyforge.core.quest_data import QUESTS, quest_for_enemy
 from storyforge.encounters.enemies import resolve_player_attack, resolve_enemy_attack
 from storyforge.events.bus import event_bus
 from storyforge.persistence import snapshot
@@ -113,6 +114,15 @@ class StateManager:
                 char.evolution_points += enemy.xp_reward
                 result["enemy_died"] = True
                 result["xp_reward"] = enemy.xp_reward
+                quest_id = quest_for_enemy(enemy_id)
+                progress = self._state.quest_progress.get(quest_id) if quest_id else None
+                if progress and progress.status == QuestStatus.ACTIVE:
+                    progress.status = QuestStatus.READY_TO_TURN_IN
+                    result["quest_update"] = {
+                        "quest_id": quest_id,
+                        "status": progress.status.value,
+                        "message": "The echo hound falls silent. Return to Bryttan Wolfholt to complete the watch.",
+                    }
             else:
                 counter = resolve_enemy_attack(enemy, char)
                 if counter.hit:
@@ -128,6 +138,89 @@ class StateManager:
 
             await self._commit(result)
             return result
+
+
+    async def interact_quest(self, actor_id: str, quest_id: str, npc_id: str) -> dict:
+        """Advance the authored quest through its named NPCs and persist changes."""
+        async with self._lock:
+            return await self._interact_quest_unlocked(actor_id, quest_id, npc_id)
+
+
+    async def _interact_quest_unlocked(self, actor_id: str, quest_id: str, npc_id: str) -> dict:
+        """Resolve a quest interaction while the state mutation lock is held."""
+        definition = QUESTS.get(quest_id)
+        if definition is None:
+            raise StateError(f"unknown quest: {quest_id}")
+        if self._state.phase != TurnPhase.EXPLORATION:
+            raise StateError("quests can only be advanced during exploration")
+
+        char = self._state.characters.get(actor_id)
+        if char is None:
+            raise StateError(f"unknown character: {actor_id}")
+        npc = self._state.npcs.get(npc_id)
+        if npc is None or not npc.interactable:
+            raise StateError(f"unknown or non-interactable NPC: {npc_id}")
+        if npc.room_id != self._state.current_room_id:
+            raise StateError(f"{npc.name} is not in the current room")
+        if grid.feet_between(char.position, npc.position) > grid.FEET_PER_CELL:
+            raise StateError(f"{npc.name} is too far away to speak with")
+        if npc_id not in (definition["start_npc_id"], definition["turn_in_npc_id"]):
+            raise StateError(f"{npc.name} is not part of this quest")
+
+        progress = self._state.quest_progress.setdefault(quest_id, QuestProgress())
+        if npc_id == definition["start_npc_id"]:
+            if progress.status == QuestStatus.AVAILABLE:
+                progress.status = QuestStatus.ACTIVE
+                progress.accepted_by = actor_id
+                message = (
+                    "Evangeline points toward the courtyard. An echo hound has been circling the signal bell. "
+                    "Clear the yard, then bring word to Bryttan."
+                )
+                result = {"type": "quest_accepted", "quest_id": quest_id,
+                          "status": progress.status.value, "objective": definition["objective"],
+                          "message": message}
+                await self._commit(result)
+                return result
+            if progress.status == QuestStatus.ACTIVE:
+                return {"type": "quest_update", "quest_id": quest_id,
+                        "status": progress.status.value, "objective": definition["objective"],
+                        "message": "The echo hound is still in Keep Courtyard. Bryttan is waiting for your report."}
+            if progress.status == QuestStatus.READY_TO_TURN_IN:
+                return {"type": "quest_update", "quest_id": quest_id,
+                        "status": progress.status.value, "objective": "Return to Bryttan Wolfholt in Ironhold Keep.",
+                        "message": "The courtyard has gone quiet. Bryttan is expecting you back at the keep."}
+            return {"type": "quest_update", "quest_id": quest_id,
+                    "status": progress.status.value, "message": "The watch is quiet again. Evangeline gives you a grateful nod."}
+
+        if progress.status == QuestStatus.ACTIVE:
+            return {"type": "quest_update", "quest_id": quest_id,
+                    "status": progress.status.value, "objective": definition["objective"],
+                    "message": "Bryttan listens, then shakes her head. The echo hound still prowls the courtyard."}
+        if progress.status == QuestStatus.AVAILABLE:
+            return {"type": "quest_update", "quest_id": quest_id,
+                    "status": progress.status.value,
+                    "message": "Bryttan says Evangeline can brief you on the broken courtyard watch."}
+        if progress.status == QuestStatus.COMPLETED:
+            return {"type": "quest_update", "quest_id": quest_id,
+                    "status": progress.status.value,
+                    "message": "The watch mark is yours. Bryttan returns to her patrol."}
+
+        char.evolution_points += int(definition["reward_xp"])
+        reward = InventoryItem.model_validate(definition["reward_item"])
+        char.inventory.append(reward)
+        progress.status = QuestStatus.COMPLETED
+        progress.completed_by = actor_id
+        result = {
+            "type": "quest_completed", "quest_id": quest_id,
+            "status": progress.status.value, "reward_xp": int(definition["reward_xp"]),
+            "reward_item": reward.model_dump(mode="json"),
+            "message": (
+                "Bryttan resets the signal bell. "
+                f"The Wolfguard Watch Mark is yours, along with {definition['reward_xp']} XP."
+            ),
+        }
+        await self._commit(result)
+        return result
 
     async def fast_travel(self, room_id: str) -> dict:
         """World-map teleport: move the party to any known room."""

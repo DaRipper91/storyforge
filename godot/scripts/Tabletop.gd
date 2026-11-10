@@ -9,6 +9,11 @@ extends Node3D
 var _miniatures: Dictionary = {}
 const CELL_SIZE   = 1.0
 const MINI_Y      = 0.05   # sits on top of floor tile
+const MINI_PICK_HEIGHT := 0.85
+const MINI_PICK_RADIUS := 0.7
+const HP_BAR_HEIGHT := 2.2
+const CAM_PIVOT_HEIGHT := 0.8
+const CourtyardDetails := preload("res://scripts/world/keep_courtyard_details.gd")
 const RaceMiniScene = preload("res://scenes/RaceMini.tscn")
 
 # ─── Dungeon geometry ───────────────────────────────────────────────
@@ -18,10 +23,10 @@ var _current_room_id: String = ""
 # Shared materials (created once, reused)
 var _mat_wall:      Material = null   # ShaderMaterial — stone blocks
 var _mat_floor:     Material = null   # ShaderMaterial — stone flags
-var _mat_door:      StandardMaterial3D = null
+var _mat_door:      Material = null
 var _mat_hazard:    StandardMaterial3D = null
-var _mat_pillar:    StandardMaterial3D = null
-var _mat_table:     StandardMaterial3D = null
+var _mat_pillar:    Material = null
+var _mat_table:     Material = null
 var _mat_difficult: StandardMaterial3D = null
 
 # ─── Environment / lighting ─────────────────────────────────────────
@@ -70,11 +75,12 @@ var _cam_pitch:    float = -45.0
 # The Tabletop camera is ORTHOGRAPHIC: moving it further away does not make anything smaller, only
 # Camera3D.size does. _cam_distance is kept as the single zoom value (wheel, pinch, reset) and is
 # converted to the camera's ortho size in _update_camera(). 14.14 distance == size 20 (the old fixed
-# value); the default is much closer so a 0.9 m mini is ~85 px tall on a phone.
+# value). World scale is one metre per cell with human-sized tokens, so the closer default keeps
+# faces and equipment readable without losing nearby board context.
 const CAM_SIZE_PER_DISTANCE := 1.41421356
-const CAM_DISTANCE_DEFAULT  := 5.66   # ortho size ~8
-const CAM_DISTANCE_MIN      := 3.5    # ortho size ~5
-const CAM_DISTANCE_MAX      := 21.0   # ortho size ~30
+const CAM_DISTANCE_DEFAULT  := 6.5    # ortho size ~9.2
+const CAM_DISTANCE_MIN      := 3.8    # ortho size ~5.4
+const CAM_DISTANCE_MAX      := 24.0   # ortho size ~34
 var _cam_distance: float = CAM_DISTANCE_DEFAULT
 var _cam_target:   Vector3 = Vector3.ZERO
 var _is_orbiting:  bool = false
@@ -616,6 +622,18 @@ void fragment() {
 	_mat_difficult.roughness = 0.92
 	_mat_difficult.metallic = 0.0
 
+	# Use imported PBR assets where present; the procedural materials above remain fallbacks.
+	var pbr_wall := load("res://assets/materials/wall_bricks.tres") as Material
+	var pbr_floor := load("res://assets/materials/stone_cobble.tres") as Material
+	var pbr_door := load("res://assets/materials/wood_dark.tres") as Material
+	var pbr_pillar := load("res://assets/materials/stone_wall_dark.tres") as Material
+	var pbr_table := load("res://assets/materials/wood_planks.tres") as Material
+	if pbr_wall: _mat_wall = pbr_wall
+	if pbr_floor: _mat_floor = pbr_floor
+	if pbr_door: _mat_door = pbr_door
+	if pbr_pillar: _mat_pillar = pbr_pillar
+	if pbr_table: _mat_table = pbr_table
+
 
 func _process(delta):
 	_flicker_t += delta
@@ -789,8 +807,9 @@ func _update_camera():
 		_cam_distance * -sin(pitch),
 		_cam_distance * cp * cos(yaw)
 	)
-	camera.position = _cam_target + offset
-	camera.look_at(_cam_target, Vector3.UP)
+	var pivot := _cam_target + Vector3(0.0, CAM_PIVOT_HEIGHT, 0.0)
+	camera.position = pivot + offset
+	camera.look_at(pivot, Vector3.UP)
 	if camera.projection == Camera3D.PROJECTION_ORTHOGONAL:
 		camera.size = _cam_distance * CAM_SIZE_PER_DISTANCE
 
@@ -978,6 +997,7 @@ func _rebuild_room(state: Dictionary):
 	_build_void_floor(w, h)
 	_add_room_torches(cells, w, h)
 	_set_room_atmosphere(room_id)
+	CourtyardDetails.populate(_dungeon_root, room_id, w, h)
 	
 	# Bake navigation mesh so party followers can pathfind
 	if _dungeon_root:
@@ -1085,8 +1105,8 @@ func _spawn_enemy_token(enemy_id: String, data: Dictionary) -> void:
 
 	# Red glow ring regardless of model
 	var ring_mesh := CylinderMesh.new()
-	ring_mesh.top_radius    = CELL_SIZE * 0.30
-	ring_mesh.bottom_radius = CELL_SIZE * 0.30
+	ring_mesh.top_radius    = CELL_SIZE * 0.36
+	ring_mesh.bottom_radius = CELL_SIZE * 0.36
 	ring_mesh.height        = 0.04
 	ring_mesh.radial_segments = 16
 	var ring_mat := StandardMaterial3D.new()
@@ -1159,6 +1179,7 @@ const NPC_COLORS: Dictionary = {
 	"npc_kodrik":   Color(0.30, 0.65, 0.95),   # steel blue — guildmaster
 	"npc_bryne":    Color(0.45, 0.75, 0.55),   # muted green — warden
 	"npc_nathis":   Color(0.85, 0.55, 0.20),   # amber — front man
+	"npc_evangeline_wolfholt": Color(0.36, 0.58, 0.82), # blue-gray — courtyard scout
 	"npc_bryttan_wolfholt": Color(0.16, 0.45, 0.82), # cobalt — Wolfguard
 	"npc_keeva":    Color(1.0,  1.0,  1.0),    # white — divine
 	"npc_bear":     Color(0.70, 0.45, 0.20),   # brown — bear
@@ -1236,6 +1257,9 @@ func spawn_miniature(character_id: String, grid_pos: Vector2, race_id: String, c
 	var model := ModelLibrary.instantiate_for_race(character_id, race_id)
 	if model:
 		root.use_model(model, RaceMini.RACE_COLORS.get(race_id, Color(0.3, 0.5, 0.8)))
+	if _miniatures.is_empty():
+		_cam_target = root.position
+		_update_camera()
 	_miniatures[character_id] = root
 	return root
 
@@ -1273,12 +1297,13 @@ func _try_select_mini(screen_pos: Vector2) -> void:
 	var closest_dist := INF
 	for cid in _miniatures:
 		var mini: Node3D = _miniatures[cid]
-		var to_ray := mini.global_position - ray_origin
+		var body_centre := mini.global_position + Vector3(0.0, MINI_PICK_HEIGHT, 0.0)
+		var to_ray := body_centre - ray_origin
 		var proj   := to_ray.dot(ray_dir)
 		if proj < 0:
 			continue
 		var closest_pt := ray_origin + ray_dir * proj
-		if mini.global_position.distance_to(closest_pt) < 0.55 and proj < closest_dist:
+		if body_centre.distance_to(closest_pt) < MINI_PICK_RADIUS and proj < closest_dist:
 			closest_dist = proj
 			closest_cid  = cid
 
@@ -1482,6 +1507,20 @@ func _show_npc_dialog(enc: Dictionary) -> void:
 
 func _npc_actions_for(encounter_id: String) -> Array:
 	match encounter_id:
+		"evangeline_wolfholt_watch":
+			return [{
+				"label": "Ask about the courtyard watch", "method": "POST",
+				"path": "/quests/wolfguard_watch/interact",
+				"body": {"actor_id": _get_any_player_id(), "npc_id": "evangeline_wolfholt"},
+				"refresh_state": true,
+			}]
+		"bryttan_wolfholt_intro":
+			return [{
+				"label": "Report on the courtyard watch", "method": "POST",
+				"path": "/quests/wolfguard_watch/interact",
+				"body": {"actor_id": _get_any_player_id(), "npc_id": "bryttan_wolfholt"},
+				"refresh_state": true,
+			}]
 		"jon_shop":
 			return [
 				{"label": "Browse Shop",  "method": "SHOP", "path": "jon"},
@@ -1563,6 +1602,7 @@ func _npc_do_action(act: Dictionary) -> void:
 		if resp is Dictionary:
 			var narrative: String = (
 				resp.get("narrative", "") or
+				resp.get("message", "") or
 				resp.get("flavor", "") or
 				resp.get("result", "") or
 				resp.get("observation", "") or
@@ -1578,9 +1618,14 @@ func _npc_do_action(act: Dictionary) -> void:
 						narrative = v
 						break
 			if not narrative.is_empty():
+				var objective := str(resp.get("objective", ""))
+				if not objective.is_empty():
+					narrative += "\n\nObjective: " + objective
 				_npc_dialog_resp.text = "[color=#e8d9b0]%s[/color]" % narrative
 			else:
 				_npc_dialog_resp.text = "[color=#888888]...[/color]"
+			if code >= 200 and code < 300 and act.get("refresh_state", false):
+				pc.fetch_full_state()
 		http.queue_free()
 	)
 
@@ -1598,6 +1643,9 @@ func _show_combat_result(data: Dictionary) -> void:
 
 	if data.get("enemy_died", false):
 		txt += "\n[color=#ffdd44][b]Enemy defeated! +%d XP[/b][/color]\n" % data.get("xp_reward", 0)
+		var quest_update: Dictionary = data.get("quest_update", {})
+		if not quest_update.is_empty():
+			txt += "\n[color=#80cfff]%s[/color]\n" % quest_update.get("message", "")
 	else:
 		var ea: Dictionary = data.get("enemy_attack", {})
 		if not ea.is_empty():
@@ -2130,15 +2178,15 @@ func _setup_keyhints() -> void:
 func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
 	var bar := Node3D.new()
 	bar.name = "HPBar"
-	bar.position = Vector3(0.0, 1.35, 0.0)
+	bar.position = Vector3(0.0, HP_BAR_HEIGHT, 0.0)
 
 	var frac: float = clamp(float(hp) / float(maxi(1, hp_max)), 0.0, 1.0)
-	var bar_w := 0.62
+	var bar_w := 0.85
 
 	# Background (dark maroon)
 	var bg := MeshInstance3D.new()
 	var bg_mesh := QuadMesh.new()
-	bg_mesh.size = Vector2(bar_w + 0.04, 0.085)
+	bg_mesh.size = Vector2(bar_w + 0.05, 0.11)
 	bg.mesh = bg_mesh
 	var bg_mat := StandardMaterial3D.new()
 	bg_mat.albedo_color  = Color(0.22, 0.02, 0.02, 0.92)
@@ -2153,7 +2201,7 @@ func _add_enemy_hp_bar(root: Node3D, hp: int, hp_max: int) -> void:
 	if frac > 0.0:
 		var fg := MeshInstance3D.new()
 		var fg_mesh := QuadMesh.new()
-		fg_mesh.size = Vector2(bar_w * frac, 0.075)
+		fg_mesh.size = Vector2(bar_w * frac, 0.095)
 		fg.mesh = fg_mesh
 		var c := Color(1.0 - frac, frac * 0.85, 0.05, 1.0)
 		var fg_mat := StandardMaterial3D.new()

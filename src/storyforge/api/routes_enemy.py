@@ -53,6 +53,8 @@ async def attack_enemy(
     if result.get("enemy_died"):
         dead_name = state.current.enemies[enemy_id].name
         lines.append(f"{dead_name} collapses. +{result['xp_reward']} XP.")
+    if result.get("quest_update"):
+        lines.append(result["quest_update"]["message"])
 
     narrative = " ".join(lines)
     await state.append_narration(actor_id=req.actor_id, kind="action", text=narrative)

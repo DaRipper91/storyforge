@@ -257,6 +257,20 @@
       "encounter_id": "mykael_hauler",
       "blocks_movement": true,
       "description": "The Supply Hauler and 'Fat Bear'. The strongest entity in the living world for 4 seconds at a time."
+    },
+    "evangeline_wolfholt": {
+      "id": "evangeline_wolfholt",
+      "name": "Evangeline Wolfholt",
+      "position": {
+        "x": 8,
+        "y": 2
+      },
+      "room_id": "keep_courtyard",
+      "sprite_key": "npc_evangeline_wolfholt",
+      "interactable": true,
+      "encounter_id": "evangeline_wolfholt_watch",
+      "blocks_movement": true,
+      "description": "A watch scout in slate and cobalt. She and Bryttan Wolfholt keep Ironhold's signal bells and patrols."
     }
   },
   "rooms": {
@@ -2566,7 +2580,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "evangeline_wolfholt"
         },
         {
           "terrain": "floor",
@@ -2694,7 +2708,7 @@
         },
         {
           "terrain": "floor",
-          "occupant_id": null
+          "occupant_id": "echo_hound_01"
         },
         {
           "terrain": "floor",
@@ -3179,7 +3193,7 @@
         "7,11": "crossroads",
         "8,11": "crossroads"
       },
-      "description": "The fortified outer yard of Ironhold Keep. Training racks and supply crates line the walls. Guards patrol in pairs. The keep's iron doors loom to the north; the Crossroads road leads south."
+      "description": "The fortified outer yard of Ironhold Keep. Training racks and supply crates line the walls. A bronze signal bell hangs from a bracket on the east wall; its cracked clapper repeats sounds after dusk. Guards patrol in pairs. The keep's iron doors loom to the north; the Crossroads road leads south."
     },
     "market_square": {
       "id": "market_square",
@@ -8954,6 +8968,32 @@
       "sprite_key": "enemy_race",
       "description": "A hostile Cinderplate Juggernaut. Wields Forge-Hammer. Armored plating over a molten core. They run hot, cool slow, and leave scorch marks on everything they touch.",
       "loot": []
+    },
+    "echo_hound_01": {
+      "id": "echo_hound_01",
+      "name": "Echo Hound",
+      "room_id": "keep_courtyard",
+      "position": {
+        "x": 8,
+        "y": 4
+      },
+      "hp_current": 8,
+      "hp_max": 8,
+      "armor_class": 11,
+      "attack_bonus": 2,
+      "damage_dice": "1d4+1",
+      "xp_reward": 25,
+      "alive": true,
+      "sprite_key": "npc_wolf",
+      "description": "A pale hound with a faint cobalt glow at its throat. It repeats the last sound it hears in a voice that is almost human.",
+      "loot": []
+    }
+  },
+  "quest_progress": {
+    "wolfguard_watch": {
+      "status": "available",
+      "accepted_by": null,
+      "completed_by": null
     }
   }
 }

@@ -29,7 +29,7 @@ const HERO_PREFIX := "Hero_"
 
 ## Standing height in world units: same as ModelLibrary.DEFAULT_HEIGHT, so a player model
 ## matches every other GLB token on the board (a cell is 1.0).
-const DEFAULT_HEIGHT := 0.9
+const DEFAULT_HEIGHT := 0.9 * ModelLibrary.WORLD_SCALE
 
 ## Group glow colours; mirrors Tabletop.RACE_COLORS (which lives in a 2000-line scene script).
 const GROUP_ACCENT := {
@@ -119,6 +119,22 @@ var _body_aabb := AABB()
 
 ## base glb path -> Array of {name, mesh, skin}: the mirrored halves, built once per base.
 static var _mirror_cache := {}
+static var _hero_texture_file_cache := {}
+static var _hero_texture_cache := {}
+
+## A small set of deliberately authored semantic aliases for surface maps whose file label differs
+## from the GLB material label (e.g. Chaosling's scale map and Solar-Lord feather plates).
+const HERO_SURFACE_ALIASES := {
+	"chaosling": {"scale": ["cl_iridskin"], "patchc": ["cl_patchirid"]},
+	"cinderplate": {"cp_core": ["cp_glow"]},
+	"forgespawn": {"fs_furnace": ["fs_glow"]},
+	"grimcrow": {"robe": ["gc_cloth", "gc_clothdark"]},
+	"ironlocust": {"metal": ["il_joint", "il_piston", "il_hose", "il_rust"]},
+	"solarlord": {
+		"fgold": ["sl_feathergold"], "fivory": ["sl_featherivory"],
+		"legscale": ["sl_legscale", "sl_leg"], "fmail": ["sl_feathermail"],
+	},
+}
 
 
 ## Normalises "Void Wraith"/"voidwraith" style ids.
@@ -430,11 +446,93 @@ func _collect_materials() -> void:
 			if src == null:
 				continue
 			var own := src.duplicate() as StandardMaterial3D
+			if _hero:
+				var surface_name := src.resource_name
+				if surface_name.is_empty():
+					surface_name = mi.mesh.surface_get_name(surface)
+				_apply_hero_surface_maps(own, surface_name)
 			mi.set_surface_override_material(surface, own)
 			_mats.append(own)
 			_base_albedo.append(own.albedo_color)
 			_is_head.append(head)
 			_part_weight.append(0.0 if _hero else PART_TINT[part])
+
+
+## The bespoke GLBs keep compact embedded preview materials. Detailed authored surface maps live
+## beside the models as <race>_<surface>_{diffuse,normal,emission}.png; bind the closest semantic
+## match per surface so each instance gets the richer maps without changing the shared GLB resource.
+func _apply_hero_surface_maps(material: StandardMaterial3D, material_name: String) -> void:
+	if race_id.is_empty() or material_name.is_empty():
+		return
+	var surface_key := _texture_key(material_name)
+	var maps: Dictionary = _hero_texture_files(race_id)
+	for kind in ["diffuse", "normal", "emission"]:
+		var best_score := 0
+		var best_path := ""
+		for semantic in maps.get(kind, {}):
+			var key := _texture_key(semantic)
+			var score := 0
+			if surface_key == key:
+				score = 1000 + key.length()
+			elif surface_key.contains(key) or key.contains(surface_key):
+				score = key.length()
+			for alias in HERO_SURFACE_ALIASES.get(race_id, {}).get(semantic, []):
+				var alias_key := _texture_key(alias)
+				if surface_key == alias_key:
+					score = maxi(score, 1000 + alias_key.length())
+				elif surface_key.contains(alias_key) or alias_key.contains(surface_key):
+					score = maxi(score, 500 + alias_key.length())
+			if score > best_score:
+				best_score = score
+				best_path = maps[kind][semantic]
+		if best_path.is_empty():
+			continue
+		var texture := _hero_texture(best_path)
+		if texture == null:
+			continue
+		match kind:
+			"diffuse":
+				material.albedo_texture = texture
+			"normal":
+				material.normal_enabled = true
+				material.normal_texture = texture
+			"emission":
+				material.emission_enabled = true
+				material.emission = Color.WHITE
+				material.emission_texture = texture
+
+
+static func _hero_texture_files(id: String) -> Dictionary:
+	if _hero_texture_file_cache.has(id):
+		return _hero_texture_file_cache[id]
+	var maps := {"diffuse": {}, "normal": {}, "emission": {}}
+	var dir := DirAccess.open(HERO_DIR)
+	if dir == null:
+		_hero_texture_file_cache[id] = maps
+		return maps
+	var prefix := id.to_lower() + "_"
+	for file_name in dir.get_files():
+		var lower := file_name.to_lower()
+		if not lower.begins_with(prefix) or not lower.ends_with(".png"):
+			continue
+		var stem := lower.trim_suffix(".png").trim_prefix(prefix)
+		for kind in maps:
+			var suffix: String = "_" + str(kind)
+			if stem.ends_with(suffix):
+				maps[kind][stem.trim_suffix(suffix)] = HERO_DIR + file_name
+				break
+	_hero_texture_file_cache[id] = maps
+	return maps
+
+
+static func _hero_texture(path: String) -> Texture2D:
+	if not _hero_texture_cache.has(path):
+		_hero_texture_cache[path] = load(path) as Texture2D
+	return _hero_texture_cache[path]
+
+
+static func _texture_key(value: String) -> String:
+	return value.to_lower().replace("_", "").replace("-", "").replace(" ", "")
 
 
 func _apply_colours() -> void:
@@ -446,9 +544,10 @@ func _apply_colours() -> void:
 		var m := _mats[i]
 		m.albedo_color = _base_albedo[i] * Color.WHITE.lerp(full, _part_weight[i])
 		if _hero:
-			m.emission_enabled = highlighted
+			var has_detail_emission := m.emission_texture != null
+			m.emission_enabled = highlighted or has_detail_emission
 			m.emission = Color.WHITE
-			m.emission_energy_multiplier = boost
+			m.emission_energy_multiplier = (0.75 if has_detail_emission else 0.0) + boost
 		elif _emissive:
 			m.emission_enabled = true
 			m.emission = accent
