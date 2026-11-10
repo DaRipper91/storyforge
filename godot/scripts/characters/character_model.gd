@@ -43,15 +43,15 @@ const GROUP_ACCENT := {
 const EMISSIVE_GROUPS := ["Cosmic", "Eldritch", "Mechanical"]
 
 ## Strength of the race colour on the base texture (0 = untouched, 1 = flat colour).
-const TINT_STRENGTH := 0.85
+## Keep authored Blender albedo maps in control; the race palette is an accent, not a paint-over.
+const TINT_STRENGTH := 0.24
 ## How strongly each body part takes the race colour (clothes carry it, skin and shoes less).
 const PART_TINT := {"head": 0.55, "body": 1.0, "legs": 0.8, "feet": 0.45, "other": 0.7}
-const EMISSION_BODY := 0.22
-const EMISSION_HEAD := 1.1
+const EMISSION_BODY := 0.045
+const EMISSION_HEAD := 0.18
 ## Primal/Humanoid bodies get a faint self-light in their race colour so dark armour stays
 ## readable in the dark, fogged rooms.
-const BASE_LIFT := 0.16
-const HIGHLIGHT_BOOST := 0.35
+const HIGHLIGHT_BOOST := 0.16
 
 ## Per-race proportions: x = height multiplier, y = girth (width/depth) multiplier.
 const RACE_BUILD := {
@@ -553,9 +553,12 @@ func _apply_colours() -> void:
 			m.emission = accent
 			m.emission_energy_multiplier = (EMISSION_HEAD if _is_head[i] else EMISSION_BODY) + boost
 		else:
-			m.emission_enabled = true
+			# Ordinary Primal and Humanoid surfaces stay lit by the scene. A faint global
+			# emissive lift flattened their normal and roughness response, making them read
+			# like painted miniatures instead of the authored Blender materials.
+			m.emission_enabled = highlighted
 			m.emission = _readable(tint)
-			m.emission_energy_multiplier = BASE_LIFT + boost
+			m.emission_energy_multiplier = boost
 
 
 ## Lifts near-black race colours so the model never turns into a silhouette.

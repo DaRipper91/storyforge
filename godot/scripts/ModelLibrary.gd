@@ -48,6 +48,10 @@ const SPRITE_MODELS := {
 	"npc_dog_black":  {"path": "animals/dog",  "height": 0.50},
 	"npc_teddy":      {"path": "animals/dog",  "height": 0.35},
 	"npc_wolf":       {"path": "animals/wolf", "height": 0.80},
+	# Ambient wildlife: rendered directly into scenery and never registered as combat entities.
+	"npc_deer":       {"path": "animals/deer", "height": 0.82},
+	"npc_fox":        {"path": "animals/fox",  "height": 0.34},
+	"npc_stag":       {"path": "animals/stag", "height": 1.05},
 	"npc_cat":        {"path": "animals/cat",  "height": 0.30},
 	"npc_cat_white":  {"path": "animals/cat",  "height": 0.30},
 	"npc_cat_black":  {"path": "animals/cat",  "height": 0.30},
