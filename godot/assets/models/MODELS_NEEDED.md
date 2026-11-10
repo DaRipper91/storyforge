@@ -1,18 +1,15 @@
 # StoryForge — Required 3D Model Files
 
-All models should be `.glb` format (GLTF binary). Drop files here and restart Godot.
-`godot/scripts/ModelLibrary.gd` resolves every token. First usable hit wins:
+All runtime models use `.glb` (GLTF binary). `godot/scripts/ModelLibrary.gd` resolves NPCs and enemies; `godot/scripts/characters/character_model.gd` resolves player species. First usable NPC hit wins:
 
 1. `characters/<id>.glb` — bespoke model for one entity (`kodrik.glb`, `ghoul_01.glb`)
 2. `SPRITE_MODELS[sprite_key]` in ModelLibrary.gd — archetype (humanoid/, animals/, enemies/, dragons/)
-3. `player/<race_id>.glb` — per-race override (players only)
-4. `player/<group>.glb` — race group body (players only)
-5. RaceMini primitive recipe — never fails
+3. RaceMini primitive recipe — never fails
 
-**A rigged model is only used if it has an idle clip.** Rigged files without clips
-(today: everything in `humanoid/` and `player/`) would stand in a T-pose, so they
-are skipped until animated versions land. Models are scaled to the height set in
-`SPRITE_MODELS` and grounded automatically — no manual scale needed.
+Player species load `heroes/<race_id>.glb` when present, then fall back to `player/<group>.glb`.
+All 35 species now have bespoke Blender-authored hero GLBs; their shared 49-bone humanoid
+rig is animated by the procedural animation library. The five group models remain fallback
+bases. Models are scaled and grounded by the runtime character model.
 
 ## Source packs (both free, CC0)
 - Humanoid NPCs: https://quaternius.com/packs/ultimateanimatedcharacter.html
@@ -53,15 +50,17 @@ prefixes (`Skeleton_Idle`) are handled:
 
 ---
 
-## player/  (Player race characters)
+## player/  (Player race fallback bases)
 
 | Filename            | Race groups it covers                           |
 |---------------------|-------------------------------------------------|
-| humanoid.glb        | All 12 Humanoid races (ashenborn, veilborn, etc)|
+| humanoid.glb        | All 15 Humanoid races (fallback only)           |
 | primal.glb          | All 5 Primal races (solarlord, grimcrow, etc)   |
 | eldritch.glb        | All 5 Eldritch races (bloodweaver, etc)         |
 | mechanical.glb      | All 5 Mechanical races (forgespawn, etc)        |
 | cosmic.glb          | All 5 Cosmic races (voidwraith, etc)            |
 
-Per-race override: place `<race_id>.glb` (e.g. `grimcrow.glb`) for a fully custom model.
-Falls back to group model, then to procedural generation.
+## heroes/  (Bespoke playable species)
+
+There is one named GLB for each of the 35 species. The complete roster and Blender source
+builders are shown in the root README and `tools/blender/build_<race_id>.py`.
