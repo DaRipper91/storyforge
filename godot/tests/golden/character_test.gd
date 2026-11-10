@@ -165,6 +165,10 @@ func _run() -> void:
 	var failed: Array = []
 	var by_group := {}
 	for id in ids:
+		var creature_probe := ModelLibrary.instantiate_hero(id, 0.9)
+		if creature_probe != null:
+			creature_probe.free()
+			continue   # bespoke creature with its own skeleton: covered by the creature checks below
 		var cm := CharacterModel.new()
 		get_root().add_child(cm)
 		var ok := cm.setup(id) and cm.is_ready()
@@ -178,7 +182,7 @@ func _run() -> void:
 			setup_ok = false
 			failed.append(id)
 		cm.free()
-	_check("CharacterModel.setup succeeds for all 35 races", setup_ok, str(failed))
+	_check("CharacterModel.setup succeeds for every humanoid-skeleton race (creatures use their own clips)", setup_ok, str(failed))
 	_check("five groups covered", by_group.size() == 5, str(by_group))
 	var neutral := CharacterModel.new()
 	get_root().add_child(neutral)
@@ -208,14 +212,18 @@ func _run() -> void:
 		_check("%s: feet on the ground (lowest y %.3f)" % [id, lowest], absf(lowest) < 0.03 * cm.body_height)
 		_check("%s: height %.2f matches body_height %.2f" % [id, highest - lowest, cm.body_height],
 			absf((highest - lowest) - cm.body_height) < 0.02)
-		_check("%s: missing right leg/foot meshes were mirrored in" % id, mirrored == 2, str(mirrored))
+		# Bespoke heroes replace the one-sided shoes with their own boots/talons, so only the legs mirror.
+		var expected_mirrors := 2 if CharacterModel.hero_path(id).is_empty() else 1
+		_check("%s: missing right leg/foot meshes were mirrored in" % id, mirrored == expected_mirrors, str(mirrored))
 		cm.free()
 	var tint_a := CharacterModel.new()
 	var tint_b := CharacterModel.new()
 	get_root().add_child(tint_a)
 	get_root().add_child(tint_b)
-	tint_a.setup("ashenborn")
-	tint_b.setup("emberpact")
+	# Exercise tinting on the group base even after every real race has authored art.
+	# Heroes deliberately preserve their own materials (checked separately below).
+	tint_a.setup(CharacterModel.NEUTRAL_ID, {"tint": CharacterModel.colours_for("ashenborn")["tint"]})
+	tint_b.setup(CharacterModel.NEUTRAL_ID, {"tint": CharacterModel.colours_for("emberpact")["tint"]})
 	var col_a := _first_albedo(tint_a)
 	var col_b := _first_albedo(tint_b)
 	_check("races of one group are tinted differently", not col_a.is_equal_approx(col_b), "%s vs %s" % [col_a, col_b])
@@ -298,6 +306,105 @@ func _run() -> void:
 	_check("NEGATIVE: a deliberate leak is detected", _node_delta(leaky) > 0)
 	for n in held:
 		n.free()
+
+	print("-- bespoke hero models")
+	_check("bloodweaver has a hero GLB", not CharacterModel.hero_path("bloodweaver").is_empty())
+	_check("an id without a hero has no bespoke GLB", CharacterModel.hero_path("not_a_race").is_empty())
+	var hero := CharacterModel.new()
+	get_root().add_child(hero)
+	_check("hero model sets up on the shared skeleton", hero.setup("bloodweaver"))
+	var hero_sk := hero.get_skeleton()
+	var hero_parts := 0
+	var mirrored_hero_parts := 0
+	for node in hero.find_children("Hero_*", "MeshInstance3D", true, false):
+		hero_parts += 1
+		if String(node.name).ends_with("_Mirrored"):
+			mirrored_hero_parts += 1
+	_check("hero attachments are present (%d Hero_* meshes)" % hero_parts, hero_parts >= 6)
+	_check("Hero_* parts are never mirrored", mirrored_hero_parts == 0)
+	var base_before := _first_albedo(hero)
+	hero.tint = Color(0.1, 0.9, 0.1)
+	_check("race tint does not recolour an authored hero", _first_albedo(hero).is_equal_approx(base_before))
+	hero.play(&"Walk")
+	_check("hero plays the shared Walk clip", hero.current_clip() == &"Walk")
+	hero.free()
+
+	var grim := CharacterModel.new()
+	get_root().add_child(grim)
+	_check("grimcrow hero sets up on the shared skeleton", not CharacterModel.hero_path("grimcrow").is_empty() and grim.setup("grimcrow"))
+	var grim_parts := grim.find_children("Hero_*", "MeshInstance3D", true, false).size()
+	_check("grimcrow has its bespoke parts (%d Hero_* meshes)" % grim_parts, grim_parts >= 12)
+	grim.free()
+
+	var void_w := CharacterModel.new()
+	get_root().add_child(void_w)
+	_check("voidwraith hero sets up on the shared skeleton", not CharacterModel.hero_path("voidwraith").is_empty() and void_w.setup("voidwraith"))
+	var void_parts := void_w.find_children("Hero_*", "MeshInstance3D", true, false).size()
+	_check("voidwraith has its bespoke parts (%d Hero_* meshes)" % void_parts, void_parts >= 20)
+	void_w.free()
+
+	print("-- every bespoke hero GLB (data-driven: new heroes are covered automatically)")
+	var hero_ids: Array[String] = []
+	var hdir := DirAccess.open("res://assets/models/heroes")
+	if hdir != null:
+		for f in hdir.get_files():
+			if f.ends_with(".glb"):
+				hero_ids.append(f.get_basename())
+	hero_ids.sort()
+	_check("at least the pilot heroes are present (%d)" % hero_ids.size(), hero_ids.size() >= 4)
+	for hid in hero_ids:
+		_check("%s: is a known race id" % hid, CharacterModel.is_known_race(hid))
+		var hcm := CharacterModel.new()
+		get_root().add_child(hcm)
+		var humanoid := hcm.setup(hid)
+		var root_node: Node = hcm if humanoid else ModelLibrary.instantiate_hero(hid, 0.62)
+		if not humanoid:
+			hcm.free()
+		_check("%s: loads (humanoid skeleton or creature with clips)" % hid, root_node != null)
+		if root_node == null:
+			continue
+		var tris := 0
+		for mnode in root_node.find_children("*", "MeshInstance3D", true, false):
+			var hmi := mnode as MeshInstance3D
+			if hmi.mesh != null:
+				tris += hmi.mesh.get_faces().size() / 3
+		_check("%s: triangle budget %d <= 26000" % [hid, tris], tris <= 26000)
+		var parts := root_node.find_children("Hero_*", "MeshInstance3D", true, false)
+		_check("%s: bespoke parts present (%d)" % [hid, parts.size()], parts.size() >= 10)
+		var mirrored_parts := 0
+		for pnode in parts:
+			if String(pnode.name).ends_with("_Mirrored"):
+				mirrored_parts += 1
+		_check("%s: bespoke parts are never mirrored" % hid, mirrored_parts == 0)
+		if humanoid:
+			hcm.play(&"Walk")
+			_check("%s: plays the shared Walk clip" % hid, hcm.current_clip() == &"Walk")
+		else:
+			var hap := ModelLibrary.find_anim_player(root_node)
+			_check("%s: creature has idle/walk/hit/death clips" % hid, hap != null and not ModelLibrary.find_clip(hap, "idle").is_empty() and not ModelLibrary.find_clip(hap, "walk").is_empty() and not ModelLibrary.find_clip(hap, "hit").is_empty() and not ModelLibrary.find_clip(hap, "death").is_empty())
+		root_node.free()
+
+	print("-- bespoke creature (own skeleton and clips)")
+	_check("ironlocust has a hero GLB", not CharacterModel.hero_path("ironlocust").is_empty())
+	var cm_creature := CharacterModel.new()
+	get_root().add_child(cm_creature)
+	_check("CharacterModel refuses a non-humanoid skeleton (falls through to the creature path)", not cm_creature.setup("ironlocust"))
+	cm_creature.free()
+	var creature := ModelLibrary.instantiate_hero("ironlocust", 0.62)
+	_check("ModelLibrary instantiates the creature", creature != null)
+	if creature != null:
+		var cap := ModelLibrary.find_anim_player(creature)
+		_check("creature ships an AnimationPlayer", cap != null)
+		for role in ["idle", "walk", "hit", "death"]:
+			_check("creature has a %s clip" % role, cap != null and not ModelLibrary.find_clip(cap, role).is_empty())
+		var cbox := {"found": false, "box": AABB()}
+		ModelLibrary._accumulate_aabb(creature, Transform3D.IDENTITY, cbox)
+		_check("creature stands at the requested height (%.2f)" % cbox["box"].size.y, absf(cbox["box"].size.y - 0.62) < 0.05)
+		creature.free()
+	var plain := ModelLibrary.instantiate_hero("ashenborn", 0.9)
+	_check("no creature model for a plain humanoid race", plain == null)
+	if plain != null:
+		plain.free()
 
 	print("")
 	print("%d checks, %d failed" % [_checks, _fails])

@@ -312,6 +312,8 @@ func setup(race_id: String, entity_name: String = "", is_enemy: bool = false) ->
 
 	if _try_character(race_id, color, is_enemy):
 		return
+	if _try_creature(race_id, is_enemy):
+		return
 
 	var recipe: Array = RACE_RECIPES.get(race_id, RACE_RECIPES["humanoid_default"])
 	for part in recipe: _add_recipe_part(part)
@@ -340,6 +342,26 @@ func _try_character(race_id: String, color: Color, is_enemy: bool) -> bool:
 		# The group glow colour (blended with the race colour): bright enough to read on a dark floor.
 		_add_identity_ring(CharacterModel.colours_for(race_id)["accent"])
 	# RaceMini's own movement code looks along -Z; a fresh token faces the default camera (+Z side).
+	if transform.basis.is_equal_approx(Basis.IDENTITY):
+		rotation.y = PI
+	return true
+
+## Standing height of non-humanoid heroes (length is whatever the model's proportions give).
+const CREATURE_HEIGHTS := {
+	"ironlocust": 0.62,
+	"mindspider": 0.62,
+}
+
+## Swaps in a hand-modelled creature that brings its own skeleton and Idle/Walk/Hit/Death clips.
+func _try_creature(race_id: String, is_enemy: bool) -> bool:
+	if not use_character_models or Engine.is_editor_hint():
+		return false
+	if not CharacterModel.is_known_race(race_id) or CharacterModel.hero_path(race_id).is_empty():
+		return false
+	var model := ModelLibrary.instantiate_hero(race_id, CREATURE_HEIGHTS.get(race_id, 0.9))
+	if model == null:
+		return false
+	use_model(model, CharacterModel.colours_for(race_id)["accent"], not is_enemy)
 	if transform.basis.is_equal_approx(Basis.IDENTITY):
 		rotation.y = PI
 	return true
@@ -427,10 +449,16 @@ func play_talk() -> void:
 func play_hit() -> void:
 	if _character:
 		_character.play(HumanoidAnimLibrary.CLIP_HIT)
+	elif _anim and ModelLibrary.play_role(_anim, "hit"):
+		var idle := ModelLibrary.find_clip(_anim, "idle")
+		if not idle.is_empty():
+			_anim.queue(idle)   # flinch once, then back to breathing
 
 func play_death() -> void:
 	if _character:
 		_character.play(HumanoidAnimLibrary.CLIP_DEATH)
+	elif _anim:
+		ModelLibrary.play_role(_anim, "death")
 
 func _add_identity_ring(color: Color) -> void:
 	var old := get_node_or_null("IdentityRing")

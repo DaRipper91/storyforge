@@ -9,9 +9,11 @@
 
 StoryForge is a virtual tabletop for *Weaver's Paradox: The Feral World*. The Godot client presents the campaign; a Python service owns game state, validates actions, and saves local snapshots. Gemini can narrate and suggest outcomes, but its proposals pass through the rules before they can change the game.
 
+> **Preview note:** Race and species sheets are concept art; hero turnarounds are Blender asset renders, not gameplay screenshots. The banner is drawn from the campaign seed data. Bryttan's appearance below interprets a text brief because the PDF export had no usable character image.
+
 ## Latest visual direction
 
-The setting has 35 custom species across five groups. The cards below are the latest realistic race-card sheets. The animated reel links the full concept-sheet set, with turnarounds and material studies for all 35 species.
+The setting has 35 custom species across five groups. These realistic race-card sheets are the latest group previews. The animated reel links the full concept-sheet set, with turnarounds and material studies for all 35 species.
 
 | Cosmic | Primal | Eldritch |
 |---|---|---|
@@ -21,13 +23,23 @@ The setting has 35 custom species across five groups. The cards below are the la
 |---|---|---|
 | <img src="docs/assets/races-mechanical.png" alt="Latest realistic race cards: Ironveil, Forgespawn, Cinderplate, Hexgear and Wirewraith" width="100%"> | <img src="docs/assets/races-humanoid.png" alt="Latest realistic race cards for 15 humanoid species" width="100%"> | <img src="docs/assets/concept-reel.webp" alt="Animated reel cycling through concept sheets for all 35 species" width="100%"> |
 
-The race-card art and concept sheets are visual design references. They are not all implemented as bespoke in-game models. The current Godot character system uses rigged humanoid assets and shared procedural animation; the hero-model work is tracked separately from this NPC update.
+### Bespoke 3D heroes
+
+The Godot project contains 23 bespoke, rigged hero models across the five species groups. These five sheets show Blender turnarounds; twelve species still use the shared character-card art while their bespoke models are pending. The hero system also uses a shared procedural humanoid animation set.
+
+| Ashenborn | Ironfast | Glitchkin |
+|---|---|---|
+| <a href="docs/assets/heroes/ashenborn.webp"><img src="docs/assets/heroes/ashenborn.webp" alt="Ashenborn bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/ironfast.webp"><img src="docs/assets/heroes/ironfast.webp" alt="Ironfast bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/glitchkin.webp"><img src="docs/assets/heroes/glitchkin.webp" alt="Glitchkin bespoke 3D hero, front, side and back Blender renders" width="100%"></a> |
+
+| Forgespawn | Ironveil | All species concepts |
+|---|---|---|
+| <a href="docs/assets/heroes/forgespawn.webp"><img src="docs/assets/heroes/forgespawn.webp" alt="Forgespawn bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/ironveil.webp"><img src="docs/assets/heroes/ironveil.webp" alt="Ironveil bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <img src="docs/assets/concept-reel.webp" alt="Animated concept reel for all 35 species" width="100%"> |
 
 ### New NPC: Bryttan Wolfholt
 
-Bryttan is the Wolfguard, a vigilant shieldwarden at Ironhold Keep. Her seeded look is built from the current rigged warrior model with cobalt wolf insignia, a shared power-core pack, a blue shard pendant, and a rune-etched survival dagger. She is an interactable named NPC, paired in the setting with Evangeline Wolfholt.
+Bryttan is the Wolfguard, a vigilant shieldwarden at Ironhold Keep. Her seeded look is built from the shared rigged warrior model with cobalt wolf insignia, a power-core pack, a blue shard pendant, and a rune-etched survival dagger. She is an interactable named NPC, paired in the setting with Evangeline Wolfholt.
 
-The PDF supplied a text description but no usable character concept image, so the in-game appearance interprets that brief; it is not presented as a faithful recreation of missing reference art. Her render is assembled in Godot from mesh details and material overrides, without modifying the shared source model.
+Her Godot appearance is assembled from mesh details and material overrides without modifying the shared source model. It interprets the PDF's text description; it is not presented as a recreation of missing reference art.
 
 ## Play locally
 
@@ -81,9 +93,9 @@ The Python suite covers character creation, validators, routes, and golden behav
 
 ### Current status
 
-- **Available:** 35-species character creation, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, and NPC encounters.
+- **Available:** 35-species character creation, 23 bespoke hero models, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, and NPC encounters.
 - **NPC update:** Bryttan Wolfholt is seeded in Ironhold Keep and uses the existing rigged character pipeline with a composed appearance.
-- **In progress:** real-device verification for the offline Android build and touch controls; combat remains deferred.
+- **In progress:** bespoke models for the remaining 12 species, real-device verification for the offline Android build and touch controls; combat remains deferred.
 - **Offline limits:** NPC encounter routes return 503 and freeform text returns 501 because those features require the AI narrator.
 
 Read the [project docs](docs/README.md) and [roadmap](ROADMAP.md) for more detail.

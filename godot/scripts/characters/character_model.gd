@@ -21,6 +21,12 @@ const GROUP_BASES := {
 }
 const NEUTRAL_ID := "humanoid_default"
 
+## Bespoke hand-modelled heroes (Blender, see blender/): a GLB here replaces the group base for that race.
+## It must keep the shared 49-bone skeleton. Its materials are authored, so no race tint or glow is applied,
+## and meshes named "Hero_*" are placed exactly as modelled (never mirrored like the one-sided base meshes).
+const HERO_DIR := "res://assets/models/heroes/"
+const HERO_PREFIX := "Hero_"
+
 ## Standing height in world units: same as ModelLibrary.DEFAULT_HEIGHT, so a player model
 ## matches every other GLB token on the board (a cell is 1.0).
 const DEFAULT_HEIGHT := 0.9
@@ -103,6 +109,7 @@ var _skeleton: Skeleton3D = null
 var _anim: AnimationPlayer = null
 var _walking := false
 var _dead := false
+var _hero := false
 var _emissive := false
 var _mats: Array[StandardMaterial3D] = []
 var _base_albedo: Array[Color] = []
@@ -135,6 +142,12 @@ static func base_path(grp: String) -> String:
 	return BASE_DIR + GROUP_BASES.get(grp, "humanoid") + ".glb"
 
 
+## Path of the bespoke GLB for a race, or "" when it uses its group base.
+static func hero_path(id: String) -> String:
+	var path := HERO_DIR + normalise_id(id) + ".glb"
+	return path if ResourceLoader.exists(path) else ""
+
+
 ## Default (tint, accent) for a race, from the existing colour tables.
 static func colours_for(id: String) -> Dictionary:
 	id = normalise_id(id)
@@ -152,7 +165,11 @@ func setup(new_race_id: String, opts: Dictionary = {}) -> bool:
 	_clear()
 	race_id = normalise_id(new_race_id)
 	group = group_of(race_id)
-	var scene := load(base_path(group)) as PackedScene
+	var model_path := hero_path(race_id)
+	_hero = not model_path.is_empty()
+	if not _hero:
+		model_path = base_path(group)
+	var scene := load(model_path) as PackedScene
 	if scene == null:
 		return false
 	_root = scene.instantiate() as Node3D
@@ -165,7 +182,7 @@ func setup(new_race_id: String, opts: Dictionary = {}) -> bool:
 		_skeleton = null
 		return false
 
-	_add_mirrored_halves(base_path(group))
+	_add_mirrored_halves(model_path)
 
 	_pivot = Node3D.new()
 	_pivot.name = "Pivot"
@@ -307,6 +324,8 @@ static func _build_mirrors(skeleton: Skeleton3D) -> Array:
 		var mi := node as MeshInstance3D
 		if mi == null or mi.mesh == null or mi.skin == null:
 			continue
+		if String(mi.name).begins_with(HERO_PREFIX):
+			continue   # bespoke part, already placed on the correct side
 		var box := mi.get_aabb()
 		if absf(box.get_center().x) < 0.03:
 			continue   # already symmetric
@@ -415,7 +434,7 @@ func _collect_materials() -> void:
 			_mats.append(own)
 			_base_albedo.append(own.albedo_color)
 			_is_head.append(head)
-			_part_weight.append(PART_TINT[part])
+			_part_weight.append(0.0 if _hero else PART_TINT[part])
 
 
 func _apply_colours() -> void:
@@ -426,7 +445,11 @@ func _apply_colours() -> void:
 	for i in _mats.size():
 		var m := _mats[i]
 		m.albedo_color = _base_albedo[i] * Color.WHITE.lerp(full, _part_weight[i])
-		if _emissive:
+		if _hero:
+			m.emission_enabled = highlighted
+			m.emission = Color.WHITE
+			m.emission_energy_multiplier = boost
+		elif _emissive:
 			m.emission_enabled = true
 			m.emission = accent
 			m.emission_energy_multiplier = (EMISSION_HEAD if _is_head[i] else EMISSION_BODY) + boost
