@@ -1,6 +1,6 @@
 # Model provenance
 
-Last reviewed: 2026-11-08.
+Last reviewed: 2026-11-10.
 
 ## Player species bases and NPC humanoids
 
@@ -13,6 +13,19 @@ Files: `player/{cosmic,eldritch,humanoid,mechanical,primal}.glb`, `humanoid/npc_
 - All ten files share one skeleton: identical bone names, order and hierarchy (checked by
   `godot/tests/golden/character_test.gd`).
 - The files ship with no animation clips.
+
+## Bespoke player hero models
+
+Files: `heroes/*.glb` (35 race-specific models).
+
+- Authored in Blender with the source builders in `tools/blender/build_*.py`; the 12 humanoid
+  species that previously used group-body fallbacks now have their own meshes, gear, and
+  surface palettes. The Blender `.blend` sources are stored beside the exports.
+- Humanoid models use the Quaternius-derived 49-bone skeleton described above so the existing
+  procedural animation library continues to drive them. Their custom clothing, armor, and race
+  features are separate skinned meshes; the textures are embedded in each GLB.
+- Designs interpret the race concept renders. The meshes and material work are original project
+  assets; the shared rig base retains the Quaternius CC0 provenance.
 
 ## Animations
 

@@ -14,6 +14,7 @@ const MINI_PICK_RADIUS := 0.7
 const HP_BAR_HEIGHT := 2.2
 const CAM_PIVOT_HEIGHT := 0.8
 const CourtyardDetails := preload("res://scripts/world/keep_courtyard_details.gd")
+const ModelLibraryScript := preload("res://scripts/ModelLibrary.gd")
 const RaceMiniScene = preload("res://scenes/RaceMini.tscn")
 
 # ─── Dungeon geometry ───────────────────────────────────────────────
@@ -38,8 +39,8 @@ var _key_light: DirectionalLight3D = null
 const ROOM_ATMOSPHERE: Dictionary = {
 	"tavern_01":        {"fog": Color(0.10, 0.07, 0.03), "fog_d": 0.020, "ambient": Color(0.15, 0.10, 0.05), "key": Color(1.00, 0.78, 0.50), "key_e": 1.4},
 	"cellar_depths":    {"fog": Color(0.02, 0.02, 0.05), "fog_d": 0.060, "ambient": Color(0.04, 0.04, 0.08), "key": Color(0.50, 0.60, 1.00), "key_e": 0.6},
-	"forest_edge":      {"fog": Color(0.04, 0.08, 0.03), "fog_d": 0.018, "ambient": Color(0.08, 0.14, 0.06), "key": Color(0.90, 1.00, 0.80), "key_e": 1.6},
-	"ancient_ruins":    {"fog": Color(0.04, 0.03, 0.06), "fog_d": 0.050, "ambient": Color(0.06, 0.05, 0.08), "key": Color(0.70, 0.65, 1.00), "key_e": 0.85},
+	"forest_edge":      {"fog": Color(0.31, 0.40, 0.32), "fog_d": 0.006, "ambient": Color(0.25, 0.31, 0.23), "key": Color(1.00, 0.91, 0.72), "key_e": 1.35},
+	"ancient_ruins":    {"fog": Color(0.27, 0.29, 0.31), "fog_d": 0.012, "ambient": Color(0.17, 0.19, 0.21), "key": Color(0.83, 0.87, 1.00), "key_e": 1.05},
 	"market_square":    {"fog": Color(0.08, 0.07, 0.06), "fog_d": 0.015, "ambient": Color(0.12, 0.11, 0.10), "key": Color(1.00, 0.95, 0.85), "key_e": 1.3},
 	"nightside_square": {"fog": Color(0.02, 0.02, 0.04), "fog_d": 0.055, "ambient": Color(0.05, 0.05, 0.10), "key": Color(0.60, 0.65, 1.00), "key_e": 0.7},
 }
@@ -872,6 +873,7 @@ func _rebuild_room(state: Dictionary):
 	var w: int = room.get("width", 10)
 	var h: int = room.get("height", 10)
 	var cells: Array = room.get("cells", [])
+	_set_room_materials(room_id)
 
 	var wall_mesh   = BoxMesh.new()
 	wall_mesh.size  = Vector3(CELL_SIZE, 2.5, CELL_SIZE)
@@ -994,10 +996,12 @@ func _rebuild_room(state: Dictionary):
 	_cam_distance = CAM_DISTANCE_DEFAULT
 	_update_camera()
 
-	_build_void_floor(w, h)
-	_add_room_torches(cells, w, h)
+	_build_void_floor(room_id, w, h)
+	_add_room_torches(room_id, cells, w, h)
 	_set_room_atmosphere(room_id)
 	CourtyardDetails.populate(_dungeon_root, room_id, w, h)
+	if room_id == "forest_edge":
+		_populate_forest_edge(w, h)
 	
 	# Bake navigation mesh so party followers can pathfind
 	if _dungeon_root:
@@ -1855,10 +1859,60 @@ func _set_room_atmosphere(room_id: String) -> void:
 
 # ─── Cave void outside rooms ─────────────────────────────────────────
 
-func _build_void_floor(w: int, h: int) -> void:
+func _set_room_materials(room_id: String) -> void:
+	var outdoors := room_id in ["forest_edge", "crossroads", "market_square", "nightside_square"]
+	var floor_path := "res://assets/materials/ground_terrain.tres" if outdoors else "res://assets/materials/stone_cobble.tres"
+	var wall_path := "res://assets/materials/stone_rock.tres" if room_id in ["forest_edge", "ancient_ruins", "cellar_depths"] else "res://assets/materials/wall_bricks.tres"
+	var floor_material := load(floor_path) as Material
+	var wall_material := load(wall_path) as Material
+	if floor_material:
+		_mat_floor = floor_material
+	if wall_material:
+		_mat_wall = wall_material
+	_mat_pillar = load("res://assets/materials/stone_wall_dark.tres") as Material
+	_mat_table = load("res://assets/materials/wood_planks.tres") as Material
+
+
+func _populate_forest_edge(room_width: int, room_height: int) -> void:
+	var kit_scene := load("res://assets/models/props/forest_edge_kit/forest_edge_kit.glb") as PackedScene
+	if kit_scene:
+		var kit := kit_scene.instantiate() as Node3D
+		kit.name = "BlenderForestEdgeKit"
+		kit.position = Vector3(4.0, 0.0, minf(room_height - 2.0, 9.0))
+		kit.scale = Vector3.ONE * 0.72
+		_dungeon_root.add_child(kit)
+	var deer := ModelLibraryScript.instantiate_for_key("npc_deer") as Node3D
+	if deer:
+		deer.name = "AmbientDeer"
+		deer.position = Vector3(minf(room_width - 2.0, 14.0), 0.0, minf(room_height - 2.0, 9.0))
+		deer.scale = Vector3.ONE * 0.72
+		_dungeon_root.add_child(deer)
+	var fox := ModelLibraryScript.instantiate_for_key("npc_fox") as Node3D
+	if fox:
+		fox.name = "AmbientFox"
+		fox.position = Vector3(2.0, 0.0, minf(room_height - 2.0, 8.0))
+		fox.scale = Vector3.ONE * 0.72
+		_dungeon_root.add_child(fox)
+
+
+func _build_void_floor(room_id: String, w: int, h: int) -> void:
 	var cx := (w - 1) * CELL_SIZE * 0.5
 	var cz := (h - 1) * CELL_SIZE * 0.5
 	var size: float = float(maxi(w, h)) * CELL_SIZE * 6.0
+
+	# Only the cellar uses a cavern void. Ruins and outdoor locations continue
+	# their authored surface beyond the board instead of hanging cave debris over it.
+	var outdoors := room_id in ["forest_edge", "crossroads", "market_square", "nightside_square"]
+	if room_id != "cellar_depths":
+		var surface := load("res://assets/materials/ground_terrain.tres" if outdoors else "res://assets/materials/stone_cobble.tres") as Material
+		var surface_plane := PlaneMesh.new()
+		surface_plane.size = Vector2(size, size)
+		var surface_inst := MeshInstance3D.new()
+		surface_inst.mesh = surface_plane
+		surface_inst.material_override = surface
+		surface_inst.position = Vector3(cx, -0.14, cz)
+		_dungeon_root.add_child(surface_inst)
+		return
 
 	# Large dark cavern floor extending beyond room bounds
 	var void_sm := ShaderMaterial.new()
@@ -1935,7 +1989,9 @@ void fragment() {
 
 # ─── Wall torches ────────────────────────────────────────────────────
 
-func _add_room_torches(cells: Array, w: int, h: int) -> void:
+func _add_room_torches(room_id: String, cells: Array, w: int, h: int) -> void:
+	if room_id in ["forest_edge", "crossroads", "market_square"]:
+		return
 	var torch_pos: Array[Vector3] = []
 
 	# Room corners (if floor)

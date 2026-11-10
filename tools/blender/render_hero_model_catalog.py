@@ -1,24 +1,37 @@
-"""Render every bespoke hero model in a labeled, front-facing catalog.
+"""Render one labeled, front-facing catalog for a selected hero group.
 
-Run: blender -b -t 1 -P tools/blender/render_hero_model_catalog.py
+Run: HERO_CATALOG_GROUP=humanoid blender -b -t 1 -P tools/blender/render_hero_model_catalog.py
 """
 import bpy
 import math
+import os
 from pathlib import Path
 from mathutils import Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 MODELS = ROOT / "godot/assets/models/heroes"
-OUT = ROOT / "docs/assets/heroes/model_catalog.png"
-FILES = sorted(MODELS.glob("*.glb"))
-assert len(FILES) == 23, f"Expected 23 bespoke hero GLBs, found {len(FILES)}"
+GROUPS = {
+    "cosmic": ["voidwraith", "nullshade", "ironlocust", "embervein", "riftwalker"],
+    "primal": ["solarlord", "thornmimic", "cinderkin", "deeptyrant", "grimcrow"],
+    "eldritch": ["bloodweaver", "dreamhusk", "bonedrifter", "mindspider", "chaosling"],
+    "mechanical": ["ironveil", "forgespawn", "cinderplate", "hexgear", "wirewraith"],
+    "humanoid_a": ["ashenborn", "hollowsong", "veilborn", "thornweft", "ashcrown"],
+    "humanoid_b": ["ironfast", "coreborn", "warpbred", "splitblood", "duskweft"],
+    "humanoid_c": ["glitchkin", "fractureline", "emberpact", "fallenlight", "scaleworn"],
+}
+group = os.environ.get("HERO_CATALOG_GROUP", "").lower()
+assert group in GROUPS, f"Set HERO_CATALOG_GROUP to one of: {', '.join(GROUPS)}"
+FILES = [MODELS / f"{name}.glb" for name in GROUPS[group]]
+assert all(path.is_file() for path in FILES), f"Missing GLB in {group} catalog"
+OUT = ROOT / f"docs/assets/heroes/model_catalog_{group}.png"
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc = bpy.context.scene
 sc.render.engine = "BLENDER_EEVEE"
-sc.render.resolution_x, sc.render.resolution_y = 2100, 1850
+sc.render.resolution_x, sc.render.resolution_y = 2100, 2500
 sc.render.resolution_percentage = 100
 sc.render.image_settings.file_format = "PNG"
+sc.eevee.taa_render_samples = 8
 sc.view_settings.view_transform = "Standard"
 
 world = bpy.data.worlds.new("Hero catalog studio")
@@ -40,6 +53,8 @@ label_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value 
 columns, spacing = 5, 3.45
 rows = math.ceil(len(FILES) / columns)
 gap_z = 3.0
+sc.render.resolution_x = 2100
+sc.render.resolution_y = 2500 if rows > 1 else 850
 for index, path in enumerate(FILES):
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=str(path))
@@ -51,14 +66,18 @@ for index, path in enumerate(FILES):
     high = Vector((max(p.x for p in points), max(p.y for p in points), max(p.z for p in points)))
     center = (low + high) * 0.5
     scale = 2.0 / max(high.z - low.z, 0.001)
-    col, row = index % columns, index // columns
+    col, grid_row = index % columns, index // columns
     gx = (col - (columns - 1) * 0.5) * spacing
-    gz = (rows - 1 - row) * gap_z + 1.25
+    gz = (rows - 1 - grid_row) * gap_z + 1.25
     root = bpy.data.objects.new("Catalog root " + path.stem, None)
     sc.collection.objects.link(root)
+    # Keep the imported armature/mesh/bone hierarchy intact. Reparenting every
+    # object detached skinned meshes from their bones and made the catalog render
+    # characters as flattened top-down fragments.
     for obj in imported:
-        obj.parent = root
-        obj.matrix_parent_inverse = Matrix.Identity(4)
+        if obj.parent not in imported:
+            obj.parent = root
+            obj.matrix_parent_inverse = Matrix.Identity(4)
     root.scale = (scale, scale, scale)
     root.location = (gx - center.x * scale, -0.55 - center.y * scale, gz - low.z * scale)
     label_data = bpy.data.curves.new(path.stem + " label", "FONT")
@@ -83,10 +102,12 @@ panel.data.materials.append(backdrop)
 cam_data = bpy.data.cameras.new("Catalog camera")
 cam = bpy.data.objects.new("Catalog camera", cam_data)
 sc.collection.objects.link(cam)
-cam.location = (0, -31, 7.65)
-cam.rotation_euler = (Vector((0, 0, 7.65)) - cam.location).to_track_quat("-Z", "Y").to_euler()
+target_z = (rows - 1) * gap_z * 0.5 + 1.25
+cam.location = (0, -31, target_z)
+cam.rotation_euler = (Vector((0, 0, target_z)) - cam.location).to_track_quat("-Z", "Y").to_euler()
 cam.data.type = "ORTHO"
-cam.data.ortho_scale = 16.0
+aspect = sc.render.resolution_x / sc.render.resolution_y
+cam.data.ortho_scale = max(columns * spacing + 0.7, (rows * gap_z + 1.0) * aspect)
 sc.camera = cam
 for name, location, energy, size in (
     ("Key", (-5, -9, 13), 2300, 8),
@@ -100,8 +121,8 @@ for name, location, energy, size in (
     light = bpy.data.objects.new(name, light_data)
     sc.collection.objects.link(light)
     light.location = location
-    light.rotation_euler = (Vector((0, 0, 7)) - light.location).to_track_quat("-Z", "Y").to_euler()
+    light.rotation_euler = (Vector((0, 0, target_z)) - light.location).to_track_quat("-Z", "Y").to_euler()
 
 sc.render.filepath = str(OUT)
 bpy.ops.render.render(write_still=True)
-print("HERO_MODEL_CATALOG_RENDERED", len(FILES), OUT)
+print("HERO_MODEL_CATALOG_RENDERED", group, len(FILES), OUT)

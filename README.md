@@ -25,11 +25,13 @@ The setting has 35 custom species across five groups. These realistic race-card 
 
 ### Bespoke 3D heroes
 
-The Godot project contains 23 bespoke, rigged hero models across the five species groups. These five sheets show Blender turnarounds; twelve species still use the shared character-card art while their bespoke models are pending. The hero system also uses a shared procedural humanoid animation set.
+The Godot project contains 35 bespoke, rigged hero models across the five species groups. Each species has a Blender-authored GLB with its own silhouette, clothing or armor, equipment, and surface palette. The hero system uses the shared procedural humanoid animation set, and the humanoid models share the game's 49-bone rig.
 
-The catalog below shows every bespoke hero mesh in the current roster.
+The 12 humanoid species that had been using generic group bodies now have bespoke Blender models. These three front-view catalogs show all 15 humanoid species with their in-game clothing, armor, and equipment.
 
-<p align="center"><a href="docs/assets/heroes/model_catalog.png"><img src="docs/assets/heroes/model_catalog.png" alt="Labeled Blender catalog of all 23 bespoke hero models" width="100%"></a></p>
+| Humanoid A | Humanoid B | Humanoid C |
+|---|---|---|
+| <img src="docs/assets/heroes/model_catalog_humanoid_a.png" alt="Front-view Blender catalog of five bespoke humanoid hero models" width="100%"> | <img src="docs/assets/heroes/model_catalog_humanoid_b.png" alt="Front-view Blender catalog of five bespoke humanoid hero models" width="100%"> | <img src="docs/assets/heroes/model_catalog_humanoid_c.png" alt="Front-view Blender catalog of five bespoke humanoid hero models" width="100%"> |
 
 | Ashenborn | Ironfast | Glitchkin |
 |---|---|---|
@@ -151,9 +153,9 @@ The Python suite covers character creation, validators, routes, and golden behav
 
 ### Current status
 
-- **Available:** 35-species character creation, 23 bespoke hero models, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, NPC encounters, and the first authored quest loop in Ironhold.
+- **Available:** 35-species character creation with 35 bespoke hero models, tabletop exploration, Python API, local snapshot saves, validator-gated Gemini proposals, NPC encounters, and the first authored quest loop in Ironhold.
 - **NPC update:** Bryttan Wolfholt is seeded in Ironhold Keep and uses the existing rigged character pipeline with a composed appearance.
-- **In progress:** bespoke models for the remaining 12 species, real-device verification for the offline Android build and touch controls, and a complete turn-based combat system. The current quest uses a basic attack/counterattack encounter.
+- **In progress:** real-device verification for the offline Android build and touch controls, and a complete turn-based combat system. The current quest uses a basic attack/counterattack encounter.
 - **Offline limits:** NPC encounter routes return 503 and freeform text returns 501 because those features require the AI narrator.
 
 Read the [project docs](docs/README.md) and [roadmap](ROADMAP.md) for more detail.
