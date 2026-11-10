@@ -20,9 +20,25 @@ M_DARK = make_metal_mat("IV_Oxid", (0.24, 0.23, 0.22), "oxid", TEX, 0.5, 0.85, s
 M_BRASS = make_metal_mat("IV_Brass", (0.66, 0.50, 0.22), "brass", TEX, 0.3, 1.0, seed=8)
 M_EYE = mat("IV_Eye", (1.0, 0.55, 0.08), 0.2, 0.0, emit=(1.0, 0.5, 0.05), strength=6.0)
 M_CABLE = mat("IV_Cable", (0.10, 0.10, 0.10), 0.55, 0.6)
-strip_base(); override_base(M_DARK)
+# The reference is broad folded sheet metal. Keep scratches subtle enough that the
+# normal map does not overwhelm those folds with a crumpled-foil appearance.
+for material in (M_STEEL, M_DARK, M_BRASS):
+    for node in material.node_tree.nodes:
+        if node.type == 'NORMAL_MAP':
+            node.inputs['Strength'].default_value = .12
+strip_base(keep=()); override_base(M_DARK)
 P = Parts(arm)
 FRONT = Vector((0, -1, 0)); X = Vector((1, 0, 0)); Z = Vector((0, 0, 1))
+
+def folded_panels(bm, sw, t0, t1, rows, n, **kwargs):
+    """Fewer broad steel facets, separated by visible seams and restrained raised folds."""
+    # Retain the original sweep/attachment layout while replacing the dense spines.
+    rows = max(1, round(rows * .65))
+    n = max(4, round(n * .60))
+    a0, a1 = kwargs.get('a0', 0), kwargs.get('a1', 2 * math.pi)
+    return shingles(bm, sw, t0, t1, rows, n, hw=(a1-a0)/n*.58,
+                    lift=kwargs.get('lift', .004), flare=.006, fold=.009,
+                    jitter=.025, a0=a0, a1=a1, overlap=1.65)
 
 # ---------------------------------------------------------------- torso lamellae (back left open for the brass spine)
 torso_t = interp([(0.0, 0.100), (0.17, 0.112), (0.45, 0.090), (0.70, 0.082), (0.88, 0.102), (1.0, 0.115)])
@@ -30,7 +46,7 @@ torso_y = interp([(0.0, 0.075), (0.17, 0.082), (0.45, 0.070), (0.70, 0.066), (0.
 TS = Sweep((0, -0.055, 1.47), (0, -0.06, 0.95), X, FRONT, torso_t, torso_y)
 BACK = 1.5 * math.pi
 for bone, ta, tb, rows in (("Chest", 0.0, 0.17, 1), ("Torso", 0.17, 0.60, 3), ("Abdomen", 0.60, 0.90, 2)):
-    shingles(P.bm(M_STEEL, bone), TS, ta, tb, rows, 11, hw=0.34, lift=0.008, flare=0.010, fold=0.006, jitter=0.07, a0=BACK + 0.34, a1=BACK + 2 * math.pi - 0.34, overlap=2.3)
+    folded_panels(P.bm(M_STEEL, bone), TS, ta, tb, rows, 11, lift=.008, a0=BACK + .34, a1=BACK + 2*math.pi - .34)
 
 # big diagonal chest/hip facets (origami folds across the sternum)
 bm = P.bm(M_STEEL, "Chest")
@@ -41,7 +57,7 @@ bm = P.bm(M_STEEL, "Abdomen")
 fan_plate(bm, [(-0.065, -0.12, 1.18), (0.065, -0.12, 1.18), (0.09, -0.125, 1.04), (0.0, -0.14, 0.98), (-0.09, -0.125, 1.04)], 0.012)
 # neck collar plates
 CS = Sweep((0, -0.045, 1.52), (0, -0.045, 1.47), X, FRONT, 0.065, 0.06)
-shingles(P.bm(M_STEEL, "Chest"), CS, 0.0, 1.0, 1, 12, lift=0.01, flare=0.03, fold=0.008, overlap=2.0)
+folded_panels(P.bm(M_STEEL, "Chest"), CS, 0, 1, 1, 8, lift=.005)
 # back plates beside the spine + brass spine
 bm = P.bm(M_BRASS, "Torso")
 for s in (1, -1):
@@ -63,7 +79,7 @@ for s in (1, -1):
 sk_r = interp([(0.0, 0.178), (1.0, 0.195)]); sk_y = interp([(0.0, 0.115), (1.0, 0.125)])
 SK = Sweep((0, -0.058, 1.03), (0, -0.075, 0.68), X, FRONT, sk_r, sk_y)
 skbm = bmesh.new()
-shingles(skbm, SK, 0.0, 1.0, 2, 12, hw=0.30, lift=0.0, flare=0.03, fold=0.010, jitter=0.08, overlap=2.0)
+folded_panels(skbm, SK, 0, 1, 3, 12, lift=.005)
 def skirt_w(co):
     t = smoothstep(0.98, 0.62, co.z); leg = "UpperLeg.L" if co.x >= 0 else "UpperLeg.R"
     wl = t * (0.2 + 0.7 * max(0.0, -co.y - 0.02) / 0.13) * smoothstep(0.0, 0.07, abs(co.x))
@@ -71,7 +87,7 @@ def skirt_w(co):
     return {"Hips": 1.0 - wl, leg: wl}
 skinned(arm, "Hero_Skirt", skbm, M_STEEL, skirt_w)
 inner = bmesh.new()
-shingles(inner, SK, 0.0, 1.0, 2, 12, hw=0.34, lift=-0.012, flare=0.02, fold=0.004, jitter=0.08, overlap=2.0, a0=0.26, a1=2 * math.pi + 0.26)
+folded_panels(inner, SK, 0, 1, 3, 12, lift=-.008, a0=.28, a1=2*math.pi+.28)
 skinned(arm, "Hero_SkirtInner", inner, M_DARK, skirt_w)
 # belt + buckle
 bm = P.bm(M_BRASS, "Hips")
@@ -86,23 +102,35 @@ for sgn, tag in ((1, "L"), (-1, "R")):
     def m(p): return Vector((p[0] * sgn, p[1], p[2]))
     # pauldron over the shoulder (top half arc)
     PS = Sweep(m((0.05, -0.058, 1.455)), m((0.27, -0.056, 1.45)), U, V, interp([(0, 0.065), (0.5, 0.058), (1, 0.046)]))
-    shingles(P.bm(M_STEEL, sh), PS, 0.0, 0.85, 3, 7, lift=0.008, flare=0.02, fold=0.012, a0=0.1, a1=math.pi - 0.1, jitter=0.1)
+    folded_panels(P.bm(M_STEEL, sh), PS, 0, .85, 2, 7, lift=.008, a0=.1, a1=math.pi-.1)
     ell(P.bm(M_BRASS, sh), m((0.155, -0.058, 1.432)), (0.034, 0.034, 0.034), seg=14, rings=8)
     cyl(P.bm(M_BRASS, sh), m((0.155, -0.058, 1.432)), (0, 1, 0), 0.022, 0.10, 12)
     cyl(P.bm(M_DARK, sh), m((0.155, -0.058, 1.432)), (0, 1, 0), 0.011, 0.115, 8)
     # upper arm
     UA = Sweep(m((0.19, -0.057, 1.442)), m((0.325, -0.057, 1.442)), U, V, interp([(0, 0.044), (1, 0.040)]))
-    shingles(P.bm(M_STEEL, up), UA, 0.0, 1.0, 2, 6, hw=0.42, lift=0.006, flare=0.010, fold=0.006, jitter=0.06, overlap=2.2)
+    folded_panels(P.bm(M_STEEL, up), UA, 0, 1, 2, 6, lift=.006)
     # elbow hinge
     hinge(P.bm(M_BRASS, lo), m((0.334, -0.057, 1.442)), (0, 0, 1), 0.026, 0.09)
     strap(P.bm(M_BRASS, lo), m((0.334, -0.057, 1.487)), m((0.39, -0.065, 1.487)), 0.012, 0.004)
     strap(P.bm(M_BRASS, lo), m((0.334, -0.057, 1.397)), m((0.39, -0.065, 1.397)), 0.012, 0.004)
     # forearm
     FA = Sweep(m((0.36, -0.062, 1.437)), m((0.555, -0.085, 1.436)), U, V, interp([(0, 0.040), (0.5, 0.034), (1, 0.030)]))
-    shingles(P.bm(M_STEEL, lo), FA, 0.0, 1.0, 3, 6, hw=0.42, lift=0.006, flare=0.010, fold=0.006, jitter=0.06, overlap=2.2)
+    folded_panels(P.bm(M_STEEL, lo), FA, 0, 1, 2, 6, lift=.006)
     # wrist ring + hinge
     cyl(P.bm(M_BRASS, hd), m((0.585, -0.087, 1.433)), (1, 0, 0), 0.030, 0.022, 14, r2=0.028)
     hinge(P.bm(M_BRASS, hd), m((0.585, -0.087, 1.433)), (0, 0, 1), 0.014, 0.07, 10)
+    # Slender individual steel phalanges replace the old generic base hands.
+    hb = arm.data.bones[hd]
+    a, b = Vector(hb.head_local), Vector(hb.tail_local)
+    blob(P.bm(M_STEEL, hd, True), a, b, .026, .031, .48, rows=5, n=10, pw=5)
+    for name in ('Index', 'Middle', 'Ring', 'Pinky', 'Thumb'):
+        for k in range(2, 5 if name != 'Thumb' else 4):
+            bn = '%s%d.%s' % (name, k, tag)
+            if bn not in arm.data.bones: continue
+            bone = arm.data.bones[bn]
+            a, b = Vector(bone.head_local), Vector(bone.tail_local)
+            tube(P.bm(M_STEEL, bn), a, b, .0065, .005, seg=6)
+            ell(P.bm(M_BRASS, bn), a, (.008,.008,.008), seg=6, rings=4)
     # little finger-knuckle brass dots
     for b2, off in (("Index2.", 0.0), ("Middle2.", 0.0), ("Ring2.", 0.0), ("Pinky2.", 0.0)):
         hp = bone_pt(arm, b2 + tag)
@@ -113,14 +141,14 @@ for sgn, tag in ((1, "L"), (-1, "R")):
     up, lo, ft = "UpperLeg." + tag, "LowerLeg." + tag, "Foot." + tag
     cx = 0.121 * sgn
     TH = Sweep((cx, -0.055, 0.95), (cx, -0.085, 0.57), X, FRONT, interp([(0, 0.058), (1, 0.044)]), interp([(0, 0.064), (1, 0.050)]))
-    shingles(P.bm(M_STEEL, up), TH, 0.0, 1.0, 3, 8, hw=0.34, lift=0.007, flare=0.012, fold=0.007, jitter=0.07, overlap=2.3)
+    folded_panels(P.bm(M_STEEL, up), TH, 0, 1, 2, 8, lift=.007)
     # knee hinge: horizontal barrel through the joint + side link plates
     hinge(P.bm(M_BRASS, lo), (cx, -0.088, 0.535), (1, 0, 0), 0.026, 0.12)
     ell(P.bm(M_BRASS, lo), (cx, -0.088, 0.535), (0.034, 0.034, 0.034), seg=12, rings=6) if False else None
     # knee cap kite
     fan_plate(P.bm(M_STEEL, lo), [(cx - 0.035, -0.125, 0.58), (cx + 0.035, -0.125, 0.58), (cx + 0.04, -0.138, 0.50), (cx, -0.15, 0.45), (cx - 0.04, -0.138, 0.50)], 0.012)
     SH = Sweep((cx, -0.085, 0.50), (cx, -0.062, 0.075), X, FRONT, interp([(0, 0.048), (0.5, 0.040), (1, 0.040)]), interp([(0, 0.056), (0.5, 0.044), (1, 0.046)]))
-    shingles(P.bm(M_STEEL, lo), SH, 0.0, 1.0, 4, 8, hw=0.34, lift=0.007, flare=0.012, fold=0.007, jitter=0.07, overlap=2.3)
+    folded_panels(P.bm(M_STEEL, lo), SH, 0, 1, 3, 8, lift=.007)
     # ankle hinge
     hinge(P.bm(M_BRASS, ft), (cx, -0.062, 0.058), (1, 0, 0), 0.022, 0.10)
     # pointed heeled shoe: hull of an ankle cuff, toe point, block heel

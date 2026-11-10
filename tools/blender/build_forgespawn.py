@@ -23,17 +23,22 @@ M_PACK = make_metal_mat("FS_Pack", (0.30, 0.28, 0.26), "oxid", TEX, 0.5, 0.65, s
 M_GLOW = mat("FS_Glow", (0.9, 0.35, 0.05), 0.4, 0.0, emit=(1.0, 0.4, 0.06), strength=4.0)
 T.bind(M_GLOW, None, None, glow, 4.0)
 M_STRAP = mat("FS_Strap", (0.10, 0.09, 0.08), 0.8, 0.1)
-M_EYE = mat("FS_Eye", (0.02, 0.02, 0.02), 0.1, 0.4, emit=(1.0, 0.45, 0.08), strength=3.0)
+M_EYE = mat("FS_Eye", (0.012, 0.014, 0.015), 0.18, 0.45)
 strip_base(keep=("Hand.", "Index", "Middle", "Ring", "Pinky", "Thumb")); override_base(M_FRAME)
 P = Parts(arm)
 X = Vector((1, 0, 0)); Z = Vector((0, 0, 1)); FRONT = Vector((0, -1, 0))
 def S(m, b): return P.bm(m, b, True)        # smooth bucket
 def sgnv(s, p): return Vector((p[0] * s, p[1], p[2]))
 
+def armour_shell(bm, p0, p1, widths, depths, rows=10, n=18):
+    """Continuous tapered armour with open joint recesses, rather than capsule end caps."""
+    u, v = frame(p0, p1)
+    ring_tube(bm, Sweep(p0, p1, u, v, interp(widths), interp(depths)), 0, 1, rows, n, cap=True)
+
 # ---------------------------------------------------------------- torso
 cx0 = -0.050
 chest = Sweep((0, cx0, 1.19), (0, cx0 - 0.005, 1.53), X, FRONT, interp([(0, 0.17), (0.3, 0.235), (0.62, 0.255), (1, 0.15)]), interp([(0, 0.14), (0.4, 0.185), (1, 0.14)]))
-blob_sw(S(M_NICKEL, "Chest"), chest, rows=12, n=18, pw=3.0)
+ring_tube(S(M_NICKEL, "Chest"), chest, 0, 1, 12, 24, cap=True)
 blob(S(M_FRAME, "Torso"), (0, -0.04, 1.00), (0, -0.04, 1.26), 0.14, 0.14, 0.95, rows=6, n=14, pw=6.0)   # waist column
 blob(S(M_NICKEL, "Abdomen"), (0, -0.075, 1.03), (0, -0.075, 1.24), 0.15, 0.17, 0.70, rows=8, n=16, pw=4.0)   # abdominal plate
 blob(S(M_NICKEL, "Hips"), (0, -0.055, 0.86), (0, -0.055, 1.07), 0.19, 0.19, 0.80, rows=8, n=18, pw=4.0)   # pelvis block
@@ -41,7 +46,10 @@ blob(S(M_NICKEL, "Hips"), (0, -0.055, 0.86), (0, -0.055, 1.07), 0.19, 0.19, 0.80
 cyl(P.bm(M_COPPER, "Torso"), (0, -0.045, 1.07), (0, 0, 1), 0.165, 0.025, 20)
 for s in (1, -1):
     blob(S(M_COPPER, "Chest"), (s * 0.19, -0.02, 1.20), (s * 0.19, -0.02, 1.35), 0.04, 0.04, 1.0, rows=4, n=8)   # side hoses
-    blob(S(M_NICKEL, "Chest"), (s * 0.085, -0.15, 1.30), (s * 0.12, -0.15, 1.47), 0.07, 0.08, 0.55, rows=6, n=12, pw=3.0, up=(0, -1, 0))   # pec plates
+    # Separate breast plates follow the chest curvature, with a recessed central seam.
+    fan_plate(P.bm(M_NICKEL, "Chest"), [(s * .012, -.232, 1.46), (s * .15, -.204, 1.48),
+              (s * .218, -.172, 1.39), (s * .15, -.202, 1.28), (s * .014, -.231, 1.30)], .009)
+    tube(P.bm(M_FRAME, "Chest"), (s * .012, -.237, 1.31), (s * .012, -.234, 1.46), .003, .003, seg=6)
 # furnace-dark seam under the chest
 cyl(P.bm(M_FRAME, "Chest"), (0, -0.05, 1.165), (0, 0, 1), 0.15, 0.035, 18)
 # neck collar + copper hoses
@@ -61,11 +69,22 @@ bmf = P.bm(M_FRAME, "Head")
 box(bmf, (0, -0.128, 1.635), (0.115, 0.008, 0.016))                                                           # eye slit band
 box(bmf, (0, -0.130, 1.572), (0.040, 0.008, 0.008))                                                           # mouth seam
 for s in (1, -1):
-    ell(P.bm(M_EYE, "Head", True), (s * 0.030, -0.134, 1.636), (0.021, 0.007, 0.013), seg=10, rings=6)
+    # Bring the articulated face in front of the helmet shell; the old eye band was buried.
+    ell(P.bm(M_FRAME, "Head", True), (s * .035, -.158, 1.648), (.029, .012, .023), seg=12, rings=8)
+    ell(P.bm(M_EYE, "Head", True), (s * .035, -.171, 1.648), (.018, .006, .010), seg=12, rings=8)
+    fan_plate(P.bm(M_NICKEL, "Head"), [(s * .006, -.182, 1.677), (s * .066, -.163, 1.681),
+              (s * .084, -.146, 1.649), (s * .060, -.175, 1.660), (s * .013, -.188, 1.660)], .004)
+    fan_plate(P.bm(M_NICKEL, "Head"), [(s * .067, -.165, 1.632), (s * .079, -.142, 1.606),
+              (s * .047, -.160, 1.566), (s * .016, -.182, 1.592), (s * .022, -.185, 1.625)], .005)
+    tube(P.bm(M_FRAME, "Head"), (s * .018, -.189, 1.591), (s * .047, -.165, 1.578), .003, .003, seg=6)
     cyl(P.bm(M_COPPER, "Head"), (s * 0.098, -0.03, 1.62), (1, 0, 0), 0.036, 0.03, 16)
     cyl(P.bm(M_NICKEL, "Head"), (s * 0.114, -0.03, 1.62), (1, 0, 0), 0.022, 0.012, 14)
     cyl(P.bm(M_FRAME, "Head"), (s * 0.12, -0.03, 1.62), (1, 0, 0), 0.010, 0.006, 8)
 box(P.bm(M_NICKEL, "Head"), (0, -0.125, 1.705), (0.045, 0.008, 0.03), (0.3, 0, 0))                           # brow crest
+fan_plate(P.bm(M_NICKEL, "Head"), [(-.016, -.184, 1.704), (.016, -.184, 1.704),
+          (.012, -.198, 1.627), (0, -.207, 1.616), (-.012, -.198, 1.627)], .004)
+fan_plate(P.bm(M_NICKEL, "Head"), [(-.033, -.179, 1.586), (.033, -.179, 1.586),
+          (.030, -.173, 1.558), (-.030, -.173, 1.558)], .005)
 
 # ---------------------------------------------------------------- arms (rounded nickel, copper joints, big fists)
 for sgn, tag in ((1, "L"), (-1, "R")):
@@ -75,12 +94,14 @@ for sgn, tag in ((1, "L"), (-1, "R")):
     ell(S(M_NICKEL, sh), m((0.205, -0.055, 1.43)), (0.115, 0.105, 0.115), seg=16, rings=10)
     cyl(P.bm(M_COPPER, up), m((0.275, -0.057, 1.435)), (1, 0, 0), 0.082, 0.02, 20)
     cyl(P.bm(M_FRAME, up), m((0.255, -0.057, 1.435)), (1, 0, 0), 0.064, 0.05, 16)
-    blob(S(M_NICKEL, up), m((0.27, -0.057, 1.435)), m((0.41, -0.057, 1.435)), 0.082, 0.072, 1.0, rows=7, n=14, pw=7.0)
+    armour_shell(S(M_NICKEL, up), m((.275, -.057, 1.435)), m((.39, -.057, 1.435)),
+                 [(0,.065),(.25,.085),(.7,.078),(1,.045)], [(0,.066),(.35,.080),(1,.050)])
     # elbow: copper hub on top/bottom (hinge axis Z)
     cyl(P.bm(M_COPPER, lo), m((0.40, -0.058, 1.435)), (0, 0, 1), 0.044, 0.15, 18)
     cyl(P.bm(M_NICKEL, lo), m((0.40, -0.058, 1.50)), (0, 0, 1), 0.030, 0.018, 14)
     cyl(P.bm(M_NICKEL, lo), m((0.40, -0.058, 1.37)), (0, 0, 1), 0.030, 0.018, 14)
-    blob(S(M_NICKEL, lo), m((0.40, -0.063, 1.435)), m((0.585, -0.088, 1.435)), 0.085, 0.060, 1.0, rows=8, n=14, pw=6.0, mid=1.1)   # bulky forearm
+    armour_shell(S(M_NICKEL, lo), m((.425, -.063, 1.435)), m((.575, -.088, 1.435)),
+                 [(0,.050),(.25,.091),(.55,.083),(1,.054)], [(0,.051),(.3,.078),(1,.048)])
     cyl(P.bm(M_COPPER, lo), m((0.575, -0.086, 1.435)), (1, 0, 0), 0.062, 0.025, 16)                # wrist ring
     # fist: back-of-hand block + a rounded capsule per finger bone
     blob(S(M_NICKEL, hd), m((0.585, -0.088, 1.435)), m((0.735, -0.088, 1.438)), 0.052, 0.058, 0.62, rows=6, n=12, pw=3.0, up=(0, 0, 1))
@@ -101,17 +122,21 @@ for sgn, tag in ((1, "L"), (-1, "R")):
 for sgn, tag in ((1, "L"), (-1, "R")):
     up, lo, ft = "UpperLeg." + tag, "LowerLeg." + tag, "Foot." + tag
     cx = 0.121 * sgn
-    blob(S(M_NICKEL, up), (cx, -0.05, 1.0), (cx, -0.086, 0.50), 0.118, 0.094, 1.18, rows=8, n=14, pw=8.0, mid=1.06)
+    armour_shell(S(M_NICKEL, up), (cx,-.05,.94), (cx,-.086,.59),
+                 [(0,.080),(.2,.111),(.6,.097),(1,.056)], [(0,.095),(.25,.128),(.65,.102),(1,.060)])
     ell(S(M_COPPER, up), (cx, -0.05, 0.965), (0.05, 0.05, 0.05), seg=12, rings=8)                    # hip ball joint
     # knee: copper hub on the outside + front kneecap
     cyl(P.bm(M_COPPER, lo), (cx, -0.088, 0.535), (1, 0, 0), 0.050, 0.17, 18)
     cyl(P.bm(M_NICKEL, lo), (cx + sgn * 0.0925, -0.088, 0.535), (1, 0, 0), 0.032, 0.012, 14)
     ell(S(M_NICKEL, lo), (cx, -0.145, 0.545), (0.078, 0.062, 0.085), seg=14, rings=8)
-    blob(S(M_NICKEL, lo), (cx, -0.085, 0.57), (cx, -0.055, 0.075), 0.092, 0.074, 1.15, rows=8, n=14, pw=8.0, mid=1.10)      # shin / calf
+    armour_shell(S(M_NICKEL, lo), (cx,-.085,.48), (cx,-.055,.09),
+                 [(0,.063),(.2,.096),(.5,.078),(.85,.056),(1,.074)],
+                 [(0,.073),(.22,.108),(.6,.080),(.85,.060),(1,.073)])
     ell(S(M_NICKEL, lo), (cx, -0.03, 0.38), (0.072, 0.052, 0.12), seg=12, rings=8)                    # calf guard
     cyl(P.bm(M_COPPER, ft), (cx, -0.062, 0.062), (1, 0, 0), 0.040, 0.18, 16)                         # ankle hub
     # foot: blocky boot with toe caps
-    blob(S(M_NICKEL, ft), (cx, 0.04, 0.052), (cx, -0.25, 0.052), 0.082, 0.088, 0.62, rows=8, n=14, pw=3.0, up=(0, 0, 1))
+    slab_e(P.bm(M_FRAME, ft), (cx,-.105,.019), (.18,.31,.036), q=.013)
+    blob(S(M_NICKEL, ft), (cx,.03,.065), (cx,-.235,.065), .082,.088,.62, rows=8,n=14,pw=5.0,up=(0,0,1))
     for k in range(4):
         tx = cx + (k - 1.5) * 0.034
         blob(S(M_FRAME, ft), (tx, -0.225, 0.034), (tx, -0.27, 0.034), 0.0165, 0.0155, 0.9, rows=3, n=8, pw=3.0)
