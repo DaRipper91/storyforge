@@ -35,6 +35,34 @@ The Godot project contains 23 bespoke, rigged hero models across the five specie
 |---|---|---|
 | <a href="docs/assets/heroes/forgespawn.webp"><img src="docs/assets/heroes/forgespawn.webp" alt="Forgespawn bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/ironveil.webp"><img src="docs/assets/heroes/ironveil.webp" alt="Ironveil bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <img src="docs/assets/concept-reel.webp" alt="Animated concept reel for all 35 species" width="100%"> |
 
+### Feral World NPC turnarounds
+
+These five realistic front, side, and back character studies follow the roles, equipment, and palettes in the November 10 Gemini design export. In that roster, **Dee is Queen D.Anna**; **The Mother is Bryttan Wolfholt**, paired with Evangeline. The PDF export preserves the written specifications but not the original uploaded concept sheets, so these images are new visual interpretations rather than copies of those sheets or finished in-game models.
+
+| D.Anna (Dee) | Vyra Larkholt | Bryttan Wolfholt (The Mother) |
+|---|---|---|
+| <a href="docs/assets/npcs/danna-dee-feral-vanguard.png"><img src="docs/assets/npcs/danna-dee-feral-vanguard.png" alt="Queen D.Anna, called Dee in the Gemini roster, in front, side and back views with amber wolf gear and paired axes" width="100%"></a> | <a href="docs/assets/npcs/vyra-larkholt-freeblade.png"><img src="docs/assets/npcs/vyra-larkholt-freeblade.png" alt="Vyra Larkholt in front, side and back views with a blue Weave battle axe, scout gear and lantern" width="100%"></a> | <a href="docs/assets/npcs/bryttan-wolfholt-the-mother.png"><img src="docs/assets/npcs/bryttan-wolfholt-the-mother.png" alt="Bryttan Wolfholt in front, side and back views with a cobalt wolf crest, blue core pack and survival gear" width="100%"></a> |
+
+| Evangeline Wolfholt | Caelyn Riven |
+|---|---|
+| <a href="docs/assets/npcs/evangeline-wolfholt-spark-scholar.png"><img src="docs/assets/npcs/evangeline-wolfholt-spark-scholar.png" alt="Young Evangeline in front, side and back views with her Spark codex, lantern and patchwork bunny" width="100%"></a> | <a href="docs/assets/npcs/caelyn-riven-wayfarer.png"><img src="docs/assets/npcs/caelyn-riven-wayfarer.png" alt="Caelyn Riven in front, side and back views in slate travel gear with a relic pouch, talisman and rune-touched hand axe" width="100%"></a> |
+
+### More cast concepts
+
+These additional turnarounds extend the seeded cast beyond the five characters in the Gemini export. Where the prompt files leave visual details open, the concept art uses restrained, practical designs that fit each character's role.
+
+| Jon | Samael | Haylie |
+|---|---|---|
+| <a href="docs/assets/npcs/jon-multiversal-bodega.png"><img src="docs/assets/npcs/jon-multiversal-bodega.png" alt="Jon in front, side and back views as a warm, practical shopkeeper with a ledger and apron" width="100%"></a> | <a href="docs/assets/npcs/samael-ascended.png"><img src="docs/assets/npcs/samael-ascended.png" alt="Samael in front, side and back views in understated dark clothing, with a quietly otherworldly presence" width="100%"></a> | <a href="docs/assets/npcs/haylie-store-manager.png"><img src="docs/assets/npcs/haylie-store-manager.png" alt="Haylie in front, side and back views as a decisive store manager carrying her ledger" width="100%"></a> |
+
+| Coco | Cinder | Mykael |
+|---|---|---|
+| <a href="docs/assets/npcs/coco-ember-hound.png"><img src="docs/assets/npcs/coco-ember-hound.png" alt="Coco, a chocolate Labrador companion, shown from front, side and back" width="100%"></a> | <a href="docs/assets/npcs/cinder-vale-performer.png"><img src="docs/assets/npcs/cinder-vale-performer.png" alt="Cinder Vale in front, side and back views wearing practical fire-performer clothes and carrying an unlit torch" width="100%"></a> | <a href="docs/assets/npcs/mykael-greenwood-hauler.png"><img src="docs/assets/npcs/mykael-greenwood-hauler.png" alt="Mykael Greenwood in front, side and back views as a broad, warm-hearted hauler with a dark shoulder tattoo" width="100%"></a> |
+
+| Nathis | Tyty |
+|---|---|
+| <a href="docs/assets/npcs/nathis-front-man.png"><img src="docs/assets/npcs/nathis-front-man.png" alt="Nathis in front, side and back views in age-appropriate scout clothing" width="100%"></a> | <a href="docs/assets/npcs/tyty-wandering-herald.png"><img src="docs/assets/npcs/tyty-wandering-herald.png" alt="Tyty, a shaggy long-eared hound companion, shown from front, side and back" width="100%"></a> |
+
 ### New NPC: Bryttan Wolfholt
 
 Bryttan is the Wolfguard, a vigilant shieldwarden at Ironhold Keep. Her seeded look is built from the shared rigged warrior model with cobalt wolf insignia, a power-core pack, a blue shard pendant, and a rune-etched survival dagger. She is an interactable named NPC, paired in the setting with Evangeline Wolfholt.
