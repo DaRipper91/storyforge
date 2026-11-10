@@ -35,9 +35,9 @@ The Godot project contains 23 bespoke, rigged hero models across the five specie
 |---|---|---|
 | <a href="docs/assets/heroes/forgespawn.webp"><img src="docs/assets/heroes/forgespawn.webp" alt="Forgespawn bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <a href="docs/assets/heroes/ironveil.webp"><img src="docs/assets/heroes/ironveil.webp" alt="Ironveil bespoke 3D hero, front, side and back Blender renders" width="100%"></a> | <img src="docs/assets/concept-reel.webp" alt="Animated concept reel for all 35 species" width="100%"> |
 
-### Feral World NPC turnarounds
+### Feral World NPC turnarounds (13)
 
-These five realistic front, side, and back character studies follow the roles, equipment, and palettes in the November 10 Gemini design export. In that roster, **Dee is Queen D.Anna**; **The Mother is Bryttan Wolfholt**, paired with Evangeline. The PDF export preserves the written specifications but not the original uploaded concept sheets, so these images are new visual interpretations rather than copies of those sheets or finished in-game models.
+This gallery showcases all 13 NPC turnaround concepts: five characters from the November 10 Gemini design export and eight additional seeded cast members below. The realistic front, side, and back studies follow each character's written role and appearance. In the Gemini roster, **Dee is Queen D.Anna**; **The Mother is Bryttan Wolfholt**, paired with Evangeline. The PDF export preserves the written specifications but not the original uploaded concept sheets, so these images are new visual interpretations rather than copies of those sheets or finished in-game models.
 
 | D.Anna (Dee) | Vyra Larkholt | Bryttan Wolfholt (The Mother) |
 |---|---|---|
@@ -47,7 +47,7 @@ These five realistic front, side, and back character studies follow the roles, e
 |---|---|
 | <a href="docs/assets/npcs/evangeline-wolfholt-spark-scholar.png"><img src="docs/assets/npcs/evangeline-wolfholt-spark-scholar.png" alt="Young Evangeline in front, side and back views with her Spark codex, lantern and patchwork bunny" width="100%"></a> | <a href="docs/assets/npcs/caelyn-riven-wayfarer.png"><img src="docs/assets/npcs/caelyn-riven-wayfarer.png" alt="Caelyn Riven in front, side and back views in slate travel gear with a relic pouch, talisman and rune-touched hand axe" width="100%"></a> |
 
-### More cast concepts
+### Additional seeded cast
 
 These additional turnarounds extend the seeded cast beyond the five characters in the Gemini export. Where the prompt files leave visual details open, the concept art uses restrained, practical designs that fit each character's role.
 
