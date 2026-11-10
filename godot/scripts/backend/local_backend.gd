@@ -55,6 +55,7 @@ const ROUTES := [
 	["POST", "api/action/freeform", "_h_freeform_stub"],
 	["GET", "api/enemy/room/{room_id}", "_h_enemy_room"],
 	["POST", "api/enemy/{enemy_id}/attack", "_h_enemy_attack"],
+	["POST", "api/quests/{quest_id}/interact", "_h_quest_interact"],
 	["POST", "api/auth/desktop_login", "_h_desktop_login_stub"],
 ]
 
@@ -85,6 +86,10 @@ const ENTITY_MODEL := [
 ]
 const TRAVEL_MODEL := [{"name": "room_id", "kind": "str", "required": true}]
 const ATTACK_MODEL := [{"name": "actor_id", "kind": "str", "required": true}]
+const QUEST_INTERACTION_MODEL := [
+	{"name": "actor_id", "kind": "str", "required": true},
+	{"name": "npc_id", "kind": "str", "required": true},
+]
 const LOAD_MODEL := [{"name": "campaign_id", "kind": "str", "required": true}]
 const TIME_MODEL := [
 	{"name": "day", "kind": "int", "required": true},
@@ -759,8 +764,25 @@ func _h_enemy_attack(ctx: Dictionary) -> Dictionary:
 		lines.append(str(result["enemy_attack"]["hint"]))
 	if result.get("enemy_died", false):
 		lines.append("%s collapses. +%d XP." % [str(enemies[enemy_id]["name"]), int(result["xp_reward"])])
+	if result.has("quest_update"):
+		lines.append(str(result["quest_update"]["message"]))
 	var narrative := " ".join(lines)
 	_manager.append_narration(actor_id, "action", narrative)
 	result["narrative"] = narrative
 	result["revision"] = st["revision"]
+	return _ok(result)
+
+
+func _h_quest_interact(ctx: Dictionary) -> Dictionary:
+	var v := _validate(QUEST_INTERACTION_MODEL, ctx["body"])
+	if not (v["errors"] as Array).is_empty():
+		return _invalid(v)
+	var quest_id := str(ctx["params"]["quest_id"])
+	var actor_id := str(v["value"]["actor_id"])
+	var npc_id := str(v["value"]["npc_id"])
+	var result: Variant = _manager.interact_quest(actor_id, quest_id, npc_id)
+	if CoreError.is_error(result):
+		return _core_failure(result, 400)
+	_manager.append_narration(actor_id, "action", str(result["message"]))
+	result["revision"] = int(_current()["revision"])
 	return _ok(result)

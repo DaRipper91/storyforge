@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/world_pbr.gdshader" id="1_sh"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/roof_tiles_alb.jpg" id="2_t"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/roof_tiles_nrm_rgh.png" id="3_t"]
+
+[resource]
+shader = ExtResource("1_sh")
+shader_parameter/albedo_tex = ExtResource("2_t")
+shader_parameter/nrm_rgh_tex = ExtResource("3_t")
+shader_parameter/tile_metres = 1.8
+shader_parameter/tint = Color(1.9, 1.05, 0.75, 1)
+shader_parameter/vertex_color_mix = 0.7

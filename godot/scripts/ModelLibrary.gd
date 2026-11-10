@@ -16,27 +16,33 @@ extends RefCounted
 const MODEL_ROOT := "res://assets/models/"
 const HumanoidAnimLibrary := preload("res://scripts/characters/humanoid_anim_library.gd")
 const BryttanWolfholtAppearance := preload("res://scripts/npcs/bryttan_wolfholt_appearance.gd")
+const QueenDAnnaAppearance := preload("res://scripts/npcs/queen_danna_appearance.gd")
+const EvangelineWolfholtAppearance := preload("res://scripts/npcs/evangeline_wolfholt_appearance.gd")
+const NamedNpcPalette := preload("res://scripts/npcs/named_npc_palette.gd")
 
-## Standing height (metres, on a 1 m grid cell) used when nothing else says.
+## One grid cell is one metre. Scale the original miniature heights into readable human-sized tokens.
+const WORLD_SCALE := 1.9
 const DEFAULT_HEIGHT := 0.9
 
 ## Archetype table. "path" is relative to MODEL_ROOT without ".glb".
 ## "height" is the mini's standing height after normalisation.
 const SPRITE_MODELS := {
 	# Named NPCs
-	"npc_kodrik":     {"path": "humanoid/npc_warrior",   "height": 0.95},
-	"npc_danna":      {"path": "humanoid/npc_royal",     "height": 0.90},
-	"npc_jon":        {"path": "humanoid/npc_default",   "height": 0.90},
-	"npc_haylie":     {"path": "humanoid/npc_default",   "height": 0.88},
-	"npc_samael":     {"path": "humanoid/npc_mage",      "height": 0.95},
-	"npc_cinder":     {"path": "humanoid/npc_performer", "height": 0.90},
-	"npc_bryne":      {"path": "humanoid/npc_default",   "height": 0.90},
-	"npc_nathis":     {"path": "humanoid/npc_default",   "height": 0.90},
+	"npc_kodrik":     {"path": "humanoid/npc_warrior",   "height": 0.95, "appearance": "kodrik"},
+	"npc_danna":      {"path": "humanoid/npc_royal",     "height": 0.90, "appearance": "queen_danna"},
+	"npc_jon":        {"path": "humanoid/npc_default",   "height": 0.90, "appearance": "jon"},
+	"npc_haylie":     {"path": "humanoid/npc_default",   "height": 0.88, "appearance": "haylie"},
+	"npc_samael":     {"path": "humanoid/npc_mage",      "height": 0.95, "appearance": "samael"},
+	"npc_cinder":     {"path": "humanoid/npc_performer", "height": 0.90, "appearance": "cinder"},
+	"npc_bryne":      {"path": "humanoid/npc_default",   "height": 0.76, "appearance": "bryne"},
+	"npc_nathis":     {"path": "humanoid/npc_default",   "height": 0.86, "appearance": "nathis"},
+	"npc_evangeline_wolfholt": {"path": "humanoid/npc_default", "height": 0.77,
+		"appearance": "evangeline_wolfholt"},
 	"npc_bryttan_wolfholt": {"path": "humanoid/npc_warrior", "height": 0.98,
 		"appearance": "bryttan_wolfholt"},
 	# Mykael: the codex describes a large man, so a wide warrior, not a bear.
 	"npc_bear":       {"path": "humanoid/npc_warrior",   "height": 1.00},
-	"npc_mykael":     {"path": "humanoid/npc_warrior",   "height": 1.00},
+	"npc_mykael":     {"path": "humanoid/npc_warrior",   "height": 1.00, "appearance": "mykael"},
 	# Beasts
 	"npc_dog":        {"path": "animals/dog",  "height": 0.45},
 	"npc_dog_black":  {"path": "animals/dog",  "height": 0.50},
@@ -125,7 +131,7 @@ static func instantiate_for_race(character_id: String, race_id: String) -> Node3
 ## Humanoid heroes go through CharacterModel instead; this is for creatures such as the Iron-Locust.
 static func instantiate_hero(race_id: String, height: float) -> Node3D:
 	race_id = race_id.to_lower().replace(" ", "_").replace("-", "")
-	return _instantiate("heroes/" + race_id, height)
+	return _instantiate("heroes/" + race_id, height, false)
 
 
 static func race_group(race_id: String) -> String:
@@ -193,13 +199,20 @@ static func _first_usable(candidates: Array) -> Node3D:
 	for c in candidates:
 		var inst := _instantiate(c.get("path", ""), c.get("height", DEFAULT_HEIGHT))
 		if inst:
-			if c.get("appearance", "") == "bryttan_wolfholt":
-				BryttanWolfholtAppearance.apply(inst)
+			match c.get("appearance", ""):
+				"bryttan_wolfholt":
+					BryttanWolfholtAppearance.apply(inst)
+				"queen_danna":
+					QueenDAnnaAppearance.apply(inst)
+				"evangeline_wolfholt":
+					EvangelineWolfholtAppearance.apply(inst)
+				"kodrik", "jon", "haylie", "samael", "cinder", "bryne", "nathis", "mykael":
+					NamedNpcPalette.apply(inst, c["appearance"])
 			return inst
 	return null
 
 
-static func _instantiate(rel_path: String, height: float) -> Node3D:
+static func _instantiate(rel_path: String, height: float, scale_from_miniature: bool = true) -> Node3D:
 	if rel_path.is_empty():
 		return null
 	var res_path := MODEL_ROOT + rel_path + ".glb"
@@ -227,7 +240,7 @@ static func _instantiate(rel_path: String, height: float) -> Node3D:
 			inst.add_child(ap)
 		ap.add_animation_library(&"humanoid", HumanoidAnimLibrary.get_library(skeleton))
 
-	_normalise_height(inst, height)
+	_normalise_height(inst, height * WORLD_SCALE if scale_from_miniature else height)
 	if ap:
 		_set_looping(ap)
 		play_role(ap, "idle")

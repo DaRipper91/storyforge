@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/world_pbr.gdshader" id="1_sh"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/bricks_alb.jpg" id="2_t"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/bricks_nrm_rgh.png" id="3_t"]
+
+[resource]
+shader = ExtResource("1_sh")
+shader_parameter/albedo_tex = ExtResource("2_t")
+shader_parameter/nrm_rgh_tex = ExtResource("3_t")
+shader_parameter/tile_metres = 2.2
+shader_parameter/tint = Color(0.9, 0.85, 0.8, 1)

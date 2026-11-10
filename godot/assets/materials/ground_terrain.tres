@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/terrain.gdshader" id="1_sh"]
+[ext_resource type="Texture2D" path="res://assets/textures/ground037_alb_ht.png" id="2_t"]
+[ext_resource type="Texture2D" path="res://assets/textures/ground037_nrm_rgh.png" id="3_t"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/cobble_alb.jpg" id="4_t"]
+[ext_resource type="Texture2D" path="res://assets/textures/pbr/cobble_nrm_rgh.png" id="5_t"]
+
+[resource]
+shader = ExtResource("1_sh")
+shader_parameter/grass_alb = ExtResource("2_t")
+shader_parameter/grass_nrm = ExtResource("3_t")
+shader_parameter/path_alb = ExtResource("4_t")
+shader_parameter/path_nrm = ExtResource("5_t")
