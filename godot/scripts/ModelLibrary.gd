@@ -10,11 +10,12 @@ extends RefCounted
 ##   4. player/<race group>.glb        group body
 ##   5. (none)                         caller keeps the RaceMini primitive recipe
 ##
-## A rigged model is only "usable" if it ships an idle clip. The humanoid/ and
-## player/ packs are rigged but have no clips yet, so they rest in a T-pose;
-## they are skipped until animated versions are dropped in.
+## A rigged model is usable when it ships an idle clip or uses the shared 49-bone
+## humanoid rig, for which the project builds procedural animation clips at runtime.
 
 const MODEL_ROOT := "res://assets/models/"
+const HumanoidAnimLibrary := preload("res://scripts/characters/humanoid_anim_library.gd")
+const BryttanWolfholtAppearance := preload("res://scripts/npcs/bryttan_wolfholt_appearance.gd")
 
 ## Standing height (metres, on a 1 m grid cell) used when nothing else says.
 const DEFAULT_HEIGHT := 0.9
@@ -31,6 +32,8 @@ const SPRITE_MODELS := {
 	"npc_cinder":     {"path": "humanoid/npc_performer", "height": 0.90},
 	"npc_bryne":      {"path": "humanoid/npc_default",   "height": 0.90},
 	"npc_nathis":     {"path": "humanoid/npc_default",   "height": 0.90},
+	"npc_bryttan_wolfholt": {"path": "humanoid/npc_warrior", "height": 0.98,
+		"appearance": "bryttan_wolfholt"},
 	# Mykael: the codex describes a large man, so a wide warrior, not a bear.
 	"npc_bear":       {"path": "humanoid/npc_warrior",   "height": 1.00},
 	"npc_mykael":     {"path": "humanoid/npc_warrior",   "height": 1.00},
@@ -182,6 +185,8 @@ static func _first_usable(candidates: Array) -> Node3D:
 	for c in candidates:
 		var inst := _instantiate(c.get("path", ""), c.get("height", DEFAULT_HEIGHT))
 		if inst:
+			if c.get("appearance", "") == "bryttan_wolfholt":
+				BryttanWolfholtAppearance.apply(inst)
 			return inst
 	return null
 
@@ -201,9 +206,18 @@ static func _instantiate(rel_path: String, height: float) -> Node3D:
 
 	var ap := find_anim_player(inst)
 	if _has_skeleton(inst) and find_clip(ap, "idle").is_empty():
-		# Rigged but unanimated: it would stand in its T-pose. Skip it.
-		inst.free()
-		return null
+		# The shared NPC/player humanoid GLBs use the same 49-bone skeleton,
+		# but ship without clips. Supply the project's procedural humanoid set.
+		var skeletons := inst.find_children("*", "Skeleton3D", true, false)
+		var skeleton := skeletons[0] as Skeleton3D if not skeletons.is_empty() else null
+		if skeleton == null or not HumanoidAnimLibrary.is_compatible(skeleton):
+			inst.free()
+			return null
+		if ap == null:
+			ap = AnimationPlayer.new()
+			ap.name = "AnimationPlayer"
+			inst.add_child(ap)
+		ap.add_animation_library(&"humanoid", HumanoidAnimLibrary.get_library(skeleton))
 
 	_normalise_height(inst, height)
 	if ap:

@@ -1159,6 +1159,7 @@ const NPC_COLORS: Dictionary = {
 	"npc_kodrik":   Color(0.30, 0.65, 0.95),   # steel blue — guildmaster
 	"npc_bryne":    Color(0.45, 0.75, 0.55),   # muted green — warden
 	"npc_nathis":   Color(0.85, 0.55, 0.20),   # amber — front man
+	"npc_bryttan_wolfholt": Color(0.16, 0.45, 0.82), # cobalt — Wolfguard
 	"npc_keeva":    Color(1.0,  1.0,  1.0),    # white — divine
 	"npc_bear":     Color(0.70, 0.45, 0.20),   # brown — bear
 	"npc_wolf":     Color(0.75, 0.75, 0.80),   # silver — wolf

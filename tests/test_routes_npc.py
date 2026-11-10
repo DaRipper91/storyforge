@@ -15,6 +15,16 @@ import pytest
 from storyforge.main import app
 
 
+def test_bryttan_wolfholt_is_a_seeded_interactable_npc(seed_state):
+    """Named NPC presentation stays in NpcSheet rather than player character data."""
+    npc = seed_state.npcs["bryttan_wolfholt"]
+    assert npc.name == "Bryttan Wolfholt"
+    assert npc.room_id == "ironhold_keep"
+    assert npc.sprite_key == "npc_bryttan_wolfholt"
+    assert npc.interactable is True
+    assert npc.encounter_id == "bryttan_wolfholt_intro"
+
+
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 @pytest.fixture(autouse=True)
